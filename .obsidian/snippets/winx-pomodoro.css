@@ -1,0 +1,248 @@
+/* ============================================
+ * WINX THEME — Pomodoro Widget
+ * File: pomodoro.css
+ *
+ * Wing decoration references var(--winx-wing-svg)
+ * from winx-tokens.css — inline data URI removed.
+ * ============================================ */
+
+.winx-pomodoro {
+  overflow-x: visible !important;
+  padding-top: 10px;
+
+  .pomodoro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .ring {
+    --p: 0;
+
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    position: relative;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--winx-border);
+    background: conic-gradient(
+      var(--winx-pink-deep) calc(var(--p) * 360deg),
+      var(--winx-purple-light) 0
+    );
+
+    /* Wing decoration — SVG lives in winx-tokens.css */
+    .wing {
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      background-image: var(--winx-wing-svg);
+      background-repeat: no-repeat;
+      background-size: contain;
+      pointer-events: none;
+
+      &.left {
+        left: -42px;
+        top: 50%;
+        transform: translateY(-50%) scaleX(-1);
+      }
+      &.right {
+        right: -42px;
+        top: 50%;
+        transform: translateY(-50%) rotate(180deg) scaleX(-1) scaleY(-1);
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      background: var(--winx-pink-light);
+      border: 2px solid var(--winx-border);
+    }
+
+    .top-star {
+      position: absolute;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+
+      svg {
+        fill: var(--winx-gold);
+        stroke: var(--winx-border);
+      }
+    }
+
+    .time {
+      position: relative;
+      font-size: 30px;
+      color: var(--winx-text-dark);
+      z-index: 2;
+    }
+
+    .btn {
+      position: absolute;
+      bottom: -20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--winx-border);
+      background: var(--winx-pink);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--winx-text-dark);
+      }
+
+      &:hover {
+        transform: scale(1.05);
+        transition: 0.15s ease;
+      }
+    }
+  }
+
+  .stars {
+    display: flex;
+    gap: 8px;
+
+    .s {
+      width: 18px;
+      height: 18px;
+      opacity: 0.3;
+      svg {
+        fill: var(--winx-purple);
+      }
+
+      &.on {
+        opacity: 1;
+        svg {
+          fill: var(--winx-gold);
+        }
+      }
+    }
+  }
+
+  .mode-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-top: 14px;
+
+    .mode-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--winx-text-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .session-count {
+      font-size: 10px;
+      color: var(--winx-purple);
+      opacity: 0.7;
+    }
+  }
+
+  /* ── Settings panel ── */
+  .settings-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--winx-pink-light);
+    border: 1px solid var(--winx-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    width: 140px;
+
+    &.hidden {
+      display: none;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    input {
+      width: 40px;
+      border: 1px solid var(--winx-border);
+      border-radius: 4px;
+      background: var(--winx-pink);
+      text-align: center;
+      font-size: 11px;
+      padding: 2px 4px;
+    }
+
+    span {
+      opacity: 0.6;
+    }
+
+    .s-save {
+      align-self: flex-end;
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--winx-border);
+      background: var(--winx-pink);
+      cursor: pointer;
+
+      &:hover {
+        background: var(--winx-pink-deep);
+      }
+    }
+
+    :is(.s-save, label, input) {
+      color: var(--winx-text-dark);
+    }
+  }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    .settings-info {
+      font-size: 10px;
+      color: var(--winx-purple);
+      opacity: 0.6;
+    }
+  }
+
+  :is(.gear-btn, .reset-btn) {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    border: 1px solid var(--winx-border);
+    background: transparent;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0;
+    transition: opacity 0.15s ease;
+    box-sizing: border-box;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--winx-purple);
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

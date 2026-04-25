@@ -1,0 +1,25 @@
+{
+  "enabledCssSnippets": [
+    "dashboard",
+    "theme",
+    "widgets",
+    "habits",
+    "winx-animations",
+    "winx-cards",
+    "winx-kanban",
+    "winx-layout",
+    "winx-tokens",
+    "fonts",
+    "callout-grid",
+    "heatmap",
+    "pomodoro",
+    "tasks-minimal",
+    "winx-000-layers",
+    "winx-callout-grid",
+    "winx-fonts",
+    "winx-heatmap",
+    "winx-pomodoro",
+    "winx-tasks-minimal",
+    "winx-widgets"
+  ]
+}

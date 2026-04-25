@@ -1,0 +1,25 @@
+- [x] #⭐⭐medium #area/body optimize all code 📅 2026-05-02 ✅ 2026-05-02
+- [ ] #⭐easy #area/rest tower of fasntasy 📅 2026-05-02 
+- [ ] #⭐easy #area/wealth купить сено 📅 2026-05-02 
+- [x] #⭐easy #area/mind redo xp today colors 📅 2026-05-01 ✅ 2026-05-01
+- [x] #⭐easy #area/mind sticker to daily note 📅 2026-05-02 ✅ 2026-05-02
+- [x] #⭐easy #area/base постирать цветное 📅 2026-05-01 ✅ 2026-05-01
+- [x] #⭐⭐medium #area/mind стили скроллбаров,пофиксить крылья на скроллящихся карточках 📅 2026-04-30 ✅ 2026-04-30
+- [x] #⭐easy #area/mind добавить светяшки на звездочки 📅 2026-04-30 ✅ 2026-04-30
+- [x] #⭐⭐medium #area/work add global rule to claude 📅 2026-04-30 ✅ 2026-04-30
+- [x] #⭐easy #area/work wrap whole prompt into prompt file 📅 2026-04-30 ✅ 2026-04-30
+- [x] #⭐easy #area/base массаж 📅 2026-05-01 ✅ 2026-05-01
+- [ ] #⭐⭐medium #area/mind bases (to watch, to play) 📅 2026-05-02
+- [x] #⭐⭐⭐hard  #area/mind добавить помодоро 📅 2026-05-01 ✅ 2026-05-01
+- [ ] #⭐⭐medium #area/body высчитать количество воды
+- [x] #⭐easy #area/mind оставить в делах только карандаш 📅 2026-04-30 ✅ 2026-04-30
+- [x] #⭐⭐⭐hard  #area/mind переделать habits виджет, углубить хештеги 📅 2026-05-01 ✅ 2026-05-01
+- [ ] #⭐⭐medium  #area/mind подумать над повторяющимися задачами и очистить старые, переделать хештеги (добавить дом и тд) 📅 2026-05-02
+- [x] #⭐easy #area/base  сходить за мирамистином и др 📅 2026-05-01 ✅ 2026-05-01
+- [x] #⭐⭐medium #area/mind #zed применить обновления zed 📅 2026-04-30 ✅ 2026-04-30
+- [x] #⭐⭐medium  #area/mind переделать виджет xp today 📅 2026-05-01 ✅ 2026-05-01
+- [ ] #⭐⭐⭐hard #area/mind реорганизовать и может замержить хранилища (сделать вторую ветку и туда запушить обсидиан апп),коммитить папку .obisdian.mobile,current keyboard layout (vial) добавить 📅 2026-05-02
+- [x] #⭐⭐medium  #area/mind  areas и xp heatmap добавить привычки (за каждую 1 xp) 📅 2026-05-01 ✅ 2026-05-01
+- [x] #⭐easy #area/mind for level add incrementing xp 📅 2026-05-01 ✅ 2026-05-01
+- [ ] #⭐easy #area/wealth заказать свинкам домик+сенник
+- [x] #⭐⭐medium #area/work work on taxonomy 📅 2026-04-30 ✅ 2026-04-30

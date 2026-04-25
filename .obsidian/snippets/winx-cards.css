@@ -1,0 +1,197 @@
+/* ============================================
+ * WINX THEME — Card & Column Callouts
+ * File: winx-cards.css
+ *
+ * .callout[data-callout="card"]
+ *   • Pink gradient background
+ *   • Fairy wing ::before/::after decorations
+ *   • Hover glow
+ *   • Custom scrollbar
+ *   • z-index stacking so wings sit behind content
+ *
+ * .callout[data-callout="col"]
+ *   • Twinkling star sparkles on edges
+ *   • Per-column positions via scoped custom props
+ *     (avoids 6 separate nth-child selector blocks)
+ * ============================================ */
+
+:is(.dashboard, .kanban-board) {
+  /* ── Card ─────────────────────────────────── */
+  .callout[data-callout="card"] {
+    position: relative;
+    background: linear-gradient(
+      135deg,
+      var(--winx-pink-light),
+      var(--winx-pink)
+    ) !important;
+    border: 1px solid var(--winx-border) !important;
+    border-radius: 14px !important;
+    overflow: visible !important;
+    padding: 12px;
+    transition:
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+
+    /* Wings sit behind all card content */
+    &::before,
+    &::after {
+      z-index: 0;
+    }
+    > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Wing pseudo-elements */
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      background-image: var(--winx-wing-svg);
+      background-repeat: no-repeat;
+      background-size: contain;
+      pointer-events: none;
+    }
+
+    &::before {
+      top: 4px;
+      left: 4px;
+    }
+    &::after {
+      bottom: 4px;
+      right: 4px;
+      transform: scale(-1, -1);
+    }
+
+    /* Title */
+    > .callout-title {
+      justify-content: center !important;
+      font-family: "Cinzel", serif !important;
+      color: var(--winx-purple-deep) !important;
+      letter-spacing: 2px !important;
+      text-transform: uppercase !important;
+      font-size: 16px !important;
+      padding-inline: 64px !important; /* room for wings */
+    }
+
+    /* Hover glow */
+    &:hover {
+      border-color: var(--winx-pink-deep);
+      box-shadow:
+        0 0 24px rgba(255, 217, 102, 0.7),
+        0 0 8px rgba(216, 120, 168, 0.6);
+    }
+
+    /* Dataview error */
+    .dataview-error-box {
+      border-color: var(--winx-pink-deep);
+    }
+
+    /* Custom scrollbar */
+    > .callout-content {
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--winx-pink-deep) transparent;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          to bottom,
+          var(--winx-purple),
+          var(--winx-pink-deep)
+        );
+        border-radius: 99px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+
+  /* ── Column sparkles ─────────────────────── */
+  /*
+     * Each col gets a ::before and ::after star.
+     * Position & delay are driven by scoped custom
+     * properties set per nth-child — one place to
+     * edit instead of 6 separate selector blocks.
+     */
+  .callout[data-callout="col"] {
+    position: relative;
+
+    /* Fallback values (star hidden off-screen if unset) */
+    --star-before-top: auto;
+    --star-before-bottom: auto;
+    --star-before-left: auto;
+    --star-before-right: auto;
+    --star-before-delay: 0s;
+    --star-after-top: auto;
+    --star-after-bottom: auto;
+    --star-after-left: auto;
+    --star-after-right: auto;
+    --star-after-delay: 0s;
+
+    &:nth-child(1) {
+      --star-before-top: 30%;
+      --star-before-right: -12px;
+      --star-before-delay: 0s;
+      --star-after-bottom: 12%;
+      --star-after-left: -10px;
+      --star-after-delay: 1.4s;
+    }
+    &:nth-child(2) {
+      --star-before-top: 8%;
+      --star-before-left: -12px;
+      --star-before-delay: 0.7s;
+      --star-after-bottom: 30%;
+      --star-after-right: -10px;
+      --star-after-delay: 2.1s;
+    }
+    &:nth-child(3) {
+      --star-before-top: 45%;
+      --star-before-left: -12px;
+      --star-before-delay: 0.4s;
+      --star-after-top: 5%;
+      --star-after-right: -10px;
+      --star-after-delay: 1.8s;
+    }
+
+    > .callout-content {
+      /* Shared star styles */
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        z-index: 2 !important;
+        width: 24px;
+        height: 24px;
+        background-image: var(--winx-star-svg);
+        background-repeat: no-repeat;
+        background-size: contain;
+        pointer-events: none;
+        animation: winx-twinkle 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 6px rgba(255, 217, 102, 0.9));
+      }
+
+      /* Position wired to scoped custom props above */
+      &::before {
+        top: var(--star-before-top);
+        bottom: var(--star-before-bottom);
+        left: var(--star-before-left);
+        right: var(--star-before-right);
+        animation-delay: var(--star-before-delay);
+      }
+      &::after {
+        top: var(--star-after-top);
+        bottom: var(--star-after-bottom);
+        left: var(--star-after-left);
+        right: var(--star-after-right);
+        animation-delay: var(--star-after-delay);
+      }
+    }
+  }
+} /* end :is(.dashboard, .kanban-board) */

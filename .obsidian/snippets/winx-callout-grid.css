@@ -1,0 +1,105 @@
+/* ============================================
+ * WINX THEME — Grid & Column Layout
+ * File: callout-grid.css
+ *
+ * • .callout[data-callout="grid"] container queries
+ * • .callout[data-callout="col"] flex layout (dashboard)
+ * • .callout[data-callout="grid"] CSS grid (kanban)
+ * • Overflow visibility fixes (merged from theme.css)
+ * ============================================ */
+
+/* ── Grid base ── */
+.callout[data-callout="grid"] {
+  container-type: inline-size;
+  .callout[data-callout="card"] {
+    margin: 0;
+  }
+}
+
+/* ── Shared: hide grid title + card icon, overflow ── */
+:is(.dashboard, .kanban-board) {
+  .markdown-preview-sizer.markdown-preview-section {
+    max-width: none !important;
+  }
+
+  .callout[data-callout="grid"] > .callout-title {
+    display: none !important;
+  }
+  .callout[data-callout="card"] .callout-icon {
+    display: none !important;
+  }
+
+  /* Overflow fixes */
+  .callout[data-callout="col"] {
+    overflow: visible !important;
+    > .callout-content {
+      overflow: visible !important;
+    }
+  }
+  .callout[data-callout="grid"] > .callout-content {
+    overflow: visible !important;
+  }
+}
+
+/* ── Dashboard: flex columns ── */
+.dashboard {
+  /* overflow fix for card content (merged from theme.css) */
+  .callout[data-callout="card"] > .callout-content {
+    overflow: visible !important;
+  }
+
+  .callout[data-callout="col"] {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    > .callout-title {
+      display: none !important;
+    }
+    > .callout-content {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 15px;
+    }
+  }
+
+  .callout[data-callout="grid"] > .callout-content {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+
+    > .callout[data-callout="col"] {
+      flex: 1;
+      min-width: 0;
+    }
+
+    @container (max-width: 900px) {
+      flex-wrap: wrap;
+      > .callout[data-callout="col"]:first-child {
+        flex-basis: 100%;
+      }
+    }
+    @container (max-width: 600px) {
+      flex-direction: column;
+      > .callout[data-callout="col"] {
+        width: 100%;
+      }
+    }
+  }
+}
+
+/* ── Kanban: CSS grid ── */
+.kanban-board .callout[data-callout="grid"] > .callout-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 15px;
+
+  @container (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @container (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}

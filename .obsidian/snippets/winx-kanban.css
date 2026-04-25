@@ -1,0 +1,33 @@
+/* ============================================
+ * WINX THEME — Kanban Board Overrides
+ * File: winx-kanban.css
+ *
+ * Overrides for .callout[data-callout="card"]
+ * inside .kanban-board only.
+ *
+ * Changes vs dashboard cards:
+ *   • Fixed 4:3 aspect ratio, overflow hidden
+ *   • Blue-purple gradient instead of pink
+ *   • Flex layout so content scrolls inside
+ *   • Blue hover glow instead of gold/pink
+ * ============================================ */
+
+.kanban-board .callout[data-callout="card"] {
+  aspect-ratio: 4 / 3 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: linear-gradient(135deg, #c8e0f5, #d8d0f0, #e8d5f5) !important;
+  border-color: var(--winx-blue) !important;
+
+  > .callout-content {
+    overflow: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &:hover {
+    border-color: #7ab0e0;
+    box-shadow: 0 0 16px rgba(168, 200, 240, 0.6);
+  }
+}

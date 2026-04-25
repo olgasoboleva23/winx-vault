@@ -1,0 +1,115 @@
+/* ============================================
+ * WINX THEME — Widgets
+ * File: widgets.css
+ *
+ * --winx-star-icon token → winx-tokens.css
+ * @keyframes winx-shimmer, pulse-glow → winx-animations.css
+ * ============================================ */
+
+:is(.dashboard, .kanban-board) {
+  .winx-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .winx-icon-circle {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: var(--winx-star-icon);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .winx-stat-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .winx-stat-text {
+    color: var(--winx-text-dark);
+    font-size: 14px;
+  }
+
+  .winx-progress-bar {
+    margin-top: 6px;
+    height: 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.4);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .winx-progress-fill {
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      var(--winx-pink-deep),
+      var(--winx-gold),
+      var(--winx-pink-deep)
+    );
+    background-size: 200% 100%;
+    animation: winx-shimmer 3s linear infinite;
+    border-radius: 6px;
+  }
+
+  /* ── Date input — golden fairy-ticket style ── */
+  /* ── Daily note button ── */
+  .callout[data-callout="col"]:has(.winx-open-note-btn) > .callout-content {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row !important;
+    gap: 8px;
+  }
+
+  .mb-input-type-date input,
+  .winx-open-note-btn {
+    background: linear-gradient(
+      135deg,
+      var(--winx-pink-light),
+      var(--winx-pink)
+    ) !important;
+    border: 1.5px solid var(--winx-gold) !important;
+    border-radius: 10px !important;
+    padding: 6px 14px !important;
+    color: #c89540 !important;
+    font-family: "Cinzel", serif !important;
+    font-size: 14px !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 0 8px rgba(255, 217, 102, 0.4) !important;
+  }
+
+  .mb-input-type-date input {
+    &::-webkit-calendar-picker-indicator {
+      opacity: 0;
+    }
+    &::-webkit-datetime-edit-text {
+      color: #c89540 !important;
+    }
+  }
+
+  .winx-open-note-btn {
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow:
+        0 0 16px rgba(255, 217, 102, 0.7),
+        0 0 8px rgba(216, 120, 168, 0.5);
+    }
+  }
+}
+
+/* Pulse glow applied globally (not scoped to dashboard/kanban) */
+.winx-icon-circle {
+  animation: pulse-glow 2s infinite alternate;
+}

@@ -1,0 +1,115 @@
+/* ============================================
+ * WINX THEME — Heatmap / XP Grid
+ * File: heatmap.css
+ *
+ * GitHub-style activity heatmap.
+ * Cell intensity driven by --cell-opacity
+ * custom property instead of 5 separate rules.
+ * ============================================ */
+
+.winx-xp {
+  --s: 10px;
+  display: grid;
+  gap: 2px;
+  font-size: 10px;
+  color: var(--winx-text-dark);
+
+  .winx-bonus {
+    font-size: 9px;
+    color: var(--winx-purple);
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+}
+
+.winx-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.winx-aura {
+  font-weight: 600;
+}
+
+.winx-grid {
+  display: grid;
+  grid-template-columns: repeat(7, max-content);
+  justify-content: start;
+  gap: 3px;
+}
+
+/* ── Cell — intensity via scoped custom prop ── */
+.winx-cell {
+  width: var(--s);
+  height: var(--s);
+  border-radius: 2px;
+}
+
+.winx-cell,
+.leg-item .swatch {
+  background: var(--winx-purple-deep);
+  opacity: var(--cell-opacity, 0.9);
+
+  &.v0 {
+    background: transparent;
+    border: 1px solid var(--winx-border);
+    --cell-opacity: 0.9;
+  }
+  &.v1 {
+    --cell-opacity: 0.2;
+  }
+  &.v2 {
+    --cell-opacity: 0.4;
+  }
+  &.v3 {
+    --cell-opacity: 0.65;
+  }
+  &.v4 {
+    --cell-opacity: 1;
+  }
+}
+
+.winx-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  font-size: 9px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  position: relative;
+  cursor: default;
+
+  &::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    right: 0;
+    background: var(--winx-purple-deep);
+    color: #fff;
+    font-size: 9px;
+    white-space: nowrap;
+    padding: 3px 7px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+.swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}

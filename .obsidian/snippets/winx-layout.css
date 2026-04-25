@@ -1,0 +1,52 @@
+/* ============================================
+ * WINX THEME — Layout & Backgrounds
+ * File: winx-layout.css
+ *
+ * • File explorer (.workspace-leaf-content[data-type="file-explorer"])
+ *   nav color overrides
+ * • Full-bleed background for dashboard & kanban
+ *   workspace leaves
+ * • Base typography shared by both views
+ * ============================================ */
+
+/* ── File explorer nav ── */
+.workspace-leaf-content[data-type="file-explorer"] {
+  --nav-item-color: #f4e4f5;
+  --nav-item-color-hover: #ffffff;
+  --nav-item-color-active: #ffffff;
+  --nav-collapse-icon-color: #f4e4f5;
+  --nav-collapse-icon-color-collapsed: #f4e4f5;
+}
+
+/* ── Dashboard / kanban workspace backgrounds ── */
+:is(
+  .workspace-leaf-content:has(.dashboard),
+  .workspace-leaf-content:has(.kanban-board)
+) {
+  --background-primary: transparent;
+  background:
+    linear-gradient(
+      to right,
+      transparent 0%,
+      transparent 30%,
+      rgba(90, 72, 120, 0.8) 50%,
+      rgba(216, 160, 192, 0.9) 100%
+    ),
+    var(--winx-bg-image) left center / auto 100% no-repeat,
+    linear-gradient(135deg, #5a4878 0%, #7a5a98 40%, #a878a8 80%, #d8a0c0 100%);
+  background-blend-mode: normal, multiply, normal;
+}
+
+/* ── Shared base styles for both views ── */
+:is(.dashboard, .kanban-board) {
+  --callout-blend-mode: normal;
+  font-family: "Quicksand", sans-serif;
+  color: var(--winx-text-dark);
+
+  /* Headings */
+  :is(.inline-title, h1, h2, h3, h4) {
+    font-family: "Cinzel", serif !important;
+    color: var(--winx-blue) !important;
+    letter-spacing: 1.5px !important;
+  }
+}

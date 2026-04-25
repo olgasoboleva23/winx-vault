@@ -1,0 +1,266 @@
+{
+  "main": {
+    "id": "2d4b20fbaab104b4",
+    "type": "split",
+    "children": [
+      {
+        "id": "c54a4707da76e642",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1d55e8bd6d63b391",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Dashboard.md",
+                "mode": "preview",
+                "source": true
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "Dashboard"
+            }
+          },
+          {
+            "id": "40b97e833a9a02b3",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Tasks/Kanban.md",
+                "mode": "preview",
+                "source": true
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "Kanban"
+            }
+          },
+          {
+            "id": "744fcc132281e917",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Tasks/Master.md",
+                "mode": "source",
+                "source": false
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "Master"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "015c5c805e400751",
+    "type": "split",
+    "children": [
+      {
+        "id": "c26db9caff095fd0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f93b9eb36b06b187",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "1c29490c58ac9346",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "05-03",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "9129285dc4f55418",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Закладки"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "aa43dd716013b2a2",
+    "type": "split",
+    "children": [
+      {
+        "id": "ec4b731bd6075128",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7a85c1a144484153",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Добро пожаловать.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Обратные ссылки для Добро пожаловать"
+            }
+          },
+          {
+            "id": "937f1a8fc1aafb79",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Добро пожаловать.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Исходящие ссылки из Добро пожаловать"
+            }
+          },
+          {
+            "id": "3b5255692dfac299",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Теги"
+            }
+          },
+          {
+            "id": "41d50700e9ac97b1",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Все свойства"
+            }
+          },
+          {
+            "id": "b467560990c75146",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Добро пожаловать.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Структура Добро пожаловать"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "templater-obsidian:Templater": false
+    }
+  },
+  "active": "1d55e8bd6d63b391",
+  "lastOpenFiles": [
+    "Tasks/Master.md",
+    "Daily Notes/2026-04-26.md",
+    "Dashboard.md",
+    "Tasks/Kanban.md",
+    "Settings/Templates/Daily Note.md",
+    "Daily Notes/2026-05-02.md",
+    "Daily Notes/2026-05-01.md",
+    "Daily Notes/2026-04-30.md",
+    "Daily Notes/2026-04-29.md",
+    "Daily Notes/2026-04-28.md",
+    "Ideas/Design.md",
+    "Prompt.md",
+    "Untitled.md",
+    "Settings/scripts/dvWidgets/dailyNote.js",
+    "Settings/scripts/dvWidgets/Архив.zip",
+    "Settings/scripts/dvWidgets/config.js",
+    "Settings/data/pomodoro.json",
+    "Settings.zip",
+    "Settings/data/pomodoro,json",
+    "Settings/data",
+    "Settings/scripts/QuickAdd/NewTask.js",
+    "Settings/scripts/QuickAdd",
+    "Settings/scripts/dvWidgets/xpToday.js",
+    "Templates/Daily Note.md",
+    "Config/Settings.md",
+    "Assets/icon2.webp",
+    "Assets/icon1.webp",
+    "Assets/z48srt4acbk8nhdrgyp0.avif",
+    "Assets/winx-bg.png",
+    "Assets/a2b9bf26-e94d-40ca-9009-9005f7623c2e.png",
+    "Dashboard/Index.md",
+    "Dashboard/Cards/Taskstoday.md",
+    "Dashboard/Cards/Energymood.md",
+    "Dashboard/Cards/Leveltoday.md",
+    "Dashboard/Cards/Xptoday.md",
+    "Dashboard/Cards/Weeklystate.md",
+    "Dashboard/Cards/Lifeareas.md",
+    "arr/Templates/Daily Note.md",
+    "arr/Tasks/Kanban.md",
+    "arr/Tasks/Master.md",
+    "arr/Daily Notes/2026-04-26.md",
+    "Tasks/Kanban.canvas"
+  ]
+}
