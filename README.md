@@ -123,4 +123,4 @@ Use the **QuickAdd `NewTask` macro**:
 | **Life Areas** | Radar chart — XP earned per area this month |
 | **Weekly State** | Line chart of energy & mood over the past week |
 | **XP Today** | XP earned today, current level name, streak heatmap |
-| **Tasks** | Tasks due today, grouped by life area tag |
+| **Quests** | Tasks due today, grouped by life area tag |
