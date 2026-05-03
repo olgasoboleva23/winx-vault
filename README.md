@@ -34,14 +34,16 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 
 ## ⚙️ Required Plugins
 
-| Plugin | Purpose |
-|---|---|
-| **Dataview** | Powers all JS widgets |
-| **Templater** | Daily note template |
-| **Tasks** | Task tracking & completion dates |
-| **QuickAdd** | `NewTask` macro for fast task creation |
-| **Kanban** | Kanban board view |
-| **Meta Bind** | `INPUT[slider]` and `INPUT[date]` inline inputs |
+> Obsidian version: 1.12.7
+
+| Plugin | Version | Purpose |
+|---|---|---|
+| **Dataview** | 0.5.68 | Powers all JS widgets |
+| **Templater** | 2.19.3 | Daily note template |
+| **Tasks** | 7.23.1 | Task tracking & completion dates |
+| **QuickAdd** | 2.12.0 | `NewTask` macro for fast task creation |
+| **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
+| **Meta Bind** | 1.4.8 | `INPUT[slider]` and `INPUT[date]` inline inputs |
 
 ---
 
