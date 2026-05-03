@@ -54,8 +54,37 @@
               "icon": "lucide-file",
               "title": "Master"
             }
+          },
+          {
+            "id": "c1fe9a26d466caf5",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Daily Notes/2026-04-26.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "2026-04-26"
+            }
+          },
+          {
+            "id": "eb01cc387382ef44",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "README"
+            }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -218,32 +247,34 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "1d55e8bd6d63b391",
+  "active": "eb01cc387382ef44",
   "lastOpenFiles": [
-    "Tasks/Master.md",
-    "Daily Notes/2026-04-26.md",
     "Dashboard.md",
-    "Tasks/Kanban.md",
-    "Settings/Templates/Daily Note.md",
+    "dashboard.png",
+    "README.md",
+    "Daily Notes/2026-04-26.md",
+    "Архив.zip",
+    "Daily Notes/2026-04-29.md",
+    "Daily Notes/2026-04-30.md",
     "Daily Notes/2026-05-02.md",
     "Daily Notes/2026-05-01.md",
-    "Daily Notes/2026-04-30.md",
-    "Daily Notes/2026-04-29.md",
     "Daily Notes/2026-04-28.md",
-    "Ideas/Design.md",
-    "Prompt.md",
-    "Untitled.md",
+    "Tasks/Kanban.md",
+    "Tasks/Master.md",
     "Settings/scripts/dvWidgets/dailyNote.js",
-    "Settings/scripts/dvWidgets/Архив.zip",
     "Settings/scripts/dvWidgets/config.js",
-    "Settings/data/pomodoro.json",
-    "Settings.zip",
-    "Settings/data/pomodoro,json",
-    "Settings/data",
-    "Settings/scripts/QuickAdd/NewTask.js",
-    "Settings/scripts/QuickAdd",
-    "Settings/scripts/dvWidgets/xpToday.js",
+    "Ideas/Design.md",
+    "Ideas",
+    "Prompt.md",
+    "scripts/dvScripts/xpToday.js",
+    "scripts/dvScripts/xpBreakdown.js",
+    "scripts/dvScripts/weeklyState.js",
+    "scripts/dvScripts/lifeAreas.js",
+    "scripts/dvScripts/levelToday.js",
+    "scripts/dvScripts/habits.js",
     "Templates/Daily Note.md",
+    "Settings/Templates/Daily Note.md",
+    "Untitled.md",
     "Config/Settings.md",
     "Assets/icon2.webp",
     "Assets/icon1.webp",
@@ -259,8 +290,6 @@
     "Dashboard/Cards/Lifeareas.md",
     "arr/Templates/Daily Note.md",
     "arr/Tasks/Kanban.md",
-    "arr/Tasks/Master.md",
-    "arr/Daily Notes/2026-04-26.md",
     "Tasks/Kanban.canvas"
   ]
 }
