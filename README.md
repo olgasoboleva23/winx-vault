@@ -23,10 +23,16 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
    │   ├── habits.js              — Monthly habits bar chart
    │   ├── lifeAreas.js           — Radar chart of life area scores
    │   ├── weeklyState.js         — Energy & mood line chart
+   │   ├── helpers.js             — Shared AudioEngine, Wallet, PurchaseLog
+   │   ├── wallet.js              — Gold balance widget
+   │   ├── shop.js                — Shop view with buy buttons
    │   ├── pomodoro.js            — Pomodoro timer
    │   └── dailyNote.js           — Date selector widget
    └── scripts/QuickAdd/
        └── NewTask.js             — QuickAdd macro for creating tagged tasks
+📁 00 System/Data/
+   ├── Shop.md          — Available reward items (name:: / cost::)
+   └── Purchases.md     — Purchase log (- YYYY-MM-DD | Name | Cost)
 📄 Dashboard.md       — Main dashboard (all widgets composed here)
 ```
 
@@ -53,12 +59,12 @@ Tasks are tagged with a **difficulty** and a **life area**. Completing a task aw
 
 ### Difficulties
 
-| Tag | XP |
-|---|---|
-| `#⭐easy` | 5 XP |
-| `#⭐⭐medium` | 10 XP |
-| `#⭐⭐⭐hard` | 20 XP |
-| `#⭐⭐⭐⭐epic` | 50 XP |
+| Tag | XP | Gold |
+|---|---|---|
+| `#⭐easy` | 5 | 2 |
+| `#⭐⭐medium` | 10 | 5 |
+| `#⭐⭐⭐hard` | 20 | 10 |
+| `#⭐⭐⭐⭐epic` | 50 | 25 |
 
 ### Level Formula
 
@@ -89,6 +95,28 @@ Complete a habit **30+ times** in a month → **+100 XP** bonus per qualifying h
 | 🏡 Base | `#area/base` | Sanctuary |
 | 🌄 Occasions | `#area/occasions` | Memory |
 | 🌙 Rest | `#area/rest` | Serenity |
+
+---
+
+## 🛍 Shop
+
+Completing tasks earns **gold** alongside XP. Spend it on real-world rewards defined in `Shop.md`.
+
+### How it works
+
+1. **Earn** — completing any tagged task adds gold (see Difficulties table).
+2. **Browse** — open `Shop.md` to see your balance and available items. Affordable items show ✅, unaffordable show ❌.
+3. **Buy** — click an affordable item. The purchase is logged to `Purchases.md` and the balance updates immediately.
+
+### Adding items
+
+Edit `Shop.md` and add a list entry:
+
+- name:: Cozy Coffee cost:: 20
+
+### Caching
+
+Earned and spent totals are computed once and cached in memory. The cache is invalidated automatically when task or purchase files change, so widget re-renders are fast.
 
 ---
 
@@ -124,3 +152,5 @@ Use the **QuickAdd `NewTask` macro**:
 | **Weekly State** | Line chart of energy & mood over the past week |
 | **XP Today** | XP earned today, current level name, streak heatmap |
 | **Quests** | Tasks due today, grouped by life area tag |
+| **Wallet** | Current gold balance, shown under Level card |
+| **Shop**   | (in Shop.md) Browse rewards, click to buy with gold |
