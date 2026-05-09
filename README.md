@@ -2,38 +2,47 @@
 
 A gamified personal productivity system built in Obsidian with a magical-girl aesthetic. Track tasks, habits, energy, and life balance through an RPG-style dashboard.
 
-![Dashboard](dashboard.png)
+![[dashboard.png]]
 
 ---
 
 ## 🗂 Vault Structure
 
 ```
-📁 Daily Notes/       — Daily journal entries (mood, energy, habits, XP log)
-📁 Tasks/
-   ├── Master.md      — All tasks inbox (new tasks prepend here)
-   └── Kanban.md      — Kanban board view of tasks
-📁 Settings/
-   ├── Templates/
-   │   └── Daily Note.md          — Templater template for new daily notes
-   ├── scripts/dvWidgets/         — Dataview JS widgets powering the dashboard
-   │   ├── config.js              — Central config (areas, difficulties, XP values, levels)
-   │   ├── levelToday.js          — Level & XP progress card
-   │   ├── xpToday.js             — XP earned today + streak heatmap
-   │   ├── habits.js              — Monthly habits bar chart
-   │   ├── lifeAreas.js           — Radar chart of life area scores
-   │   ├── weeklyState.js         — Energy & mood line chart
-   │   ├── helpers.js             — Shared AudioEngine, Wallet, PurchaseLog
-   │   ├── wallet.js              — Gold balance widget
-   │   ├── shop.js                — Shop view with buy buttons
-   │   ├── pomodoro.js            — Pomodoro timer
-   │   └── dailyNote.js           — Date selector widget
-   └── scripts/QuickAdd/
-       └── NewTask.js             — QuickAdd macro for creating tagged tasks
-📁 00 System/Data/
-   ├── Shop.md          — Available reward items (name:: / cost::)
-   └── Purchases.md     — Purchase log (- YYYY-MM-DD | Name | Cost)
-📄 Dashboard.md       — Main dashboard (all widgets composed here)
+├── 📁 00 System
+│   ├── 📁 Assets - Sounds for pomodoro and shop
+│   ├── 📁 Data
+│   │   └── Shop.md
+│   ├── 📁 Scripts
+│   │   ├── 📁 QuickAdd
+│   │   │   └── NewTask.js           — Date selector widget
+│   │   └── 📁 dvWidgets
+│   │       ├── config.js              — Central config (areas, difficulties, XP values, levels)
+│   │       ├── levelToday.js          — Level & XP progress card
+│   │       ├── xpToday.js             — XP earned today + streak heatmap
+│   │       ├── habits.js              — Monthly habits bar chart
+│   │       ├── lifeAreas.js           — Radar chart of life area scores
+│   │       ├── weeklyState.js         — Energy & mood line chart
+│   │       ├── helpers.js             — Shared AudioEngine, Wallet, PurchaseLog
+│   │       ├── wallet.js              — Gold balance widget
+│   │       ├── shop.js                — Shop view with buy buttons
+│   │       ├── pomodoro.js            — Pomodoro timer
+│   │       └── dailyNote.js           — Date selector widget
+│   └── 📁 Templates
+│       ├── Daily Note.md — Templater template for new daily notes
+│       ├── game.md — Templater template for new game
+│       ├── recipe.md — Templater template for new recipe
+│       ├── task.md — Templater template for new task
+│       └── watch item.md — Templater template for new watch item (cartoon, movie, etc)
+├── 📁 01 Projects
+├── 📁 02 Areas
+│   └── 📁 Personal
+│       ├── 📁 Daily Notes — Daily journal entries (mood, energy, habits, XP log)
+│       └── 📁 Tasks
+│           └── Kanban.md — Kanban board view of tasks
+├── 📁 04 Archive
+├── 📁 99 Inbox
+└── Dashboard.md
 ```
 
 ---
@@ -132,6 +141,8 @@ Create via Templater from `Settings/Templates/Daily Note.md`.
 ---
 
 ## ✅ Creating a Task
+
+![[kanban.png]]
 
 Use the **QuickAdd `NewTask` macro**:
 1. Choose difficulty (Easy / Medium / Hard / Epic)
