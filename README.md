@@ -2,7 +2,7 @@
 
 A gamified personal productivity system built in Obsidian with a magical-girl aesthetic. Track tasks, habits, energy, and life balance through an RPG-style dashboard.
 
-![[dashboard.png]]
+![Dashboard](dashboard.png)
 
 ---
 
@@ -142,7 +142,7 @@ Create via Templater from `Settings/Templates/Daily Note.md`.
 
 ## ✅ Creating a Task
 
-![[kanban.png]]
+![Kanban](kanban.png)
 
 Use the **QuickAdd `NewTask` macro**:
 1. Choose difficulty (Easy / Medium / Hard / Epic)
