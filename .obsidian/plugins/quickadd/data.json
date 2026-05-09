@@ -1,23 +1,190 @@
 {
   "choices": [
     {
-      "id": "bfac4e44-3ace-4776-a484-05681754eacd",
-      "name": "New  Task",
+      "id": "84c310a2-28a3-4b3b-b70d-3a11ea18e863",
+      "name": "Task",
       "type": "Macro",
       "command": false,
       "runOnStartup": false,
       "macro": {
-        "name": "New  Task",
-        "id": "f33ec160-17dc-4ae5-98f3-8f1fb1267bc1",
+        "name": "Task",
+        "id": "48e8dab3-b697-411f-b89c-4b2169e64e13",
         "commands": [
           {
             "name": "NewTask",
             "type": "UserScript",
-            "id": "55937a6a-8be5-4f26-9e46-bc1b62570927",
-            "path": "Settings/scripts/QuickAdd/NewTask.js",
+            "id": "b67b56b9-8e7b-47c3-bd10-191106b5014d",
+            "path": "00 System/Scripts/QuickAdd/NewTask.js",
             "settings": {}
           }
         ]
+      }
+    },
+    {
+      "id": "94231b2e-4bc4-4643-81a1-b18ea15772ea",
+      "name": "Watch item",
+      "type": "Template",
+      "command": false,
+      "templatePath": "00 System/Templates/watch item.md",
+      "fileNameFormat": {
+        "enabled": false,
+        "format": ""
+      },
+      "folder": {
+        "enabled": true,
+        "folders": [
+          "03 Resources/Collections/Watchlist"
+        ],
+        "chooseWhenCreatingNote": false,
+        "createInSameFolderAsActiveFile": false,
+        "chooseFromSubfolders": false
+      },
+      "appendLink": false,
+      "openFile": true,
+      "fileOpening": {
+        "location": "tab",
+        "direction": "vertical",
+        "mode": "default",
+        "focus": true
+      },
+      "fileExistsMode": "Increment the file name",
+      "setFileExistsBehavior": false
+    },
+    {
+      "id": "cb208fb8-48d5-4744-aa54-722c94b9cd1c",
+      "name": "Game",
+      "type": "Template",
+      "command": false,
+      "templatePath": "00 System/Templates/game.md",
+      "fileNameFormat": {
+        "enabled": false,
+        "format": ""
+      },
+      "folder": {
+        "enabled": true,
+        "folders": [
+          "03 Resources/Collections/Gamelist"
+        ],
+        "chooseWhenCreatingNote": false,
+        "createInSameFolderAsActiveFile": false,
+        "chooseFromSubfolders": false
+      },
+      "appendLink": false,
+      "openFile": true,
+      "fileOpening": {
+        "location": "tab",
+        "direction": "vertical",
+        "mode": "default",
+        "focus": true
+      },
+      "fileExistsMode": "Increment the file name",
+      "setFileExistsBehavior": false
+    },
+    {
+      "id": "d1f07a89-3348-4aff-9af0-db170804cfbf",
+      "name": "Work task",
+      "type": "Template",
+      "command": false,
+      "templatePath": "00 System/Templates/task.md",
+      "fileNameFormat": {
+        "enabled": false,
+        "format": ""
+      },
+      "folder": {
+        "enabled": true,
+        "folders": [
+          "01 Projects/Work/Aiday/tasks"
+        ],
+        "chooseWhenCreatingNote": false,
+        "createInSameFolderAsActiveFile": false,
+        "chooseFromSubfolders": false
+      },
+      "appendLink": false,
+      "openFile": true,
+      "fileOpening": {
+        "location": "tab",
+        "direction": "vertical",
+        "mode": "default",
+        "focus": true
+      },
+      "fileExistsMode": "Increment the file name",
+      "setFileExistsBehavior": false
+    },
+    {
+      "id": "7f269913-fc3d-4440-a465-551d36924530",
+      "name": "Recipe",
+      "type": "Template",
+      "command": false,
+      "templatePath": "00 System/Templates/recipe.md",
+      "fileNameFormat": {
+        "enabled": false,
+        "format": ""
+      },
+      "folder": {
+        "enabled": true,
+        "folders": [
+          "03 Resources/Collections/Recipes"
+        ],
+        "chooseWhenCreatingNote": false,
+        "createInSameFolderAsActiveFile": false,
+        "chooseFromSubfolders": false
+      },
+      "appendLink": false,
+      "openFile": true,
+      "fileOpening": {
+        "location": "tab",
+        "direction": "vertical",
+        "mode": "default",
+        "focus": true
+      },
+      "fileExistsMode": "Increment the file name",
+      "setFileExistsBehavior": false
+    },
+    {
+      "id": "a13e1801-f0bb-4942-843c-e2285b0c6726",
+      "name": "Buy Reward",
+      "type": "Capture",
+      "command": false,
+      "appendLink": false,
+      "captureTo": "00 System/Data/Purchases.md",
+      "captureToActiveFile": false,
+      "captureToCanvasNodeId": "",
+      "activeFileWritePosition": "cursor",
+      "createFileIfItDoesntExist": {
+        "enabled": false,
+        "createWithTemplate": false,
+        "template": ""
+      },
+      "format": {
+        "enabled": true,
+        "format": "- {{DATE:YYYY-MM-DD}} | {{VALUE:name}} | {{VALUE:cost}}"
+      },
+      "insertAfter": {
+        "enabled": false,
+        "after": "",
+        "insertAtEnd": false,
+        "considerSubsections": false,
+        "createIfNotFound": false,
+        "createIfNotFoundLocation": "top",
+        "inline": false,
+        "replaceExisting": false,
+        "blankLineAfterMatchMode": "auto"
+      },
+      "newLineCapture": {
+        "enabled": false,
+        "direction": "below"
+      },
+      "prepend": true,
+      "task": false,
+      "openFile": false,
+      "fileOpening": {
+        "location": "tab",
+        "direction": "vertical",
+        "mode": "default",
+        "focus": true
+      },
+      "templater": {
+        "afterCapture": "none"
       }
     }
   ],
@@ -26,7 +193,7 @@
   "useSelectionAsCaptureValue": true,
   "devMode": false,
   "templateFolderPath": "",
-  "announceUpdates": "major",
+  "announceUpdates": "all",
   "version": "2.12.0",
   "globalVariables": {},
   "onePageInputEnabled": false,
@@ -57,6 +224,10 @@
         "endpoint": "https://api.openai.com/v1",
         "apiKey": "",
         "models": [
+          {
+            "name": "text-davinci-003",
+            "maxTokens": 4096
+          },
           {
             "name": "gpt-3.5-turbo",
             "maxTokens": 4096
@@ -94,29 +265,7 @@
             "maxTokens": 128000
           }
         ],
-        "autoSyncModels": false,
-        "modelSource": "modelsDev"
-      },
-      {
-        "name": "Gemini",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "apiKey": "",
-        "models": [
-          {
-            "name": "gemini-1.5-pro",
-            "maxTokens": 1000000
-          },
-          {
-            "name": "gemini-1.5-flash",
-            "maxTokens": 1000000
-          },
-          {
-            "name": "gemini-1.5-flash-8b",
-            "maxTokens": 1000000
-          }
-        ],
-        "autoSyncModels": false,
-        "modelSource": "modelsDev"
+        "modelSource": "auto"
       }
     ]
   },
@@ -132,5 +281,6 @@
     "backfillFileOpeningDefaults": true,
     "setProviderModelDiscoveryMode": true,
     "migrateProviderApiKeysToSecretStorage": true
-  }
+  },
+  "macros": []
 }

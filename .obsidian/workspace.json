@@ -83,8 +83,7 @@
               "title": "README"
             }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "vertical"
@@ -247,11 +246,16 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "eb01cc387382ef44",
+  "active": "1d55e8bd6d63b391",
   "lastOpenFiles": [
-    "Dashboard.md",
-    "dashboard.png",
+    "00 System/Data/Shop.md",
+    "00 System/Data",
+    "00 System/Datat",
+    "00 System/Scripts/Shop.md",
     "README.md",
+    "dashboard.png",
+    "Dashboard.md",
+    "02 Areas/Personal/Daily Notes/2026-05-09.md",
     "Daily Notes/2026-04-26.md",
     "Архив.zip",
     "Daily Notes/2026-04-29.md",
@@ -270,8 +274,6 @@
     "scripts/dvScripts/xpBreakdown.js",
     "scripts/dvScripts/weeklyState.js",
     "scripts/dvScripts/lifeAreas.js",
-    "scripts/dvScripts/levelToday.js",
-    "scripts/dvScripts/habits.js",
     "Templates/Daily Note.md",
     "Settings/Templates/Daily Note.md",
     "Untitled.md",
@@ -288,8 +290,6 @@
     "Dashboard/Cards/Xptoday.md",
     "Dashboard/Cards/Weeklystate.md",
     "Dashboard/Cards/Lifeareas.md",
-    "arr/Templates/Daily Note.md",
-    "arr/Tasks/Kanban.md",
     "Tasks/Kanban.canvas"
   ]
 }

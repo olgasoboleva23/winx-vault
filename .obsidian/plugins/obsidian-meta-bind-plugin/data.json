@@ -8,7 +8,9 @@
     "shortName": "Mo"
   },
   "syncInterval": 200,
-  "enableJs": false,
+  "minSyncInterval": 50,
+  "maxSyncInterval": 1000,
+  "enableJs": true,
   "viewFieldDisplayNullAsEmpty": false,
   "enableSyntaxHighlighting": true,
   "enableEditorRightClickMenu": true,

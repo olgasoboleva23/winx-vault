@@ -1,6 +1,6 @@
 {
   "command_timeout": 5,
-  "templates_folder": "Settings/Templates",
+  "templates_folder": "00 System/Templates",
   "templates_pairs": [
     [
       "",
@@ -34,5 +34,10 @@
   "startup_templates": [
     ""
   ],
-  "intellisense_render": 1
+  "intellisense_render": 1,
+  "ignore_folders_on_creation": [
+    {
+      "folder": ""
+    }
+  ]
 }

@@ -1,25 +1,18 @@
 {
+  "textFontFamily": "JetBrains Mono",
+  "interfaceFontFamily": "JetBrains Mono",
   "enabledCssSnippets": [
-    "dashboard",
-    "theme",
-    "widgets",
-    "habits",
     "winx-animations",
-    "winx-cards",
-    "winx-kanban",
-    "winx-layout",
-    "winx-tokens",
-    "fonts",
-    "callout-grid",
-    "heatmap",
-    "pomodoro",
-    "tasks-minimal",
-    "winx-000-layers",
     "winx-callout-grid",
+    "winx-cards",
     "winx-fonts",
     "winx-heatmap",
+    "winx-kanban",
+    "winx-layout",
     "winx-pomodoro",
     "winx-tasks-minimal",
-    "winx-widgets"
+    "winx-tokens",
+    "winx-widgets",
+    "winx-shop"
   ]
 }

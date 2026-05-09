@@ -82,27 +82,51 @@
       z-index: 2;
     }
 
-    .btn {
+    .controls {
       position: absolute;
       bottom: -20px;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 2px solid var(--winx-border);
-      background: var(--winx-pink);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: -10px;
 
-      svg {
-        width: 20px;
-        height: 20px;
-        fill: var(--winx-text-dark);
-      }
+      .btn {
+        border-radius: 50%;
+        border: 2px solid var(--winx-border);
+        background: var(--winx-pink);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        padding: 0;
 
-      &:hover {
-        transform: scale(1.05);
-        transition: 0.15s ease;
+        &:hover {
+          transform: scale(1.05);
+          transition: 0.15s ease;
+        }
+
+        svg {
+          fill: var(--winx-text-dark);
+        }
+
+        &.play {
+          width: 48px;
+          height: 48px;
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        &.reset-btn,
+        &.skip-btn {
+          width: 36px;
+          height: 36px;
+          svg {
+            width: 14px;
+            height: 14px;
+          }
+        }
       }
     }
   }
@@ -110,6 +134,12 @@
   .stars {
     display: flex;
     gap: 8px;
+
+    .multiplier {
+      font-size: 14px;
+      font-weight: 500;
+      margin-left: 4px;
+    }
 
     .s {
       width: 18px;
@@ -218,7 +248,7 @@
     }
   }
 
-  :is(.gear-btn, .reset-btn) {
+  .gear-btn {
     width: 22px;
     min-width: 22px;
     height: 22px;

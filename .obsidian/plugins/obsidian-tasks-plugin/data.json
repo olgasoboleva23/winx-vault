@@ -11,7 +11,7 @@
   },
   "globalQuery": "hide toolbar",
   "globalFilter": "",
-  "removeGlobalFilter": false,
+  "removeGlobalFilter": true,
   "taskFormat": "tasksPluginEmoji",
   "setCreatedDate": false,
   "setDoneDate": true,

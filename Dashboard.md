@@ -1,5 +1,5 @@
 ---
-date: 2026-05-02
+date: 2026-05-01
 cssclasses:
   - dashboard
 pomodoro:
@@ -12,44 +12,45 @@ pomodoro:
 > >`INPUT[date:date]`
 > >
 > >```dataviewjs
-> >dv.view("Settings/scripts/dvWidgets/dailyNote");
+> >dv.view("00 System/Scripts/dvWidgets/dailyNote");
 > >```
 
 > [!grid]
 > > [!col]
 > > > [!card] Level
 > > > ```dataviewjs
-> > > dv.view("Settings/scripts/dvWidgets/levelToday");
+> > > dv.view("00 System/Scripts/dvWidgets/levelToday");
+> > > dv.view("00 System/Scripts/dvWidgets/wallet");
 > > > ```
 > > 
 > > > [!card] Pomodoro
 > > > ```dataviewjs
-> > > dv.view("Settings/scripts/dvWidgets/pomodoro");
+> > > dv.view("00 System/Scripts/dvWidgets/pomodoro");
 > > > ```
 > > 
 > > > [!card] Monthly Habits
 > > > ```dataviewjs
-> > > dv.view("Settings/scripts/dvWidgets/habits");
+> > > dv.view("00 System/Scripts/dvWidgets/habits");
 > > > ```
 > 
 > > [!col]
 > > > [!card] Life Areas
 > > > ```dataviewjs
-> > > dv.view("Settings/scripts/dvWidgets/lifeAreas");
+> > > dv.view("00 System/Scripts/dvWidgets/lifeAreas");
 > > > ```
 > >
 > > > [!card] Weekly State
 > > > ```dataviewjs
-> > > dv.view("Settings/scripts/dvWidgets/weeklyState");
+> > > dv.view("00 System/Scripts/dvWidgets/weeklyState");
 > > > ```
 >
 > > [!col]
 > > > [!card] XP Today
 > > > ```dataviewjs
-> > > dv.view("Settings/scripts/dvWidgets/xpToday");
+> > > dv.view("00 System/Scripts/dvWidgets/xpToday");
 > > > ```
 > >
-> > > [!card] Tasks
+> > > [!card] Quests
 > > > ```tasks
 due on {{query.file.property('date')}}
 path includes Tasks
