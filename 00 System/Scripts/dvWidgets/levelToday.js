@@ -1,8 +1,8 @@
-const selected    = dv.current().date;
-const selectedStr = selected.toFormat("yyyy-MM-dd");
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const { xpMap } = await H.loadConfig();
 
-const config  = eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/config.js"));
-const { xpMap } = config;
+const selected    = dv.current().date ?? dv.date("today");
+const selectedStr = selected.toFormat("yyyy-MM-dd");
 
 const BASE = 100;
 const STEP = 25;
@@ -21,10 +21,7 @@ function getLevelInfo(totalXP) {
 const tasks = dv.pages('"02 Areas/Personal/Tasks"').file.tasks
   .where(t => t.completed && t.completion?.toFormat("yyyy-MM-dd") <= selectedStr);
 
-const total = tasks.array().reduce((sum, t) => {
-  const xp = Object.entries(xpMap).find(([tag]) => t.tags.includes(tag))?.[1] ?? 0;
-  return sum + xp;
-}, 0);
+const total = tasks.array().reduce((sum, t) => sum + H.taskXp(t, xpMap), 0);
 
 const { level, progress, cost } = getLevelInfo(total);
 

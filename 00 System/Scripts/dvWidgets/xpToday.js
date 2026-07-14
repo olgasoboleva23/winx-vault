@@ -1,9 +1,9 @@
-const sel   = dv.current().date;
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const { xpMap, levels, HABIT_BONUS_XP, HABIT_BONUS_THRESHOLD } = await H.loadConfig();
+
+const sel   = dv.current().date ?? dv.date("today");
 const start = sel.startOf("month");
 const end   = sel.endOf("month");
-
-const config = eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/config.js"));
-const { xpMap, levels, HABIT_BONUS_XP, HABIT_BONUS_THRESHOLD } = config;
 
 const getLevel = xpVal => levels.find(l => xpVal <= l.max) ?? levels.at(-1);
 
@@ -11,25 +11,11 @@ const getLevel = xpVal => levels.find(l => xpVal <= l.max) ?? levels.at(-1);
 const xpByDay = new Map();
 for (const t of dv.pages('"02 Areas/Personal/Tasks"').file.tasks.where(t => t.completed && t.completion)) {
   const day = t.completion.toFormat("yyyy-MM-dd");
-  const xp  = Object.entries(xpMap).find(([tag]) => t.tags.includes(tag))?.[1] ?? 0;
-  xpByDay.set(day, (xpByDay.get(day) ?? 0) + xp);
+  xpByDay.set(day, (xpByDay.get(day) ?? 0) + H.taskXp(t, xpMap));
 }
 
-// Habit bonus — same single-pass pattern as lifeAreas.js
-const habitDone = {};
-for (const page of dv.pages('"02 Areas/Personal/Daily Notes"').where(p => p.date?.ts >= start.ts && p.date?.ts <= end.ts)) {
-  const dateStr = page.date.toFormat("yyyy-MM-dd");
-  for (const t of page.file.tasks) {
-    const habitTag = t.tags?.find(tag => tag.startsWith("#habit/"));
-    if (!habitTag || !t.completed) continue;
-    const [, areaSlug, habitPart] = habitTag.split("/");
-    const name = habitPart ?? areaSlug;
-    (habitDone[name] ??= new Set()).add(dateStr);
-  }
-}
-
-const habitBonus = Object.values(habitDone)
-  .filter(s => s.size >= HABIT_BONUS_THRESHOLD)
+const habitBonus = Object.values(H.collectHabitDays(dv, start, end))
+  .filter(h => h.days.size >= HABIT_BONUS_THRESHOLD)
   .length * HABIT_BONUS_XP;
 
 // Generate all days in the month via Array.from — replaces for loop
@@ -38,9 +24,13 @@ const days = Array.from(
   (_, i) => start.plus({ days: i }).toFormat("yyyy-MM-dd")
 );
 
+// 7-day average over the week *ending at the selected date* — slicing the
+// month array would average future (zero-XP) days mid-month.
+const last7 = Array.from({ length: 7 }, (_, i) => sel.minus({ days: 6 - i }).toFormat("yyyy-MM-dd"));
+const avg   = Math.round(last7.reduce((a, d) => a + (xpByDay.get(d) ?? 0), 0) / 7);
+
 const todayStr = sel.toFormat("yyyy-MM-dd");
 const todayXP  = (xpByDay.get(todayStr) ?? 0) + habitBonus;
-const avg      = Math.round(days.slice(-7).reduce((a, d) => a + (xpByDay.get(d) ?? 0), 0) / 7);
 const aura     = getLevel(todayXP).name;
 const vals     = days.map(d => levels.indexOf(getLevel(xpByDay.get(d) ?? 0)));
 

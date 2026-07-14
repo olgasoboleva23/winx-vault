@@ -1,13 +1,21 @@
-const selected = dv.current().date ?? dv.date("today");
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+
+const selected  = dv.current().date ?? dv.date("today");
 const weekStart = selected.minus({ days: 6 });
 
-const pages = dv.pages('"02 Areas/Personal/Daily Notes"')
-  .where(p => p.date && p.date.ts >= weekStart.ts && p.date.ts <= selected.ts)
-  .sort(p => p.date);
+const byDay = new Map(
+  dv.pages('"02 Areas/Personal/Daily Notes"')
+    .where(p => p.date && p.date.ts >= weekStart.ts && p.date.ts <= selected.ts)
+    .map(p => [p.date.toFormat("yyyy-MM-dd"), p])
+    .array()
+);
 
-const labels = pages.map(p => p.date.toFormat("MM-dd")).array();
-const energy = pages.map(p => p.energy ?? null).array();
-const mood = pages.map(p => p.mood ?? null).array();
+// Full 7-day range; days without a note become null so the chart
+// shows a gap instead of silently compressing missing days.
+const days   = Array.from({ length: 7 }, (_, i) => selected.minus({ days: 6 - i }));
+const labels = days.map(d => d.toFormat("MM-dd"));
+const energy = days.map(d => byDay.get(d.toFormat("yyyy-MM-dd"))?.energy ?? null);
+const mood   = days.map(d => byDay.get(d.toFormat("yyyy-MM-dd"))?.mood ?? null);
 
 window.renderChart({
   type: "line",
@@ -17,15 +25,15 @@ window.renderChart({
       {
         label: "😴 Energy",
         data: energy,
-        borderColor: "rgba(168, 200, 240, 1)",
-        backgroundColor: "rgba(168, 200, 240, 0.3)",
+        borderColor: H.chartColor("--winx-blue"),
+        backgroundColor: H.chartColor("--winx-blue", 0.3),
         tension: 0.3,
       },
       {
         label: "😊 Mood",
         data: mood,
-        borderColor: "rgba(216, 120, 168, 1)",
-        backgroundColor: "rgba(216, 120, 168, 0.3)",
+        borderColor: H.chartColor("--winx-pink-deep"),
+        backgroundColor: H.chartColor("--winx-pink-deep", 0.3),
         tension: 0.3,
       },
     ],

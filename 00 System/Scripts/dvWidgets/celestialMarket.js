@@ -5,9 +5,8 @@ if (!file) {
   return;
 }
 
-const { marketCategories } = eval(
-  await app.vault.adapter.read("00 System/Scripts/dvWidgets/config.js"),
-);
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const { marketCategories } = await H.loadConfig();
 const categoryMap = Object.fromEntries(marketCategories.map((c) => [c.tag, c]));
 
 const items = file.file.tasks.where((t) => !t.completed).array();

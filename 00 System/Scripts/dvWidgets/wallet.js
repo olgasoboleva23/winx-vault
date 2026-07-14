@@ -1,7 +1,7 @@
-const config = eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/config.js"));
-const { Wallet } = eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js"));
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const config = await H.loadConfig();
 
-const balance = await Wallet.balance(dv, config);
+const balance = await H.Wallet.balance(dv, config);
 
 const wallet = dv.container.createEl("div", { cls: "winx-wallet" });
 wallet.createEl("span", { text: `✨ Gold: ${balance}`, cls: "winx-wallet-amount" });

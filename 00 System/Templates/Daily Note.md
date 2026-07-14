@@ -1,10 +1,10 @@
 ---
-date: <% tp.date.now("YYYY-MM-DD") %>
+date: <% tp.date.now("YYYY-MM-DD", 0, tp.file.title, "YYYY-MM-DD") %>
 mood: 5
 energy: 5
 ---
 
-# <% tp.date.now("dddd, MMMM D") %>
+# <% tp.date.now("dddd, MMMM D", 0, tp.file.title, "YYYY-MM-DD") %>
 
 ## 💫 Daily State
 😴 Energy: `INPUT[slider(minValue(1), maxValue(10)):energy]`

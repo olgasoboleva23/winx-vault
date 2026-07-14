@@ -1,8 +1,8 @@
 module.exports = async (params) => {
   const { quickAddApi } = params;
 
-  const { difficulties, areas } =
-    eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/config.js"));
+  const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+  const { difficulties, areas } = await H.loadConfig();
 
   const difficulty = await quickAddApi.suggester(
     difficulties.map(d => `${d.label} (${d.xp} XP)`),
@@ -21,6 +21,9 @@ module.exports = async (params) => {
   if (!result) return;
 
   const file = app.vault.getAbstractFileByPath("02 Areas/Personal/Tasks/Master.md");
-  const content = await app.vault.read(file);
-  await app.vault.modify(file, result + "\n" + content);
+  if (!file) {
+    new Notice("✦ 02 Areas/Personal/Tasks/Master.md not found — task not saved");
+    return;
+  }
+  await app.vault.process(file, content => result + "\n" + content);
 };

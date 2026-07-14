@@ -1,5 +1,6 @@
-const config = eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/config.js"));
-const { AudioEngine, Wallet, PurchaseLog } = eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js"));
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const { AudioEngine, Wallet, PurchaseLog } = H;
+const config = await H.loadConfig();
 
 class ShopUI {
   constructor(container, dv, audio) {

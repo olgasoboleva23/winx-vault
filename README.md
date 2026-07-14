@@ -171,7 +171,7 @@ Each daily note tracks:
 - **XP Log** — freeform notes on what you did/learned
 - **Habits** — checkbox tasks tagged `#habit/<area>/<name>`
 
-Create via Templater from `00 System/Templates/Daily Note.md` (the Daily Notes core plugin is preconfigured to use it).
+Create via Templater from `00 System/Templates/Daily Note.md` (the Daily Notes core plugin is preconfigured to use it), or just click **✦ Open** on the dashboard — if the selected day has no note yet, it's created from the template automatically.
 
 ---
 
