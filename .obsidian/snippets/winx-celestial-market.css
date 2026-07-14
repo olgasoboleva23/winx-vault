@@ -1,0 +1,144 @@
+/* ─────────────────────────────
+   CELESTIAL MARKET
+───────────────────────────── */
+
+.winx-celestial-market {
+  display: grid;
+  gap: 0.75rem;
+  overflow: hidden;
+
+  .market-list {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .market-item {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    padding: 0.7rem 0.9rem;
+
+    border-radius: 14px;
+
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--winx-gold) 6%, transparent),
+        transparent 35%
+      ),
+      color-mix(in srgb, white 12%, transparent);
+
+    border: 1px solid color-mix(in srgb, var(--winx-border) 40%, transparent);
+
+    backdrop-filter: blur(6px);
+
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease,
+      background 0.15s ease;
+
+    &::before {
+      content: "";
+
+      position: absolute;
+      inset: 0.45rem auto 0.45rem 0.45rem;
+
+      width: 3px;
+      border-radius: 999px;
+
+      background: linear-gradient(
+        to bottom,
+        var(--winx-gold-bright),
+        var(--winx-pink)
+      );
+    }
+
+    &:hover {
+      transform: translateX(3px);
+
+      border-color: color-mix(
+        in srgb,
+        var(--winx-gold) 50%,
+        var(--winx-border)
+      );
+
+      background:
+        linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--winx-gold) 10%, transparent),
+          transparent 35%
+        ),
+        color-mix(in srgb, white 18%, transparent);
+    }
+  }
+
+  .market-icon {
+    margin-inline-start: 0.35rem;
+
+    color: var(--winx-gold);
+    font-size: 0.9rem;
+    line-height: 1;
+
+    flex-shrink: 0;
+  }
+
+  .market-text {
+    color: var(--winx-text-dark);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .market-footer {
+    text-align: center;
+
+    color: var(--winx-purple);
+
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .market-empty {
+    text-align: center;
+
+    padding-block: 1rem;
+
+    color: var(--winx-purple-deep);
+
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+
+  .market-open {
+    cursor: pointer;
+    color: var(--winx-purple-deep);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-inline-start: 0.75rem;
+    opacity: 0.8;
+    transition: opacity 0.15s ease;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .market-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .market-group-header {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--winx-purple-deep);
+    background: color-mix(in srgb, var(--winx-border) 40%, transparent);
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    margin-bottom: 0.4rem;
+    display: inline-block;
+  }
+}

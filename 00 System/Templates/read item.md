@@ -2,29 +2,29 @@
 const title = await tp.system.prompt("Title");
 
 const media_type = await tp.system.suggester(
-  ["Movie", "Cartoon", "Animated series", "TV Show", "Anime", "Documentary", "Other"],
-  ["movie", "cartoon", "animated_series", "tv", "anime", "doc", "other"]
+  ["Fanfiction", "Fiction", "Scientific pop", "IT"],
+  ["fanfiction", "fiction", "scientific_pop", "it"]
 );
 
 const status = await tp.system.suggester(
-  ["to watch", "watching", "completed", "dropped"],
-  ["to_watch", "watching", "completed", "dropped"]
+  ["to read", "reading", "completed", "dropped"],
+  ["to_read", "reading", "completed", "dropped"]
 );
 
 const date = tp.date.now("YYYY-MM-DD");
 
 tR = `---
-type: watch
+type: read
 title: "${title}"
 media_type: ${media_type}
 status: ${status}
 rating: 
 created: ${date}
 tags:
-  - #media/watch
+  - #media/read
 ---
 
-# 🎬 ${title}
+# 📖 ${title}
 
 ## Notes
 

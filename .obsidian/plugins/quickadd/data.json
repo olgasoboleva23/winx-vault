@@ -186,6 +186,56 @@
       "templater": {
         "afterCapture": "none"
       }
+    },
+    {
+      "id": "44239900-8806-45bf-beff-78afe8339085",
+      "name": "Read item",
+      "type": "Template",
+      "command": false,
+      "templatePath": "00 System/Templates/read item.md",
+      "fileNameFormat": {
+        "enabled": false,
+        "format": ""
+      },
+      "folder": {
+        "enabled": true,
+        "folders": [
+          "03 Resources/Collections/Readlist"
+        ],
+        "chooseWhenCreatingNote": false,
+        "createInSameFolderAsActiveFile": false,
+        "chooseFromSubfolders": false
+      },
+      "appendLink": false,
+      "openFile": true,
+      "fileOpening": {
+        "location": "tab",
+        "direction": "vertical",
+        "mode": "default",
+        "focus": true
+      },
+      "fileExistsMode": "Increment the file name",
+      "setFileExistsBehavior": false
+    },
+    {
+      "id": "480849c0-6b8a-4d53-b93c-6aa6077a82cc",
+      "name": "New Market Item",
+      "type": "Macro",
+      "command": false,
+      "runOnStartup": false,
+      "macro": {
+        "name": "New Market Item",
+        "id": "c1b5dff3-1bce-4ac1-8f3a-2e9471fdb871",
+        "commands": [
+          {
+            "name": "NewMarketItem",
+            "type": "UserScript",
+            "id": "d920e11f-6404-4d0a-ba1d-0357a270e20d",
+            "path": "00 System/Scripts/QuickAdd/NewMarketItem.js",
+            "settings": {}
+          }
+        ]
+      }
     }
   ],
   "inputPrompt": "single-line",

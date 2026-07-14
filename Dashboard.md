@@ -1,5 +1,5 @@
 ---
-date: 2026-04-30
+date: 2026-07-13
 cssclasses:
   - dashboard
 pomodoro:
@@ -57,4 +57,9 @@ path includes Tasks
 group by function task.tags.filter(tag => tag.includes("area"))
 short mode
 sort by tags
+> > > ```
+> >
+> > > [!card] Celestial Market
+> > > ```dataviewjs
+> > > dv.view("00 System/Scripts/dvWidgets/celestialMarket");
 > > > ```

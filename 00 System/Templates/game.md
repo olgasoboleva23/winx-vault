@@ -13,7 +13,6 @@ const date = tp.date.now("YYYY-MM-DD");
 tR = `---
 type: game
 title: "${title}"
-cover:
 status: ${status}
 genre: ${genre}
 rating: 

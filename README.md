@@ -12,10 +12,12 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 ├── 📁 00 System
 │   ├── 📁 Assets - Sounds for pomodoro and shop
 │   ├── 📁 Data
-│   │   └── Shop.md
+│   │   ├── Shop.md
+│   │   └── Celestial Market.md
 │   ├── 📁 Scripts
 │   │   ├── 📁 QuickAdd
-│   │   │   └── NewTask.js           — Date selector widget
+│   │   │   ├── NewTask.js           — Task creation macro (difficulty + area pickers)
+│   │   │   └── NewMarketItem.js     — Add an item to the Celestial Market
 │   │   └── 📁 dvWidgets
 │   │       ├── config.js              — Central config (areas, difficulties, XP values, levels)
 │   │       ├── levelToday.js          — Level & XP progress card
@@ -27,12 +29,14 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 │   │       ├── wallet.js              — Gold balance widget
 │   │       ├── shop.js                — Shop view with buy buttons
 │   │       ├── pomodoro.js            — Pomodoro timer
+│   │       ├── celestialMarket.js     — Celestial Market shopping list widget
 │   │       └── dailyNote.js           — Date selector widget
 │   └── 📁 Templates
 │       ├── Daily Note.md — Templater template for new daily notes
 │       ├── game.md — Templater template for new game
 │       ├── recipe.md — Templater template for new recipe
 │       ├── task.md — Templater template for new task
+│       ├── read item.md — Templater template for new read item (book, article, etc)
 │       └── watch item.md — Templater template for new watch item (cartoon, movie, etc)
 ├── 📁 01 Projects
 ├── 📁 02 Areas
@@ -129,6 +133,30 @@ Earned and spent totals are computed once and cached in memory. The cache is inv
 
 ---
 
+## 🌌 Celestial Market
+
+A themed shopping list, rendered as a dashboard card. Items live in `00 System/Data/Celestial Market.md` as regular checkbox tasks tagged with a category; the widget groups pending items by category and shows how many are left. Checking an item off in the file clears it from the card.
+
+### Categories
+
+| Group | Tag |
+|---|---|
+| 🌿 Harvest | `#food` |
+| 🌸 Bloom | `#care` |
+| 🐾 Familiar | `#pet` |
+| 🏰 Sanctuary | `#home` |
+| ✨ Vitality | `#health` |
+
+Untagged items land in a ✦ Other group.
+
+### Adding items
+
+Use the **QuickAdd `New Market Item` macro** (pick a category, type the name), or edit `Celestial Market.md` directly:
+
+- \[ \] Fresh bread #food
+
+---
+
 ## 📝 Daily Note
 
 Each daily note tracks:
@@ -164,4 +192,5 @@ Use the **QuickAdd `NewTask` macro**:
 | **XP Today** | XP earned today, current level name, streak heatmap |
 | **Quests** | Tasks due today, grouped by life area tag |
 | **Wallet** | Current gold balance, shown under Level card |
+| **Celestial Market** | Pending shopping items grouped by category |
 | **Shop**   | (in Shop.md) Browse rewards, click to buy with gold |

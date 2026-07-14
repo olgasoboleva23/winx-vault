@@ -13,6 +13,8 @@
     "winx-tasks-minimal",
     "winx-tokens",
     "winx-widgets",
-    "winx-shop"
-  ]
+    "winx-shop",
+    "winx-celestial-market"
+  ],
+  "theme": "obsidian"
 }
