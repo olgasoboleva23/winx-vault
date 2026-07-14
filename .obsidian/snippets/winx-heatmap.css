@@ -92,7 +92,7 @@
     bottom: calc(100% + 6px);
     right: 0;
     background: var(--winx-purple-deep);
-    color: #fff;
+    color: white;
     font-size: 9px;
     white-space: nowrap;
     padding: 3px 7px;

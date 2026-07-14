@@ -3,6 +3,7 @@
   "interfaceFontFamily": "JetBrains Mono",
   "enabledCssSnippets": [
     "winx-animations",
+    "winx-assets",
     "winx-callout-grid",
     "winx-cards",
     "winx-fonts",

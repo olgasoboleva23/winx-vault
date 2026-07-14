@@ -80,8 +80,8 @@
     &:hover {
       border-color: var(--winx-pink-deep);
       box-shadow:
-        0 0 24px rgba(255, 217, 102, 0.7),
-        0 0 8px rgba(216, 120, 168, 0.6);
+        0 0 24px rgb(from var(--winx-gold) r g b / 70%),
+        0 0 8px rgb(from var(--winx-pink-deep) r g b / 60%);
     }
 
     /* Dataview error */
@@ -108,7 +108,7 @@
           var(--winx-pink-deep)
         );
         border-radius: 99px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgb(255 255 255 / 30%);
       }
     }
   }
@@ -174,7 +174,7 @@
         background-size: contain;
         pointer-events: none;
         animation: winx-twinkle 3s ease-in-out infinite;
-        filter: drop-shadow(0 0 6px rgba(255, 217, 102, 0.9));
+        filter: drop-shadow(0 0 6px rgb(from var(--winx-gold) r g b / 90%));
       }
 
       /* Position wired to scoped custom props above */

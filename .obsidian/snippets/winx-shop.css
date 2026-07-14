@@ -13,7 +13,7 @@
   border-radius: 999px;
   color: var(--winx-text-dark);
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(216, 120, 168, 0.15);
+  box-shadow: 0 2px 8px rgb(from var(--winx-pink-deep) r g b / 15%);
   margin-top: 10px;
 
   & .winx-wallet-amount {
@@ -58,8 +58,8 @@
     color: white;
     font-size: 1.4em;
     font-weight: 600;
-    box-shadow: 0 4px 16px rgba(110, 42, 110, 0.25);
-    text-shadow: 0 1px 2px rgba(74, 31, 74, 0.3);
+    box-shadow: 0 4px 16px rgb(from var(--winx-purple-deep) r g b / 25%);
+    text-shadow: 0 1px 2px rgb(from var(--winx-text-dark) r g b / 30%);
 
     & .winx-shop-balance-icon {
       font-size: 1.3em;
@@ -120,7 +120,7 @@
     &:not(:disabled):hover {
       background: var(--winx-pink);
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(216, 120, 168, 0.3);
+      box-shadow: 0 6px 16px rgb(from var(--winx-pink-deep) r g b / 30%);
     }
 
     &:disabled {

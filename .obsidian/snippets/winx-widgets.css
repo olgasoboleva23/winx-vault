@@ -2,7 +2,7 @@
  * WINX THEME — Widgets
  * File: widgets.css
  *
- * --winx-star-icon token → winx-tokens.css
+ * --winx-star-icon token → winx-assets.css
  * @keyframes winx-shimmer, pulse-glow → winx-animations.css
  * ============================================ */
 
@@ -43,7 +43,7 @@
     margin-top: 6px;
     height: 10px;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgb(255 255 255 / 40%);
     overflow: hidden;
     position: relative;
   }
@@ -81,11 +81,11 @@
     border: 1.5px solid var(--winx-gold) !important;
     border-radius: 10px !important;
     padding: 6px 14px !important;
-    color: #c89540 !important;
+    color: var(--winx-gold-deep) !important;
     font-family: "Cinzel", serif !important;
     font-size: 14px !important;
     letter-spacing: 1px !important;
-    box-shadow: 0 0 8px rgba(255, 217, 102, 0.4) !important;
+    box-shadow: 0 0 8px rgb(from var(--winx-gold) r g b / 40%) !important;
   }
 
   .mb-input-type-date input {
@@ -93,7 +93,7 @@
       opacity: 0;
     }
     &::-webkit-datetime-edit-text {
-      color: #c89540 !important;
+      color: var(--winx-gold-deep) !important;
     }
   }
 
@@ -103,8 +103,8 @@
 
     &:hover {
       box-shadow:
-        0 0 16px rgba(255, 217, 102, 0.7),
-        0 0 8px rgba(216, 120, 168, 0.5);
+        0 0 16px rgb(from var(--winx-gold) r g b / 70%),
+        0 0 8px rgb(from var(--winx-pink-deep) r g b / 50%);
     }
   }
 }

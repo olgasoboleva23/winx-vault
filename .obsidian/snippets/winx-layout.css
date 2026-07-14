@@ -11,11 +11,11 @@
 
 /* ── File explorer nav ── */
 .workspace-leaf-content[data-type="file-explorer"] {
-  --nav-item-color: #f4e4f5;
-  --nav-item-color-hover: #ffffff;
-  --nav-item-color-active: #ffffff;
-  --nav-collapse-icon-color: #f4e4f5;
-  --nav-collapse-icon-color-collapsed: #f4e4f5;
+  --nav-item-color: var(--winx-lavender);
+  --nav-item-color-hover: white;
+  --nav-item-color-active: white;
+  --nav-collapse-icon-color: var(--winx-lavender);
+  --nav-collapse-icon-color-collapsed: var(--winx-lavender);
 }
 
 /* ── Dashboard / kanban workspace backgrounds ── */
@@ -29,11 +29,11 @@
       to right,
       transparent 0%,
       transparent 30%,
-      rgba(90, 72, 120, 0.8) 50%,
-      rgba(216, 160, 192, 0.9) 100%
+      rgb(from var(--winx-dusk-dark) r g b / 80%) 50%,
+      rgb(from var(--winx-dusk-rose) r g b / 90%) 100%
     ),
     var(--winx-bg-image) left center / auto 100% no-repeat,
-    linear-gradient(135deg, #5a4878 0%, #7a5a98 40%, #a878a8 80%, #d8a0c0 100%);
+    var(--winx-dusk);
   background-blend-mode: normal, multiply, normal;
 }
 

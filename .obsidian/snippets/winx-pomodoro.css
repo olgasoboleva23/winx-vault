@@ -3,8 +3,17 @@
  * File: pomodoro.css
  *
  * Wing decoration references var(--winx-wing-svg)
- * from winx-tokens.css — inline data URI removed.
+ * from winx-assets.css — inline data URI removed.
  * ============================================ */
+
+/* Register --p so the conic-gradient ring can transition
+ * smoothly between the once-per-second JS updates instead
+ * of jumping. */
+@property --p {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
 
 .winx-pomodoro {
   overflow-x: visible !important;
@@ -27,12 +36,13 @@
     display: grid;
     place-items: center;
     border: 2px solid var(--winx-border);
+    transition: --p 1s linear;
     background: conic-gradient(
       var(--winx-pink-deep) calc(var(--p) * 360deg),
       var(--winx-purple-light) 0
     );
 
-    /* Wing decoration — SVG lives in winx-tokens.css */
+    /* Wing decoration — SVG lives in winx-assets.css */
     .wing {
       position: absolute;
       width: 56px;
