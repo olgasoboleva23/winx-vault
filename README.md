@@ -185,6 +185,18 @@ Use the **QuickAdd `NewTask` macro**:
 3. Fill in task details in the Tasks modal
 4. Task is prepended to `Tasks/Master.md`
 
+### Other QuickAdd choices
+
+| Choice | Template | Creates note in |
+|---|---|---|
+| **Work task** | `task.md` | `01 Projects` |
+| **Read item** | `read item.md` | `03 Resources/Collections/Readlist` |
+| **Watch item** | `watch item.md` | `03 Resources/Collections/Watchlist` |
+| **Game** | `game.md` | `03 Resources/Collections/Gamelist` |
+| **Recipe** | `recipe.md` | `03 Resources/Collections/Recipes` |
+
+> ⚠️ **Work task** targets the generic `01 Projects` folder. Point it at your own project folder instead (Settings → QuickAdd → Work task → folder). If you sync this vault's QuickAdd config into another vault, remember the sync overwrites that folder setting — re-pick your project folder afterwards.
+
 ---
 
 ## 🖥 Dashboard Widgets
