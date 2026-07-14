@@ -44,6 +44,13 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 │       ├── 📁 Daily Notes — Daily journal entries (mood, energy, habits, XP log)
 │       └── 📁 Tasks
 │           └── Kanban.md — Kanban board view of tasks
+├── 📁 03 Resources
+│   ├── 📁 Collections — Card-view lists (Obsidian Bases) with example entries
+│   │   ├── 📁 Readlist — Books & fanfics to read
+│   │   ├── 📁 Gamelist — Games to play
+│   │   ├── 📁 Watchlist — Movies, series & cartoons
+│   │   └── 📁 Recipes — Recipe cards
+│   └── 📁 Media — Attachments (images, fonts)
 ├── 📁 04 Archive
 ├── 📁 99 Inbox
 └── Dashboard.md
@@ -164,7 +171,7 @@ Each daily note tracks:
 - **XP Log** — freeform notes on what you did/learned
 - **Habits** — checkbox tasks tagged `#habit/<area>/<name>`
 
-Create via Templater from `Settings/Templates/Daily Note.md`.
+Create via Templater from `00 System/Templates/Daily Note.md` (the Daily Notes core plugin is preconfigured to use it).
 
 ---
 

@@ -93,7 +93,7 @@
       "folder": {
         "enabled": true,
         "folders": [
-          "01 Projects/Work/Aiday/tasks"
+          "01 Projects"
         ],
         "chooseWhenCreatingNote": false,
         "createInSameFolderAsActiveFile": false,

@@ -1,0 +1,13 @@
+formulas:
+  coverImageFormula: file.embeds[0]
+views:
+  - type: cards
+    name: Table
+    filters:
+      and:
+        - type == "read"
+    order:
+      - title
+      - media_type
+      - status
+    image: formula.coverImageFormula

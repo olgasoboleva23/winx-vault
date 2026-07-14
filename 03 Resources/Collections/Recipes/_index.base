@@ -1,0 +1,17 @@
+formulas:
+  coverImageFormula: file.embeds[0]
+views:
+  - type: cards
+    name: Table
+    filters:
+      and:
+        - type == "recipe"
+    order:
+      - name
+      - time
+      - difficulty
+      - tags
+    sort:
+      - property: name
+        direction: ASC
+    image: formula.coverImageFormula

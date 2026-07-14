@@ -1,0 +1,14 @@
+formulas:
+  coverImageFormula: file.embeds[0]
+views:
+  - type: cards
+    name: Table
+    filters:
+      and:
+        - type == "game"
+    order:
+      - title
+      - status
+      - genre
+      - tags
+    image: formula.coverImageFormula
