@@ -24,17 +24,47 @@
   .workspace-leaf-content:has(.kanban-board)
 ) {
   --background-primary: transparent;
-  background:
-    linear-gradient(
-      to right,
-      transparent 0%,
-      transparent 30%,
-      rgb(from var(--winx-dusk-dark) r g b / 80%) 50%,
-      rgb(from var(--winx-dusk-rose) r g b / 90%) 100%
-    ),
-    var(--winx-bg-image) left center / auto 100% no-repeat,
-    var(--winx-dusk);
-  background-blend-mode: normal, multiply, normal;
+  position: relative;
+  z-index: 0; /* stacking context so the z-index:-1 photo stays inside this leaf */
+  background: var(--winx-dusk);
+}
+
+/* Photo lives on its own layer, sized to its native ratio (full height,
+   proportional width) so the fade mask below tracks the image itself
+   rather than the pane width — smooth on any pane shape. */
+:is(
+  .workspace-leaf-content:has(.dashboard),
+  .workspace-leaf-content:has(.kanban-board)
+)::before {
+  content: "";
+  position: absolute;
+  z-index: -1; /* above the leaf's dusk background, below its content */
+  top: 0;
+  left: 0;
+  height: 100%;
+  aspect-ratio: 1566 / 1005; /* native ratio of --winx-bg-image */
+  max-width: 100%;
+  background: var(--winx-bg-image) left center / cover no-repeat;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    black 0%,
+    black 52%,
+    rgb(0 0 0 / 78%) 65%,
+    rgb(0 0 0 / 45%) 76%,
+    rgb(0 0 0 / 18%) 87%,
+    transparent 98%
+  );
+  mask-image: linear-gradient(
+    to right,
+    black 0%,
+    black 52%,
+    rgb(0 0 0 / 78%) 65%,
+    rgb(0 0 0 / 45%) 76%,
+    rgb(0 0 0 / 18%) 87%,
+    transparent 98%
+  );
 }
 
 /* ── Shared base styles for both views ── */
