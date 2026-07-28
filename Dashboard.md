@@ -1,5 +1,5 @@
 ---
-date: 2026-07-14
+date: 2026-07-28
 cssclasses:
   - dashboard
 pomodoro:
@@ -43,6 +43,9 @@ pomodoro:
 > > > ```dataviewjs
 > > > dv.view("00 System/Scripts/dvWidgets/weeklyState");
 > > > ```
+> >
+> > > [!card] Финансы
+> > > 💰 [[Finance|Открыть финансы]]
 >
 > > [!col]
 > > > [!card] XP Today
