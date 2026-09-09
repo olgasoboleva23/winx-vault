@@ -113,3 +113,10 @@
 .winx-icon-circle {
   animation: pulse-glow 2s infinite alternate;
 }
+
+/* Obsidian 1.13 sets --corner-shape: superellipse(1.33) on .mod-macos, and app.css
+   applies it to every <button>/<input> — which turns our round controls into
+   squircles. Pin the shape back for anything inside a winx widget. */
+:is(.dashboard, .kanban-board, .winx-pomodoro, .winx-shop) :is(button, input) {
+  corner-shape: round;
+}
