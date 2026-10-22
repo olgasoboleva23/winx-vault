@@ -20,7 +20,6 @@ pomodoro:
 > > > [!card] Level
 > > > ```dataviewjs
 > > > dv.view("00 System/Scripts/dvWidgets/levelToday");
-> > > dv.view("00 System/Scripts/dvWidgets/wallet");
 > > > ```
 > > 
 > > > [!card] Pomodoro
@@ -28,9 +27,9 @@ pomodoro:
 > > > dv.view("00 System/Scripts/dvWidgets/pomodoro");
 > > > ```
 > > 
-> > > [!card] Monthly Habits
+> > > [!card] Goals
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/habits");
+> > > dv.view("00 System/Scripts/dvWidgets/goals");
 > > > ```
 > 
 > > [!col]
@@ -39,13 +38,14 @@ pomodoro:
 > > > dv.view("00 System/Scripts/dvWidgets/lifeAreas");
 > > > ```
 > >
-> > > [!card] Weekly State
+> > > [!card] Cycle
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/weeklyState");
+> > > dv.view("00 System/Scripts/dvWidgets/cycle");
 > > > ```
 > >
 > > > [!card] Финансы
 > > > 💰 [[Finance|Открыть финансы]]
+> > > 🗓 [[Week|Неделя]]
 >
 > > [!col]
 > > > [!card] XP Today
