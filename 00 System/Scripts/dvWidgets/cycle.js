@@ -20,7 +20,10 @@ if (!page) {
   }
 }
 
-const btn = root.createEl("button", { text: "началось сегодня", cls: "winx-open-note-btn" });
+const btns = root.createEl("div", { cls: "winx-cycle-btns" });
+const btn  = btns.createEl("button", { text: "началось сегодня", cls: "winx-open-note-btn" });
+const edit = btns.createEl("button", { text: "даты", cls: "winx-open-note-btn" });
+edit.onclick = () => app.workspace.openLinkText(CYCLE_PATH, "", false);
 btn.onclick = async () => {
   const line = `- start:: ${selected}`;
   const file = app.vault.getAbstractFileByPath(CYCLE_PATH);
