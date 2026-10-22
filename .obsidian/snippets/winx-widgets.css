@@ -120,3 +120,39 @@
 :is(.dashboard, .kanban-board, .winx-pomodoro, .winx-shop) :is(button, input) {
   corner-shape: round;
 }
+
+/* ── Goals, Cycle, Week widgets ── */
+.winx-goals {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.winx-goal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--winx-text-dark);
+}
+
+.winx-goal-name { font-weight: 600; }
+.winx-goal-count, .winx-goal-min, .winx-cycle-next { font-size: 12px; color: var(--winx-purple-deep); }
+
+.winx-goal-dots {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 2px;
+}
+
+.winx-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--winx-border);
+  background: rgb(255 255 255 / 40%);
+
+  &.done    { background: var(--winx-gold); border-color: var(--winx-gold-deep); }
+  &.missed  { border-color: var(--winx-pink-deep); border-style: dashed; }
+  &.planned { border-color: var(--winx-purple); }
+  &.sel     { box-shadow: 0 0 6px var(--winx-pink-deep); }
+}

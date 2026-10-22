@@ -1,7 +1,7 @@
 // ===== MODULE LOADING =====
 // Widgets bootstrap this file once per session:
 //   const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-// Both caches are dropped by the vault "modify" listener below whenever a
+// These caches (and goalsLib's) are dropped by the vault "modify" listener below whenever a
 // file under 00 System/Scripts changes, so edits hot-reload on next render.
 const CONFIG_PATH = "00 System/Scripts/dvWidgets/config.js";
 
@@ -165,6 +165,7 @@ if (!globalThis.app.__winxSub2) {
     if (file.path.startsWith("00 System/Scripts")) {
       delete globalThis.app.__winxHelpers;
       delete globalThis.app.__winxConfig;
+      delete globalThis.app.__winxGoalsLib;
     }
   });
 }

@@ -1,3 +1,9 @@
+- [ ] #⭐easy #area/body #goal/stretch растяжка 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-24
+- [x] #⭐easy #area/body #goal/stretch растяжка 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-20 ✅ 2026-10-20
+- [x] #⭐easy #area/body #goal/stretch растяжка 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-15 ✅ 2026-10-15
+- [ ] #⭐easy #area/mind #goal/reading чтение 🔁 every day 📅 2026-10-22
+- [x] #⭐easy #area/mind #goal/reading чтение 🔁 every day 📅 2026-10-19 ✅ 2026-10-19
+- [x] #⭐easy #area/mind #goal/reading чтение 🔁 every day 📅 2026-10-21 ✅ 2026-10-21
 - [x] #⭐⭐medium #area/body optimize all code 📅 2026-05-02 ✅ 2026-05-02
 - [ ] #⭐easy #area/rest tower of fasntasy 📅 2026-05-02 
 - [ ] #⭐easy #area/wealth купить сено 📅 2026-05-02 

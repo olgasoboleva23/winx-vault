@@ -17,7 +17,7 @@ const weekOf = date => {
 const DAY_NAMES = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 
 // Goal list item from Goals.md (Shop.md format): "name:: …" plus continuation lines.
-function parseGoal(text) {
+const parseGoal = function (text) {
   const field = k => text.match(new RegExp(`(?:^|\\s)${k}::[ \\t]*(.*)`, "m"))?.[1].trim() || null;
   const name = field("name"), tag = field("tag");
   if (!name || !tag) return null;
@@ -27,27 +27,27 @@ function parseGoal(text) {
     : null;
   const perWeek = days ? null : Number(field("perWeek")) || null;
   return { name, tag, days, perWeek, min: field("min"), plan: field("plan") };
-}
+};
 
 const weeklyTarget = goal => goal.days?.length ?? goal.perWeek ?? 0;
 
 const countDone = (doneDates, week) => new Set(doneDates.filter(d => week.includes(d))).size;
 
-function dayStatus(goal, date, doneSet, today) {
+const dayStatus = function (goal, date, doneSet, today) {
   if (doneSet.has(date)) return "done";
   if (goal.days?.includes(weekday(date))) return date < today ? "missed" : "planned";
   return "none";
-}
+};
 
-function nextPlannedDate(goal, from) {
+const nextPlannedDate = function (goal, from) {
   if (!goal.days?.length) return from;
   for (let i = 0; ; i++) if (goal.days.includes(weekday(addDays(from, i)))) return addDays(from, i);
-}
+};
 
 // Replace "📅 oldDate" with "📅 newDate" on a task line; unchanged if absent.
 const rollDue = (line, oldDate, newDate) => line.replace(`📅 ${oldDate}`, `📅 ${newDate}`);
 
-function cycleInfo(starts, date, period = 8) {
+const cycleInfo = function (starts, date, period = 8) {
   const past = starts.filter(s => s <= date).sort();
   if (!past.length) return null;
   const recent = past.slice(-7);
@@ -57,6 +57,6 @@ function cycleInfo(starts, date, period = 8) {
   const day = diffDays(date, last) + 1;
   const nextStart = addDays(last, length);
   return { day, length, nextStart, daysUntil: diffDays(nextStart, date), isPeriod: day <= period };
-}
+};
 
 ({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo })

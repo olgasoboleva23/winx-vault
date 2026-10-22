@@ -19,6 +19,7 @@ sort by tags
 > > [!card] 🔴 Overdue
 > > ```tasks
 not done
+tags do not include #goal
 due before {{query.file.property('date')}}
 path includes 02 Areas/Personal/Tasks
 group by function task.tags.filter(tag => tag.includes("area"))
