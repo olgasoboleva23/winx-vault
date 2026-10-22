@@ -15,7 +15,8 @@ if (!page) {
   } else {
     root.createEl("div", { text: `день ${info.day}`, cls: `winx-cycle-day${info.isPeriod ? " period" : ""}` });
     const [, mm, dd] = info.nextStart.split("-");
-    root.createEl("div", { text: `следующие ~${dd}.${mm}, через ${info.daysUntil} дн.`, cls: "winx-cycle-next" });
+    const when = info.daysUntil >= 0 ? `через ${info.daysUntil} дн.` : `задержка ${-info.daysUntil} дн.`;
+    root.createEl("div", { text: `следующие ~${dd}.${mm}, ${when}`, cls: "winx-cycle-next" });
   }
 }
 
