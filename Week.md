@@ -6,6 +6,7 @@ cssclasses:
 
 `INPUT[date:date]`
 
-```dataviewjs
-dv.view("00 System/Scripts/dvWidgets/week");
-```
+> [!card] Неделя
+> ```dataviewjs
+> dv.view("00 System/Scripts/dvWidgets/week");
+> ```
