@@ -185,3 +185,5 @@
 }
 
 .winx-week-day { font-size: 12px; color: var(--winx-purple-deep); margin-top: 6px; }
+
+.winx-cycle-btns { display: flex; gap: 8px; flex-wrap: wrap; }
