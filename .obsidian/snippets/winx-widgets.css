@@ -145,6 +145,8 @@
 }
 
 .winx-dot {
+  display: inline-block;
+  flex: none;
   width: 14px;
   height: 14px;
   border-radius: 50%;
