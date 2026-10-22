@@ -1,38 +1,18 @@
 ---
-type: task
-project: aiday
 status: active
-tags: []
 created: {{date}}
+asana:
 ---
+# <% tp.file.title %>
 
-# Title
+## Зачем
+<!-- 1–3 строки: ссылка на Asana, что нужно или что сломано -->
 
-## Context
-<!-- links, Asana, GitHub, short problem description -->
+## Сделать
+- [ ] 
 
-## Frontend
-<!-- UI, views, components, UX rules -->
-### Subsections (optional)
-- components
-- states
-- interactions
+## Лог
+<!-- всё свободное: созвоны, находки, решения, команды. Новое сверху, с датой. Код — в блоках ``` -->
 
-## Backend
-<!-- APIs, services, business logic -->
-### Subsections (optional)
-- models
-- services / operations
-- validations
-
-## Data / DB
-<!-- schema, entities, relations, migrations -->
-
-## Logic / Rules
-<!-- system rules, edge cases, state machines -->
-
-## Notes
-<!-- decisions, discussion, logs -->
-
-## TODO
-- [ ]
+## Проверка
+<!-- как убедиться, что работает: шаги, ссылки, тест-чек-лист -->
