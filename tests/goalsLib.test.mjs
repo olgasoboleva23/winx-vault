@@ -41,3 +41,8 @@ test("cycleInfo", () => {
   const c = L.cycleInfo(["2026-08-01","2026-08-29","2026-09-28","2026-10-27"], "2026-10-30");
   assert.equal(c.length, 29); assert.equal(c.day, 4); assert.equal(c.isPeriod, true);
 });
+
+test("rollDue", () => {
+  assert.equal(L.rollDue("- [ ] #goal/x a 🔁 every day 📅 2026-10-01", "2026-10-01", "2026-10-22"), "- [ ] #goal/x a 🔁 every day 📅 2026-10-22");
+  assert.equal(L.rollDue("- [ ] #goal/x a 📅 2026-10-05", "2026-10-01", "2026-10-22"), "- [ ] #goal/x a 📅 2026-10-05");
+});
