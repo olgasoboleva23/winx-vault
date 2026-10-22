@@ -22,13 +22,17 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 │   │       ├── config.js              — Central config (areas, difficulties, XP values, levels)
 │   │       ├── levelToday.js          — Level & XP progress card
 │   │       ├── xpToday.js             — XP earned today + streak heatmap
-│   │       ├── habits.js              — Monthly habits bar chart
+│   │       ├── habits.js              — Monthly habits bar chart (not on the dashboard)
 │   │       ├── lifeAreas.js           — Radar chart of life area scores
-│   │       ├── weeklyState.js         — Energy & mood line chart
+│   │       ├── weeklyState.js         — Energy & mood line chart (not on the dashboard)
 │   │       ├── helpers.js             — Shared AudioEngine, Wallet, PurchaseLog
-│   │       ├── wallet.js              — Gold balance widget
+│   │       ├── wallet.js              — Gold balance widget (not on the dashboard)
 │   │       ├── shop.js                — Shop view with buy buttons
 │   │       ├── pomodoro.js            — Pomodoro timer
+│   │       ├── goalsLib.js            — Pure week / goal / cycle logic (tested in tests/)
+│   │       ├── goals.js               — Goals: "X из Y на этой неделе" + Mon–Sun dots
+│   │       ├── cycle.js               — Cycle day and next start forecast
+│   │       ├── week.js                — Weekly review (used by Week.md)
 │   │       ├── celestialMarket.js     — Celestial Market shopping list widget
 │   │       └── dailyNote.js           — Date selector widget
 │   └── 📁 Templates
@@ -40,8 +44,11 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 │       └── watch item.md — Templater template for new watch item (cartoon, movie, etc)
 ├── 📁 01 Projects
 ├── 📁 02 Areas
+│   ├── 📁 Health & Body
+│   │   └── Cycle.md — Cycle start dates (`period::`, `- start::`)
 │   └── 📁 Personal
-│       ├── 📁 Daily Notes — Daily journal entries (mood, energy, habits, XP log)
+│       ├── Goals.md — Goal list (see Goals)
+│       ├── 📁 Daily Notes — Daily journal entries (notes, XP log)
 │       └── 📁 Tasks
 │           └── Kanban.md — Kanban board view of tasks
 ├── 📁 03 Resources
@@ -53,7 +60,9 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 │   └── 📁 Media — Attachments (images, fonts)
 ├── 📁 04 Archive
 ├── 📁 99 Inbox
-└── Dashboard.md
+├── Dashboard.md
+├── Week.md — Weekly review page
+└── 📁 tests — `node --test tests/*.test.mjs`
 ```
 
 ---
@@ -164,12 +173,30 @@ Use the **QuickAdd `New Market Item` macro** (pick a category, type the name), o
 
 ---
 
+## 🎯 Goals
+
+A goal is a regular **recurring task** in `Tasks/Master.md` tagged `#goal/<slug>`, ticked off in the Kanban like any task (and earning XP). `02 Areas/Personal/Goals.md` describes each goal:
+
+```
+- name:: Растяжка
+  tag:: #goal/stretch
+  days:: вт, чт, сб
+  min:: 5 минут на коврике
+  plan:: если выключила компьютер вечером, раскатываю коврик
+```
+
+- `days` (пн … вс) sets the weekly plan; otherwise `perWeek:: N`. If both are given, `days` wins.
+- A day counts as done when a completed task with the tag has `✅` on that day. Weeks start on Monday.
+- Use repeats without `when done`. A missed goal task is moved by the Goals widget to the next planned day (not before today), so it never piles up in Overdue; Kanban's Overdue skips `#goal` tasks anyway.
+- **Week.md** shows the selected week: goals × days, cycle day, other tasks done and still open, and the first lines of each daily note.
+
+---
+
 ## 📝 Daily Note
 
-Each daily note tracks:
-- **Energy** & **Mood** (1–10 sliders)
+Each daily note has:
+- **Notes** — free text (first lines show up on the Week page)
 - **XP Log** — freeform notes on what you did/learned
-- **Habits** — checkbox tasks tagged `#habit/<area>/<name>`
 
 Create via Templater from `00 System/Templates/Daily Note.md` (the Daily Notes core plugin is preconfigured to use it), or just click **✦ Open** on the dashboard — if the selected day has no note yet, it's created from the template automatically.
 
@@ -205,11 +232,10 @@ Use the **QuickAdd `NewTask` macro**:
 |---|---|
 | **Level** | Current level, total XP, progress to next level |
 | **Pomodoro** | 25/5 min focus timer, session counter |
-| **Monthly Habits** | Bar chart of habit completions this month |
+| **Goals** | Per goal "X из Y на этой неделе", Mon–Sun dots, minimum version |
 | **Life Areas** | Radar chart — XP earned per area this month |
-| **Weekly State** | Line chart of energy & mood over the past week |
+| **Cycle** | Cycle day, next start forecast, "началось сегодня" button |
 | **XP Today** | XP earned today, current level name, streak heatmap |
 | **Quests** | Tasks due today, grouped by life area tag |
-| **Wallet** | Current gold balance, shown under Level card |
 | **Celestial Market** | Pending shopping items grouped by category |
 | **Shop**   | (in Shop.md) Browse rewards, click to buy with gold |
