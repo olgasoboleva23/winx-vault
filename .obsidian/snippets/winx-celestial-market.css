@@ -11,19 +11,6 @@
 
   .market-list { display: grid; }
 
-  .market-group-header {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    margin: 0.55rem 0 0.15rem;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--winx-purple-deep);
-
-    &:first-child { margin-top: 0; }
-  }
-
   .market-count {
     min-width: 1.3rem;
     padding: 0 0.35rem;
@@ -134,4 +121,22 @@
   0%   { opacity: 0; scale: 0.4; }
   30%  { opacity: 1; scale: 1.1; }
   100% { opacity: 0; scale: 1.4; }
+}
+
+/* Category pill, shared by the market widget and the Supplies page */
+:is(.winx-celestial-market, .winx-supplies) .market-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  margin: 0.6rem 0 0.25rem;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--winx-border) 40%, transparent);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--winx-purple-deep);
+
+  &:first-child { margin-top: 0; }
 }
