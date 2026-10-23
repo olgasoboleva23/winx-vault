@@ -103,3 +103,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Phone: reclaim side space ──
+   Page margins + grid padding + card padding stack up to ~70px per side,
+   too much on a ~390px screen. Desktop is untouched. */
+.is-phone :is(.dashboard, .kanban-board) {
+  --file-margins: 12px 8px;
+
+  .callout[data-callout="grid"] { padding: 4px !important; }
+  .callout[data-callout="card"] { padding: 10px !important; }
+}
