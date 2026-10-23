@@ -107,4 +107,9 @@ const reminders = function (tasks, goals) {
   return out.sort((a, b) => a.at.localeCompare(b.at));
 };
 
-({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders })
+// Mark an open market line as bought today, the way the Tasks plugin does.
+// Lines that are not open tasks come back unchanged.
+const markBought = (line, date) =>
+  /^\s*- \[ \]/.test(line) ? `${line.replace("- [ ]", "- [x]").trimEnd()} ✅ ${date}` : line;
+
+({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought })

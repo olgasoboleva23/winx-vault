@@ -107,3 +107,10 @@ test("reminders", () => {
     { at: "20:30", title: "Reading", body: "one chapter" },
   ]);
 });
+
+test("markBought", () => {
+  assert.equal(L.markBought("- [ ] apples #food", "2026-10-23"), "- [x] apples #food ✅ 2026-10-23");
+  assert.equal(L.markBought("  - [ ] rice #food  ", "2026-10-23"), "  - [x] rice #food ✅ 2026-10-23");
+  assert.equal(L.markBought("- [x] apples #food ✅ 2026-10-01", "2026-10-23"), "- [x] apples #food ✅ 2026-10-01"); // already bought: unchanged
+  assert.equal(L.markBought("просто текст", "2026-10-23"), "просто текст");
+});

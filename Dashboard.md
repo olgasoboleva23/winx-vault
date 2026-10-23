@@ -62,7 +62,7 @@ short mode
 sort by tags
 > > > ```
 > >
-> > > [!card] Celestial Market
+> > > [!card|scroll] Celestial Market
 > > > ```dataviewjs
 > > > dv.view("00 System/Scripts/dvWidgets/celestialMarket");
 > > > ```
