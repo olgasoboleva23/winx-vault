@@ -37,7 +37,7 @@ test("nextPlannedDate", () => {
 
 test("cycleInfo", () => {
   assert.equal(L.cycleInfo(["2026-10-05"], "2026-10-01"), null);
-  assert.deepEqual(L.cycleInfo(["2026-10-05"], "2026-10-22"), {day: 18, length: 30, nextStart: "2026-11-04", daysUntil: 13, isPeriod: false});
+  assert.deepEqual(L.cycleInfo(["2026-10-05"], "2026-10-22"), {day: 18, length: 30, nextStart: "2026-11-04", daysUntil: 13, isPeriod: false, ended: false});
   const c = L.cycleInfo(["2026-08-01","2026-08-29","2026-09-28","2026-10-27"], "2026-10-30");
   assert.equal(c.length, 29); assert.equal(c.day, 4); assert.equal(c.isPeriod, true);
 });
@@ -45,4 +45,24 @@ test("cycleInfo", () => {
 test("rollDue", () => {
   assert.equal(L.rollDue("- [ ] #goal/x a 🔁 every day 📅 2026-10-01", "2026-10-01", "2026-10-22"), "- [ ] #goal/x a 🔁 every day 📅 2026-10-22");
   assert.equal(L.rollDue("- [ ] #goal/x a 📅 2026-10-05", "2026-10-01", "2026-10-22"), "- [ ] #goal/x a 📅 2026-10-05");
+});
+
+test("cycleInfo with end dates", () => {
+  const s = ["2026-09-12", "2026-10-11"];
+  // no end yet for the current cycle: falls back to period length
+  assert.equal(L.cycleInfo(["2026-10-11"], "2026-10-15", 8).isPeriod, true);
+  assert.equal(L.cycleInfo(["2026-10-11"], "2026-10-15", 8).ended, false);
+  // end recorded: period lasts exactly to it
+  assert.equal(L.cycleInfo(["2026-10-11"], "2026-10-16", 8, ["2026-10-16"]).isPeriod, true);
+  assert.equal(L.cycleInfo(["2026-10-11"], "2026-10-16", 8, ["2026-10-16"]).ended, true);
+  assert.equal(L.cycleInfo(["2026-10-11"], "2026-10-17", 8, ["2026-10-16"]).isPeriod, false);
+  // past days of a week view see the end even if it is after them
+  assert.equal(L.cycleInfo(["2026-10-11"], "2026-10-13", 8, ["2026-10-16"]).ended, false);
+  assert.equal(L.cycleInfo(["2026-10-11"], "2026-10-13", 8, ["2026-10-16"]).isPeriod, true);
+  // previous cycle's end does not end the current one
+  const c = L.cycleInfo(s, "2026-10-12", 8, ["2026-09-17"]);
+  assert.deepEqual([c.isPeriod, c.ended], [true, false]);
+  // recorded lengths replace the default: last time 6 days, so day 7 is not period
+  assert.equal(L.cycleInfo(s, "2026-10-17", 8, ["2026-09-17"]).isPeriod, false);
+  assert.equal(L.cycleInfo(s, "2026-10-16", 8, ["2026-09-17"]).isPeriod, true);
 });
