@@ -44,6 +44,11 @@ pomodoro:
 > > > dv.view("00 System/Scripts/dvWidgets/cycle");
 > > > ```
 > >
+> > > [!card] Weight
+> > > ```dataviewjs
+> > > dv.view("00 System/Scripts/dvWidgets/weight");
+> > > ```
+> >
 > > > [!card] Finance
 > > > 💰 [[Finance|Open finance]]
 >
