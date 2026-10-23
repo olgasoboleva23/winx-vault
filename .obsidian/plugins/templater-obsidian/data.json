@@ -32,7 +32,7 @@
     ""
   ],
   "startup_templates": [
-    ""
+    "00 System/Templates/_startup.md"
   ],
   "intellisense_render": 1,
   "ignore_folders_on_creation": [

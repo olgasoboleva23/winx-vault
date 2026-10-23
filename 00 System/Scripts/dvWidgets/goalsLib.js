@@ -26,7 +26,7 @@ const parseGoal = function (text) {
     ? daysRaw.toLowerCase().split(/[,\s]+/).map(d => DAY_NAMES.indexOf(d) + 1).filter(Boolean)
     : null;
   const perWeek = days ? null : Number(field("perWeek")) || null;
-  return { name, tag, days, perWeek, min: field("min"), plan: field("plan") };
+  return { name, tag, days, perWeek, min: field("min"), plan: field("plan"), remind: field("remind") ?? "18:00" };
 };
 
 const weeklyTarget = goal => goal.days?.length ?? goal.perWeek ?? 0;
@@ -90,4 +90,21 @@ const supplyStats = function (history, today) {
   });
 };
 
-({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats })
+// Today's notifications from open tasks due today. A goal task fires at the
+// goal's remind time with its plan; a task with "HH:MM" in its text fires
+// 30 minutes before. Sorted by time.
+const reminders = function (tasks, goals) {
+  const out = [];
+  for (const t of tasks) {
+    const goal = goals.find(g => t.tags.includes(g.tag));
+    if (goal) { out.push({ at: goal.remind, title: goal.name, body: goal.plan || goal.min || goal.name }); continue; }
+    const m = t.text.match(/(?:^|\s)(\d{1,2}):(\d{2})(?!\d)/);
+    if (!m) continue;
+    const mins = Math.max(0, Number(m[1]) * 60 + Number(m[2]) - 30);
+    const at = `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
+    out.push({ at, title: "Через 30 минут", body: t.text.replace(/#[^\s]+/g, "").trim() });
+  }
+  return out.sort((a, b) => a.at.localeCompare(b.at));
+};
+
+({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders })
