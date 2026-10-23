@@ -118,3 +118,25 @@ test("markBought", () => {
 test("parseGoal accepts English day names", () => {
   assert.deepEqual(L.parseGoal("name:: X\n tag:: #goal/x\n days:: Mon, wed, Friday").days, [1, 3, 5]);
 });
+
+test("unmarkBought", () => {
+  assert.equal(L.unmarkBought("- [x] apples #food ✅ 2026-10-23"), "- [ ] apples #food");
+  assert.equal(L.unmarkBought("  - [x] rice #food ✅ 2026-10-23 "), "  - [ ] rice #food");
+  assert.equal(L.unmarkBought("- [ ] уже открыт #pet"), "- [ ] уже открыт #pet");
+  assert.equal(L.unmarkBought(L.markBought("- [ ] хлеб #food", "2026-10-23")), "- [ ] хлеб #food"); // round trip
+});
+
+test("todayCount", () => {
+  const d = "2026-10-23";
+  const tasks = [
+    { done: false, recurring: false, scheduled: "2026-10-23" },             // today pick
+    { done: false, recurring: false, scheduled: "2026-10-24" },             // future pick
+    { done: false, recurring: true,  due: "2026-10-20" },                   // routine left from earlier
+    { done: false, recurring: true,  due: "2026-10-25" },                   // routine later
+    { done: false, recurring: false, due: "2026-10-23" },                   // deadline today
+    { done: false, recurring: false, due: "2026-10-01" },                   // overdue deadline
+    { done: true,  recurring: false, scheduled: "2026-10-23" },             // done
+    { done: false, recurring: false },                                      // no date
+  ];
+  assert.equal(L.todayCount(tasks, d), 4);
+});

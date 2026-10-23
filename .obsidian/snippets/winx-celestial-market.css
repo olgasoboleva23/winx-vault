@@ -11,16 +11,6 @@
 
   .market-list { display: grid; }
 
-  .market-count {
-    min-width: 1.3rem;
-    padding: 0 0.35rem;
-    border-radius: 999px;
-    text-align: center;
-    font-size: 0.62rem;
-    letter-spacing: 0;
-    color: #fff;
-    background: var(--winx-pink-deep);
-  }
 
   .market-item {
     position: relative;
@@ -124,7 +114,7 @@
 }
 
 /* Category pill, shared by the market widget and the Supplies page */
-:is(.winx-celestial-market, .winx-supplies) .market-group-header {
+:is(.winx-celestial-market, .winx-supplies, .winx-mshop) .market-group-header {
   display: flex;
   align-items: center;
   gap: 0.45rem;
@@ -139,4 +129,15 @@
   color: var(--winx-purple-deep);
 
   &:first-child { margin-top: 0; }
+}
+
+:is(.winx-celestial-market, .winx-mshop) .market-count {
+  min-width: 1.3rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0;
+  color: #fff;
+  background: var(--winx-pink-deep);
 }

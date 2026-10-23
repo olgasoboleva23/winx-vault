@@ -113,4 +113,16 @@ const reminders = function (tasks, goals) {
 const markBought = (line, date) =>
   /^\s*- \[ \]/.test(line) ? `${line.replace("- [ ]", "- [x]").trimEnd()} ✅ ${date}` : line;
 
-({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought })
+// Undo markBought: reopen a bought line and drop its ✅ date.
+const unmarkBought = line =>
+  /^\s*- \[x\]/i.test(line) ? line.replace(/- \[x\]/i, "- [ ]").replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/u, "").trimEnd() : line;
+
+// How many things are on today's plate, same rules as Kanban2:
+// picked for today (⏳ today), routines due by today, deadlines due by today.
+// tasks: [{done, recurring, due?, scheduled?}] with "YYYY-MM-DD" dates.
+const todayCount = (tasks, date) => tasks.filter(t => !t.done && (
+  t.recurring ? (t.due ?? t.scheduled) !== undefined && (t.due ?? t.scheduled) <= date
+              : t.scheduled === date || (t.due !== undefined && t.due <= date)
+)).length;
+
+({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought, unmarkBought, todayCount })
