@@ -85,3 +85,25 @@ test("supplyStats", () => {
   assert.equal(salt.due, false);
   assert.equal(L.supplyStats(h, "2026-09-25")[0].due, false);        // 4 of 10 days
 });
+
+test("reminders", () => {
+  const goals = [
+    L.parseGoal("name:: Stretching\n tag:: #goal/stretch\n days:: пн, ср, пт\n plan:: after lunch → yoga mat"),
+    L.parseGoal("name:: Reading\n tag:: #goal/read\n perWeek:: 5\n min:: one chapter\n remind:: 20:30"),
+  ];
+  assert.equal(goals[0].remind, "18:00");                 // default
+  assert.equal(goals[1].remind, "20:30");
+  const tasks = [
+    { text: "stretch #goal/stretch", tags: ["#goal/stretch"] },
+    { text: "read #goal/read", tags: ["#goal/read"] },
+    { text: "#⭐easy meeting 10:00", tags: ["#⭐easy"] },
+    { text: "call 0:15 at night", tags: [] },
+    { text: "buy apples", tags: [] },
+  ];
+  assert.deepEqual(L.reminders(tasks, goals), [
+    { at: "00:00", title: "Через 30 минут", body: "call 0:15 at night" },
+    { at: "09:30", title: "Через 30 минут", body: "meeting 10:00" },
+    { at: "18:00", title: "Stretching", body: "after lunch → yoga mat" },
+    { at: "20:30", title: "Reading", body: "one chapter" },
+  ]);
+});
