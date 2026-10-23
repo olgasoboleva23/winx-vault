@@ -207,3 +207,27 @@
   max-height: 300px;
   overflow-y: auto !important;
 }
+
+/* ── Scroll hint: fade the edge that has more content beyond it ──
+   Scroll-driven animation: with nothing to scroll the timeline is inactive,
+   the fades stay 0 and nothing changes. */
+@property --winx-fade-top    { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --winx-fade-bottom { syntax: "<length>"; inherits: false; initial-value: 0px; }
+
+@keyframes winx-scroll-fade {
+  0%   { --winx-fade-top: 0px;  --winx-fade-bottom: 48px; }
+  8%   { --winx-fade-top: 48px; }
+  92%  { --winx-fade-bottom: 48px; }
+  100% { --winx-fade-top: 48px; --winx-fade-bottom: 0px; }
+}
+
+:is(
+  .dashboard .callout[data-callout="card"][data-callout-metadata~="scroll"],
+  .kanban-board .callout[data-callout="card"]
+) > .callout-content {
+  mask-image: linear-gradient(to bottom,
+    transparent 0, #000 var(--winx-fade-top),
+    #000 calc(100% - var(--winx-fade-bottom)), transparent 100%);
+  animation: winx-scroll-fade linear both;
+  animation-timeline: scroll(self);
+}
