@@ -21,7 +21,6 @@ status: ${status}
 rating: 
 created: ${date}
 tags:
-  - #media/watch
 ---
 
 # 🎬 ${title}
