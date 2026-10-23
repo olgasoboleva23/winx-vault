@@ -6,7 +6,7 @@ cssclasses:
 
 `INPUT[date:date]`
 
-> [!card] Неделя
+> [!card|scroll tall] Неделя
 > ```dataviewjs
 > dv.view("00 System/Scripts/dvWidgets/week");
 > ```
