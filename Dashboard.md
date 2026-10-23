@@ -31,7 +31,7 @@ pomodoro:
 > > > ```dataviewjs
 > > > dv.view("00 System/Scripts/dvWidgets/goals");
 > > > ```
-> > > 🗓 [[Week|Неделя]]
+> > > 🗓 [[Week|Week]]
 > 
 > > [!col]
 > > > [!card] Life Areas
@@ -45,7 +45,7 @@ pomodoro:
 > > > ```
 > >
 > > > [!card] Finance
-> > > 💰 [[Finance|Открыть финансы]]
+> > > 💰 [[Finance|Open finance]]
 >
 > > [!col]
 > > > [!card] XP Today

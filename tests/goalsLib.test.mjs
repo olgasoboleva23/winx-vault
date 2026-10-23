@@ -101,8 +101,8 @@ test("reminders", () => {
     { text: "buy apples", tags: [] },
   ];
   assert.deepEqual(L.reminders(tasks, goals), [
-    { at: "00:00", title: "Через 30 минут", body: "call 0:15 at night" },
-    { at: "09:30", title: "Через 30 минут", body: "meeting 10:00" },
+    { at: "00:00", title: "In 30 minutes", body: "call 0:15 at night" },
+    { at: "09:30", title: "In 30 minutes", body: "meeting 10:00" },
     { at: "18:00", title: "Stretching", body: "after lunch → yoga mat" },
     { at: "20:30", title: "Reading", body: "one chapter" },
   ]);
@@ -113,4 +113,8 @@ test("markBought", () => {
   assert.equal(L.markBought("  - [ ] rice #food  ", "2026-10-23"), "  - [x] rice #food ✅ 2026-10-23");
   assert.equal(L.markBought("- [x] apples #food ✅ 2026-10-01", "2026-10-23"), "- [x] apples #food ✅ 2026-10-01"); // already bought: unchanged
   assert.equal(L.markBought("просто текст", "2026-10-23"), "просто текст");
+});
+
+test("parseGoal accepts English day names", () => {
+  assert.deepEqual(L.parseGoal("name:: X\n tag:: #goal/x\n days:: Mon, wed, Friday").days, [1, 3, 5]);
 });

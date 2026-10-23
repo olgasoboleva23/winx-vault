@@ -42,4 +42,4 @@ window.renderChart({
   },
 }, dv.container);
 
-dv.container.createEl("div", { text: "последние 4 недели", cls: "winx-goal-min" }).style.textAlign = "center";
+dv.container.createEl("div", { text: "last 4 weeks", cls: "winx-goal-min" }).style.textAlign = "center";

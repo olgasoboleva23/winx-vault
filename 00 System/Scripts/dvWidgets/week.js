@@ -3,7 +3,7 @@ const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/S
 const selected = (dv.current().date ?? dv.date("today")).toFormat("yyyy-MM-dd");
 const today    = window.moment().format("YYYY-MM-DD");
 const week     = L.weekOf(selected);
-const DAYS     = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+const DAYS     = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const label    = d => `${DAYS[L.weekday(d) - 1]} ${d.slice(8, 10)}.${d.slice(5, 7)}`;
 const tasks    = dv.pages('"02 Areas/Personal/Tasks"').file.tasks;
 const fmt      = dt => dt?.toFormat("yyyy-MM-dd");
@@ -26,34 +26,34 @@ for (const goal of goals) {
   const tr = table.createEl("tr");
   tr.createEl("td", { text: goal.name });
   for (const d of week) tr.createEl("td").createEl("span", { cls: `winx-dot ${L.dayStatus(goal, d, doneSet, today)}` });
-  tr.createEl("td", { text: `${L.countDone(done, week)} из ${L.weeklyTarget(goal)}` });
+  tr.createEl("td", { text: `${L.countDone(done, week)} of ${L.weeklyTarget(goal)}` });
 }
 
 if (starts.length) {
   const tr = table.createEl("tr");
-  tr.createEl("td", { text: "цикл" });
+  tr.createEl("td", { text: "cycle" });
   for (const d of week) {
     const info = L.cycleInfo(starts, d, cyclePage.period ?? 8, ends);
     tr.createEl("td", { text: info ? String(info.day) : "", cls: info?.isPeriod ? "period" : "" });
   }
   tr.createEl("td");
 }
-if (!goals.length) dv.el("div", "Создай 02 Areas/Personal/Goals.md");
+if (!goals.length) dv.el("div", "Create 02 Areas/Personal/Goals.md");
 
 // ── Tasks without #goal ──
 const plain = tasks.where(t => !t.tags.some(tag => tag.startsWith("#goal")));
-dv.header(3, "Сделано");
+dv.header(3, "Done");
 for (const d of week) {
   const doneOn = plain.where(t => t.completed && fmt(t.completion) === d);
   if (!doneOn.length) continue;
   dv.el("div", label(d), { cls: "winx-week-day" });
   dv.taskList(doneOn, false);
 }
-dv.header(3, "Не сделано");
+dv.header(3, "Not done");
 dv.taskList(plain.where(t => !t.completed && week.includes(fmt(t.due))), false);
 
 // ── Daily notes: link + first 3 lines under "## 📝 Notes" ──
-dv.header(3, "Заметки");
+dv.header(3, "Notes");
 for (const p of dv.pages('"02 Areas/Personal/Daily Notes"').where(p => week.includes(fmt(p.date))).sort(p => p.date)) {
   const text  = await app.vault.cachedRead(app.vault.getAbstractFileByPath(p.file.path));
   const notes = (text.split(/^## 📝 Notes.*$/m)[1] ?? "").split(/^## /m)[0];

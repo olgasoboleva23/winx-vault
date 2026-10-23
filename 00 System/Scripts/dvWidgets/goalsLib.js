@@ -15,6 +15,7 @@ const weekOf = date => {
 };
 
 const DAY_NAMES = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+const DAY_NAMES_EN = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
 // Goal list item from Goals.md (Shop.md format): "name:: …" plus continuation lines.
 const parseGoal = function (text) {
@@ -23,7 +24,7 @@ const parseGoal = function (text) {
   if (!name || !tag) return null;
   const daysRaw = field("days");
   const days = daysRaw
-    ? daysRaw.toLowerCase().split(/[,\s]+/).map(d => DAY_NAMES.indexOf(d) + 1).filter(Boolean)
+    ? daysRaw.toLowerCase().split(/[,\s]+/).map(d => (DAY_NAMES.indexOf(d) + 1) || (DAY_NAMES_EN.indexOf(d.slice(0, 3)) + 1)).filter(Boolean)
     : null;
   const perWeek = days ? null : Number(field("perWeek")) || null;
   return { name, tag, days, perWeek, min: field("min"), plan: field("plan"), remind: field("remind") ?? "18:00" };
@@ -102,7 +103,7 @@ const reminders = function (tasks, goals) {
     if (!m) continue;
     const mins = Math.max(0, Number(m[1]) * 60 + Number(m[2]) - 30);
     const at = `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
-    out.push({ at, title: "Через 30 минут", body: t.text.replace(/#[^\s]+/g, "").trim() });
+    out.push({ at, title: "In 30 minutes", body: t.text.replace(/#[^\s]+/g, "").trim() });
   }
   return out.sort((a, b) => a.at.localeCompare(b.at));
 };
