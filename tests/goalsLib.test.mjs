@@ -78,8 +78,8 @@ test("supplyStats", () => {
   ];
   const s = L.supplyStats(h, "2026-09-30");
   assert.deepEqual(s.map(x => x.name), ["apples", "rice"]);          // bought once: not a staple
-  const hay = s[0];
-  assert.deepEqual([hay.buys, hay.avg, hay.since, hay.due, hay.tag], [3, 10, 9, true]  .concat(["#pet"]));
+  const apples = s[0];
+  assert.deepEqual([apples.buys, apples.avg, apples.since, apples.due, apples.tag], [3, 10, 9, true, "#food"]);
   const salt = s[1];
   assert.deepEqual([salt.buys, salt.avg, salt.tag], [2, null, "#home"]); // <3 buys: no forecast; last tag wins
   assert.equal(salt.due, false);
