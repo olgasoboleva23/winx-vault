@@ -3,6 +3,8 @@ const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/S
 
 const today = window.moment().format("YYYY-MM-DD");
 const fmt   = d => d?.toFormat("yyyy-MM-dd");
+const wfile = app.vault.getAbstractFileByPath("02 Areas/Appearance/Weight.md");
+const lastW = wfile ? L.parseWeights(await app.vault.cachedRead(wfile)).at(-1) : null;
 const left  = dv.page("00 System/Data/Celestial Market")?.file.tasks.where(t => !t.completed).length ?? 0;
 const tasks = dv.pages('"02 Areas/Personal/Tasks"').file.tasks.array()
   .map(t => ({ done: t.completed, recurring: t.text.includes("🔁"), due: fmt(t.due), scheduled: fmt(t.scheduled) }));
@@ -10,6 +12,7 @@ const tasks = dv.pages('"02 Areas/Personal/Tasks"').file.tasks.array()
 const tiles = [
   { icon: "🛒", title: "Shopping", sub: `${left} left`, path: "Mobile/Shopping" },
   { icon: "☀️", title: "Tasks", sub: `${L.todayCount(tasks, today)} today`, path: "Mobile/Tasks" },
+  { icon: "⚖️", title: "Weight", sub: lastW ? `${lastW.kg} kg` : "log", path: "Mobile/Weight" },
 ];
 
 const grid = dv.container.createEl("div", { cls: "winx-tiles" });

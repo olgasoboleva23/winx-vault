@@ -140,3 +140,14 @@ test("todayCount", () => {
   ];
   assert.equal(L.todayCount(tasks, d), 4);
 });
+
+test("weights: parse and upsert", () => {
+  const text = "%% note %%\n- 2026-10-21 70.1\n- 2026-10-08 70,8\nnot a line\n- 2026-10-23 70.5\n";
+  assert.deepEqual(L.parseWeights(text), [
+    { date: "2026-10-08", kg: 70.8 }, { date: "2026-10-21", kg: 70.1 }, { date: "2026-10-23", kg: 70.5 },
+  ]);
+  // new day appends, same day replaces, other text untouched
+  assert.equal(L.upsertWeight("- 2026-10-21 70.1", "2026-10-23", 70.5), "- 2026-10-21 70.1\n- 2026-10-23 70.5\n");
+  assert.equal(L.upsertWeight("%% x %%\n- 2026-10-23 70.5\n", "2026-10-23", 71), "%% x %%\n- 2026-10-23 71\n");
+  assert.equal(L.upsertWeight("", "2026-10-23", 70.5), "- 2026-10-23 70.5\n");
+});
