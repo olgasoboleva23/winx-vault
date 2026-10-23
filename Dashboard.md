@@ -53,7 +53,7 @@ pomodoro:
 > > > dv.view("00 System/Scripts/dvWidgets/xpToday");
 > > > ```
 > >
-> > > [!card] Quests
+> > > [!card|scroll] Quests
 > > > ```tasks
 due on {{query.file.property('date')}}
 path includes Tasks
