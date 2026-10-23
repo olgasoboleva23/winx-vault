@@ -152,6 +152,26 @@ class PurchaseLog {
   }
 }
 
+// ===== CELESTIAL MARKET =====
+const MARKET_PATH = "00 System/Data/Celestial Market.md";
+const marketName  = t => t.text.replace(/#[\w/]+/g, "").replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
+const marketTag   = t => t.tags?.find(tag => !tag.includes("/")) ?? "#other";
+
+// { history: [{name, tag, date}] of bought items, open: Set of lowercased names still on the list }
+function marketState(dv) {
+  const tasks = dv.page(MARKET_PATH)?.file.tasks.array() ?? [];
+  return {
+    history: tasks.filter(t => t.completed && t.completion)
+      .map(t => ({ name: marketName(t), tag: marketTag(t), date: t.completion.toFormat("yyyy-MM-dd") })),
+    open: new Set(tasks.filter(t => !t.completed).map(t => marketName(t).toLowerCase())),
+  };
+}
+
+async function addToMarket(name, tag) {
+  const file = app.vault.getAbstractFileByPath(MARKET_PATH);
+  if (file) await app.vault.process(file, c => `${c.replace(/\s+$/, "")}\n- [ ] ${name} ${tag}\n`);
+}
+
 // ===== ONE-TIME EVENT SUBSCRIPTIONS =====
 // Invalidate caches when relevant files change. Survives re-evals via globalThis flag.
 // metadataCache "changed" only fires for markdown; script files need vault "modify".
@@ -170,4 +190,4 @@ if (!globalThis.app.__winxSub2) {
   });
 }
 
-({ AudioEngine, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor })
+({ AudioEngine, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor, marketState, addToMarket })
