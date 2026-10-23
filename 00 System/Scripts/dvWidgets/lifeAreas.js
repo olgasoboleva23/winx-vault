@@ -5,12 +5,13 @@ const sel        = dv.current().date ?? dv.date("today");
 const monthStart = sel.startOf("month");
 const monthEnd   = sel.endOf("month");
 
-// --- task XP per area ---
+// --- task XP per area, last 4 weeks up to the selected date ---
+const since = sel.minus({ days: 27 }).startOf("day");
 const scores = Object.fromEntries(
   areas.map(a => [a.name, 0])
 );
 
-for (const t of dv.pages('"02 Areas/Personal/Tasks"').file.tasks.where(t => t.completed && t.completion?.ts <= sel.ts)) {
+for (const t of dv.pages('"02 Areas/Personal/Tasks"').file.tasks.where(t => t.completed && t.completion && t.completion.ts >= since.ts && t.completion.ts <= sel.endOf("day").ts)) {
   const area = Object.entries(areaMap).find(([tag]) => t.tags.includes(tag))?.[1];
   if (area) scores[area] += H.taskXp(t, xpMap);
 }
@@ -40,3 +41,5 @@ window.renderChart({
     plugins: { legend: { display: false } },
   },
 }, dv.container);
+
+dv.container.createEl("div", { text: "последние 4 недели", cls: "winx-goal-min" }).style.textAlign = "center";
