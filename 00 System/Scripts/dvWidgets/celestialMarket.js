@@ -1,72 +1,56 @@
-const filePath = "00 System/Data/Celestial Market.md";
-const file = dv.page("00 System/Data/Celestial Market");
-if (!file) {
-  dv.paragraph("Market file not found.");
-  return;
-}
+const FILE_PATH = "00 System/Data/Celestial Market.md";
+const page = dv.page("00 System/Data/Celestial Market");
+if (!page) { dv.paragraph("Market file not found."); return; }
 
 const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 const { marketCategories } = await H.loadConfig();
-const categoryMap = Object.fromEntries(marketCategories.map((c) => [c.tag, c]));
 
-const items = file.file.tasks.where((t) => !t.completed).array();
-const L   = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
-const mkt = H.marketState(dv);
-const soon = L.supplyStats(mkt.history, window.moment().format("YYYY-MM-DD")).filter(s => s.due && !mkt.open.has(s.name)).map(s => s.name);
+const today = window.moment().format("YYYY-MM-DD");
+const items = page.file.tasks.where(t => !t.completed).array();
+const mkt   = H.marketState(dv);
+const soon  = L.supplyStats(mkt.history, today).filter(s => s.due && !mkt.open.has(s.name)).map(s => s.name);
+const cats  = [...marketCategories, { label: "✦ Other", tag: "#other" }];
+const catOf = t => t.tags?.find(tag => cats.some(c => c.tag === tag)) ?? "#other";
 
-const grouped = {};
-items.forEach((t) => {
-  const tag = t.tags?.find((tag) => categoryMap[tag]) ?? "#other";
-  if (!grouped[tag]) grouped[tag] = [];
-  grouped[tag].push(t);
-});
-
-const renderGroups = () =>
-  Object.entries(grouped)
-    .map(([tag, tasks]) => {
-      const cat = categoryMap[tag] ?? {
-        label: "✦ Other",
-      };
-      const taskItems = tasks
-        .map((t) => {
-          const cleanText = t.text.replace(/#\w+/g, "").trim();
-          return `
-      <div class="market-item">
-        <span class="market-icon">✦</span>
-        <span class="market-text">${cleanText}</span>
-      </div>`;
-        })
-        .join("");
-
-      return `
-    <div class="market-group">
-      <div class="market-group-header">
-        ${cat.label}
-      </div>
-      ${taskItems}
-    </div>`;
-    })
-    .join("");
-
-dv.container.innerHTML = `
-  <div class="winx-celestial-market">
-    <div class="market-list">
-      ${items.length ? renderGroups() : '<div class="market-empty">✨ Merchant inventory cleared</div>'}
-    </div>
-    ${soon.length ? `<div class="market-soon">⏳ скоро кончится: ${soon.join(", ")}</div>` : ""}
-    <div class="market-footer">
-      ${items.length} item${items.length === 1 ? "" : "s"} left
-      <span class="market-open" data-action="open">✦ open market</span>
-      <span class="market-open" data-action="supplies">✦ запасы</span>
-    </div>
-  </div>`;
-
-dv.container
-  .querySelector("[data-action='supplies']")
-  ?.addEventListener("click", () => app.workspace.openLinkText("00 System/Data/Supplies", "", false));
-
-dv.container
-  .querySelector("[data-action='open']")
-  ?.addEventListener("click", () => {
-    app.workspace.openLinkText("00 System/Data/Celestial Market", "", false);
+// Mark one line bought: let the sparkle play first, then write (the write re-renders the widget).
+const buy = async (t, row) => {
+  if (row.classList.contains("bought")) return;
+  row.classList.add("bought");
+  await new Promise(r => setTimeout(r, 650));
+  const file = app.vault.getAbstractFileByPath(FILE_PATH);
+  await app.vault.process(file, c => {
+    const lines = c.split("\n");
+    if (lines[t.line] !== undefined) lines[t.line] = L.markBought(lines[t.line], today);
+    return lines.join("\n");
   });
+};
+
+const root = dv.container.createEl("div", { cls: "winx-celestial-market" });
+const list = root.createEl("div", { cls: "market-list" });
+if (!items.length) list.createEl("div", { text: "✨ Merchant inventory cleared", cls: "market-empty" });
+
+for (const cat of cats) {
+  const group = items.filter(t => catOf(t) === cat.tag);
+  if (!group.length) continue;
+  const head = list.createEl("div", { cls: "market-group-header" });
+  head.createEl("span", { text: cat.label });
+  head.createEl("span", { text: String(group.length), cls: "market-count" });
+  for (const t of group) {
+    const row = list.createEl("div", { cls: "market-item" });
+    row.createEl("span", { text: t.text.replace(/#[\w/]+/g, "").trim(), cls: "market-text" });
+    const btn = row.createEl("button", { cls: "market-buy", attr: { "aria-label": "купила", title: "купила" } });
+    btn.onclick = () => buy(t, row);
+  }
+}
+
+if (soon.length) root.createEl("div", { text: `⏳ скоро кончится: ${soon.join(", ")}`, cls: "market-soon" });
+
+const foot = root.createEl("div", { cls: "market-footer" });
+foot.createEl("span", { text: `${items.length} item${items.length === 1 ? "" : "s"} left` });
+const link = (text, path) => {
+  const a = foot.createEl("span", { text, cls: "market-open" });
+  a.onclick = () => app.workspace.openLinkText(path, "", false);
+};
+link("✦ open market", "00 System/Data/Celestial Market");
+link("✦ запасы", "00 System/Data/Supplies");
