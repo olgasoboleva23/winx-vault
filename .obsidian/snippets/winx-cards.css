@@ -167,14 +167,15 @@
         content: "";
         position: absolute;
         z-index: 2 !important;
-        width: 24px;
-        height: 24px;
-        background-image: var(--winx-star-svg);
+        width: 56px;
+        height: 56px;
+        translate: -16px -16px;          /* wider canvas for sparkles, star stays put */
+        background-image: var(--winx-star-sparkle-svg);
         background-repeat: no-repeat;
         background-size: contain;
         pointer-events: none;
         animation: winx-twinkle 3s ease-in-out infinite;
-        filter: drop-shadow(0 0 6px rgb(from var(--winx-gold) r g b / 90%));
+        filter: drop-shadow(0 0 3px rgb(from var(--winx-gold) r g b / 60%));
       }
 
       /* Position wired to scoped custom props above */
