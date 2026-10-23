@@ -12,6 +12,7 @@ const fmt      = dt => dt?.toFormat("yyyy-MM-dd");
 const goals = dv.pages('"02 Areas/Personal/Goals"').file.lists.map(i => L.parseGoal(i.text)).where(Boolean).array();
 const cyclePage = dv.page("02 Areas/Health & Body/Cycle.md");
 const starts = cyclePage?.file.lists.map(i => i.text.match(/start::\s*(\d{4}-\d{2}-\d{2})/)?.[1]).where(Boolean).array() ?? [];
+const ends   = cyclePage?.file.lists.map(i => i.text.match(/end::\s*(\d{4}-\d{2}-\d{2})/)?.[1]).where(Boolean).array() ?? [];
 
 const table = dv.container.createEl("table", { cls: "winx-week" });
 const head  = table.createEl("tr");
@@ -32,7 +33,7 @@ if (starts.length) {
   const tr = table.createEl("tr");
   tr.createEl("td", { text: "цикл" });
   for (const d of week) {
-    const info = L.cycleInfo(starts, d, cyclePage.period ?? 8);
+    const info = L.cycleInfo(starts, d, cyclePage.period ?? 8, ends);
     tr.createEl("td", { text: info ? String(info.day) : "", cls: info?.isPeriod ? "period" : "" });
   }
   tr.createEl("td");
