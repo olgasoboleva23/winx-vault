@@ -10,6 +10,9 @@ const { marketCategories } = await H.loadConfig();
 const categoryMap = Object.fromEntries(marketCategories.map((c) => [c.tag, c]));
 
 const items = file.file.tasks.where((t) => !t.completed).array();
+const L   = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
+const mkt = H.marketState(dv);
+const soon = L.supplyStats(mkt.history, window.moment().format("YYYY-MM-DD")).filter(s => s.due && !mkt.open.has(s.name)).map(s => s.name);
 
 const grouped = {};
 items.forEach((t) => {
@@ -50,11 +53,17 @@ dv.container.innerHTML = `
     <div class="market-list">
       ${items.length ? renderGroups() : '<div class="market-empty">✨ Merchant inventory cleared</div>'}
     </div>
+    ${soon.length ? `<div class="market-soon">⏳ скоро кончится: ${soon.join(", ")}</div>` : ""}
     <div class="market-footer">
       ${items.length} item${items.length === 1 ? "" : "s"} left
       <span class="market-open" data-action="open">✦ open market</span>
+      <span class="market-open" data-action="supplies">✦ запасы</span>
     </div>
   </div>`;
+
+dv.container
+  .querySelector("[data-action='supplies']")
+  ?.addEventListener("click", () => app.workspace.openLinkText("00 System/Data/Supplies", "", false));
 
 dv.container
   .querySelector("[data-action='open']")

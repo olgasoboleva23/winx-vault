@@ -72,4 +72,22 @@ const cycleInfo = function (starts, date, period = 8, ends = []) {
   };
 };
 
-({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo })
+// Staples from purchase history: anything bought at least twice.
+// history: [{name, tag, date}] of completed market items. A forecast (avg days
+// between buys) needs 3+ buys; due when 85% of the usual interval has passed.
+const supplyStats = function (history, today) {
+  const by = {};
+  for (const h of [...history].sort((a, b) => a.date.localeCompare(b.date))) {
+    const key = h.name.trim().toLowerCase();
+    (by[key] ??= { name: key, dates: [], tag: h.tag }).dates.push(h.date);
+    by[key].tag = h.tag;
+  }
+  return Object.values(by).filter(x => x.dates.length >= 2).sort((a, b) => a.name.localeCompare(b.name)).map(x => {
+    const gaps  = x.dates.slice(1).map((d, i) => diffDays(d, x.dates[i]));
+    const avg   = x.dates.length >= 3 ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : null;
+    const since = diffDays(today, x.dates.at(-1));
+    return { name: x.name, tag: x.tag, buys: x.dates.length, avg, since, due: avg !== null && since >= avg * 0.85 };
+  });
+};
+
+({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats })

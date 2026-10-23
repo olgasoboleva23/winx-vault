@@ -66,3 +66,22 @@ test("cycleInfo with end dates", () => {
   assert.equal(L.cycleInfo(s, "2026-10-17", 8, ["2026-09-17"]).isPeriod, false);
   assert.equal(L.cycleInfo(s, "2026-10-16", 8, ["2026-09-17"]).isPeriod, true);
 });
+
+test("supplyStats", () => {
+  const h = [
+    { name: "Apples", tag: "#food", date: "2026-09-01" },
+    { name: "apples ", tag: "#food", date: "2026-09-11" },
+    { name: "apples", tag: "#food", date: "2026-09-21" },
+    { name: "Rice", tag: "#food", date: "2026-06-01" },
+    { name: "rice", tag: "#home", date: "2026-09-03" },
+    { name: "kiwi", tag: "#food", date: "2026-06-12" },
+  ];
+  const s = L.supplyStats(h, "2026-09-30");
+  assert.deepEqual(s.map(x => x.name), ["apples", "rice"]);          // bought once: not a staple
+  const hay = s[0];
+  assert.deepEqual([hay.buys, hay.avg, hay.since, hay.due, hay.tag], [3, 10, 9, true]  .concat(["#pet"]));
+  const salt = s[1];
+  assert.deepEqual([salt.buys, salt.avg, salt.tag], [2, null, "#home"]); // <3 buys: no forecast; last tag wins
+  assert.equal(salt.due, false);
+  assert.equal(L.supplyStats(h, "2026-09-25")[0].due, false);        // 4 of 10 days
+});

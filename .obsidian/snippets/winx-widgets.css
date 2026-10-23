@@ -187,3 +187,17 @@
 .winx-week-day { font-size: 12px; color: var(--winx-purple-deep); margin-top: 6px; }
 
 .winx-cycle-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Supplies ── */
+.winx-supply {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  color: var(--winx-text-dark);
+
+  &.due .winx-supply-info { color: var(--winx-pink-deep); font-weight: 600; }
+}
+.winx-supply-name { flex: 1; }
+.winx-supply-info { font-size: 12px; color: var(--winx-purple-deep); }
+.market-soon { font-size: 12px; color: var(--winx-pink-deep); margin: 6px 0 2px; }
