@@ -12,6 +12,7 @@
 
   const notify = (title, body) => {
     const n = new Notification(title, { body, silent: false });
+    state.shown = [...(state.shown ?? []).slice(-9), n];  // keep a reference, or Electron may drop the click
     n.onclick = () => {
       const w = require("electron").remote.getCurrentWindow();
       if (w.isMinimized()) w.restore();
