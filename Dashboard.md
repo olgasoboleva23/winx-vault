@@ -43,7 +43,7 @@ pomodoro:
 > > > dv.view("00 System/Scripts/dvWidgets/cycle");
 > > > ```
 > >
-> > > [!card] Финансы
+> > > [!card] Finance
 > > > 💰 [[Finance|Открыть финансы]]
 > > > 🗓 [[Week|Неделя]]
 >
