@@ -208,26 +208,44 @@
   overflow-y: auto !important;
 }
 
-/* ── Scroll hint: fade the edge that has more content beyond it ──
-   Scroll-driven animation: with nothing to scroll the timeline is inactive,
-   the fades stay 0 and nothing changes. */
-@property --winx-fade-top    { syntax: "<length>"; inherits: false; initial-value: 0px; }
-@property --winx-fade-bottom { syntax: "<length>"; inherits: false; initial-value: 0px; }
+/* ── Scroll hint: a bouncing sparkly arrow at the bottom of scrollable cards ──
+   The arrow is a sticky ::after at the end of the scrolling content. The
+   content animates --winx-more with a scroll-driven animation (the arrow inherits it): with nothing to scroll the
+   timeline is inactive, --winx-more stays 0 and the arrow is invisible; at the
+   very end of the scroll it fades out. Zero height, so it takes no space. */
+@property --winx-more { syntax: "<number>"; inherits: true; initial-value: 0; }
 
-@keyframes winx-scroll-fade {
-  0%   { --winx-fade-top: 0px;  --winx-fade-bottom: 48px; }
-  8%   { --winx-fade-top: 48px; }
-  92%  { --winx-fade-bottom: 48px; }
-  100% { --winx-fade-top: 48px; --winx-fade-bottom: 0px; }
+@keyframes winx-more   { 0%, 88% { --winx-more: 1; } 100% { --winx-more: 0; } }
+@keyframes winx-bounce { 0%, 100% { translate: 0 0; } 50% { translate: 0 5px; } }
+
+:is(
+  .dashboard .callout[data-callout="card"][data-callout-metadata~="scroll"],
+  .kanban-board .callout[data-callout="card"]
+) > .callout-content::after {
+  content: "✦ ▾ ✦";
+  position: sticky;
+  bottom: 6px;
+  display: block;
+  width: fit-content;
+  height: 22px;
+  margin: -22px auto 0;           /* net zero height: takes no space */
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgb(from var(--winx-pink-light) r g b / 92%);
+  box-shadow: 0 0 10px rgb(from var(--winx-pink-deep) r g b / 45%);
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--winx-gold-deep);
+  text-shadow: 0 0 6px var(--winx-gold-bright), 0 0 12px var(--winx-pink-deep);
+  pointer-events: none;
+  opacity: var(--winx-more);
+  animation: winx-bounce 1.4s ease-in-out infinite;
 }
 
 :is(
   .dashboard .callout[data-callout="card"][data-callout-metadata~="scroll"],
   .kanban-board .callout[data-callout="card"]
 ) > .callout-content {
-  mask-image: linear-gradient(to bottom,
-    transparent 0, #000 var(--winx-fade-top),
-    #000 calc(100% - var(--winx-fade-bottom)), transparent 100%);
-  animation: winx-scroll-fade linear both;
+  animation: winx-more linear both;
   animation-timeline: scroll(self);
 }
