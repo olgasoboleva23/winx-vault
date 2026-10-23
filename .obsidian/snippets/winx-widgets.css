@@ -202,10 +202,14 @@
 .winx-supply-info { font-size: 12px; color: var(--winx-purple-deep); }
 .market-soon { font-size: 12px; color: var(--winx-pink-deep); margin: 6px 0 2px; }
 
-/* ── Fixed-height scrolling card: [!card|scroll] ── */
+/* ── Fixed-height scrolling card: [!card|scroll] (300px) or [!card|scroll tall] (70vh) ── */
 .dashboard .callout[data-callout="card"][data-callout-metadata~="scroll"] > .callout-content {
   max-height: 300px;
   overflow-y: auto !important;
+}
+/* [!card|scroll tall]: for page-wide cards (Week, Finance) */
+.dashboard .callout[data-callout="card"][data-callout-metadata~="scroll"][data-callout-metadata~="tall"] > .callout-content {
+  max-height: 70vh;
 }
 
 /* ── Scroll hint: a bouncing sparkly arrow at the bottom of scrollable cards ──
@@ -257,6 +261,11 @@
   .dashboard .callout[data-callout="card"][data-callout-metadata~="scroll"],
   .kanban-board .callout[data-callout="card"]
 ) > .callout-content {
+  /* declared 0 is the fallback while nothing scrolls; the active scroll
+     animation overrides it. Keeps a short card from inheriting a scrolling parent's value. */
+  --winx-more: 0;
+  --winx-less: 0;
   animation: winx-more linear both;
   animation-timeline: scroll(self);
 }
+
