@@ -1,0 +1,22 @@
+// Mobile home: big tiles with live counts, each opens a mobile page.
+const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
+
+const today = window.moment().format("YYYY-MM-DD");
+const fmt   = d => d?.toFormat("yyyy-MM-dd");
+const left  = dv.page("00 System/Data/Celestial Market")?.file.tasks.where(t => !t.completed).length ?? 0;
+const tasks = dv.pages('"02 Areas/Personal/Tasks"').file.tasks.array()
+  .map(t => ({ done: t.completed, recurring: t.text.includes("🔁"), due: fmt(t.due), scheduled: fmt(t.scheduled) }));
+
+const tiles = [
+  { icon: "🛒", title: "Shopping", sub: `${left} left`, path: "Mobile/Shopping" },
+  { icon: "☀️", title: "Tasks", sub: `${L.todayCount(tasks, today)} today`, path: "Mobile/Tasks" },
+];
+
+const grid = dv.container.createEl("div", { cls: "winx-tiles" });
+for (const t of tiles) {
+  const tile = grid.createEl("button", { cls: "winx-tile" });
+  tile.createEl("div", { text: t.icon, cls: "winx-tile-icon" });
+  tile.createEl("div", { text: t.title, cls: "winx-tile-title" });
+  tile.createEl("div", { text: t.sub, cls: "winx-tile-sub" });
+  tile.onclick = () => app.workspace.openLinkText(t.path, "", false);
+}
