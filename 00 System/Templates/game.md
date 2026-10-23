@@ -19,7 +19,6 @@ rating:
 hours: 
 created: ${date}
 tags:
-  - #media/game
 ---
 
 # 🎮 ${title}
