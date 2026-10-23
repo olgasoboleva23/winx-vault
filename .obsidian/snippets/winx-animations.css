@@ -2,7 +2,7 @@
  * WINX THEME — Animations
  * File: winx-animations.css
  *
- * • @keyframes winx-twinkle (col star sparkles)
+ * • @keyframes winx-twinkle (old col star, unused) / winx-burst (col sparkle bursts)
  * • Date input golden styling (.mb-input-type-date)
  * ============================================ */
 
@@ -16,6 +16,15 @@
     opacity: 1;
     transform: scale(1.15) rotate(180deg);
   }
+}
+
+/* Col sparkle burst: flare up, glow, fade, rest — delays keep them out of sync */
+@keyframes winx-burst {
+  0%   { opacity: 0; scale: 0.5; }
+  12%  { opacity: 1; scale: 1; }
+  55%  { opacity: 1; scale: 1; }
+  75%  { opacity: 0; scale: 0.8; }
+  100% { opacity: 0; scale: 0.5; }
 }
 
 /* Progress bar shimmer — used by .winx-progress-fill in widgets.css */
