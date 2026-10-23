@@ -7,7 +7,7 @@ const { history, open } = H.marketState(dv);
 const stats = L.supplyStats(history, today);
 const root  = dv.container.createEl("div", { cls: "winx-supplies" });
 
-if (!stats.length) root.createEl("div", { text: "Пока ничего не покупалось дважды" });
+if (!stats.length) root.createEl("div", { text: "Nothing bought twice yet" });
 
 const cats = [...marketCategories, { label: "✦ Other", tag: "#other" }];
 for (const cat of cats) {
@@ -18,12 +18,12 @@ for (const cat of cats) {
     const row = root.createEl("div", { cls: `winx-supply${s.due ? " due" : ""}` });
     row.createEl("span", { text: s.name, cls: "winx-supply-name" });
     const listed = open.has(s.name);
-    const info = listed ? "в списке покупок ✦"
-      : s.avg ? `прошло ${s.since} из ~${s.avg} дн.${s.due ? " ⏳" : ""}`
-      : `куплено ${s.buys} раза`;
+    const info = listed ? "on the shopping list ✦"
+      : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}`
+      : `bought ${s.buys} times`;
     row.createEl("span", { text: info, cls: "winx-supply-info" });
     if (!listed) {
-      const b = row.createEl("button", { text: "кончается", cls: "winx-open-note-btn" });
+      const b = row.createEl("button", { text: "running low", cls: "winx-open-note-btn" });
       b.onclick = async () => { await H.addToMarket(s.name, s.tag); new Notice(`✦ ${s.name} → Celestial Market`); };
     }
   }

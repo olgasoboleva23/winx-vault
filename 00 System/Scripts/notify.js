@@ -40,7 +40,7 @@
     try { if (localStorage.getItem("winx-notify-summary") === d) return; localStorage.setItem("winx-notify-summary", d); } catch {}
     const due     = open().where(t => t.due.toFormat("yyyy-MM-dd") === d).length;
     const overdue = open().where(t => t.due.toFormat("yyyy-MM-dd") < d && !t.tags.some(tag => tag.startsWith("#goal"))).length;
-    notify(`✦ На сегодня ${due} задач`, overdue ? `Просрочено: ${overdue}` : "Просроченных нет");
+    notify(`✦ ${due} task${due === 1 ? "" : "s"} today`, overdue ? `Overdue: ${overdue}` : "Nothing overdue");
   };
 
   const start = () => {

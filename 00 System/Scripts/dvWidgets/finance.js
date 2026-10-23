@@ -16,10 +16,10 @@ const LEDGER = "02 Areas/Finance/Ledger";
 const RULES = "02 Areas/Finance/rules.json";
 const TRANSFER = "Переводы";
 
-const MONTHS = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-const MONTHS_SHORT = ["янв", "фев", "мар", "апр", "май", "июн",
-                      "июл", "авг", "сен", "окт", "ноя", "дек"];
+const MONTHS = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+const MONTHS_SHORT = ["jan", "feb", "mar", "apr", "may", "jun",
+                      "jul", "aug", "sep", "oct", "nov", "dec"];
 
 // Palette cycled across categories, in winx token order.
 const PALETTE = ["--winx-pink", "--winx-gold", "--winx-purple", "--winx-lavender",
@@ -165,8 +165,8 @@ const root = dv.container.createDiv({ cls: "winx-fin" });
 if (!available.length) {
   root.createDiv({
     cls: "winx-fin-empty",
-    text: "Леджер пуст. Выгрузи выписку из СберБанк Онлайн в 02 Areas/Finance/Statements "
-        + "и запусти 00 System/Scripts/finance/import.sh",
+    text: "The ledger is empty. Export a statement from SberBank Online to 02 Areas/Finance/Statements "
+        + "and run 00 System/Scripts/finance/import.sh",
   });
   return;
 }
@@ -197,9 +197,9 @@ function render() {
   const totalsEl = root.createDiv({ cls: "winx-fin-totals" });
   const net = totals.income - totals.spent;
   const cards = [
-    ["Потрачено", totals.spent, "is-neg"],
-    ["Получено", totals.income, "is-pos"],
-    ["Итого", net, net < 0 ? "is-neg" : "is-pos"],
+    ["Spent", totals.spent, "is-neg"],
+    ["Received", totals.income, "is-pos"],
+    ["Net", net, net < 0 ? "is-neg" : "is-pos"],
   ];
   for (const [label, value, cls] of cards) {
     const card = totalsEl.createDiv({ cls: `winx-fin-total ${cls}` });
@@ -209,14 +209,14 @@ function render() {
   if (totals.transfers > 0) {
     root.createDiv({
       cls: "winx-fin-section",
-      text: `переводы ${money(totals.transfers)} — не считаются тратами`,
+      text: `transfers ${money(totals.transfers)} — not counted as spending`,
     });
   }
 
   // categories
   const categories = Object.entries(totals.categories).sort((a, b) => b[1] - a[1]);
   if (categories.length) {
-    root.createDiv({ cls: "winx-fin-section", text: "Категории" });
+    root.createDiv({ cls: "winx-fin-section", text: "Categories" });
     const list = root.createDiv({ cls: "winx-fin-rows" });
     const max = categories[0][1];
     categories.forEach(([name, value], i) => {
@@ -227,7 +227,7 @@ function render() {
   // 6-month trend
   const window6 = available.slice(Math.max(0, index - 5), index + 1);
   if (window6.length > 1) {
-    root.createDiv({ cls: "winx-fin-section", text: "Траты по месяцам" });
+    root.createDiv({ cls: "winx-fin-section", text: "Spending by month" });
     const trend = root.createDiv({ cls: "winx-fin-trend" });
     const spends = window6.map((m) => summarize(ledger[m]).spent);
     const peak = Math.max(...spends, 1);
@@ -246,7 +246,7 @@ function render() {
     .sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))
     .slice(0, 8);
   if (latest.length) {
-    root.createDiv({ cls: "winx-fin-section", text: "Последние операции" });
+    root.createDiv({ cls: "winx-fin-section", text: "Recent transactions" });
     const list = root.createDiv({ cls: "winx-fin-list" });
     for (const row of latest) {
       const item = list.createDiv({ cls: "winx-fin-item" });

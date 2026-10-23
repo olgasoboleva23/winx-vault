@@ -39,12 +39,12 @@ for (const cat of cats) {
   for (const t of group) {
     const row = list.createEl("div", { cls: "market-item" });
     row.createEl("span", { text: t.text.replace(/#[\w/]+/g, "").trim(), cls: "market-text" });
-    const btn = row.createEl("button", { cls: "market-buy", attr: { "aria-label": "купила", title: "купила" } });
+    const btn = row.createEl("button", { cls: "market-buy", attr: { "aria-label": "bought", title: "bought" } });
     btn.onclick = () => buy(t, row);
   }
 }
 
-if (soon.length) root.createEl("div", { text: `⏳ скоро кончится: ${soon.join(", ")}`, cls: "market-soon" });
+if (soon.length) root.createEl("div", { text: `⏳ running low soon: ${soon.join(", ")}`, cls: "market-soon" });
 
 const foot = root.createEl("div", { cls: "market-footer" });
 foot.createEl("span", { text: `${items.length} item${items.length === 1 ? "" : "s"} left` });
@@ -53,4 +53,4 @@ const link = (text, path) => {
   a.onclick = () => app.workspace.openLinkText(path, "", false);
 };
 link("✦ open market", "00 System/Data/Celestial Market");
-link("✦ запасы", "00 System/Data/Supplies");
+link("✦ supplies", "00 System/Data/Supplies");

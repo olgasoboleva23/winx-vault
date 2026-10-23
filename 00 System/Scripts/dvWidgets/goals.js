@@ -1,7 +1,7 @@
 const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 
 const GOALS_PATH = "02 Areas/Personal/Goals.md";
-if (!app.vault.getAbstractFileByPath(GOALS_PATH)) { dv.el("div", `Создай ${GOALS_PATH}`); return; }
+if (!app.vault.getAbstractFileByPath(GOALS_PATH)) { dv.el("div", `Create ${GOALS_PATH}`); return; }
 
 const selected = (dv.current().date ?? dv.date("today")).toFormat("yyyy-MM-dd");
 const today    = window.moment().format("YYYY-MM-DD");
@@ -33,10 +33,10 @@ for (const goal of goals) {
   const row = root.createEl("div", { cls: "winx-goal", attr: goal.plan ? { title: goal.plan } : {} });
   const head = row.createEl("div", { cls: "winx-goal-head" });
   head.createEl("span", { text: goal.name, cls: "winx-goal-name" });
-  head.createEl("span", { text: `${L.countDone(done, week)} из ${L.weeklyTarget(goal)} на этой неделе`, cls: "winx-goal-count" });
+  head.createEl("span", { text: `${L.countDone(done, week)} of ${L.weeklyTarget(goal)} this week`, cls: "winx-goal-count" });
   const dots = row.createEl("div", { cls: "winx-goal-dots" });
   for (const d of week) {
     dots.createEl("span", { cls: `winx-dot ${L.dayStatus(goal, d, doneSet, today)}${d === selected ? " sel" : ""}`, attr: { title: d } });
   }
-  if (goal.min) row.createEl("div", { text: `мин: ${goal.min}`, cls: "winx-goal-min" });
+  if (goal.min) row.createEl("div", { text: `min: ${goal.min}`, cls: "winx-goal-min" });
 }
