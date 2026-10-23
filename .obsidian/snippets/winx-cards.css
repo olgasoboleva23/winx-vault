@@ -167,15 +167,14 @@
         content: "";
         position: absolute;
         z-index: 2 !important;
-        width: 44px;
-        height: 44px;
-        translate: -10px -10px;          /* keep the old 24px star's centre */
-        background-image: var(--winx-burst-svg);
+        width: 24px;
+        height: 24px;
+        background-image: var(--winx-star-svg);
         background-repeat: no-repeat;
         background-size: contain;
         pointer-events: none;
-        animation: winx-burst 4.5s ease-in-out infinite both;
-        filter: drop-shadow(0 0 4px rgb(255 255 255 / 70%));
+        animation: winx-twinkle 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 6px rgb(from var(--winx-gold) r g b / 90%));
       }
 
       /* Position wired to scoped custom props above */
