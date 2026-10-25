@@ -103,10 +103,10 @@ for (const col of COLS) {
     if (h) meta.push(`done ${h.count}× · last ${dm(h.last)}`);
     if (meta.length) card.createEl("div", { text: meta.join("  ·  "), cls: "winx-board-meta" });
 
-    const btns = card.createEl("div", { cls: "winx-board-btns" });   // CSS: hover-only on desktop
-    for (const [id, txt] of [["today", "today"], ["tomorrow", "tmrw"], ["later", "later"], ["nodate", "✕ date"]]) {
+    const btns = card.createEl("div", { cls: "winx-board-btns" });   // CSS: fades in on hover on desktop
+    for (const [id, icon, tip] of [["today", "☀️", "today"], ["tomorrow", "🌙", "tomorrow"], ["later", "✨", "later (in a week)"], ["nodate", "💭", "no date"]]) {
       if (id === col.id) continue;
-      btns.createEl("button", { text: txt }).onclick = () => move(t, id, card);
+      btns.createEl("button", { text: icon, attr: { title: tip, "aria-label": tip } }).onclick = () => move(t, id, card);
     }
   }
   if (col.id === "nodate" && cards.length > SHOWN) {

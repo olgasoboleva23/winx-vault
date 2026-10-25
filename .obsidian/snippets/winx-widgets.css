@@ -460,7 +460,9 @@
            background: linear-gradient(135deg, var(--winx-pink), var(--winx-pink-deep)); }
 }
 
-/* ── Planning board (drag & drop) ── */
+/* ── Planning board (drag & drop) ──
+   Tasks are list rows like the Celestial Market; the move buttons fade in
+   over the row's right edge on hover (no height jump), always shown on the phone. */
 .winx-board {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -468,63 +470,97 @@
   align-items: start;
 }
 .winx-board-col {
-  min-height: 140px;
-  padding: 10px;
+  min-height: 120px;
+  padding: 10px 10px 6px;
   border-radius: 16px;
   border: 1px solid var(--winx-border);
   background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
 
   &.over { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px rgb(from var(--winx-gold) r g b / 80%); }
+  &:not(:has(.winx-board-card))::after {
+    content: "✨ free — pick from the backlog";
+    display: block;
+    padding: 18px 0 10px;
+    text-align: center;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--winx-purple-deep) 55%, transparent);
+  }
 }
 .winx-board-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-family: "Cinzel", serif;
   color: var(--winx-purple-deep);
 }
 .winx-board-card {
-  margin-bottom: 8px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: rgb(255 255 255 / 60%);
-  border: 1px solid color-mix(in srgb, var(--winx-border) 60%, transparent);
+  position: relative;
+  padding: 7px 8px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--winx-gold-deep) 35%, transparent);
   color: var(--winx-text-dark);
   cursor: grab;
+  transition: background 0.15s ease;
 
+  &:last-child { border-bottom: none; }
+  &:hover { background: color-mix(in srgb, white 35%, transparent); border-radius: 10px; }
   &.dragging { opacity: 0.4; }
-  &:hover { border-color: var(--winx-pink-deep); }
 }
-.winx-board-text { font-size: 14px; }
-.winx-board-meta { margin-top: 4px; font-size: 11px; color: var(--winx-purple-deep); }
+.winx-board-text { font-size: 14px; line-height: 1.35; }
+.winx-board-meta { margin-top: 2px; font-size: 11px; color: color-mix(in srgb, var(--winx-purple-deep) 75%, transparent); }
+
+/* round move buttons: ☀️ 🌙 ✨ 💭 */
 :is(.winx-board, .winx-board-backlog) .winx-board-btns {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 4px;
 }
-:is(.winx-board, .winx-board-backlog) .winx-board-btns button, .winx-board-backlog button.winx-board-more {
-  min-height: 36px;
+body:not(.is-mobile) :is(.winx-board, .winx-board-backlog) .winx-board-btns {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  translate: 0 -50%;
+  padding-left: 18px;
+  background: linear-gradient(90deg, transparent, var(--winx-pink-light) 18px);
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+body:not(.is-mobile) .winx-board-card:hover .winx-board-btns { opacity: 1; pointer-events: auto; }
+body.is-mobile :is(.winx-board, .winx-board-backlog) .winx-board-btns { margin-top: 6px; }
+:is(.winx-board, .winx-board-backlog) .winx-board-btns button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--winx-border);
+  background: rgb(255 255 255 / 85%);
+  box-shadow: 0 0 6px rgb(from var(--winx-pink-deep) r g b / 35%);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover { transform: scale(1.12); box-shadow: 0 0 10px rgb(from var(--winx-gold) r g b / 90%); }
+}
+body.is-mobile :is(.winx-board, .winx-board-backlog) .winx-board-btns button { width: 34px; height: 34px; font-size: 16px; }
+.winx-board-backlog button.winx-board-more {
+  margin-top: 8px;
+  min-height: 30px;
   padding: 0 12px;
   border-radius: 999px;
   border: 1px solid var(--winx-border);
   background: rgb(255 255 255 / 70%);
   color: var(--winx-purple-deep);
   box-shadow: none;
-  font-size: 13px;
+  font-size: 12px;
 }
-body:not(.is-mobile) .winx-board-card:not(:hover) .winx-board-btns { display: none; }
 .winx-board-backlog { margin-top: 12px; }
-.winx-board-backlog .winx-board-more { margin-top: 8px; }
 .winx-board-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 8px;
-  align-items: start;
-
-  .winx-board-card { margin-bottom: 0; }
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  column-gap: 14px;
 }
 .winx-board-goals { margin-bottom: 14px; }
 .winx-board-goal-row {
@@ -534,8 +570,12 @@ body:not(.is-mobile) .winx-board-card:not(:hover) .winx-board-btns { display: no
 }
 .winx-board-card.fixed {
   cursor: default;
-  border-color: var(--winx-gold-deep);
+  padding: 8px 12px;
+  border: 1px solid var(--winx-gold-deep);
+  border-radius: 14px;
   background: linear-gradient(135deg, rgb(255 255 255 / 70%), rgb(from var(--winx-gold-bright) r g b / 35%));
+
+  &:hover { background: linear-gradient(135deg, rgb(255 255 255 / 80%), rgb(from var(--winx-gold-bright) r g b / 45%)); }
 }
 .winx-board-goals > .winx-board-head { color: var(--winx-lavender); }
 .winx-board-head button.winx-board-mute { padding: 0 6px; background: none; border: none; box-shadow: none; font-size: 16px; cursor: pointer; }
