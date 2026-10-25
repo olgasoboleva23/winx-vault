@@ -6,12 +6,16 @@ cssclasses:
 
 `INPUT[date:date]`
 
+```dataviewjs
+(app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js"))).installSounds();
+```
+
 > [!grid]
 > > [!card] ✅ Done Today
 > > ```tasks
 done on {{query.file.property('date')}}
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -22,7 +26,7 @@ not done
 tags do not include #goal
 due before {{query.file.property('date')}}
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -32,7 +36,7 @@ sort by tags
 not done
 due on {{query.file.property('date')}}
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -43,7 +47,7 @@ not done
 due after {{query.file.property('date')}}
 due before in 2 days
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -60,7 +64,7 @@ filter by function \
   const due = task.due?.moment?.valueOf(); \
   return !!due && due >= start && due < end;
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -77,7 +81,7 @@ filter by function \
   const due = task.due?.moment?.valueOf(); \
   return !!due && due >= start && due < end;
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -93,7 +97,7 @@ filter by function \
   const due = task.due?.moment?.valueOf(); \
   return !!due && due >= start && due < end;
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -107,7 +111,7 @@ filter by function \
   const due = task.due?.moment?.valueOf(); \
   return !!due && due >= nextYear;
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```
@@ -117,7 +121,7 @@ sort by tags
 not done
 no due date
 path includes 02 Areas/Personal/Tasks
-group by function task.tags.filter(tag => tag.includes("area"))
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 > > ```

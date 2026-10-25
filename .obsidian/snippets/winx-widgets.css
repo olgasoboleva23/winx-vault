@@ -523,3 +523,4 @@ body:not(.is-mobile) .winx-board-card:not(:hover) .winx-board-btns { display: no
   background: linear-gradient(135deg, rgb(255 255 255 / 70%), rgb(from var(--winx-gold-bright) r g b / 35%));
 }
 .winx-board-goals > .winx-board-head { color: var(--winx-lavender); }
+.winx-board-head button.winx-board-mute { padding: 0 6px; background: none; border: none; box-shadow: none; font-size: 16px; cursor: pointer; }
