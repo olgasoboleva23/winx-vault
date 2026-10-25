@@ -38,5 +38,8 @@ for (const goal of goals) {
   for (const d of week) {
     dots.createEl("span", { cls: `winx-dot ${L.dayStatus(goal, d, doneSet, today)}${d === selected ? " sel" : ""}`, attr: { title: d } });
   }
-  if (goal.min) row.createEl("div", { text: `min: ${goal.min}`, cls: "winx-goal-min" });
+  // "I've done this before": total and last time, from the ✅ dates already in the tasks
+  const last = [...done].sort().at(-1);
+  const bits = [goal.min && `min: ${goal.min}`, done.length && `done ${done.length}× · last ${last.slice(8, 10)}.${last.slice(5, 7)}`].filter(Boolean);
+  if (bits.length) row.createEl("div", { text: bits.join("  ·  "), cls: "winx-goal-min" });
 }

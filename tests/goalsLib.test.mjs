@@ -151,3 +151,41 @@ test("weights: parse and upsert", () => {
   assert.equal(L.upsertWeight("%% x %%\n- 2026-10-23 70.5\n", "2026-10-23", 71), "%% x %%\n- 2026-10-23 71\n");
   assert.equal(L.upsertWeight("", "2026-10-23", 70.5), "- 2026-10-23 70.5\n");
 });
+
+test("setScheduled", () => {
+  assert.equal(L.setScheduled("- [ ] #⭐easy water plants", "2026-10-26"), "- [ ] #⭐easy water plants ⏳ 2026-10-26");
+  assert.equal(L.setScheduled("- [ ] call bank ⏳ 2026-10-01 📅 2026-11-01", "2026-10-26"), "- [ ] call bank 📅 2026-11-01 ⏳ 2026-10-26");
+  assert.equal(L.setScheduled("- [ ] call bank ⏳ 2026-10-01", null), "- [ ] call bank");          // no date
+  assert.equal(L.setScheduled("not a task", "2026-10-26"), "not a task");
+});
+
+test("boardColumn and dropDate", () => {
+  const today = "2026-10-21";                    // Wednesday; week ends Sunday 2026-10-25
+  assert.equal(L.boardColumn(undefined, today), "nodate");
+  assert.equal(L.boardColumn("2026-10-19", today), "today");   // missed plan comes back to today
+  assert.equal(L.boardColumn("2026-10-21", today), "today");
+  assert.equal(L.boardColumn("2026-10-22", today), "tomorrow");
+  assert.equal(L.boardColumn("2026-10-25", today), "week");
+  assert.equal(L.boardColumn("2026-10-26", today), "later");
+  assert.equal(L.dropDate("today", today), "2026-10-21");
+  assert.equal(L.dropDate("tomorrow", today), "2026-10-22");
+  assert.equal(L.dropDate("week", today), "2026-10-23");      // day after tomorrow
+  assert.equal(L.dropDate("later", today), "2026-10-28");     // a week from today
+  assert.equal(L.dropDate("nodate", today), null);
+  assert.equal(L.dropDate("week", "2026-10-24"), null);        // Saturday: nothing left this week
+  assert.equal(L.boardColumn("2026-10-26", "2026-10-25"), "tomorrow"); // Sunday: Monday is tomorrow
+});
+
+test("taskKey and history", () => {
+  assert.equal(L.taskKey("#⭐easy #area/base Water plants 📅 2026-10-01 ✅ 2026-10-02"), "water plants");
+  // a raw file line and the task text must give the same key
+  assert.equal(L.taskKey("- [ ] #⭐easy water plants ⏳ 2026-10-26"), L.taskKey("#⭐easy water plants"));
+  assert.equal(L.taskKey("  - [x] Water plants ✅ 2026-10-02"), "water plants");
+  const done = [
+    { text: "#⭐easy water plants ✅ 2026-09-01", date: "2026-09-01" },
+    { text: "Water plants 📅 2026-10-01", date: "2026-10-02" },
+    { text: "call bank", date: "2026-08-01" },
+  ];
+  assert.deepEqual(L.history("water plants ⏳ 2026-10-26", done), { count: 2, last: "2026-10-02" });
+  assert.equal(L.history("new thing", done), null);
+});

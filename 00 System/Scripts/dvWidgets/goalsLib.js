@@ -141,4 +141,46 @@ const upsertWeight = (text, date, kg) => {
   return lines.join("\n") + "\n";
 };
 
-({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought, unmarkBought, todayCount, parseWeights, upsertWeight })
+// ── Planning board ──
+// Set or clear the plan date (⏳) of an open task line; other fields stay.
+const setScheduled = (line, date) => {
+  if (!/^\s*- \[ \]/.test(line)) return line;
+  const base = line.replace(/\s*⏳\s*\d{4}-\d{2}-\d{2}/u, "").trimEnd();
+  return date ? `${base} ⏳ ${date}` : base;
+};
+
+const weekEnd = d => addDays(d, 7 - weekday(d));   // Sunday
+
+// Which column a planned date belongs to. Missed plans come back to today.
+const boardColumn = (date, today) =>
+  !date ? "nodate"
+  : date <= today ? "today"
+  : date === addDays(today, 1) ? "tomorrow"
+  : date <= weekEnd(today) ? "week"
+  : "later";
+
+// Date a card gets when dropped on a column (null = no date / column not available).
+const dropDate = (col, today) => {
+  if (col === "today") return today;
+  if (col === "tomorrow") return addDays(today, 1);
+  if (col === "week") { const d = addDays(today, 2); return d <= weekEnd(today) ? d : null; }
+  if (col === "later") return addDays(today, 7);
+  return null;
+};
+
+// Task identity for "done before": text without tags and date fields, lowercased.
+const taskKey = text => text
+  .replace(/^\s*- \[.\]\s*/, "")
+  .replace(/#[^\s]+/g, "")
+  .replace(/🔁[^📅⏳✅🛫➕]*/u, "")
+  .replace(/[📅⏳✅🛫➕]\s*\d{4}-\d{2}-\d{2}/gu, "")
+  .replace(/\s+/g, " ").trim().toLowerCase();
+
+// { count, last } of completed tasks with the same key, or null.
+const history = (text, done) => {
+  const key = taskKey(text);
+  const hits = done.filter(d => taskKey(d.text) === key);
+  return hits.length ? { count: hits.length, last: hits.map(h => h.date).sort().at(-1) } : null;
+};
+
+({ weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought, unmarkBought, todayCount, parseWeights, upsertWeight, setScheduled, boardColumn, dropDate, taskKey, history })
