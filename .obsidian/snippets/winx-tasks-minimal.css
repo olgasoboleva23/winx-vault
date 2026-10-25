@@ -2,13 +2,32 @@
  * WINX THEME — Tasks Minimal
  * File: tasks-minimal.css
  *
- * Hides tags (area shows as the group heading) and fades task metadata
+ * Hides tags except difficulty stars (area shows as the group heading),
+ * fades task metadata
  * until hover.
  * ============================================ */
 
 :is(.dashboard, .kanban-board) {
-  .task-list-item .tag {
+  .task-list-item .tag:not([data-tag-name^="#⭐"]) {
     display: none;
+  }
+
+  /* difficulty: stars only, without the word */
+  .task-list-item .tag[data-tag-name^="#⭐"] {
+    font-size: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    &::before { font-size: 11px; }
+  }
+  .tag[data-tag-name="#⭐easy"]::before { content: "⭐"; }
+  .tag[data-tag-name="#⭐⭐medium"]::before { content: "⭐⭐"; }
+  .tag[data-tag-name="#⭐⭐⭐hard"]::before { content: "⭐⭐⭐"; }
+  .tag[data-tag-name="#⭐⭐⭐⭐epic"]::before { content: "⭐⭐⭐⭐"; }
+
+  /* beats the blue !important heading color in winx-layout.css */
+  h4.tasks-group-heading {
+    color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep)) !important;
   }
 
   .task-list-item {
