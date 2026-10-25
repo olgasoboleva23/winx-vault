@@ -23,6 +23,7 @@
     vertical-align: middle;
     line-height: 1;
     margin-top: -0.2em;   /* emoji sit low: lift to the text's middle */
+    margin-right: -3px;   /* cancel letter-spacing after the last star */
     &::before { font-size: 11px; letter-spacing: 3px; }
     /* sparkles flying off the stars (same art as the scroll arrows) */
     &::after {
