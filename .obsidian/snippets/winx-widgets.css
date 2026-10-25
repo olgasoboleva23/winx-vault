@@ -545,6 +545,14 @@ body.is-mobile :is(.winx-board, .winx-board-backlog) .winx-board-btns { margin-t
   &:hover { transform: scale(1.12); box-shadow: 0 0 10px rgb(from var(--winx-gold) r g b / 90%); }
 }
 body.is-mobile :is(.winx-board, .winx-board-backlog) .winx-board-btns button { width: 34px; height: 34px; font-size: 16px; }
+:is(.winx-board, .winx-board-backlog) .winx-board-btns button.winx-board-del.armed {
+  width: auto;
+  padding: 0 8px;
+  border-color: #d0457a;
+  background: #d0457a;
+  color: #fff;
+  font-size: 12px;
+}
 .winx-board-backlog button.winx-board-more {
   margin-top: 8px;
   min-height: 30px;

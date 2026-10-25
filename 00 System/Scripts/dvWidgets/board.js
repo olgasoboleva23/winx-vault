@@ -33,13 +33,17 @@ const move = async (t, col, card) => {
   lists[col]?.append(card);
   if (!H.isMuted()) (col === "today" ? SND.today : SND.move).play({ gain: 0.25 });
   const date = L.dropDate(col, today);
-  const file = app.vault.getAbstractFileByPath(t.path);
-  await app.vault.process(file, c => {
-    const lines = c.split("\n");
-    if (L.taskKey(lines[t.line] ?? "") === L.taskKey(t.text)) lines[t.line] = L.setScheduled(lines[t.line], date);
-    return lines.join("\n");
-  });
+  await editLine(t, line => L.setScheduled(line, date));
 };
+
+// Rewrite the task's line in its file (null deletes it) — only if the line is still that task
+const editLine = (t, fn) => app.vault.process(app.vault.getAbstractFileByPath(t.path), c => {
+  const lines = c.split("\n");
+  if (L.taskKey(lines[t.line] ?? "") !== L.taskKey(t.text)) return c;
+  const next = fn(lines[t.line]);
+  next === null ? lines.splice(t.line, 1) : (lines[t.line] = next);
+  return lines.join("\n");
+});
 
 // ── Goals: fixed recurring tasks with week progress and history ──
 const goals = dv.pages('"02 Areas/Personal/Goals"').file.lists.map(i => L.parseGoal(i.text)).where(Boolean).array();
@@ -104,10 +108,21 @@ for (const col of COLS) {
     if (meta.length) card.createEl("div", { text: meta.join("  ·  "), cls: "winx-board-meta" });
 
     const btns = card.createEl("div", { cls: "winx-board-btns" });   // CSS: fades in on hover on desktop
-    for (const [id, icon, tip] of [["today", "☀️", "today"], ["tomorrow", "🌙", "tomorrow"], ["later", "✨", "later (in a week)"], ["nodate", "💭", "no date"]]) {
+    for (const [id, icon, tip] of [["today", "☀️", "today"], ["tomorrow", "🌙", "tomorrow"], ["nodate", "💭", "no date"]]) {
       if (id === col.id) continue;
       btns.createEl("button", { text: icon, attr: { title: tip, "aria-label": tip } }).onclick = () => move(t, id, card);
     }
+    // delete: first click arms the button for 3 s, second click removes the line from the file
+    const del = btns.createEl("button", { text: "🗑", cls: "winx-board-del", attr: { title: "delete task", "aria-label": "delete task" } });
+    del.onclick = async () => {
+      if (!del.classList.contains("armed")) {
+        del.classList.add("armed"); del.textContent = "✓?"; del.title = "click again to delete";
+        setTimeout(() => { del.classList.remove("armed"); del.textContent = "🗑"; del.title = "delete task"; }, 3000);
+        return;
+      }
+      card.remove();
+      await editLine(t, () => null);
+    };
   }
   if (col.id === "nodate" && cards.length > SHOWN) {
     colEl.createEl("button", { text: cut ? `show all ${cards.length}` : "show less", cls: "winx-board-more" }).onclick = () => {
