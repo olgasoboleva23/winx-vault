@@ -484,22 +484,32 @@
 }
 .winx-board-text { font-size: 14px; }
 .winx-board-meta { margin-top: 4px; font-size: 11px; color: var(--winx-purple-deep); }
-.winx-board .winx-board-btns {
+:is(.winx-board, .winx-board-backlog) .winx-board-btns {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 8px;
+}
+:is(.winx-board, .winx-board-backlog) .winx-board-btns button, .winx-board-backlog button.winx-board-more {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--winx-border);
+  background: rgb(255 255 255 / 70%);
+  color: var(--winx-purple-deep);
+  box-shadow: none;
+  font-size: 13px;
+}
+body:not(.is-mobile) .winx-board-card:not(:hover) .winx-board-btns { display: none; }
+.winx-board-backlog { margin-top: 12px; }
+.winx-board-backlog .winx-board-more { margin-top: 8px; }
+.winx-board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  align-items: start;
 
-  button {
-    min-height: 36px;
-    padding: 0 12px;
-    border-radius: 999px;
-    border: 1px solid var(--winx-border);
-    background: rgb(255 255 255 / 70%);
-    color: var(--winx-purple-deep);
-    box-shadow: none;
-    font-size: 13px;
-  }
+  .winx-board-card { margin-bottom: 0; }
 }
 .winx-board-goals { margin-bottom: 14px; }
 .winx-board-goal-row {
