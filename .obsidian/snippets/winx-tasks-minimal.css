@@ -18,7 +18,21 @@
     padding: 0;
     background: none;
     border: none;
-    &::before { font-size: 11px; }
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+    margin-top: -0.2em;   /* emoji sit low: lift to the text's middle */
+    &::before { font-size: 11px; letter-spacing: 3px; }
+    /* sparkles flying off the stars (same art as the scroll arrows) */
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -12px -10px;
+      filter: drop-shadow(0 0 1.5px rgb(255 255 255 / 90%));
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='24' viewBox='0 0 40 24'%3E%3Cg transform='translate(20 12)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-14 -7' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Cpath d='M0 -4.7Q0 0 4.7 0Q0 0 0 4.7Q0 0 -4.7 0Q0 0 0 -4.7Z' fill='%23f5c542'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 12)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;13 -8' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Cpath d='M0 -4.0Q0 0 4.0 0Q0 0 0 4.0Q0 0 -4.0 0Q0 0 0 -4.0Z' fill='%23d878a8'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 12)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-15 6' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Cpath d='M0 -3.6Q0 0 3.6 0Q0 0 0 3.6Q0 0 -3.6 0Q0 0 0 -3.6Z' fill='%23f5c542'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 12)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;14 6' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Cpath d='M0 -4.0Q0 0 4.0 0Q0 0 0 4.0Q0 0 -4.0 0Q0 0 0 -4.0Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 12)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-4 -10' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Cpath d='M0 -3.2Q0 0 3.2 0Q0 0 0 3.2Q0 0 -3.2 0Q0 0 0 -3.2Z' fill='%23d878a8'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 12)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;5 10' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Cpath d='M0 -3.6Q0 0 3.6 0Q0 0 0 3.6Q0 0 -3.6 0Q0 0 0 -3.6Z' fill='%23f5c542'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat;
+      pointer-events: none;
+    }
   }
   .tag[data-tag-name="#⭐easy"]::before { content: "⭐"; }
   .tag[data-tag-name="#⭐⭐medium"]::before { content: "⭐⭐"; }
