@@ -44,8 +44,7 @@
     height: 10px;
     border-radius: 6px;
     background: rgb(255 255 255 / 40%);
-    overflow: hidden;
-    position: relative;
+    position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
   }
 
   .winx-progress-fill {
@@ -59,6 +58,22 @@
     background-size: 200% 100%;
     animation: winx-shimmer 3s linear infinite;
     border-radius: 6px;
+    position: relative;
+
+    /* sparkles flying off the tip of the filled part.
+       Off: add the class winx-sparkle to the fill (or drop it from the selector) to bring them back */
+    &.winx-sparkle::after {
+      content: "";
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      width: 40px;
+      height: 24px;
+      translate: 0 -50%;
+      background: var(--winx-tip-sparkle-svg) center / 100% 100% no-repeat;
+      filter: drop-shadow(0 0 1.5px rgb(255 255 255 / 90%));
+      pointer-events: none;
+    }
   }
 
   /* ── Date input — golden fairy-ticket style ── */
