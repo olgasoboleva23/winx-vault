@@ -21,7 +21,10 @@ const COLS = [
   { id: "nodate",   title: "💭 No date" },
 ].filter(c => c.id !== "week" || L.dropDate("week", today));   // no days left this week: hide
 
-const move = async (t, col) => {
+const lists = {};   // column id → element the cards live in
+// Dataview re-renders only after it re-indexes (seconds), so the card is moved right away
+const move = async (t, col, card) => {
+  lists[col]?.append(card);
   const date = L.dropDate(col, today);
   const file = app.vault.getAbstractFileByPath(t.path);
   await app.vault.process(file, c => {
@@ -53,7 +56,7 @@ if (goals.length) {
 const board   = dv.container.createEl("div", { cls: "winx-board" });
 const backlog = dv.container.createEl("div", { cls: "winx-board-backlog" });
 const SHOWN   = 8;
-let dragged = null;
+let dragged = null, draggedEl = null;
 
 for (const col of COLS) {
   const cards = open.filter(t => L.boardColumn(fmt(t.scheduled) ?? fmt(t.due), today) === col.id);
@@ -68,15 +71,15 @@ for (const col of COLS) {
     e.preventDefault();
     e.stopPropagation();   // keep Obsidian's own file-drop handling out of it
     colEl.classList.remove("over");
-    if (dragged && L.boardColumn(fmt(dragged.scheduled) ?? fmt(dragged.due), today) !== col.id) await move(dragged, col.id);
+    if (dragged && L.boardColumn(fmt(dragged.scheduled) ?? fmt(dragged.due), today) !== col.id) await move(dragged, col.id, draggedEl);
     dragged = null;
   };
 
-  const list = col.id === "nodate" ? colEl.createEl("div", { cls: "winx-board-grid" }) : colEl;
+  const list = lists[col.id] = col.id === "nodate" ? colEl.createEl("div", { cls: "winx-board-grid" }) : colEl;
   const cut = col.id === "nodate" && cards.length > SHOWN && !app.__winxBacklogOpen;
   for (const t of cut ? cards.slice(0, SHOWN) : cards) {
     const card = list.createEl("div", { cls: "winx-board-card", attr: { draggable: "true" } });
-    card.ondragstart = e => { dragged = t; card.classList.add("dragging"); e.dataTransfer?.setData("text/plain", ""); };
+    card.ondragstart = e => { dragged = t; draggedEl = card; card.classList.add("dragging"); e.dataTransfer?.setData("text/plain", ""); };
     card.ondragend   = () => card.classList.remove("dragging");
     card.createEl("div", { text: label(t), cls: "winx-board-text" });
 
@@ -91,7 +94,7 @@ for (const col of COLS) {
     const btns = card.createEl("div", { cls: "winx-board-btns" });   // CSS: hover-only on desktop
     for (const [id, txt] of [["today", "today"], ["tomorrow", "tmrw"], ["later", "later"], ["nodate", "✕ date"]]) {
       if (id === col.id) continue;
-      btns.createEl("button", { text: txt }).onclick = () => move(t, id);
+      btns.createEl("button", { text: txt }).onclick = () => move(t, id, card);
     }
   }
   if (col.id === "nodate" && cards.length > SHOWN) {
