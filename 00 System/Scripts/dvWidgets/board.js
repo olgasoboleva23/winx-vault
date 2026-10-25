@@ -1,6 +1,7 @@
 // Planning board. Top: "Goals", the recurring goal tasks (not draggable).
-// Below: one-off tasks in date columns. Drag a card to a column
-// (or tap a button on the phone) and its ⏳ plan date is rewritten in place.
+// Below: one-off tasks in date columns, then the "No date" backlog as a compact
+// grid (first 8, "show all" opens the rest). Drag a card to a column or use its
+// buttons (on hover; always shown on the phone) and its ⏳ plan date is rewritten.
 // Deadlines (📅) are not touched; recurring tasks stay in Routines.
 const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 
@@ -49,12 +50,14 @@ if (goals.length) {
   }
 }
 
-const board = dv.container.createEl("div", { cls: "winx-board" });
+const board   = dv.container.createEl("div", { cls: "winx-board" });
+const backlog = dv.container.createEl("div", { cls: "winx-board-backlog" });
+const SHOWN   = 8;
 let dragged = null;
 
 for (const col of COLS) {
   const cards = open.filter(t => L.boardColumn(fmt(t.scheduled) ?? fmt(t.due), today) === col.id);
-  const colEl = board.createEl("div", { cls: "winx-board-col" });
+  const colEl = (col.id === "nodate" ? backlog : board).createEl("div", { cls: "winx-board-col" });
   const head  = colEl.createEl("div", { cls: "winx-board-head" });
   head.createEl("span", { text: col.title });
   head.createEl("span", { text: String(cards.length), cls: "market-count" });
@@ -69,8 +72,10 @@ for (const col of COLS) {
     dragged = null;
   };
 
-  for (const t of cards) {
-    const card = colEl.createEl("div", { cls: "winx-board-card", attr: { draggable: "true" } });
+  const list = col.id === "nodate" ? colEl.createEl("div", { cls: "winx-board-grid" }) : colEl;
+  const cut = col.id === "nodate" && cards.length > SHOWN && !app.__winxBacklogOpen;
+  for (const t of cut ? cards.slice(0, SHOWN) : cards) {
+    const card = list.createEl("div", { cls: "winx-board-card", attr: { draggable: "true" } });
     card.ondragstart = e => { dragged = t; card.classList.add("dragging"); e.dataTransfer?.setData("text/plain", ""); };
     card.ondragend   = () => card.classList.remove("dragging");
     card.createEl("div", { text: label(t), cls: "winx-board-text" });
@@ -83,12 +88,17 @@ for (const col of COLS) {
     if (h) meta.push(`done ${h.count}× · last ${dm(h.last)}`);
     if (meta.length) card.createEl("div", { text: meta.join("  ·  "), cls: "winx-board-meta" });
 
-    if (app.isMobile) {   // drag is awkward with a finger: quick buttons instead
-      const btns = card.createEl("div", { cls: "winx-board-btns" });
-      for (const [id, txt] of [["today", "today"], ["tomorrow", "tmrw"], ["later", "later"], ["nodate", "✕ date"]]) {
-        if (id === col.id) continue;
-        btns.createEl("button", { text: txt }).onclick = () => move(t, id);
-      }
+    const btns = card.createEl("div", { cls: "winx-board-btns" });   // CSS: hover-only on desktop
+    for (const [id, txt] of [["today", "today"], ["tomorrow", "tmrw"], ["later", "later"], ["nodate", "✕ date"]]) {
+      if (id === col.id) continue;
+      btns.createEl("button", { text: txt }).onclick = () => move(t, id);
     }
+  }
+  if (col.id === "nodate" && cards.length > SHOWN) {
+    colEl.createEl("button", { text: cut ? `show all ${cards.length}` : "show less", cls: "winx-board-more" }).onclick = () => {
+      app.__winxBacklogOpen = cut;
+      dv.container.empty();
+      dv.view("00 System/Scripts/dvWidgets/board");
+    };
   }
 }
