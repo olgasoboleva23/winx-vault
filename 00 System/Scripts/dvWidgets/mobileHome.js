@@ -1,5 +1,6 @@
 // Mobile home: big tiles with live counts, each opens a mobile page.
 const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
+(app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js"))).installSounds();
 
 const today = window.moment().format("YYYY-MM-DD");
 const fmt   = d => d?.toFormat("yyyy-MM-dd");

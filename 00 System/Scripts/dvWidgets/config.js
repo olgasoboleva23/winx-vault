@@ -28,6 +28,11 @@ const areas = [
   // derived maps — ready to use in widgets
   xpMap: Object.fromEntries(difficulties.map((d) => [d.tag, d.xp])),
   areaMap: Object.fromEntries(areas.map((a) => [a.tag, a.name])),
+  // icon per #area/ tag, incl. tags without a Life Areas row
+  areaIcons: {
+    ...Object.fromEntries(areas.map((a) => [a.tag, a.label.split(" ")[0]])),
+    "#area/learning": "📚", "#area/work": "💼", "#area/personal": "🌸", "#area/health": "💊",
+  },
 
   levels: [
     { name: "VOID", max: 0, cls: "v0" },

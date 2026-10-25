@@ -17,7 +17,8 @@ module.exports = async (params) => {
   if (!area) return;
 
   const tasksApi = app.plugins.plugins["obsidian-tasks-plugin"].apiV1;
-  const result = await tasksApi.editTaskLineModal(`- [ ] ${difficulty} ${area} `);
+  const created = window.moment().format("YYYY-MM-DD");   // ➕ shows how long it waits on the board
+  const result = await tasksApi.editTaskLineModal(`- [ ] ${difficulty} ${area}  ➕ ${created}`);
   if (!result) return;
 
   const file = app.vault.getAbstractFileByPath("02 Areas/Personal/Tasks/Master.md");

@@ -82,6 +82,22 @@ class AudioEngine {
   }
 }
 
+// ===== SOUNDS (ticking a task anywhere; muted via the board's 🔊 button) =====
+const isMuted = () => app.loadLocalStorage("winx-mute") === "1";
+function installSounds() {
+  if (app.__winxSoundsOn) return;
+  app.__winxSoundsOn = true;
+  const gems   = [1, 2, 3, 4, 5, 6].map(n => new AudioEngine(`00 System/Assets/winx music/snd_pickup_gem0${n}.wav`));
+  const flower = new AudioEngine("00 System/Assets/winx music/snd_pickup_dragon_flower.wav");
+  // capture phase: the checkbox already shows its new state, before Tasks re-renders it
+  app.plugins.plugins.dataview.registerDomEvent(document, "click", e => {
+    const box = e.target.closest?.("input.task-list-item-checkbox");
+    if (!box?.checked || isMuted()) return;
+    const goal = (box.closest("li")?.textContent ?? "").includes("#goal/");
+    (goal ? flower : gems[Math.floor(Math.random() * gems.length)]).play({ gain: 0.25 });
+  }, true);
+}
+
 // ===== WALLET (cached earned/spent, invalidated on file change) =====
 class Wallet {
   static #cache() { return globalThis.app.__winxWallet ??= { earned: null, spent: null }; }
@@ -190,4 +206,4 @@ if (!globalThis.app.__winxSub2) {
   });
 }
 
-({ AudioEngine, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor, marketState, addToMarket })
+({ AudioEngine, installSounds, isMuted, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor, marketState, addToMarket })

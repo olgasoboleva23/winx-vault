@@ -2,12 +2,12 @@
  * WINX THEME — Tasks Minimal
  * File: tasks-minimal.css
  *
- * Hides non-starred tags and fades task metadata
+ * Hides tags (area shows as the group heading) and fades task metadata
  * until hover.
  * ============================================ */
 
 :is(.dashboard, .kanban-board) {
-  .task-list-item .tag:not([href^="#⭐"]) {
+  .task-list-item .tag {
     display: none;
   }
 

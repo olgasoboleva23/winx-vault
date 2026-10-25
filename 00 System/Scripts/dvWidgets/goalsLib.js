@@ -117,7 +117,7 @@ const markBought = (line, date) =>
 const unmarkBought = line =>
   /^\s*- \[x\]/i.test(line) ? line.replace(/- \[x\]/i, "- [ ]").replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/u, "").trimEnd() : line;
 
-// How many things are on today's plate, same rules as Kanban2:
+// How many things are on today's plate, same rules as the old Kanban2 Today column:
 // picked for today (⏳ today), routines due by today, deadlines due by today.
 // tasks: [{done, recurring, due?, scheduled?}] with "YYYY-MM-DD" dates.
 const todayCount = (tasks, date) => tasks.filter(t => !t.done && (
