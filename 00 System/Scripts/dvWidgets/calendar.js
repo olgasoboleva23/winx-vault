@@ -9,9 +9,9 @@
 // `overdue: false` leaves overdue tasks out (a page that lists them elsewhere, e.g. the Missed strip).
 // Every 🔁 entry of a day (done, open, the faded repeats) folds into one "🔁 2/5" box; done one-offs are listed
 // only when the `showDone` toggle is on, otherwise each day shows just a count with the names in a tooltip.
-const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-const Task = (app.__winxTask ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/task.js"))(L));
+const L = winx.L;
+const H = winx.H;
+const Task = winx.Task;
 const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
 const { areaIcons, areaMap, difficulties } = await H.loadConfig();
 H.installSounds();

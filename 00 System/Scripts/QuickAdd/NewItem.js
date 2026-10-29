@@ -22,7 +22,7 @@ module.exports = {
   settings: { name: "New collection item", options: { Kind: { type: "dropdown", defaultValue: "watch", options: Object.keys(KINDS) } } },
   entry: async (params, settings) => {
     const kind = settings.Kind, k = KINDS[kind];
-    const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+    const H = winx.H;
     const Form = (app.__winxForm ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/form.js")));
     const v = await Form.ask(k.title, [
       { name: "Title", key: "title", text: "title" },

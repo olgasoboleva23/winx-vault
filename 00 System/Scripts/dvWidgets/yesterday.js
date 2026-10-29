@@ -3,9 +3,9 @@
 // ☀️ moves it to today. Shows nothing when nothing is missed.
 // The calendar embeds it with dv.view(…, { parent, drag, text }): drawn into `parent`, rows draggable onto its days,
 // each row's text drawn by `text(el, t)` (the calendar's look: stars, sticker, area color).
-const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-const Task = (app.__winxTask ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/task.js"))(L));
+const L = winx.L;
+const H = winx.H;
+const Task = winx.Task;
 const { areaIcons } = await H.loadConfig();
 const SND = { done: new H.AudioEngine("00 System/Assets/winx music/snd_pickup_gem02.wav"), today: new H.AudioEngine("00 System/Assets/star.wav") };
 

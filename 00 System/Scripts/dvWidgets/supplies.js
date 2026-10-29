@@ -1,5 +1,5 @@
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
+const H = winx.H;
+const L = winx.L;
 const { marketCategories } = await H.loadConfig();
 
 const today = H.today();

@@ -4,8 +4,8 @@ const FILE_PATH = "00 System/Data/Celestial Market.md";
 const page = dv.page("00 System/Data/Celestial Market");
 if (!page) { dv.paragraph("Market file not found."); return; }
 
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
+const H = winx.H;
+const L = winx.L;
 const { marketCategories } = await H.loadConfig();
 
 const today = H.today();

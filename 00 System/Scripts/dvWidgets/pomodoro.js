@@ -3,7 +3,7 @@ const PATH = "00 System/Data/pomodoro.json";
 const DEFAULTS = { focusMin: 25, breakMin: 5 };
 
 // ===== HELPERS =====
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const H = winx.H;
 const { AudioEngine } = H;
 
 // ===== ICONS =====

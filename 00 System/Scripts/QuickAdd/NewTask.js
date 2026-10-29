@@ -1,7 +1,7 @@
 module.exports = async () => {
-  const H    = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-  const L    = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
-  const Task = (app.__winxTask ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/task.js"))(L));
+  const H    = winx.H;
+  const L    = winx.L;
+  const Task = winx.Task;
 
   // difficulty, area, time of day, sticker (or "to pool") in one window; then the Tasks modal for the text and dates
   const pick = await H.taskWindow({}, true);

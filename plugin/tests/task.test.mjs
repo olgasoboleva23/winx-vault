@@ -1,10 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { Task } from "../src/lib/task.js";
 
-const read = f => readFileSync(new URL(`../00 System/Scripts/dvWidgets/${f}`, import.meta.url), "utf8");
-const L = eval(read("goalsLib.js"));
-const Task = eval(read("task.js"))(L);
 const T = line => new Task(line);
 
 test("what a line is", () => {

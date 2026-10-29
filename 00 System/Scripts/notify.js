@@ -2,7 +2,7 @@
 // Schedules today's macOS notifications from open tasks due today, plus a
 // morning summary once a day. Reschedules when tasks or goals change and at midnight.
 (async () => {
-  const L     = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
+  const L     = winx.L;
   const dv    = app.plugins.plugins.dataview?.api;
   const state = (app.__winxNotify ??= { timers: [], subscribed: false });
   if (!dv || app.isMobile || typeof Notification === "undefined") return;  // desktop only

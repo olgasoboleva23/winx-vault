@@ -1,6 +1,4 @@
 // Pure goal / week / cycle logic, no Obsidian globals (tested by tests/goalsLib.test.mjs).
-// Widgets load it like helpers.js:
-//   const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 // Dates are "YYYY-MM-DD" strings, weekdays ISO 1 = Monday … 7 = Sunday. Math in UTC.
 const DAY_MS = 86400000;
 const toMs   = date => Date.parse(date + "T00:00:00Z");
@@ -208,4 +206,5 @@ const monthGrid = date => {
   return out;
 };
 
-({ addMonths, projectRepeats, monthGrid, weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought, unmarkBought, todayCount, parseWeights, upsertWeight, ruleText, levelInfo, diffDays })
+
+export const L = { addMonths, projectRepeats, monthGrid, weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought, unmarkBought, todayCount, parseWeights, upsertWeight, ruleText, levelInfo, diffDays };

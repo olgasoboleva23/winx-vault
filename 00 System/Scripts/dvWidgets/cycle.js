@@ -1,5 +1,5 @@
-const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const L = winx.L;
+const H = winx.H;
 
 const CYCLE_PATH = "02 Areas/Health & Body/Cycle.md";
 const selected   = H.ymd(H.pageDay(dv));

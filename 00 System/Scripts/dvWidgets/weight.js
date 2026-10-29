@@ -1,8 +1,8 @@
 // Weight: line chart of the last 30 days (same look as the old mood chart),
 // last value, change vs a week ago, a field to log today's weight, a button to the list.
 // The same widget on the dashboard and the phone's Weight page.
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
+const H = winx.H;
+const L = winx.L;
 
 const PATH  = "02 Areas/Appearance/Weight.md";
 const DAYS  = 30;

@@ -2,19 +2,19 @@
 // return the new line; widgets write it). The only place that knows the format:
 //   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening · ![[sticker]]
 //   🔁 rule (up to the next field) · 📅 due (an old ⏳ still counts) · ✅ done · ❌ skipped · ➕ created · 🛫 start
-// No Obsidian globals (tested by tests/task.test.mjs). It needs goalsLib's date math, so the file is a function of it:
-//   const Task = (app.__winxTask ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/task.js"))(L));
+// No Obsidian globals (tested by tests/task.test.mjs).
 // Wrap a Dataview task with Task.of(t) (t is kept as .src, for its path and line) or a raw line with new Task(line).
 // A pool line (Pool.md: a task to pick when it's time, "- #⭐easy #area/base take out trash") is the same without
 // checkbox, rule or dates; its copies on the days are ordinary tasks with the same text.
-(L => {
+import { L } from "./goalsLib.js";
+
 const DATE   = "\\d{4}-\\d{2}-\\d{2}";
 const FIELDS = "📅⏳✅❌🛫➕";   // a date field starts with one of these; a 🔁 rule runs up to the next one
 const field  = (line, emoji) => line.match(new RegExp(`${emoji}\\s*(${DATE})`, "u"))?.[1] ?? null;
 const drop   = (line, emojis) => line.replace(new RegExp(`\\s*[${emojis}]\\s*${DATE}`, "gu"), "");
 const OPEN   = /^\s*- \[ \]/, ANY = /^\s*- \[.\]/, DONE = /^\s*- \[[xX]\]/;
 
-class Task {
+export class Task {
   constructor(line, src = null) { this.line = line; this.src = src; }
   static of(t) { return new Task(`- [${t.status}] ${t.text}`, t); }
 
@@ -128,5 +128,3 @@ class Task {
     return toggled.split("\n").map(l => /^\s*- \[x\]/.test(l) ? l.replace(/^(\s*- \[)x/, "$1-").replace(/✅(\s*\d{4}-\d{2}-\d{2})/u, "❌$1") : l).join("\n");
   }
 }
-return Task;
-})
