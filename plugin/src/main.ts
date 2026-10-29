@@ -1,4 +1,5 @@
 import { Plugin } from "obsidian";
+import { CalendarView, VIEW_TYPE } from "./calendar/view.ts";
 import { L } from "./lib/goalsLib.js";
 import { Task } from "./lib/task.js";
 import { H } from "./lib/helpers.js";
@@ -19,6 +20,10 @@ export default class WinxPlugin extends Plugin {
     H.watchCaches((emitter: any, name: string, cb: any) => this.registerEvent(emitter.on(name, cb)));
     H.installSounds(this);
     registerCommands(this);
+    // the calendar: its own tab; the command and the ribbon icon open it, or go to the one already open
+    this.registerView(VIEW_TYPE, leaf => new CalendarView(leaf));
+    this.addCommand({ id: "open-calendar", name: "Open calendar", callback: () => this.openCalendar() });
+    this.addRibbonIcon("calendar-days", "Winx calendar", () => this.openCalendar());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",
       name: "Reload",
@@ -29,6 +34,12 @@ export default class WinxPlugin extends Plugin {
       },
     });
     console.log("winx loaded");
+  }
+  async openCalendar() {
+    const { workspace } = this.app;
+    let leaf = workspace.getLeavesOfType(VIEW_TYPE)[0];
+    if (!leaf) { leaf = workspace.getLeaf("tab"); await leaf.setViewState({ type: VIEW_TYPE, active: true }); }
+    workspace.revealLeaf(leaf);
   }
   onunload() { delete (window as any).winx; }
 }

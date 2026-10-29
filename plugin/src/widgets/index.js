@@ -1,5 +1,4 @@
-// The widgets, by the name a note's block asks for: await winx.render("calendar", dv, input)
-import calendar from "./calendar.js";
+// The widgets, by the name a note's block asks for: await winx.render("weight", dv, input)
 import celestialMarket from "./celestialMarket.js";
 import cycle from "./cycle.js";
 import dailyNote from "./dailyNote.js";
@@ -18,7 +17,6 @@ import week from "./week.js";
 import weeklyState from "./weeklyState.js";
 import weight from "./weight.js";
 import xpToday from "./xpToday.js";
-import yesterday from "./yesterday.js";
 
-export const widgets = { calendar, celestialMarket, cycle, dailyNote, finance, goals, habits, levelToday, lifeAreas, mobileHome, mobileShopping, pomodoro, shop, supplies, wallet, week, weeklyState, weight, xpToday, yesterday };
+export const widgets = { celestialMarket, cycle, dailyNote, finance, goals, habits, levelToday, lifeAreas, mobileHome, mobileShopping, pomodoro, shop, supplies, wallet, week, weeklyState, weight, xpToday };
 export const render = (name, dv, input) => widgets[name] ? widgets[name](dv, input) : dv.el("div", `winx: no widget "${name}"`);
