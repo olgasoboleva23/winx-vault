@@ -2,16 +2,13 @@
 // 00 System/Scripts/finance/import_statement.py and renders a month summary,
 // category breakdown, 6-month trend and the latest operations.
 //
-// This file is synced from winx-vault along with the rest of 00 System/Scripts,
-// so edit it THERE — a local edit here is wiped by the next sync. The data it
-// reads (02 Areas/Finance) is outside the sync scope and stays vault-local.
+// The data it reads (02 Areas/Finance) stays in the vault; this repo has the code only.
 //
-// Styles are injected from this file rather than shipped as a CSS snippet, so
-// the widget stays self-contained; they only use --winx-* tokens, so
-// re-theming still carries through.
+// Styles are injected from this file rather than kept in plugin/styles, so the
+// widget stays self-contained; they only use --winx-* tokens, so re-theming
+// still carries through.
 //
-// Usage:  render("finance", dv);
-import { render } from "./index.js";
+// Usage (a note's dataviewjs block):  await winx.render("finance", dv);
 
 export default async function (dv, input) {
   const LEDGER = "02 Areas/Finance/Ledger";

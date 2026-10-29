@@ -1,7 +1,7 @@
 // "Missed?": open tasks whose day (⏳, else 📅) has passed. ✓ marks one done on that day
 // (toggled by the Tasks plugin, so a 🔁 task still gets its next copy, moved back with it for "when done"),
 // ☀️ moves it to today. Shows nothing when nothing is missed.
-// The calendar embeds it with dv.view(…, { parent, drag, text }): drawn into `parent`, rows draggable onto its days,
+// The calendar embeds it with render("yesterday", dv, { parent, drag, text }): drawn into `parent`, rows draggable onto its days,
 // each row's text drawn by `text(el, t)` (the calendar's look: stars, sticker, area color).
 import { H } from "../lib/helpers.js";
 import { L } from "../lib/goalsLib.js";
