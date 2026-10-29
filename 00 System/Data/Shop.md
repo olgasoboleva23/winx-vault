@@ -1,7 +1,7 @@
 # 🛍 Shop
 
 ```dataviewjs
-await dv.view("00 System/Scripts/dvWidgets/shop")
+await winx.render("shop", dv)
 ```
 
 - name:: Cozy Coffee  

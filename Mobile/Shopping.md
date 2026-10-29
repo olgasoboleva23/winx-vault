@@ -9,5 +9,5 @@ cssclasses:
 
 > [!card] Shopping
 > ```dataviewjs
-> dv.view("00 System/Scripts/dvWidgets/mobileShopping");
+> await winx.render("mobileShopping", dv);
 > ```

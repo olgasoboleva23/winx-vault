@@ -5,5 +5,5 @@ cssclasses:
 ---
 
 ```dataviewjs
-dv.view("00 System/Scripts/dvWidgets/mobileHome");
+await winx.render("mobileHome", dv);
 ```

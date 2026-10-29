@@ -3,23 +3,18 @@ import { L } from "./lib/goalsLib.js";
 import { Task } from "./lib/task.js";
 import { H } from "./lib/helpers.js";
 import { registerCommands } from "./commands.ts";
+import { render } from "./widgets/index.js";
 
 // The Winx plugin: widgets for the notes' dataviewjs blocks (window.winx.render), the task window and the
 // commands, and the styles (styles.css, built from styles/*.scss).
-type Widget = (dv: unknown, input?: unknown) => Promise<void> | void;
-const widgets: Record<string, Widget> = {};
 
 export default class WinxPlugin extends Plugin {
   async onload() {
     (window as any).winx = {
-      // the shared code, for the widgets still in 00 System/Scripts (until they move here)
-      L, Task, H,
       // a note's block: await winx.render("weight", dv, input)
-      render: async (name: string, dv: any, input?: unknown) => {
-        const widget = widgets[name];
-        if (!widget) return dv.el("div", `winx: no widget "${name}"`);
-        await widget(dv, input);
-      },
+      render,
+      // the shared code, for 00 System/Scripts/notify.js (Templater's startup script)
+      L, Task, H,
     };
     H.watchCaches((emitter: any, name: string, cb: any) => this.registerEvent(emitter.on(name, cb)));
     H.installSounds(this);
