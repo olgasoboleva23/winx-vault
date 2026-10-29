@@ -3,7 +3,6 @@ view: week
 cssclasses:
   - dashboard
 showDone: true
-overdue: false
 ---
 
 ```dataviewjs

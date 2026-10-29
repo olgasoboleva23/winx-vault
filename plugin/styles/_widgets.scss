@@ -650,7 +650,6 @@ body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { wid
   &:last-child { border-bottom: none; }
   &[draggable="true"] { cursor: grab; }
   &[draggable="true"]:hover { background: color-mix(in srgb, white 35%, transparent); border-radius: 8px; }
-  &.overdue { color: #b0306a; }
   &.ghost   { opacity: 0.5; }
   &.done    { opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
   &:has(> input.task-list-item-checkbox) { padding-left: 26px; }

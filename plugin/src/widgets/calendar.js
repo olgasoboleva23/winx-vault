@@ -1,12 +1,11 @@
 // Calendar: the week (7 day columns) or the month (grid) around the page's `date`,
 // switched by its `view` property (the week/month button in the header). Tasks sit on their 📅 date (an old ⏳ wins if a task still has one),
 // done ones on their ✅ date; recurring tasks also show their next repeats faded (🔁),
-// projected from the rule. Overdue tasks show on today. Below, three tabs: No date (open one-off tasks
+// projected from the rule. Overdue tasks show only in "Missed?" above the days. Below, three tabs: No date (open one-off tasks
 // without a date), Regulars (every 🔁 task: its rule, next date, history; ⏸ pauses one by dropping its dates)
 // and Pool (Pool.md: tasks with no schedule, picked when it's time; dragging one onto a day adds a copy there).
 // Drag a task (open or done) to a day: a future day moves its 📅 there; today or an earlier day splits
 // into "✓ done" (✅ that day) and "📅 move". Dropping on the backlog clears the date.
-// `overdue: false` leaves overdue tasks out (a page that lists them elsewhere, e.g. the Missed strip).
 // Every 🔁 entry of a day (done, open, the faded repeats) folds into one "🔁 2/5" box; done one-offs are listed
 // only when the `showDone` toggle is on, otherwise each day shows just a count with the names in a tooltip.
 import { H } from "../lib/helpers.js";
@@ -27,7 +26,7 @@ export default async function (dv, input) {
   const fm    = app.metadataCache.getFileCache(pageFile)?.frontmatter ?? {};
   const base  = /^\d{4}-\d{2}-\d{2}/.test(fm.date ?? "") ? String(fm.date).slice(0, 10) : today;
   const view  = fm.view === "month" ? "month" : "week";
-  const shown = { open: true, overdue: true, done: !!fm.showDone, ghost: true };
+  const shown = { open: true, done: !!fm.showDone, ghost: true };
   if (!dv.container.winxCalHooked) {
     dv.container.winxCalHooked = true;
     dv.component.registerEvent(app.metadataCache.on("changed", f => {
@@ -79,7 +78,8 @@ export default async function (dv, input) {
     for (const src of stickers(t)) el.createEl("img", { cls: "winx-cal-sticker", attr: { src, alt: "" } });
   };
 
-  // day → entries { t, kind: open | overdue | ghost | done }; backlog: open tasks with no date
+  // day → entries { t, kind: open | ghost | done }; backlog: open tasks with no date. Overdue ones are left out:
+  // "Missed?" lists them
   const byDay = Object.fromEntries(days.map(d => [d, []]));
   const backlog = [];
   const all = dv.pages('"02 Areas/Personal/Tasks"').file.tasks.array();
@@ -88,11 +88,11 @@ export default async function (dv, input) {
     if (!T(t).isOpen) continue;   // skipped, in progress etc.
     const d = T(t).date;
     if (!d) { if (!T(t).isRecurring) backlog.push(t); continue; }   // an undated 🔁 task is a paused regular
-    if (d >= today || fm.overdue !== false) byDay[d < today ? today : d]?.push({ t, kind: d < today ? "overdue" : "open" });   // overdue piles up on today
+    if (d >= today) byDay[d]?.push({ t, kind: "open" });
     const rule = T(t).rule;
     if (rule) for (const g of L.projectRepeats(rule, d, last)) if (g > today) byDay[g]?.push({ t, kind: "ghost" });   // future only
   }
-  const ORDER = { overdue: 0, open: 1, ghost: 2, done: 3 };
+  const ORDER = { open: 0, ghost: 1, done: 2 };
   for (const d of days) byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
 
   // a view change (date, week/month, a filter): .busy at once, the redraw follows the page's metadata change
@@ -208,7 +208,7 @@ export default async function (dv, input) {
       el.ondragend   = () => root.classList.remove("dragging");
     }
     // open tasks in the week view: ✏️ edits, 🗑 deletes
-    if (!compact && (kind === "open" || kind === "overdue")) {
+    if (!compact && kind === "open") {
       deleteButton(el.createEl("div", { cls: "winx-board-btns" }), t, el);   // CSS: fades in on hover on desktop
       if (box) swipe(el, t, () => { if (!box.checked) box.click(); });
     }
