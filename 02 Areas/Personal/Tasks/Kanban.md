@@ -6,10 +6,6 @@ cssclasses:
 
 `INPUT[date:date]`
 
-```dataviewjs
-(app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js"))).installSounds();
-```
-
 > [!grid]
 > > [!card] ✅ Done Today
 > > ```tasks
