@@ -2,6 +2,7 @@ import { Plugin } from "obsidian";
 import { L } from "./lib/goalsLib.js";
 import { Task } from "./lib/task.js";
 import { H } from "./lib/helpers.js";
+import { registerCommands } from "./commands.ts";
 
 // The Winx plugin: widgets for the notes' dataviewjs blocks (window.winx.render), the task window and the
 // commands, and the styles (styles.css, built from styles/*.scss).
@@ -22,6 +23,7 @@ export default class WinxPlugin extends Plugin {
     };
     H.watchCaches((emitter: any, name: string, cb: any) => this.registerEvent(emitter.on(name, cb)));
     H.installSounds(this);
+    registerCommands(this);
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",
       name: "Reload",

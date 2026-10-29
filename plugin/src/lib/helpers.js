@@ -1,5 +1,6 @@
 // Shared widget logic: dates, task line edits, the task window, wallet, purchases, market, sounds.
 import config from "./config.js";
+import { Form } from "../ui/form.ts";
 
 async function loadConfig() { return config; }
 
@@ -120,8 +121,7 @@ const editTaskLine = (t, fn, Task) => app.vault.process(app.vault.getAbstractFil
 const taskWindow = async (preset = {}, required = false) => {
   const { difficulties, areas } = await loadConfig();
   const stickers = (app.vault.getFolderByPath("00 System/Assets/stickers")?.children ?? []).sort((a, b) => a.name.localeCompare(b.name));
-  const Form = (app.__winxForm ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/form.js")));
-  return Form.ask(required ? "✦ New task" : "✦ Edit task", [
+  return Form.ask(app, required ? "✦ New task" : "✦ Edit task", [
     { name: "Difficulty", key: "difficulty", options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.tag })) },
     { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.tag })) },
     // a routine's time of day: the calendar groups its 🔁 box by it
