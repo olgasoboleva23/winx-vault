@@ -37,9 +37,9 @@ Copy the plugin and what it reads:
 | `plugin/dist/*` (after `npm run build`) | `.obsidian/plugins/winx/` — then turn **Winx** on in Community plugins |
 | the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
 | `Dashboard.md`, `Week.md`, `Mobile.md`, `Mobile/` | anywhere (they hold the widget blocks) |
-| `02 Areas/Personal/Tasks/` (`Master.md`, `Calendar.md`, `Kanban.md`), `Goals.md`, `00 System/Data/`, `00 System/Assets/` | the same paths: the widgets read them there |
+| `02 Areas/Personal/Tasks/` (`Master.md`, `Pool.md`, `Kanban.md`), `Goals.md`, `00 System/Data/`, `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
 
-The paths the widgets read are in the widget files (`plugin/src/widgets/*.js`, constants at the top) and `plugin/src/lib/config.js`.
+The paths the widgets read are in the widget files (`plugin/src/widgets/*.js`, `plugin/src/calendar/view.ts`, constants at the top) and `plugin/src/lib/config.js`.
 
 ### Keeping your vault in sync with this repo
 
@@ -114,7 +114,7 @@ await winx.render("weight", dv);
 
 ## 📅 Calendar
 
-`02 Areas/Personal/Tasks/Calendar.md`: the tasks of `Master.md` on a week or a month.
+A tab of its own: **Winx: Open calendar** (Cmd+P) or the 📅 icon on the left. The tasks of `02 Areas/Personal/Tasks` on a week or a month. Pin the tab, drag it to a sidebar or a window; it keeps its week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
 
 ![Calendar](calendar.png)
 
@@ -216,6 +216,8 @@ Notes (free text; the first lines show on the Week page) and an XP Log. Made fro
 ├── 📁 plugin — the Winx plugin
 │   ├── 📁 src
 │   │   ├── main.ts               — loads everything; window.winx.render for the notes' blocks
+│   │   ├── 📁 calendar           — the calendar tab: view.ts (state, redraws), data.js (the model, tested),
+│   │   │                           state.js (tested), header, grid, panel, missed, card, drag, swipe, actions
 │   │   ├── commands.ts           — the Cmd+P commands
 │   │   ├── 📁 ui/form.ts         — one window of buttons / text boxes instead of a chain of prompts
 │   │   ├── 📁 lib                — config, goalsLib (week / goal / cycle / weight logic), task (one task line:
@@ -233,7 +235,7 @@ Notes (free text; the first lines show on the Week page) and an XP Log. Made fro
 │   └── 📁 Personal
 │       ├── Goals.md
 │       ├── 📁 Daily Notes
-│       └── 📁 Tasks              — Master.md (all tasks), Calendar.md, Kanban.md
+│       └── 📁 Tasks              — Master.md (all tasks), Pool.md, Kanban.md
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
 ├── Dashboard.md, Week.md, Mobile.md, 📁 Mobile
 ```
