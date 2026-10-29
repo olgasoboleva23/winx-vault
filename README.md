@@ -116,6 +116,8 @@ await winx.render("weight", dv);
 
 `02 Areas/Personal/Tasks/Calendar.md`: the tasks of `Master.md` on a week or a month.
 
+![Calendar](calendar.png)
+
 - **Days** show one-off tasks, and a day's 🔁 tasks folded into one pill "🔁 2/5"; a click unfolds them, grouped by time of day (`#time/morning`, `#time/evening`).
 - **Drag** a task onto a day: open and due that day, or ✓ done that day. While dragging, a bar of 7 days sticks to the top of the screen.
 - **Missed?** lists open tasks whose day has passed: ✓ done that day, or ☀️ move to today.
@@ -126,6 +128,8 @@ await winx.render("weight", dv);
 ---
 
 ## ✅ Tasks and commands
+
+![Task window](task-window.png)
 
 Tasks live in `02 Areas/Personal/Tasks/Master.md` in the Tasks plugin's format, tagged with a difficulty and a life area:
 
