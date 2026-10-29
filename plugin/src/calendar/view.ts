@@ -45,12 +45,9 @@ export class CalendarView extends ItemView {
     // a note in reading view (fonts, margins), with the dashboard pages' background and fonts on top
     this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard", "winx-cal-view"]);
     this.root = this.contentEl.createEl("div");
-    const dv = this.dataview();
-    // a cold start: Dataview may not have read the vault yet
-    if (dv && !dv.index?.initialized) await new Promise<void>(done => {
-      const ref = this.app.metadataCache.on("dataview:index-ready" as any, () => { this.app.metadataCache.offref(ref); done(); });
-      this.registerEvent(ref);
-    });
+    // a cold start: Dataview reads the vault only once the layout is ready, after this tab opens; draw when it has
+    // (not waiting here: Obsidian waits for onOpen before the layout is ready)
+    this.registerEvent((this.app.metadataCache as any).on("dataview:index-ready", () => this.draw()));
     this.draw();
     // a task file changed in Dataview's index: new data, every part (a hidden tab waits until it shows)
     let timer = 0;
@@ -65,8 +62,16 @@ export class CalendarView extends ItemView {
       this.ctx?.root.classList.add("busy");
       window.setTimeout(() => this.ctx?.root.classList.remove("busy"), 5000);
     }));
-    this.registerEvent(this.app.workspace.on("active-leaf-change", () => { if (this.stale && this.contentEl.isShown()) this.draw(); }));
+    this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
+    this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));   // a sidebar or split shown
+    // a new day: following today, the days move on; and "today" in every action is the new one
+    this.registerInterval(window.setInterval(() => {
+      if (this.ctx && this.ctx.today !== H.today()) this.contentEl.isShown() ? this.draw() : (this.stale = true);
+    }, 60_000));
   }
+  onResize() { this.catchUp(); }
+  // a hidden tab that missed changes, drawn when it shows
+  private catchUp() { if (this.stale && this.contentEl.isShown()) this.draw(); }
   async onClose() { this.contentEl.empty(); this.ctx = null; }
 
   private dataview(): any { return (this.app as any).plugins.plugins.dataview?.api; }
@@ -75,7 +80,9 @@ export class CalendarView extends ItemView {
   private async draw() {
     this.stale = false;
     const dv = this.dataview();
-    if (!dv) { this.root.empty(); this.root.setText("✦ the calendar needs the Dataview plugin"); return; }
+    const say = (text: string) => { this.ctx = null; this.root.empty(); this.root.setText(text); };   // no calendar to redraw in place
+    if (!dv) return say("✦ the calendar needs the Dataview plugin");
+    if (!dv.index?.initialized) return say("✦ waiting for Dataview…");   // index-ready draws again
     const today = H.today(), days = shownDays(this.state, today);
     const tasks = dv.pages(`"${TASKS_DIR.slice(0, -1)}"`).file.tasks.array();
     const poolLines = (dv.page(POOL)?.file.lists.array() ?? []).filter((l: any) => !l.task);
@@ -97,7 +104,7 @@ export class CalendarView extends ItemView {
     ctx.swipe = makeSwipe(ctx.actions);
     this.parts.clear();
     for (const p of PARTS) this.parts.set(p, this.drawPart(p));
-    old ? old.replaceWith(root) : this.root.appendChild(root);
+    old ? old.replaceWith(root) : (this.root.empty(), this.root.appendChild(root));   // first time: over "waiting…"
   }
 
   private drawPart(p: Part): HTMLElement[] {

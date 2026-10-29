@@ -3,6 +3,7 @@
 // pill "🔁 2/5" under the one-offs; a click unfolds them inside the pill's dashed box, grouped by time of day
 // (#time/morning, #time/evening, the rest); a click on a group heading or the box's edge folds it back.
 import { T } from "./data.js";
+import { dateFor } from "./state.js";
 
 const TIMES = [["morning", "🌅 morning"], ["evening", "🌙 evening"], [null, "🔁 other"]];
 
@@ -55,7 +56,7 @@ export function drawGrid(ctx, drag, cards) {
       const cell = grid.createEl("div", { cls: "winx-cal-cell" + (d === today ? " today" : "") + (d.slice(0, 7) !== base.slice(0, 7) ? " outside" : "") });
       cell.createEl("div", { cls: "winx-cal-num", text: String(+d.slice(8)) });
       fill(cell, d, true);
-      cell.onclick = e => { if (e.target === cell || e.target.matches(".winx-cal-num, .winx-cal-marks, .winx-cal-marks *")) ctx.set({ date: d, view: "week" }, ["header", "missed", "grid"]); };
+      cell.onclick = e => { if (e.target === cell || e.target.matches(".winx-cal-num, .winx-cal-marks, .winx-cal-marks *")) ctx.set({ date: dateFor(d, "week", today), view: "week" }, ["header", "missed", "grid"]); };
       drag.dropTarget(cell, d);
     }
   }
