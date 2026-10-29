@@ -1,1 +1,15 @@
-// Winx styles: one partial per part of the vault, in the order Obsidian applied the old snippets.
+// Winx styles: one partial per part of the vault, in the order Obsidian applied the old snippets (by name).
+@use "animations";
+@use "assets";
+@use "callout-grid";
+@use "cards";
+@use "celestial-market";
+@use "fonts";
+@use "heatmap";
+@use "kanban";
+@use "layout";
+@use "pomodoro";
+@use "shop";
+@use "tasks-minimal";
+@use "tokens";
+@use "widgets";
