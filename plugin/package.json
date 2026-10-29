@@ -1,0 +1,16 @@
+{
+  "name": "winx",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "dev": "node esbuild.config.mjs --watch",
+    "test": "node --test --experimental-strip-types tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "obsidian": "^1.14.4",
+    "sass": "^1.107.0",
+    "typescript": "^7.0.2"
+  }
+}
