@@ -1,7 +1,8 @@
-// Run inside Obsidian (obsidian eval): opens each page (live preview), waits for its widgets, and writes the computed styles of
-// every visible element (and its ::before / ::after) to OUT as JSON, keyed by the element's path in the page.
+// Run inside Obsidian (obsidian eval): opens each page (live preview; "view:<type>" opens a plugin tab of that type),
+// waits for its widgets, and writes the computed styles of every visible element (and its ::before / ::after) under
+// ROOT (a selector; default: the whole page) to OUT as JSON, keyed by the element's path below it.
 // Two snapshots (old snippets on / plugin styles on) must match: tests/obsidian/compare-snapshots.mjs.
-(async (OUT, PAGES) => {
+(async (OUT, PAGES, ROOT = null) => {
   const PROPS = ["display", "position", "top", "left", "width", "height", "margin", "padding", "color", "background-color",
     "background-image", "border", "border-radius", "box-shadow", "font-family", "font-size", "font-weight", "line-height",
     "text-transform", "letter-spacing", "opacity", "transform", "filter", "gap", "flex-direction", "justify-content",
@@ -12,17 +13,18 @@
   // live preview: the reading view isn't drawn while the window is hidden behind others
   const leaf = app.workspace.getLeaf(false), was = leaf.getViewState();
   for (const page of PAGES) {
-    const file = app.metadataCache.getFirstLinkpathDest(page, "");
-    await leaf.setViewState({ type: "markdown", state: { file: file.path, mode: "source" } });
+    if (page.startsWith("view:")) await leaf.setViewState({ type: page.slice(5) });
+    else await leaf.setViewState({ type: "markdown", state: { file: app.metadataCache.getFirstLinkpathDest(page, "").path, mode: "source" } });
     await wait(5000);
-    const root = leaf.view.containerEl.querySelector(".markdown-source-view");
+    const root = leaf.view.containerEl.querySelector(ROOT ?? ".markdown-source-view");
+    if (!root) throw new Error(`${page}: no ${ROOT}`);
     const els = [...root.querySelectorAll("*")].filter(e => e.getClientRects().length);
     const path = e => { const p = []; for (; e && e !== root; e = e.parentElement) p.unshift(`${e.tagName}${[...e.classList].filter(c => /^winx|^callout|^dashboard|^task|^block/.test(c)).map(c => "." + c).join("")}:${[...e.parentElement.children].indexOf(e)}`); return p.join(">"); };
     for (const e of els) {
       for (const pseudo of [null, "::before", "::after"]) {
         const cs = getComputedStyle(e, pseudo);
         if (pseudo && (cs.content === "none" || cs.content === "normal")) continue;
-        shot[`${page} ${path(e)}${pseudo ?? ""}`] = PROPS.map(p => cs.getPropertyValue(p)).join("|");
+        shot[`${ROOT ? "" : page + " "}${path(e)}${pseudo ?? ""}`] = PROPS.map(p => cs.getPropertyValue(p)).join("|");
       }
     }
   }
