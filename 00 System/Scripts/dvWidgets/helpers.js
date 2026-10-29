@@ -21,7 +21,7 @@ function collectHabitDays(dv, start, end) {
   const habits = {};
   for (const page of dv.pages('"02 Areas/Personal/Daily Notes"')
       .where(p => p.date?.ts >= start.ts && p.date?.ts <= end.ts)) {
-    const dateStr = page.date.toFormat("yyyy-MM-dd");
+    const dateStr = ymd(page.date);
     for (const t of page.file.tasks) {
       const habitTag = t.tags?.find(tag => tag.startsWith("#habit/"));
       if (!habitTag || !t.completed) continue;
@@ -92,11 +92,87 @@ function installSounds() {
   // capture phase: the checkbox already shows its new state, before Tasks re-renders it
   app.plugins.plugins.dataview.registerDomEvent(document, "click", e => {
     const box = e.target.closest?.("input.task-list-item-checkbox");
-    if (!box?.checked || isMuted()) return;
+    if (!box || isMuted()) return;
+    if (!box.checked) return gems[0].play({ rate: 0.6, gain: 0.2 });   // unticked: the same gem, slowed down
     const goal = (box.closest("li")?.textContent ?? "").includes("#goal/");
     (goal ? flower : gems[Math.floor(Math.random() * gems.length)]).play({ gain: 0.25 });
   }, true);
 }
+
+// ===== DATES =====
+// today as "YYYY-MM-DD"; a Dataview (Luxon) date the same way (undefined stays undefined);
+// the day a page is about: its `date` property, else today (Luxon, for .minus/.plus)
+const today   = () => window.moment().format("YYYY-MM-DD");
+const ymd     = d => d?.toFormat("yyyy-MM-dd");
+const pageDay = dv => dv.current().date ?? dv.date("today");
+
+// ===== TASK LINES =====
+// Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
+// only if that line is still the same task (Task is the class from task.js, passed in by the widget).
+const editTaskLine = (t, fn, Task) => app.vault.process(app.vault.getAbstractFileByPath(t.path), c => {
+  const lines = c.split("\n");
+  if (Task.keyOf(lines[t.line] ?? "") !== Task.keyOf(t.text)) return c;
+  const next = fn(lines[t.line]);
+  next === null ? lines.splice(t.line, 1) : (lines[t.line] = next);
+  return lines.join("\n");
+});
+
+// What the Tasks modal doesn't ask: difficulty, area, time of day, sticker (from 00 System/Assets/stickers);
+// `preset` (Task#picks) has the current ones. A new task must have a difficulty and an area (`required`) and can
+// go to the pool instead (a "to pool" checkbox: pick.pool). Resolves to the picks, null when closed.
+const taskWindow = async (preset = {}, required = false) => {
+  const { difficulties, areas } = await loadConfig();
+  const stickers = (app.vault.getFolderByPath("00 System/Assets/stickers")?.children ?? []).sort((a, b) => a.name.localeCompare(b.name));
+  const Form = (app.__winxForm ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/form.js")));
+  return Form.ask(required ? "✦ New task" : "✦ Edit task", [
+    { name: "Difficulty", key: "difficulty", options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.tag })) },
+    { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.tag })) },
+    // a routine's time of day: the calendar groups its 🔁 box by it
+    { name: "Time of day", key: "time", options: [{ label: "—", value: null }, { label: "🌅 morning", value: "#time/morning" }, { label: "🌙 evening", value: "#time/evening" }] },
+    { name: "Sticker", key: "sticker", options: [{ label: "—", value: null }, ...stickers.map(f => ({ label: f.name, value: f.name, img: f }))] },
+    // Pool.md: tasks to pick when it's time (the calendar's Pool tab); no dates
+    ...(required ? [{ name: "To pool", key: "pool", check: "pick it from the calendar's Pool tab when it's time" }] : []),
+  ], { values: { difficulty: null, area: null, time: null, sticker: null, ...preset }, required: required ? ["difficulty", "area"] : [] });
+};
+
+// Edit a task: the task window, then the Tasks plugin's own edit dialog (text, dates; works on the phone).
+// Cancelling either changes nothing. A pool line (t.pool) goes through the dialog as a task and comes back
+// as a pool line (any dates set there are dropped).
+const editTaskModal = async (t, Task) => {
+  const api  = app.plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
+  const line = (await app.vault.cachedRead(app.vault.getAbstractFileByPath(t.path))).split("\n")[t.line];
+  if (!api || Task.keyOf(line ?? "") !== Task.keyOf(t.text)) return;
+  const was  = new Task(line).picks;
+  const pick = await taskWindow(was);
+  if (!pick) return;
+  // the picks go in first, so the Tasks dialog shows them; nothing is written until it saves
+  const changed = Object.fromEntries(Object.entries(pick).filter(([k, v]) => v !== was[k]));
+  const asTask = t.pool ? line.replace(/^(\s*)- /, "$1- [ ] ") : line;
+  const edited = await api.editTaskLineModal(new Task(asTask).withPicks(changed));   // "" when cancelled
+  const next = edited && (t.pool ? new Task(edited).poolLine : edited);
+  if (next && next !== line) await editTaskLine(t, () => next, Task);
+};
+
+// Change a task's line like editTaskLine (fn may return several lines, or null to delete), then show
+// a notice "<mark> <task>  undo" for 8 s; undo puts the old line back if the new lines are still there.
+const editTaskLineWithUndo = async (t, fn, Task, mark) => {
+  let before = null, after = null;
+  await editTaskLine(t, line => { before = line; return after = fn(line); }, Task);
+  if (before === null) return;
+  const added = after === null ? [] : after.split("\n");
+  const frag  = document.createDocumentFragment();
+  frag.append(`${mark} ${new Task(before).text.slice(0, 40)}  `);
+  const undo = frag.appendChild(document.createElement("button"));
+  undo.textContent = "undo";
+  undo.onclick = () => app.vault.process(app.vault.getAbstractFileByPath(t.path), c => {
+    const lines = c.split("\n");
+    if (lines.slice(t.line, t.line + added.length).join("\n") !== added.join("\n")) return c;   // changed since
+    lines.splice(Math.min(t.line, lines.length), added.length, before);
+    return lines.join("\n");
+  });
+  new Notice(frag, 8000);
+};
+const deleteTaskLine = (t, Task) => editTaskLineWithUndo(t, () => null, Task, "🗑");
 
 // ===== WALLET (cached earned/spent, invalidated on file change) =====
 class Wallet {
@@ -154,7 +230,7 @@ class PurchaseLog {
   static PATH = "00 System/Data/Purchases.md";
 
   static async append(name, cost) {
-    const date = window.moment().format("YYYY-MM-DD");
+    const date = today();
     const line = `- ${date} | ${name} | ${cost}`;
     const file = app.vault.getAbstractFileByPath(PurchaseLog.PATH);
 
@@ -178,7 +254,7 @@ function marketState(dv) {
   const tasks = dv.page(MARKET_PATH)?.file.tasks.array() ?? [];
   return {
     history: tasks.filter(t => t.completed && t.completion)
-      .map(t => ({ name: marketName(t), tag: marketTag(t), date: t.completion.toFormat("yyyy-MM-dd") })),
+      .map(t => ({ name: marketName(t), tag: marketTag(t), date: ymd(t.completion) })),
     open: new Set(tasks.filter(t => !t.completed).map(t => marketName(t).toLowerCase())),
   };
 }
@@ -202,8 +278,10 @@ if (!globalThis.app.__winxSub2) {
       delete globalThis.app.__winxHelpers;
       delete globalThis.app.__winxConfig;
       delete globalThis.app.__winxGoalsLib;
+      delete globalThis.app.__winxTask;
+      delete globalThis.app.__winxForm;
     }
   });
 }
 
-({ AudioEngine, installSounds, isMuted, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor, marketState, addToMarket })
+({ today, ymd, pageDay, AudioEngine, installSounds, isMuted, editTaskLine, editTaskLineWithUndo, taskWindow, editTaskModal, deleteTaskLine, marketName, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor, marketState, addToMarket })

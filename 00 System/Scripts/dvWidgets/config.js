@@ -12,11 +12,11 @@ const difficulties = [
 ];
 
 const areas = [
-  { label: "🏃 Body", tag: "#area/body", name: "Vitality" },
-  { label: "🧠 Mind", tag: "#area/mind", name: "Knowledge" },
-  { label: "💰 Wealth", tag: "#area/wealth", name: "Resources" },
-  { label: "🏡 Base", tag: "#area/base", name: "Sanctuary" },
-  { label: "🌄 Occasions", tag: "#area/occasions", name: "Memory" },
+  { label: "🌺 Body", tag: "#area/body", name: "Vitality" },
+  { label: "🔮 Mind", tag: "#area/mind", name: "Knowledge" },
+  { label: "💎 Wealth", tag: "#area/wealth", name: "Resources" },
+  { label: "🏰 Base", tag: "#area/base", name: "Sanctuary" },
+  { label: "🌠 Occasions", tag: "#area/occasions", name: "Memory" },
   { label: "🌙 Rest", tag: "#area/rest", name: "Serenity" },
 ];
 
@@ -31,7 +31,7 @@ const areas = [
   // icon per #area/ tag, incl. tags without a Life Areas row
   areaIcons: {
     ...Object.fromEntries(areas.map((a) => [a.tag, a.label.split(" ")[0]])),
-    "#area/learning": "📚", "#area/work": "💼", "#area/personal": "🌸", "#area/health": "💊",
+    "#area/learning": "📜", "#area/work": "🪄", "#area/personal": "🦋", "#area/health": "🧪",
   },
 
   levels: [

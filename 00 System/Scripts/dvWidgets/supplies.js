@@ -2,7 +2,7 @@ const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Sc
 const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 const { marketCategories } = await H.loadConfig();
 
-const today = window.moment().format("YYYY-MM-DD");
+const today = H.today();
 const { history, open } = H.marketState(dv);
 const stats = L.supplyStats(history, today);
 const root  = dv.container.createEl("div", { cls: "winx-supplies" });

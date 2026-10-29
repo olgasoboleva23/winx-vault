@@ -152,40 +152,40 @@ test("weights: parse and upsert", () => {
   assert.equal(L.upsertWeight("", "2026-10-23", 70.5), "- 2026-10-23 70.5\n");
 });
 
-test("setScheduled", () => {
-  assert.equal(L.setScheduled("- [ ] #⭐easy water plants", "2026-10-26"), "- [ ] #⭐easy water plants ⏳ 2026-10-26");
-  assert.equal(L.setScheduled("- [ ] call bank ⏳ 2026-10-01 📅 2026-11-01", "2026-10-26"), "- [ ] call bank 📅 2026-11-01 ⏳ 2026-10-26");
-  assert.equal(L.setScheduled("- [ ] call bank ⏳ 2026-10-01", null), "- [ ] call bank");          // no date
-  assert.equal(L.setScheduled("not a task", "2026-10-26"), "not a task");
+test("levelInfo", () => {
+  assert.deepEqual(L.levelInfo(0),   { level: 1, progress: 0,  cost: 100 });
+  assert.deepEqual(L.levelInfo(99),  { level: 1, progress: 99, cost: 100 });
+  assert.deepEqual(L.levelInfo(100), { level: 2, progress: 0,  cost: 125 });
+  assert.deepEqual(L.levelInfo(260), { level: 3, progress: 35, cost: 150 });
 });
 
-test("boardColumn and dropDate", () => {
-  const today = "2026-10-21";                    // Wednesday; week ends Sunday 2026-10-25
-  assert.equal(L.boardColumn(undefined, today), "nodate");
-  assert.equal(L.boardColumn("2026-10-19", today), "today");   // missed plan comes back to today
-  assert.equal(L.boardColumn("2026-10-21", today), "today");
-  assert.equal(L.boardColumn("2026-10-22", today), "tomorrow");
-  assert.equal(L.boardColumn("2026-10-25", today), "week");
-  assert.equal(L.boardColumn("2026-10-26", today), "later");
-  assert.equal(L.dropDate("today", today), "2026-10-21");
-  assert.equal(L.dropDate("tomorrow", today), "2026-10-22");
-  assert.equal(L.dropDate("week", today), "2026-10-23");      // day after tomorrow
-  assert.equal(L.dropDate("later", today), "2026-10-28");     // a week from today
-  assert.equal(L.dropDate("nodate", today), null);
-  assert.equal(L.dropDate("week", "2026-10-24"), null);        // Saturday: nothing left this week
-  assert.equal(L.boardColumn("2026-10-26", "2026-10-25"), "tomorrow"); // Sunday: Monday is tomorrow
+test("projectRepeats", () => {
+  const p = (rule, from, until) => L.projectRepeats(rule, from, until);
+  assert.deepEqual(p("every day when done", "2026-10-26", "2026-10-29"), ["2026-10-27", "2026-10-28", "2026-10-29"]);
+  assert.deepEqual(p("every 3 days when done", "2026-10-26", "2026-11-04"), ["2026-10-29", "2026-11-01", "2026-11-04"]);
+  // 2026-10-27 is a Tuesday
+  assert.deepEqual(p("every week on Tuesday, Thursday", "2026-10-27", "2026-11-05"), ["2026-10-29", "2026-11-03", "2026-11-05"]);
+  assert.deepEqual(p("every week", "2026-10-27", "2026-11-10"), ["2026-11-03", "2026-11-10"]);
+  assert.deepEqual(p("every month on the 1st", "2026-11-01", "2027-01-15"), ["2026-12-01", "2027-01-01"]);
+  assert.deepEqual(p("every 2 months when done", "2026-08-31", "2027-01-01"), ["2026-10-31", "2026-12-31"]);
+  assert.deepEqual(p("every month", "2026-01-31", "2026-03-31"), ["2026-02-28", "2026-03-31"]);   // clamps, keeps the 31st
+  assert.deepEqual(p("every year", "2026-02-14", "2028-12-31"), ["2027-02-14", "2028-02-14"]);
+  assert.deepEqual(p("every fortnight-ish", "2026-10-26", "2026-12-31"), []);   // unknown rule: nothing
 });
 
-test("taskKey and history", () => {
-  assert.equal(L.taskKey("#⭐easy #area/base Water plants 📅 2026-10-01 ✅ 2026-10-02"), "water plants");
-  // a raw file line and the task text must give the same key
-  assert.equal(L.taskKey("- [ ] #⭐easy water plants ⏳ 2026-10-26"), L.taskKey("#⭐easy water plants"));
-  assert.equal(L.taskKey("  - [x] Water plants ✅ 2026-10-02"), "water plants");
-  const done = [
-    { text: "#⭐easy water plants ✅ 2026-09-01", date: "2026-09-01" },
-    { text: "Water plants 📅 2026-10-01", date: "2026-10-02" },
-    { text: "call bank", date: "2026-08-01" },
-  ];
-  assert.deepEqual(L.history("water plants ⏳ 2026-10-26", done), { count: 2, last: "2026-10-02" });
-  assert.equal(L.history("new thing", done), null);
+test("monthGrid", () => {
+  const g = L.monthGrid("2026-10-15");   // Oct 2026 starts on Thursday
+  assert.equal(g[0], "2026-09-28"); assert.equal(g.length % 7, 0); assert.equal(g.at(-1), "2026-11-01");
 });
+
+test("ruleText", () => {
+  assert.equal(L.ruleText("every 3 days when done"), "every 3 days after done");
+  assert.equal(L.ruleText("every day when done "), "daily after done");
+  assert.equal(L.ruleText("every 2 months when done"), "every 2 months after done");
+  assert.equal(L.ruleText("every week on Monday, Wednesday, Friday when done"), "Mon · Wed · Fri after done");
+  assert.equal(L.ruleText("every week on Tuesday, Thursday"), "Tue · Thu");
+  assert.equal(L.ruleText("every month on the 1st"), "monthly, the 1st");
+  assert.equal(L.ruleText("every year"), "yearly");
+  assert.equal(L.ruleText("every weekday"), "every weekday");   // unknown: as written
+});
+

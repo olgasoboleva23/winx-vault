@@ -1,6 +1,6 @@
 const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
 
-const selected   = dv.current().date ?? dv.date("today");
+const selected   = H.pageDay(dv);
 const monthStart = selected.startOf("month");
 const monthEnd   = selected.endOf("month");
 

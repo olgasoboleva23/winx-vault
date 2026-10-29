@@ -8,13 +8,13 @@ const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Sc
 const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 const { marketCategories } = await H.loadConfig();
 
-const today = window.moment().format("YYYY-MM-DD");
+const today = H.today();
 const cats  = [...marketCategories, { label: "✦ Other", tag: "#other" }];
 const catOf = t => t.tags?.find(tag => cats.some(c => c.tag === tag)) ?? "#other";
-const name  = t => t.text.replace(/#[\w/]+/g, "").replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
+const name  = H.marketName;
 const all   = page.file.tasks.array();
 const open  = all.filter(t => !t.completed);
-const bought = all.filter(t => t.completed && t.completion?.toFormat("yyyy-MM-dd") === today);
+const bought = all.filter(t => t.completed && H.ymd(t.completion) === today);
 
 // Rewrite one line; the change re-renders the widget.
 const rewrite = async (t, fn) => {

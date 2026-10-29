@@ -1,29 +1,16 @@
+const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
 const { xpMap } = await H.loadConfig();
 
-const selected    = dv.current().date ?? dv.date("today");
-const selectedStr = selected.toFormat("yyyy-MM-dd");
-
-const BASE = 100;
-const STEP = 25;
-
-// Level n costs BASE + (n-1)*STEP XP.
-// Iterate until remaining XP can't afford the next level.
-function getLevelInfo(totalXP) {
-  let remaining = totalXP;
-  for (let level = 1; ; level++) {
-    const cost = BASE + (level - 1) * STEP;
-    if (remaining < cost) return { level, progress: remaining, cost };
-    remaining -= cost;
-  }
-}
+const selected    = H.pageDay(dv);
+const selectedStr = H.ymd(selected);
 
 const tasks = dv.pages('"02 Areas/Personal/Tasks"').file.tasks
-  .where(t => t.completed && t.completion?.toFormat("yyyy-MM-dd") <= selectedStr);
+  .where(t => t.completed && H.ymd(t.completion) <= selectedStr);
 
 const total = tasks.array().reduce((sum, t) => sum + H.taskXp(t, xpMap), 0);
 
-const { level, progress, cost } = getLevelInfo(total);
+const { level, progress, cost } = L.levelInfo(total);
 
 dv.container.innerHTML = `
   <div class="winx-stat-card">

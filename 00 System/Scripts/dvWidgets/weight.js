@@ -1,6 +1,6 @@
 // Weight: line chart of the last 30 days (same look as the old mood chart),
-// last value, change vs a week ago, a button to the list.
-// dv.view("…/weight", { input: true }) also shows a field to log today's weight (mobile page).
+// last value, change vs a week ago, a field to log today's weight, a button to the list.
+// The same widget on the dashboard and the phone's Weight page.
 const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
 const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 
@@ -9,7 +9,7 @@ const DAYS  = 30;
 const file  = app.vault.getAbstractFileByPath(PATH);
 if (!file) { dv.el("div", `Create ${PATH}`); return; }
 
-const today = window.moment().format("YYYY-MM-DD");
+const today = H.today();
 const ws    = L.parseWeights(await app.vault.cachedRead(file));
 const root  = dv.container.createEl("div", { cls: "winx-weight" });
 
@@ -25,7 +25,7 @@ if (last) {
   }
 } else head.createEl("span", { text: "no entries yet", cls: "winx-weight-delta" });
 
-if (input?.input) {
+{
   const form = root.createEl("form", { cls: "winx-weight-add" });
   const box  = form.createEl("input", { attr: { type: "number", step: "0.1", inputmode: "decimal", placeholder: "today, kg" } });
   form.createEl("button", { text: "Save", attr: { type: "submit" } });

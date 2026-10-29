@@ -1,12 +1,12 @@
 const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
 
-const selected  = dv.current().date ?? dv.date("today");
+const selected  = H.pageDay(dv);
 const weekStart = selected.minus({ days: 6 });
 
 const byDay = new Map(
   dv.pages('"02 Areas/Personal/Daily Notes"')
     .where(p => p.date && p.date.ts >= weekStart.ts && p.date.ts <= selected.ts)
-    .map(p => [p.date.toFormat("yyyy-MM-dd"), p])
+    .map(p => [H.ymd(p.date), p])
     .array()
 );
 
@@ -14,8 +14,8 @@ const byDay = new Map(
 // shows a gap instead of silently compressing missing days.
 const days   = Array.from({ length: 7 }, (_, i) => selected.minus({ days: 6 - i }));
 const labels = days.map(d => d.toFormat("MM-dd"));
-const energy = days.map(d => byDay.get(d.toFormat("yyyy-MM-dd"))?.energy ?? null);
-const mood   = days.map(d => byDay.get(d.toFormat("yyyy-MM-dd"))?.mood ?? null);
+const energy = days.map(d => byDay.get(H.ymd(d))?.energy ?? null);
+const mood   = days.map(d => byDay.get(H.ymd(d))?.mood ?? null);
 
 window.renderChart({
   type: "line",

@@ -3,7 +3,8 @@ const PATH = "00 System/Data/pomodoro.json";
 const DEFAULTS = { focusMin: 25, breakMin: 5 };
 
 // ===== HELPERS =====
-const { AudioEngine } = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const { AudioEngine } = H;
 
 // ===== ICONS =====
 const icons = {
@@ -161,7 +162,7 @@ class PomodoroTimer {
       sessionType: this.sessionType,
       elapsed:     this.#elapsed,
       sessions:    this.sessions,
-      date:        window.moment().format("YYYY-MM-DD"),
+      date:        H.today(),
       savedAt:     Date.now(),
     };
   }
@@ -317,7 +318,7 @@ class PomodoroUI {
 
   async #save({ updateStats = false, focusMin = 0 } = {}) {
     const data  = await Storage.load();
-    const today = window.moment().format("YYYY-MM-DD");
+    const today = H.today();
 
     data.settings = this.timer.settings;
     data.current  = this.timer.serialize();
@@ -390,7 +391,7 @@ const container = dv.container;
 container.classList.add("winx-pomodoro");
 
 const saved   = await Storage.load();
-const today   = window.moment().format("YYYY-MM-DD");
+const today   = H.today();
 const current = saved?.current?.date === today ? saved.current : null;
 
 const timer = new PomodoroTimer(saved?.settings, current);

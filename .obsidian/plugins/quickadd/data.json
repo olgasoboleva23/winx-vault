@@ -23,62 +23,46 @@
     {
       "id": "94231b2e-4bc4-4643-81a1-b18ea15772ea",
       "name": "Watch item",
-      "type": "Template",
+      "type": "Macro",
       "command": false,
-      "templatePath": "00 System/Templates/watch item.md",
-      "fileNameFormat": {
-        "enabled": false,
-        "format": ""
-      },
-      "folder": {
-        "enabled": true,
-        "folders": [
-          "03 Resources/Collections/Watchlist"
-        ],
-        "chooseWhenCreatingNote": false,
-        "createInSameFolderAsActiveFile": false,
-        "chooseFromSubfolders": false
-      },
-      "appendLink": false,
-      "openFile": true,
-      "fileOpening": {
-        "location": "tab",
-        "direction": "vertical",
-        "mode": "default",
-        "focus": true
-      },
-      "fileExistsMode": "Increment the file name",
-      "setFileExistsBehavior": false
+      "runOnStartup": false,
+      "macro": {
+        "name": "Watch item",
+        "id": "632bb6a9-7e22-46a3-9b5c-dd8b3b3798c9",
+        "commands": [
+          {
+            "name": "NewItem",
+            "type": "UserScript",
+            "id": "bd594062-7b91-4e5f-8ed7-6dd52d69ca89",
+            "path": "00 System/Scripts/QuickAdd/NewItem.js",
+            "settings": {
+              "Kind": "watch"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "cb208fb8-48d5-4744-aa54-722c94b9cd1c",
       "name": "Game",
-      "type": "Template",
+      "type": "Macro",
       "command": false,
-      "templatePath": "00 System/Templates/game.md",
-      "fileNameFormat": {
-        "enabled": false,
-        "format": ""
-      },
-      "folder": {
-        "enabled": true,
-        "folders": [
-          "03 Resources/Collections/Gamelist"
-        ],
-        "chooseWhenCreatingNote": false,
-        "createInSameFolderAsActiveFile": false,
-        "chooseFromSubfolders": false
-      },
-      "appendLink": false,
-      "openFile": true,
-      "fileOpening": {
-        "location": "tab",
-        "direction": "vertical",
-        "mode": "default",
-        "focus": true
-      },
-      "fileExistsMode": "Increment the file name",
-      "setFileExistsBehavior": false
+      "runOnStartup": false,
+      "macro": {
+        "name": "Game",
+        "id": "60032b9b-6e80-479c-aa3e-94d1d8686e67",
+        "commands": [
+          {
+            "name": "NewItem",
+            "type": "UserScript",
+            "id": "437c0819-ab90-4fca-8d29-5b1b1aad821a",
+            "path": "00 System/Scripts/QuickAdd/NewItem.js",
+            "settings": {
+              "Kind": "game"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "d1f07a89-3348-4aff-9af0-db170804cfbf",
@@ -143,79 +127,44 @@
     {
       "id": "a13e1801-f0bb-4942-843c-e2285b0c6726",
       "name": "Buy Reward",
-      "type": "Capture",
+      "type": "Macro",
       "command": false,
-      "appendLink": false,
-      "captureTo": "00 System/Data/Purchases.md",
-      "captureToActiveFile": false,
-      "captureToCanvasNodeId": "",
-      "activeFileWritePosition": "cursor",
-      "createFileIfItDoesntExist": {
-        "enabled": false,
-        "createWithTemplate": false,
-        "template": ""
-      },
-      "format": {
-        "enabled": true,
-        "format": "- {{DATE:YYYY-MM-DD}} | {{VALUE:name}} | {{VALUE:cost}}"
-      },
-      "insertAfter": {
-        "enabled": false,
-        "after": "",
-        "insertAtEnd": false,
-        "considerSubsections": false,
-        "createIfNotFound": false,
-        "createIfNotFoundLocation": "top",
-        "inline": false,
-        "replaceExisting": false,
-        "blankLineAfterMatchMode": "auto"
-      },
-      "newLineCapture": {
-        "enabled": false,
-        "direction": "below"
-      },
-      "prepend": true,
-      "task": false,
-      "openFile": false,
-      "fileOpening": {
-        "location": "tab",
-        "direction": "vertical",
-        "mode": "default",
-        "focus": true
-      },
-      "templater": {
-        "afterCapture": "none"
+      "runOnStartup": false,
+      "macro": {
+        "name": "Buy Reward",
+        "id": "dd3a057b-49b9-4209-93ba-1ab08d1b8994",
+        "commands": [
+          {
+            "name": "BuyReward",
+            "type": "UserScript",
+            "id": "64c0100c-34a1-4b88-be20-742da4c05146",
+            "path": "00 System/Scripts/QuickAdd/BuyReward.js",
+            "settings": {}
+          }
+        ]
       }
     },
     {
       "id": "44239900-8806-45bf-beff-78afe8339085",
       "name": "Read item",
-      "type": "Template",
+      "type": "Macro",
       "command": false,
-      "templatePath": "00 System/Templates/read item.md",
-      "fileNameFormat": {
-        "enabled": false,
-        "format": ""
-      },
-      "folder": {
-        "enabled": true,
-        "folders": [
-          "03 Resources/Collections/Readlist"
-        ],
-        "chooseWhenCreatingNote": false,
-        "createInSameFolderAsActiveFile": false,
-        "chooseFromSubfolders": false
-      },
-      "appendLink": false,
-      "openFile": true,
-      "fileOpening": {
-        "location": "tab",
-        "direction": "vertical",
-        "mode": "default",
-        "focus": true
-      },
-      "fileExistsMode": "Increment the file name",
-      "setFileExistsBehavior": false
+      "runOnStartup": false,
+      "macro": {
+        "name": "Read item",
+        "id": "9b063b3f-ce8e-41f1-886e-81b33a48eb27",
+        "commands": [
+          {
+            "name": "NewItem",
+            "type": "UserScript",
+            "id": "ceb94fae-5da2-436b-8f07-2b02e4549c2e",
+            "path": "00 System/Scripts/QuickAdd/NewItem.js",
+            "settings": {
+              "Kind": "read"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "480849c0-6b8a-4d53-b93c-6aa6077a82cc",

@@ -6,7 +6,7 @@ const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Sc
 const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
 const { marketCategories } = await H.loadConfig();
 
-const today = window.moment().format("YYYY-MM-DD");
+const today = H.today();
 const items = page.file.tasks.where(t => !t.completed).array();
 const mkt   = H.marketState(dv);
 const soon  = L.supplyStats(mkt.history, today).filter(s => s.due && !mkt.open.has(s.name)).map(s => s.name);
