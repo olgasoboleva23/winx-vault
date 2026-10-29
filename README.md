@@ -9,48 +9,50 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 ## 🗂 Vault Structure
 
 ```
+├── 📁 plugin — the Winx plugin: widgets, task window, commands, styles (see Development)
+│   ├── 📁 src
+│   │   ├── main.ts               — loads everything; window.winx.render for the notes' blocks
+│   │   ├── commands.ts           — Cmd+P commands: New task, New watch/read item, New game, Buy reward, New market item
+│   │   ├── 📁 ui
+│   │   │   └── form.ts           — one window of buttons / text boxes instead of a chain of prompts
+│   │   ├── 📁 lib
+│   │   │   ├── config.js         — areas, difficulties, XP values, levels, market categories
+│   │   │   ├── goalsLib.js       — pure week / goal / cycle / weight logic (tested)
+│   │   │   ├── task.js           — one task line in the Tasks format: read it, change it (tested)
+│   │   │   ├── items.js          — watch / read / game notes (tested)
+│   │   │   └── helpers.js        — dates, task line edits, task window, wallet, purchases, market, sounds
+│   │   └── 📁 widgets            — one file per widget, render(dv, input)
+│   │       ├── calendar.js       — week / month calendar, No date / Regulars / Pool tabs, drag and drop
+│   │       ├── yesterday.js      — "Missed?" box inside the calendar
+│   │       ├── levelToday.js, xpToday.js, goals.js, lifeAreas.js, cycle.js, weight.js, pomodoro.js,
+│   │       ├── celestialMarket.js, shop.js, supplies.js, wallet.js, habits.js, weeklyState.js,
+│   │       └── week.js, dailyNote.js, finance.js, mobileHome.js, mobileShopping.js
+│   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css
+│   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
 ├── 📁 00 System
-│   ├── 📁 Assets - Sounds for pomodoro and shop
-│   ├── 📁 Data
-│   │   ├── Shop.md
-│   │   └── Celestial Market.md
-│   ├── 📁 Scripts
-│   │   ├── 📁 QuickAdd
-│   │   │   ├── NewTask.js           — Task creation macro (difficulty + area pickers)
-│   │   │   └── NewMarketItem.js     — Add an item to the Celestial Market
-│   │   └── 📁 dvWidgets
-│   │       ├── config.js              — Central config (areas, difficulties, XP values, levels)
-│   │       ├── levelToday.js          — Level & XP progress card
-│   │       ├── xpToday.js             — XP earned today + streak heatmap
-│   │       ├── habits.js              — Monthly habits bar chart (not on the dashboard)
-│   │       ├── lifeAreas.js           — Radar chart of life area scores
-│   │       ├── weeklyState.js         — Energy & mood line chart (not on the dashboard)
-│   │       ├── helpers.js             — Shared AudioEngine, Wallet, PurchaseLog
-│   │       ├── wallet.js              — Gold balance widget (not on the dashboard)
-│   │       ├── shop.js                — Shop view with buy buttons
-│   │       ├── pomodoro.js            — Pomodoro timer
-│   │       ├── goalsLib.js            — Pure week / goal / cycle logic (tested in tests/)
-│   │       ├── goals.js               — Goals: "X из Y на этой неделе" + Mon–Sun dots
-│   │       ├── cycle.js               — Cycle day and next start forecast
-│   │       ├── week.js                — Weekly review (used by Week.md)
-│   │       ├── celestialMarket.js     — Celestial Market shopping list widget
-│   │       └── dailyNote.js           — Date selector widget
-│   └── 📁 Templates
-│       ├── Daily Note.md — Templater template for new daily notes
-│       ├── game.md — Templater template for new game
-│       ├── recipe.md — Templater template for new recipe
-│       ├── task.md — Templater template for new task
-│       ├── read item.md — Templater template for new read item (book, article, etc)
-│       └── watch item.md — Templater template for new watch item (cartoon, movie, etc)
+│   ├── 📁 Assets — sounds for pomodoro and shop, task stickers (stickers/)
+│   ├── 📁 Data
+│   │   ├── Shop.md
+│   │   └── Celestial Market.md
+│   ├── 📁 Scripts
+│   │   ├── notify.js — desktop reminders (Templater startup script)
+│   │   └── 📁 QuickAdd
+│   │       └── MirrorMobileConfig.js — copies obsidian-mobile/ into the phone's config folder
+│   └── 📁 Templates
+│       ├── Daily Note.md — Templater template for new daily notes
+│       ├── recipe.md — Templater template for new recipe
+│       └── task.md — Templater template for new work task
 ├── 📁 01 Projects
 ├── 📁 02 Areas
 │   ├── 📁 Health & Body
 │   │   └── Cycle.md — Cycle start dates (`period::`, `- start::`)
-│   └── 📁 Personal
-│       ├── Goals.md — Goal list (see Goals)
-│       ├── 📁 Daily Notes — Daily journal entries (notes, XP log)
-│       └── 📁 Tasks
-│           └── Kanban.md — Kanban board view of tasks
+│   └── 📁 Personal
+│       ├── Goals.md — Goal list (see Goals)
+│       ├── 📁 Daily Notes — Daily journal entries (notes, XP log)
+│       └── 📁 Tasks
+│           ├── Master.md — all tasks
+│           ├── Calendar.md — the calendar
+│           └── Kanban.md — Kanban board view of tasks
 ├── 📁 03 Resources
 │   ├── 📁 Collections — Card-view lists (Obsidian Bases) with example entries
 │   │   ├── 📁 Readlist — Books & fanfics to read
@@ -61,9 +63,16 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 ├── 📁 04 Archive
 ├── 📁 99 Inbox
 ├── Dashboard.md
-├── Week.md — Weekly review page
-└── 📁 tests — `node --test tests/*.test.mjs`
+└── Week.md — Weekly review page
 ```
+
+A note shows a widget with a Dataview block:
+
+````
+```dataviewjs
+await winx.render("weight", dv);
+```
+````
 
 ---
 
@@ -73,10 +82,11 @@ A gamified personal productivity system built in Obsidian with a magical-girl ae
 
 | Plugin | Version | Purpose |
 |---|---|---|
-| **Dataview** | 0.5.68 | Powers all JS widgets |
+| **Winx** | (this repo, `plugin/`) | Widgets, task window, commands, all styles |
+| **Dataview** | 0.5.68 | Data for the widgets (their `dataviewjs` blocks) |
 | **Templater** | 2.19.3 | Daily note template |
 | **Tasks** | 7.23.1 | Task tracking & completion dates |
-| **QuickAdd** | 2.12.0 | `NewTask` macro for fast task creation |
+| **QuickAdd** | 2.12.0 | Work task and Recipe notes; Update Mobile Config on the phone |
 | **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
 | **Meta Bind** | 1.4.8 | `INPUT[slider]` and `INPUT[date]` inline inputs |
 
@@ -167,7 +177,7 @@ Untagged items land in a ✦ Other group.
 
 ### Adding items
 
-Use the **QuickAdd `New Market Item` macro** (pick a category, type the name), or edit `Celestial Market.md` directly:
+Use **Winx: New market item** in Cmd+P (pick a category, type the name), or edit `Celestial Market.md` directly:
 
 - \[ \] Fresh bread #food
 
@@ -204,22 +214,26 @@ Create via Templater from `00 System/Templates/Daily Note.md` (the Daily Notes c
 
 ## ✅ Creating a Task
 
-![Kanban](kanban.png)
+Use **Winx: New task** in Cmd+P:
+1. One window: difficulty and area (both needed), time of day, sticker; or tick **To pool** to keep it in `Pool.md` (the calendar's Pool tab) instead
+2. Fill in the text and dates in the Tasks modal
+3. The task goes to the top of `Tasks/Master.md` (a pool item to the end of `Tasks/Pool.md`)
 
-Use the **QuickAdd `NewTask` macro**:
-1. Choose difficulty (Easy / Medium / Hard / Epic)
-2. Choose life area
-3. Fill in task details in the Tasks modal
-4. Task is prepended to `Tasks/Master.md`
+The ✏️ on a calendar task opens the same window, then the Tasks modal.
 
-### Other QuickAdd choices
+### Other commands
+
+| Command (Cmd+P) | Creates |
+|---|---|
+| **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
+| **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
+| **Winx: New market item** | an item in `00 System/Data/Celestial Market.md` |
+
+QuickAdd keeps two Templater choices:
 
 | Choice | Template | Creates note in |
 |---|---|---|
 | **Work task** | `task.md` | `01 Projects` |
-| **Read item** | `read item.md` | `03 Resources/Collections/Readlist` |
-| **Watch item** | `watch item.md` | `03 Resources/Collections/Watchlist` |
-| **Game** | `game.md` | `03 Resources/Collections/Gamelist` |
 | **Recipe** | `recipe.md` | `03 Resources/Collections/Recipes` |
 
 > ⚠️ **Work task** targets the generic `01 Projects` folder. Point it at your own project folder instead (Settings → QuickAdd → Work task → folder). If you sync this vault's QuickAdd config into another vault, remember the sync overwrites that folder setting — re-pick your project folder afterwards.
@@ -239,3 +253,25 @@ Use the **QuickAdd `NewTask` macro**:
 | **Quests** | Tasks due today, grouped by life area tag |
 | **Celestial Market** | Pending shopping items grouped by category |
 | **Shop**   | (in Shop.md) Browse rewards, click to buy with gold |
+
+---
+
+## 🛠 Development
+
+The plugin is built with esbuild (TypeScript, JS modules) and Sass. Node 24:
+
+```sh
+cd plugin
+npm ci
+npm test                                   # unit tests
+WINX_VAULT=/path/to/your/vault npm run dev # build into <vault>/.obsidian/plugins/winx on every save
+```
+
+Then enable **Winx** in Settings → Community plugins. After a rebuild run **Winx: Reload** (Cmd+P) instead of restarting Obsidian. `npm run build` makes `plugin/dist/` (`main.js`, `styles.css`, `manifest.json`).
+
+`tests/obsidian/styles-snapshot.js` records the computed styles of every element on a set of pages (run it inside Obsidian); `compare-snapshots.mjs` diffs two such records, to check that a style change moved nothing it shouldn't.
+
+## 📱 Phone
+
+The plugin works on the phone (no desktop-only APIs). A vault that syncs from this repo builds the plugin in its sync job and ships it with the other plugins.
+
