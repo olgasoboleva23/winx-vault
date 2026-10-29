@@ -1,6 +1,6 @@
 // Builds the plugin: src/main.ts → main.js, styles/main.scss → styles.css, plus manifest.json.
 //   npm run build   into dist/
-//   npm run dev     into $WINX_VAULT/.obsidian/plugins/winx/ (default: this repo's vault), again on every save
+//   npm run dev     into $WINX_VAULT/.obsidian/plugins/winx/ (without it: dist/), again on every save
 import esbuild from "esbuild";
 import * as sass from "sass";
 import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 const here  = dirname(fileURLToPath(import.meta.url));
 const watch = process.argv.includes("--watch");
-const out   = watch ? resolve(process.env.WINX_VAULT ?? resolve(here, ".."), ".obsidian/plugins/winx") : resolve(here, "dist");
+const out   = watch && process.env.WINX_VAULT ? resolve(process.env.WINX_VAULT, ".obsidian/plugins/winx") : resolve(here, "dist");
 mkdirSync(out, { recursive: true });
 
 const styles = () => writeFileSync(resolve(out, "styles.css"), sass.compile(resolve(here, "styles/main.scss")).css);
@@ -18,7 +18,7 @@ const extras = {
   setup(build) {
     build.onEnd(result => {
       if (result.errors.length) return;
-      try { styles(); } catch (e) { console.error(e.message); }
+      try { styles(); } catch (e) { if (!watch) throw e; console.error(e.message); }   // a build without styles must fail
       copyFileSync(resolve(here, "manifest.json"), resolve(out, "manifest.json"));
       if (watch) console.log(`winx → ${out}`);
     });

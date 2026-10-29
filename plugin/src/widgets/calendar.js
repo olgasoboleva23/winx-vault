@@ -229,8 +229,7 @@ export default async function (dv, input) {
   const pick = top.createEl("div", { cls: "mb-input-type-date" }).createEl("input", { type: "date", value: base });   // Meta Bind's date look, see winx-widgets.css
   pick.onchange = () => pick.value && setPage({ date: pick.value });
   const mute = top.createEl("button", { text: H.isMuted() ? "🔇" : "🔊", cls: "winx-cal-mute", attr: { title: "sounds on/off", "aria-label": "sounds on/off" } });
-  const QA = app.plugins.plugins.quickadd?.api;
-  if (QA) top.createEl("button", { text: "＋ task", cls: "winx-cal-today", attr: { title: "new task (QuickAdd)" } }).onclick = () => QA.executeChoice("Task");
+  top.createEl("button", { text: "＋ task", cls: "winx-cal-today", attr: { title: "new task (Winx: New task)" } }).onclick = () => app.commands.executeCommandById("winx:new-task");
   mute.onclick = () => { app.saveLocalStorage("winx-mute", H.isMuted() ? null : "1"); mute.textContent = H.isMuted() ? "🔇" : "🔊"; };
   // legend: the areas of the tasks shown, as colored dots, named as on the Life Areas chart
   const legend = top.createEl("div", { cls: "winx-cal-legend" });
