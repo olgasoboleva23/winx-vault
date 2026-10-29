@@ -24,3 +24,7 @@ export function readState(saved) {
 
 export const baseDate  = (state, today) => state.date ?? today;
 export const shownDays = (state, today) => state.view === "month" ? L.monthGrid(baseDate(state, today)) : L.weekOf(baseDate(state, today));
+// the state's date for a picked one: null (follow today) when it falls in today's week (week view) or month
+export const dateFor = (date, view, today) => !date || (view === "month"
+  ? date.slice(0, 7) === today.slice(0, 7)
+  : L.weekOf(date)[0] === L.weekOf(today)[0]) ? null : date;

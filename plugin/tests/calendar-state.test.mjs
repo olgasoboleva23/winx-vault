@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT, readState, baseDate, shownDays } from "../src/calendar/state.js";
+import { DEFAULT, readState, baseDate, shownDays, dateFor } from "../src/calendar/state.js";
 
 test("no or broken saved state gives the defaults", () => {
   assert.deepEqual(readState(undefined), DEFAULT);
@@ -25,4 +25,13 @@ test("the month view shows whole weeks around the month", () => {
   assert.equal(days[0], "2026-09-28");
   assert.equal(days.length % 7, 0);
   assert.ok(days.includes("2026-10-31"));
+});
+
+test("a date in today's week (or month) means following today again", () => {
+  const today = "2026-10-28";
+  assert.equal(dateFor("2026-11-01", "week", today), null);          // Sunday of this week
+  assert.equal(dateFor("2026-10-21", "week", today), "2026-10-21");  // last week stays picked
+  assert.equal(dateFor("2026-10-03", "month", today), null);
+  assert.equal(dateFor("2026-11-03", "month", today), "2026-11-03");
+  assert.equal(dateFor(null, "week", today), null);
 });

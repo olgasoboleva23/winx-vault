@@ -3,6 +3,7 @@
 import { H } from "../lib/helpers.js";
 import { L } from "../lib/goalsLib.js";
 import { T } from "./data.js";
+import { dateFor } from "./state.js";
 
 export function drawHeader(ctx, drag) {
   const { root, state, days, today, base, view, model, shown } = ctx;
@@ -22,7 +23,7 @@ export function drawHeader(ctx, drag) {
   // the shown date, sounds on/off (the one switch for all winx sounds), a new task, the legend
   const top  = root.createEl("div", { cls: "winx-cal-top" }); els.push(top);
   const pick = top.createEl("div", { cls: "mb-input-type-date" }).createEl("input", { type: "date", value: base });   // Meta Bind's date look
-  pick.onchange = () => pick.value && ctx.set({ date: pick.value }, ["header", "missed", "grid"]);
+  pick.onchange = () => pick.value && ctx.set({ date: dateFor(pick.value, view, today) }, ["header", "missed", "grid"]);
   const mute = top.createEl("button", { text: H.isMuted() ? "🔇" : "🔊", cls: "winx-cal-mute", attr: { title: "sounds on/off", "aria-label": "sounds on/off" } });
   top.createEl("button", { text: "＋ task", cls: "winx-cal-today", attr: { title: "new task (Winx: New task)" } }).onclick = () => app.commands.executeCommandById("winx:new-task");
   mute.onclick = () => { app.saveLocalStorage("winx-mute", H.isMuted() ? null : "1"); mute.textContent = H.isMuted() ? "🔇" : "🔊"; };
@@ -32,7 +33,7 @@ export function drawHeader(ctx, drag) {
     legend.createEl("span", { attr: { "data-area": g.slice(6) }, text: areaMap[g] ?? g.slice(6) });
 
   const nav  = root.createEl("div", { cls: "winx-cal-nav" }); els.push(nav);
-  const go   = date => ctx.set({ date }, ["header", "missed", "grid"]);
+  const go   = date => ctx.set({ date: dateFor(date, view, today) }, ["header", "missed", "grid"]);   // back in today's period: follow today
   const step = n => go(view === "week" ? L.addDays(base, 7 * n) : L.addMonths(base, n));
   nav.createEl("button", { text: "‹", attr: { "aria-label": "previous" } }).onclick = () => step(-1);
   nav.createEl("span", { cls: "winx-cal-title", text: view === "week"
