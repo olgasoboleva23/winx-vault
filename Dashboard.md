@@ -12,41 +12,41 @@ pomodoro:
 > >`INPUT[date:date]`
 > >
 > >```dataviewjs
-> >dv.view("00 System/Scripts/dvWidgets/dailyNote");
+> >await winx.render("dailyNote", dv);
 > >```
 
 > [!grid]
 > > [!col]
 > > > [!card] Level
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/levelToday");
+> > > await winx.render("levelToday", dv);
 > > > ```
 > > 
 > > > [!card] Pomodoro
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/pomodoro");
+> > > await winx.render("pomodoro", dv);
 > > > ```
 > > 
 > > > [!card] Goals
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/goals");
+> > > await winx.render("goals", dv);
 > > > ```
 > > > 🗓 [[Week|Week]]
 > 
 > > [!col]
 > > > [!card] Life Areas
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/lifeAreas");
+> > > await winx.render("lifeAreas", dv);
 > > > ```
 > >
 > > > [!card] Cycle
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/cycle");
+> > > await winx.render("cycle", dv);
 > > > ```
 > >
 > > > [!card] Weight
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/weight");
+> > > await winx.render("weight", dv);
 > > > ```
 > >
 > > > [!card] Finance
@@ -55,7 +55,7 @@ pomodoro:
 > > [!col]
 > > > [!card] XP Today
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/xpToday");
+> > > await winx.render("xpToday", dv);
 > > > ```
 > >
 > > > [!card|scroll] Quests
@@ -69,5 +69,5 @@ sort by tags
 > >
 > > > [!card|scroll] Celestial Market
 > > > ```dataviewjs
-> > > dv.view("00 System/Scripts/dvWidgets/celestialMarket");
+> > > await winx.render("celestialMarket", dv);
 > > > ```

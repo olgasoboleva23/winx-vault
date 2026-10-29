@@ -8,5 +8,5 @@ cssclasses:
 
 > [!card|scroll tall] Week
 > ```dataviewjs
-> dv.view("00 System/Scripts/dvWidgets/week");
+> await winx.render("week", dv);
 > ```

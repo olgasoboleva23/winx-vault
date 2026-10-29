@@ -9,5 +9,5 @@ cssclasses:
 
 > [!card] Weight
 > ```dataviewjs
-> dv.view("00 System/Scripts/dvWidgets/weight");
+> await winx.render("weight", dv);
 > ```
