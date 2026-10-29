@@ -1,8 +1,8 @@
 // Mobile home: big tiles with live counts, each opens a mobile page.
-const L = (app.__winxGoalsLib ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/goalsLib.js")));
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const L = winx.L;
+const H = winx.H;
 H.installSounds();
-const Task = (app.__winxTask ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/task.js"))(L));
+const Task = winx.Task;
 
 const today = H.today();
 const wfile = app.vault.getAbstractFileByPath("02 Areas/Appearance/Weight.md");

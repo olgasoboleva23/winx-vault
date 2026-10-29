@@ -1,4 +1,4 @@
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const H = winx.H;
 const { xpMap, levels, HABIT_BONUS_XP, HABIT_BONUS_THRESHOLD } = await H.loadConfig();
 
 const sel   = H.pageDay(dv);

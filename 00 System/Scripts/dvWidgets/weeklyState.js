@@ -1,4 +1,4 @@
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const H = winx.H;
 
 const selected  = H.pageDay(dv);
 const weekStart = selected.minus({ days: 6 });

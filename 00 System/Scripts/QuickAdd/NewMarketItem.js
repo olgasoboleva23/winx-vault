@@ -1,5 +1,5 @@
 module.exports = async () => {
-  const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+  const H = winx.H;
   const Form = (app.__winxForm ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/form.js")));
   const { marketCategories } = await H.loadConfig();
 

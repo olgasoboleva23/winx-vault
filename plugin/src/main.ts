@@ -1,4 +1,7 @@
 import { Plugin } from "obsidian";
+import { L } from "./lib/goalsLib.js";
+import { Task } from "./lib/task.js";
+import { H } from "./lib/helpers.js";
 
 // The Winx plugin: widgets for the notes' dataviewjs blocks (window.winx.render), the task window and the
 // commands, and the styles (styles.css, built from styles/*.scss).
@@ -8,6 +11,8 @@ const widgets: Record<string, Widget> = {};
 export default class WinxPlugin extends Plugin {
   async onload() {
     (window as any).winx = {
+      // the shared code, for the widgets still in 00 System/Scripts (until they move here)
+      L, Task, H,
       // a note's block: await winx.render("weight", dv, input)
       render: async (name: string, dv: any, input?: unknown) => {
         const widget = widgets[name];
@@ -15,6 +20,8 @@ export default class WinxPlugin extends Plugin {
         await widget(dv, input);
       },
     };
+    H.watchCaches((emitter: any, name: string, cb: any) => this.registerEvent(emitter.on(name, cb)));
+    H.installSounds(this);
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",
       name: "Reload",

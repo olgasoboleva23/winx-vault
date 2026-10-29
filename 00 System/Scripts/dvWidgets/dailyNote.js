@@ -1,4 +1,4 @@
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const H = winx.H;
 const date = H.ymd(dv.current().date);
 if (!date) return;
 

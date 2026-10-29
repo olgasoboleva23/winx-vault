@@ -1,4 +1,4 @@
-const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const H = winx.H;
 const { AudioEngine, Wallet, PurchaseLog } = H;
 const config = await H.loadConfig();
 

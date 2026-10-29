@@ -1,8 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-
-const L = eval(readFileSync(new URL("../00 System/Scripts/dvWidgets/goalsLib.js", import.meta.url), "utf8"));
+import { L } from "../src/lib/goalsLib.js";
 
 // 2026-10-19 is a Monday
 test("weeks", () => {

@@ -1,13 +1,7 @@
-// ===== MODULE LOADING =====
-// Widgets bootstrap this file once per session:
-//   const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
-// These caches (and goalsLib's) are dropped by the vault "modify" listener below whenever a
-// file under 00 System/Scripts changes, so edits hot-reload on next render.
-const CONFIG_PATH = "00 System/Scripts/dvWidgets/config.js";
+// Shared widget logic: dates, task line edits, the task window, wallet, purchases, market, sounds.
+import config from "./config.js";
 
-async function loadConfig() {
-  return (globalThis.app.__winxConfig ??= eval(await app.vault.adapter.read(CONFIG_PATH)));
-}
+async function loadConfig() { return config; }
 
 // ===== SHARED WIDGET LOGIC =====
 // XP value of a task, based on its difficulty tag (0 if untagged).
@@ -44,7 +38,7 @@ function chartColor(token, alpha = 1) {
 }
 
 // ===== AUDIO (shared AudioContext + buffer cache across renders) =====
-const _audio = (globalThis.app.__winxAudio ??= { ctx: null, buffers: new Map() });
+const _audio = { ctx: null, buffers: new Map() };
 const _ctx   = () => _audio.ctx ??= new (window.AudioContext || window.webkitAudioContext)();
 
 class AudioEngine {
@@ -84,13 +78,16 @@ class AudioEngine {
 
 // ===== SOUNDS (ticking a task anywhere; muted via the board's ðŸ”Š button) =====
 const isMuted = () => app.loadLocalStorage("winx-mute") === "1";
-function installSounds() {
-  if (app.__winxSoundsOn) return;
-  app.__winxSoundsOn = true;
+// The plugin installs them on load (`plugin` removes the listener on unload); widgets calling it again do nothing.
+let soundsOn = false;
+function installSounds(plugin) {
+  if (soundsOn || !plugin) return;
+  soundsOn = true;
   const gems   = [1, 2, 3, 4, 5, 6].map(n => new AudioEngine(`00 System/Assets/winx music/snd_pickup_gem0${n}.wav`));
   const flower = new AudioEngine("00 System/Assets/winx music/snd_pickup_dragon_flower.wav");
   // capture phase: the checkbox already shows its new state, before Tasks re-renders it
-  app.plugins.plugins.dataview.registerDomEvent(document, "click", e => {
+  plugin.register(() => { soundsOn = false; });
+  plugin.registerDomEvent(document, "click", e => {
     const box = e.target.closest?.("input.task-list-item-checkbox");
     if (!box || isMuted()) return;
     if (!box.checked) return gems[0].play({ rate: 0.6, gain: 0.2 });   // unticked: the same gem, slowed down
@@ -176,11 +173,11 @@ const deleteTaskLine = (t, Task) => editTaskLineWithUndo(t, () => null, Task, "ð
 
 // ===== WALLET (cached earned/spent, invalidated on file change) =====
 class Wallet {
-  static #cache() { return globalThis.app.__winxWallet ??= { earned: null, spent: null }; }
+  static #sums = { earned: null, spent: null };
+  static #cache() { return Wallet.#sums; }
 
   static invalidate(which = "all") {
-    const c = globalThis.app.__winxWallet;
-    if (!c) return;
+    const c = Wallet.#sums;
     if (which === "all" || which === "earned") c.earned = null;
     if (which === "all" || which === "spent")  c.spent  = null;
   }
@@ -264,24 +261,14 @@ async function addToMarket(name, tag) {
   if (file) await app.vault.process(file, c => `${c.replace(/\s+$/, "")}\n- [ ] ${name} ${tag}\n`);
 }
 
-// ===== ONE-TIME EVENT SUBSCRIPTIONS =====
-// Invalidate caches when relevant files change. Survives re-evals via globalThis flag.
-// metadataCache "changed" only fires for markdown; script files need vault "modify".
-if (!globalThis.app.__winxSub2) {
-  globalThis.app.__winxSub2 = true;
-  app.metadataCache.on("changed", (file) => {
+// ===== CACHES =====
+// The wallet's sums are dropped when their notes change. metadataCache "changed" only fires for markdown.
+// Called once by the plugin, which unsubscribes on unload.
+function watchCaches(on) {
+  on(app.metadataCache, "changed", (file) => {
     if (file.path.startsWith("02 Areas/Personal/Tasks")) Wallet.invalidate("earned");
     else if (file.path.startsWith("00 System/Data/Purchases")) Wallet.invalidate("spent");
   });
-  app.vault.on("modify", (file) => {
-    if (file.path.startsWith("00 System/Scripts")) {
-      delete globalThis.app.__winxHelpers;
-      delete globalThis.app.__winxConfig;
-      delete globalThis.app.__winxGoalsLib;
-      delete globalThis.app.__winxTask;
-      delete globalThis.app.__winxForm;
-    }
-  });
 }
 
-({ today, ymd, pageDay, AudioEngine, installSounds, isMuted, editTaskLine, editTaskLineWithUndo, taskWindow, editTaskModal, deleteTaskLine, marketName, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor, marketState, addToMarket })
+export const H = { today, ymd, pageDay, AudioEngine, installSounds, isMuted, editTaskLine, editTaskLineWithUndo, taskWindow, editTaskModal, deleteTaskLine, marketName, Wallet, PurchaseLog, loadConfig, taskXp, collectHabitDays, chartColor, marketState, addToMarket, watchCaches };

@@ -1,3 +1,4 @@
+// Areas, difficulties, XP and gold, levels, market categories: the numbers the widgets share.
 const difficulties = [
   { label: "⭐ Easy", tag: "#⭐easy", xp: 5, gold: 2, prop: "easy" },
   { label: "⭐⭐ Medium", tag: "#⭐⭐medium", xp: 10, gold: 5, prop: "medium" },
@@ -20,7 +21,8 @@ const areas = [
   { label: "🌙 Rest", tag: "#area/rest", name: "Serenity" },
 ];
 
-({
+
+export default {
   // raw arrays — for QuickAdd suggester
   difficulties,
   areas,
@@ -52,4 +54,4 @@ const areas = [
     { label: "🏰 Sanctuary", tag: "#home" },
     { label: "✨ Vitality", tag: "#health" },
   ],
-});
+};
