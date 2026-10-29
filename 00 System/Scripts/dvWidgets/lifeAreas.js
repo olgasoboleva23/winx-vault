@@ -1,7 +1,7 @@
 const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
 const { xpMap, areaMap, areas, HABIT_BONUS_XP, HABIT_BONUS_THRESHOLD } = await H.loadConfig();
 
-const sel        = dv.current().date ?? dv.date("today");
+const sel        = H.pageDay(dv);
 const monthStart = sel.startOf("month");
 const monthEnd   = sel.endOf("month");
 

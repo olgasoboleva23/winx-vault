@@ -1,4 +1,5 @@
-const date = dv.current().date?.toFormat("yyyy-MM-dd");
+const H = (app.__winxHelpers ??= eval(await app.vault.adapter.read("00 System/Scripts/dvWidgets/helpers.js")));
+const date = H.ymd(dv.current().date);
 if (!date) return;
 
 const NOTES_FOLDER  = "02 Areas/Personal/Daily Notes";

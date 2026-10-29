@@ -13,7 +13,7 @@
   }
 
   /* difficulty: stars only, without the word */
-  .task-list-item .tag[data-tag-name^="#⭐"] {
+  :is(.task-list-item, .winx-cal) .tag[data-tag-name^="#⭐"] {
     font-size: 0;
     padding: 0;
     background: none;
