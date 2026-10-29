@@ -78,6 +78,8 @@ await winx.render("weight", dv);
 
 ## ⚙️ Required Plugins
 
+> Build the Winx plugin first: `cd plugin && npm ci && WINX_VAULT=.. npm run dev` (or `npm run build` and copy `plugin/dist/*` into `.obsidian/plugins/winx/`). Without it every card shows "winx is not defined".
+
 > Obsidian version: 1.12.7
 
 | Plugin | Version | Purpose |
@@ -267,7 +269,7 @@ npm test                                   # unit tests
 WINX_VAULT=/path/to/your/vault npm run dev # build into <vault>/.obsidian/plugins/winx on every save
 ```
 
-Then enable **Winx** in Settings → Community plugins. After a rebuild run **Winx: Reload** (Cmd+P) instead of restarting Obsidian. `npm run build` makes `plugin/dist/` (`main.js`, `styles.css`, `manifest.json`).
+Then enable **Winx** in Settings → Community plugins. After a rebuild run **Winx: Reload** (Cmd+P) instead of restarting Obsidian, and reopen the open notes: widgets already drawn keep the old code. `npm run build` makes `plugin/dist/` (`main.js`, `styles.css`, `manifest.json`).
 
 `tests/obsidian/styles-snapshot.js` records the computed styles of every element on a set of pages (run it inside Obsidian); `compare-snapshots.mjs` diffs two such records, to check that a style change moved nothing it shouldn't.
 
