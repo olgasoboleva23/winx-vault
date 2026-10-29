@@ -1,70 +1,104 @@
 # ✨ Winx Vault — Obsidian RPG Dashboard
 
-A gamified personal productivity system built in Obsidian with a magical-girl aesthetic. Track tasks, habits, energy, and life balance through an RPG-style dashboard.
+A gamified personal productivity system built in Obsidian with a magical-girl aesthetic. Track tasks, habits, goals and life balance through an RPG-style dashboard and a task calendar.
 
 ![Dashboard](dashboard.png)
 
+The repo is two things at once:
+
+- **an example vault** (open the repo folder in Obsidian) with demo notes, tasks and the dashboard;
+- **the Winx plugin** (`plugin/`): every widget, the task window, the commands and all the styles. Notes only say where a widget goes.
+
 ---
 
-## 🗂 Vault Structure
+## 🚀 Install
 
+You need [Node.js](https://nodejs.org) 24 and Obsidian 1.9 or newer.
+
+1. **Get the repo:** `git clone https://github.com/olgasoboleva23/winx-vault.git`
+2. **Build the plugin** into the vault:
+   ```sh
+   cd winx-vault/plugin
+   npm ci
+   npm run build
+   mkdir -p ../.obsidian/plugins/winx && cp dist/* ../.obsidian/plugins/winx/
+   ```
+3. **Open the `winx-vault` folder as a vault** in Obsidian, trust its plugins (Settings → Community plugins → Turn on). The other plugins (below) are already in `.obsidian/plugins/`.
+4. Open `Dashboard.md`.
+
+Without step 2 every card shows "winx is not defined": the notes ask the plugin to draw them.
+
+### Into your own vault
+
+Copy the plugin and what it reads:
+
+| What | Where it goes in your vault |
+|---|---|
+| `plugin/dist/*` (after `npm run build`) | `.obsidian/plugins/winx/` — then turn **Winx** on in Community plugins |
+| the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
+| `Dashboard.md`, `Week.md`, `Mobile.md`, `Mobile/` | anywhere (they hold the widget blocks) |
+| `02 Areas/Personal/Tasks/` (`Master.md`, `Calendar.md`, `Kanban.md`), `Goals.md`, `00 System/Data/`, `00 System/Assets/` | the same paths: the widgets read them there |
+
+The paths the widgets read are in the widget files (`plugin/src/widgets/*.js`, constants at the top) and `plugin/src/lib/config.js`.
+
+### Keeping your vault in sync with this repo
+
+Pull and rebuild, then run **Winx: Reload** (Cmd+P):
+
+```sh
+cd winx-vault && git pull
+cd plugin && npm ci && npm run build && cp dist/* /path/to/your/vault/.obsidian/plugins/winx/
 ```
-├── 📁 plugin — the Winx plugin: widgets, task window, commands, styles (see Development)
-│   ├── 📁 src
-│   │   ├── main.ts               — loads everything; window.winx.render for the notes' blocks
-│   │   ├── commands.ts           — Cmd+P commands: New task, New watch/read item, New game, Buy reward, New market item
-│   │   ├── 📁 ui
-│   │   │   └── form.ts           — one window of buttons / text boxes instead of a chain of prompts
-│   │   ├── 📁 lib
-│   │   │   ├── config.js         — areas, difficulties, XP values, levels, market categories
-│   │   │   ├── goalsLib.js       — pure week / goal / cycle / weight logic (tested)
-│   │   │   ├── task.js           — one task line in the Tasks format: read it, change it (tested)
-│   │   │   ├── items.js          — watch / read / game notes (tested)
-│   │   │   └── helpers.js        — dates, task line edits, task window, wallet, purchases, market, sounds
-│   │   └── 📁 widgets            — one file per widget, render(dv, input)
-│   │       ├── calendar.js       — week / month calendar, No date / Regulars / Pool tabs, drag and drop
-│   │       ├── yesterday.js      — "Missed?" box inside the calendar
-│   │       ├── levelToday.js, xpToday.js, goals.js, lifeAreas.js, cycle.js, weight.js, pomodoro.js,
-│   │       ├── celestialMarket.js, shop.js, supplies.js, wallet.js, habits.js, weeklyState.js,
-│   │       └── week.js, dailyNote.js, finance.js, mobileHome.js, mobileShopping.js
-│   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css
-│   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
-├── 📁 00 System
-│   ├── 📁 Assets — sounds for pomodoro and shop, task stickers (stickers/)
-│   ├── 📁 Data
-│   │   ├── Shop.md
-│   │   └── Celestial Market.md
-│   ├── 📁 Scripts
-│   │   ├── notify.js — desktop reminders (Templater startup script)
-│   │   └── 📁 QuickAdd
-│   │       └── MirrorMobileConfig.js — copies obsidian-mobile/ into the phone's config folder
-│   └── 📁 Templates
-│       ├── Daily Note.md — Templater template for new daily notes
-│       ├── recipe.md — Templater template for new recipe
-│       └── task.md — Templater template for new work task
-├── 📁 01 Projects
-├── 📁 02 Areas
-│   ├── 📁 Health & Body
-│   │   └── Cycle.md — Cycle start dates (`period::`, `- start::`)
-│   └── 📁 Personal
-│       ├── Goals.md — Goal list (see Goals)
-│       ├── 📁 Daily Notes — Daily journal entries (notes, XP log)
-│       └── 📁 Tasks
-│           ├── Master.md — all tasks
-│           ├── Calendar.md — the calendar
-│           └── Kanban.md — Kanban board view of tasks
-├── 📁 03 Resources
-│   ├── 📁 Collections — Card-view lists (Obsidian Bases) with example entries
-│   │   ├── 📁 Readlist — Books & fanfics to read
-│   │   ├── 📁 Gamelist — Games to play
-│   │   ├── 📁 Watchlist — Movies, series & cartoons
-│   │   └── 📁 Recipes — Recipe cards
-│   └── 📁 Media — Attachments (images, fonts)
-├── 📁 04 Archive
-├── 📁 99 Inbox
-├── Dashboard.md
-└── Week.md — Weekly review page
+
+Or let a GitHub Action do it, if your vault is a git repo: check out this repo next to it, build the plugin, copy it in, commit. The core steps:
+
+```yaml
+- uses: actions/checkout@v4            # your vault
+  with: { path: base }
+- uses: actions/checkout@v4            # this repo
+  with: { repository: olgasoboleva23/winx-vault, path: styles }
+- uses: actions/setup-node@v4
+  with: { node-version: 24 }
+- run: cd styles/plugin && npm ci && npm run build
+- run: mkdir -p base/.obsidian/plugins/winx && cp styles/plugin/dist/* base/.obsidian/plugins/winx/
+# then copy the notes you take from here, and git commit + push in base/
 ```
+
+### 📱 Phone
+
+The plugin works on the phone (no desktop-only code). It only has to get there: whatever syncs your vault (Obsidian Sync, iCloud, Remotely Save, …) must carry `.obsidian/plugins/winx/`, and **Winx** must be on in the phone's Community plugins. Tools that skip dot-folders (Remotely Save does) need a visible copy of the config folder that you move into place on the phone; `00 System/Scripts/QuickAdd/MirrorMobileConfig.js` does that from an `obsidian-mobile/` folder.
+
+---
+
+## ⚙️ Plugins
+
+> Obsidian version: 1.12.7
+
+| Plugin | Version | Purpose |
+|---|---|---|
+| **Winx** | this repo, `plugin/` | Widgets, task window, commands, all styles |
+| **Dataview** | 0.5.68 | Data for the widgets (their `dataviewjs` blocks) |
+| **Tasks** | 7.23.1 | Task format, the edit dialog, ticking 🔁 tasks |
+| **Templater** | 2.19.3 | Daily note template |
+| **QuickAdd** | 2.12.0 | Work task and Recipe notes |
+| **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
+| **Meta Bind** | 1.4.8 | `INPUT[slider]` and `INPUT[date]` inline inputs |
+
+---
+
+## 🖥 Dashboard
+
+| Card | What it shows |
+|---|---|
+| **Level** | Current level, total XP, progress to the next level |
+| **Pomodoro** | 25/5 min focus timer, session counter |
+| **Goals** | Per goal "X of Y this week", Mon–Sun dots, the minimum version |
+| **Life Areas** | Radar chart — XP earned per area this month |
+| **Cycle** | Cycle day, next start forecast, "started today" button |
+| **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight |
+| **XP Today** | XP earned today, level name, streak heatmap |
+| **Quests** | Tasks due today, grouped by life area |
+| **Celestial Market** | Pending shopping items grouped by category |
 
 A note shows a widget with a Dataview block:
 
@@ -74,31 +108,50 @@ await winx.render("weight", dv);
 ```
 ````
 
----
-
-## ⚙️ Required Plugins
-
-> Build the Winx plugin first: `cd plugin && npm ci && WINX_VAULT=.. npm run dev` (or `npm run build` and copy `plugin/dist/*` into `.obsidian/plugins/winx/`). Without it every card shows "winx is not defined".
-
-> Obsidian version: 1.12.7
-
-| Plugin | Version | Purpose |
-|---|---|---|
-| **Winx** | (this repo, `plugin/`) | Widgets, task window, commands, all styles |
-| **Dataview** | 0.5.68 | Data for the widgets (their `dataviewjs` blocks) |
-| **Templater** | 2.19.3 | Daily note template |
-| **Tasks** | 7.23.1 | Task tracking & completion dates |
-| **QuickAdd** | 2.12.0 | Work task and Recipe notes; Update Mobile Config on the phone |
-| **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
-| **Meta Bind** | 1.4.8 | `INPUT[slider]` and `INPUT[date]` inline inputs |
+`Week.md` is the weekly review: goals × days, cycle day, tasks done and still open, the first lines of each daily note. `Mobile.md` and `Mobile/` are the same widgets laid out for a phone.
 
 ---
 
-## 🎮 XP & Leveling System
+## 📅 Calendar
 
-Tasks are tagged with a **difficulty** and a **life area**. Completing a task awards XP.
+`02 Areas/Personal/Tasks/Calendar.md`: the tasks of `Master.md` on a week or a month.
 
-### Difficulties
+- **Days** show one-off tasks, and a day's 🔁 tasks folded into one pill "🔁 2/5"; a click unfolds them, grouped by time of day (`#time/morning`, `#time/evening`).
+- **Drag** a task onto a day: open and due that day, or ✓ done that day. While dragging, a bar of 7 days sticks to the top of the screen.
+- **Missed?** lists open tasks whose day has passed: ✓ done that day, or ☀️ move to today.
+- **Bottom tabs:** **No date** (open tasks without a date), **Regulars** (🔁 tasks), **Pool** (tasks to pick when it's time, from `Tasks/Pool.md`: drag one onto a day to make a copy).
+- **On a task:** ⭐ change difficulty, ✏️ edit (the task window, then the Tasks dialog), ⏭ skip a 🔁 task this time, 🗑 delete (click twice). On the phone, swipe right = done, swipe left = skip / take the date off.
+- **Stickers:** `![[name.gif|28]]` in a task's text (files in `00 System/Assets/stickers/`); hover to see one big.
+
+---
+
+## ✅ Tasks and commands
+
+Tasks live in `02 Areas/Personal/Tasks/Master.md` in the Tasks plugin's format, tagged with a difficulty and a life area:
+
+```
+- [ ] #⭐⭐medium #area/mind #time/evening read a chapter ![[rings.gif|28]] 🔁 every week on Tuesday, Thursday 📅 2026-11-03
+```
+
+**Winx: New task** (Cmd+P, or **＋ task** in the calendar):
+1. One window: difficulty and area (both needed), time of day, sticker; or tick **To pool** to keep it in `Pool.md` instead
+2. Text and dates in the Tasks dialog
+3. The task goes to the top of `Master.md` (a pool item to the end of `Pool.md`)
+
+| Command (Cmd+P) | Creates |
+|---|---|
+| **Winx: New task** | a task in `Tasks/Master.md` |
+| **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
+| **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
+| **Winx: New market item** | an item in `00 System/Data/Celestial Market.md` |
+
+QuickAdd keeps two Templater choices: **Work task** (`task.md` → `01 Projects`; point it at your own project folder in Settings → QuickAdd) and **Recipe** (`recipe.md` → `03 Resources/Collections/Recipes`).
+
+---
+
+## 🎮 XP & Levels
+
+Completing a task awards XP and gold by its difficulty:
 
 | Tag | XP | Gold |
 |---|---|---|
@@ -107,160 +160,81 @@ Tasks are tagged with a **difficulty** and a **life area**. Completing a task aw
 | `#⭐⭐⭐hard` | 20 | 10 |
 | `#⭐⭐⭐⭐epic` | 50 | 25 |
 
-### Level Formula
+Level `n` costs `100 + (n-1) × 25` XP. Complete a habit **30+ times** in a month → **+100 XP** per habit.
 
-Level `n` costs `100 + (n-1) × 25` XP. Levels are named:
+### Life areas
 
-| Name | Total XP threshold |
-|---|---|
-| VOID | 0 |
-| SPARK | 10 |
-| GLOW | 20 |
-| AURA | 30 |
-| TRANSFORMATION | ∞ |
-
-### Habit Bonus
-
-Complete a habit **30+ times** in a month → **+100 XP** bonus per qualifying habit.
-
----
-
-## 🌐 Life Areas (Radar Chart)
-
-| Emoji | Tag | Radar Name |
+| Area | Tag | Radar name |
 |---|---|---|
-| 🏃 Body | `#area/body` | Vitality |
-| 💼 Work | `#area/work` | Craft |
-| 🧠 Mind | `#area/mind` | Knowledge |
-| 💰 Wealth | `#area/wealth` | Resources |
-| 🏡 Base | `#area/base` | Sanctuary |
-| 🌄 Occasions | `#area/occasions` | Memory |
+| 🌺 Body | `#area/body` | Vitality |
+| 🔮 Mind | `#area/mind` | Knowledge |
+| 💎 Wealth | `#area/wealth` | Resources |
+| 🏰 Base | `#area/base` | Sanctuary |
+| 🌠 Occasions | `#area/occasions` | Memory |
 | 🌙 Rest | `#area/rest` | Serenity |
+
+Tags without a radar row still get an icon: `#area/learning` 📜, `#area/work` 🪄, `#area/personal` 🦋, `#area/health` 🧪. All of it is in `plugin/src/lib/config.js`.
 
 ---
 
 ## 🛍 Shop
 
-Completing tasks earns **gold** alongside XP. Spend it on real-world rewards defined in `Shop.md`.
-
-### How it works
-
-1. **Earn** — completing any tagged task adds gold (see Difficulties table).
-2. **Browse** — open `Shop.md` to see your balance and available items. Affordable items show ✅, unaffordable show ❌.
-3. **Buy** — click an affordable item. The purchase is logged to `Purchases.md` and the balance updates immediately.
-
-### Adding items
-
-Edit `Shop.md` and add a list entry:
-
-- name:: Cozy Coffee cost:: 20
-
-### Caching
-
-Earned and spent totals are computed once and cached in memory. The cache is invalidated automatically when task or purchase files change, so widget re-renders are fast.
-
----
+Gold from tasks buys real-world rewards listed in `00 System/Data/Shop.md` (`- name:: Cozy Coffee cost:: 20`). The Shop page shows the balance; a click on an affordable item logs it to `Purchases.md` (or use **Winx: Buy reward**).
 
 ## 🌌 Celestial Market
 
-A themed shopping list, rendered as a dashboard card. Items live in `00 System/Data/Celestial Market.md` as regular checkbox tasks tagged with a category; the widget groups pending items by category and shows how many are left. Checking an item off in the file clears it from the card.
-
-### Categories
-
-| Group | Tag |
-|---|---|
-| 🌿 Harvest | `#food` |
-| 🌸 Bloom | `#care` |
-| 🐾 Familiar | `#pet` |
-| 🏰 Sanctuary | `#home` |
-| ✨ Vitality | `#health` |
-
-Untagged items land in a ✦ Other group.
-
-### Adding items
-
-Use **Winx: New market item** in Cmd+P (pick a category, type the name), or edit `Celestial Market.md` directly:
-
-- \[ \] Fresh bread #food
-
----
+A shopping list card. Items are checkbox lines in `00 System/Data/Celestial Market.md` tagged with a category (`- [ ] Fresh bread #food`); ticking one clears it from the card. Categories: 🌿 Harvest `#food`, 🌸 Bloom `#care`, 🐾 Familiar `#pet`, 🏰 Sanctuary `#home`, ✨ Vitality `#health`; untagged items land in ✦ Other.
 
 ## 🎯 Goals
 
-A goal is a regular **recurring task** in `Tasks/Master.md` tagged `#goal/<slug>`, ticked off in the Kanban like any task (and earning XP). `02 Areas/Personal/Goals.md` describes each goal:
+A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any task. `02 Areas/Personal/Goals.md` describes each one:
 
 ```
-- name:: Растяжка
+- name:: Stretching
   tag:: #goal/stretch
-  days:: вт, чт, сб
-  min:: 5 минут на коврике
-  plan:: если выключила компьютер вечером, раскатываю коврик
+  days:: tue, thu, sat
+  min:: 5 minutes on the mat
+  plan:: when I shut the laptop in the evening, I roll out the mat
 ```
 
-- `days` (пн … вс) sets the weekly plan; otherwise `perWeek:: N`. If both are given, `days` wins.
-- A day counts as done when a completed task with the tag has `✅` on that day. Weeks start on Monday.
-- Use repeats without `when done`. A missed goal task is moved by the Goals widget to the next planned day (not before today), so it never piles up in Overdue; Kanban's Overdue skips `#goal` tasks anyway.
-- **Week.md** shows the selected week: goals × days, cycle day, other tasks done and still open, and the first lines of each daily note.
-
----
+- `days` sets the weekly plan; otherwise `perWeek:: N` (`days` wins if both are given). A day counts when a done task with the tag has its `✅` on that day. Weeks start on Monday.
+- Use repeats without `when done`: a missed goal task moves to the next planned day, so it never piles up.
 
 ## 📝 Daily Note
 
-Each daily note has:
-- **Notes** — free text (first lines show up on the Week page)
-- **XP Log** — freeform notes on what you did/learned
-
-Create via Templater from `00 System/Templates/Daily Note.md` (the Daily Notes core plugin is preconfigured to use it), or just click **✦ Open** on the dashboard — if the selected day has no note yet, it's created from the template automatically.
+Notes (free text; the first lines show on the Week page) and an XP Log. Made from `00 System/Templates/Daily Note.md`, or by **✦ Open** on the dashboard for the selected day.
 
 ---
 
-## ✅ Creating a Task
+## 🗂 Structure
 
-Use **Winx: New task** in Cmd+P:
-1. One window: difficulty and area (both needed), time of day, sticker; or tick **To pool** to keep it in `Pool.md` (the calendar's Pool tab) instead
-2. Fill in the text and dates in the Tasks modal
-3. The task goes to the top of `Tasks/Master.md` (a pool item to the end of `Tasks/Pool.md`)
-
-The ✏️ on a calendar task opens the same window, then the Tasks modal.
-
-### Other commands
-
-| Command (Cmd+P) | Creates |
-|---|---|
-| **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
-| **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
-| **Winx: New market item** | an item in `00 System/Data/Celestial Market.md` |
-
-QuickAdd keeps two Templater choices:
-
-| Choice | Template | Creates note in |
-|---|---|---|
-| **Work task** | `task.md` | `01 Projects` |
-| **Recipe** | `recipe.md` | `03 Resources/Collections/Recipes` |
-
-> ⚠️ **Work task** targets the generic `01 Projects` folder. Point it at your own project folder instead (Settings → QuickAdd → Work task → folder). If you sync this vault's QuickAdd config into another vault, remember the sync overwrites that folder setting — re-pick your project folder afterwards.
-
----
-
-## 🖥 Dashboard Widgets
-
-| Widget | Description |
-|---|---|
-| **Level** | Current level, total XP, progress to next level |
-| **Pomodoro** | 25/5 min focus timer, session counter |
-| **Goals** | Per goal "X из Y на этой неделе", Mon–Sun dots, minimum version |
-| **Life Areas** | Radar chart — XP earned per area this month |
-| **Cycle** | Cycle day, next start forecast, "началось сегодня" button |
-| **XP Today** | XP earned today, current level name, streak heatmap |
-| **Quests** | Tasks due today, grouped by life area tag |
-| **Celestial Market** | Pending shopping items grouped by category |
-| **Shop**   | (in Shop.md) Browse rewards, click to buy with gold |
-
----
+```
+├── 📁 plugin — the Winx plugin
+│   ├── 📁 src
+│   │   ├── main.ts               — loads everything; window.winx.render for the notes' blocks
+│   │   ├── commands.ts           — the Cmd+P commands
+│   │   ├── 📁 ui/form.ts         — one window of buttons / text boxes instead of a chain of prompts
+│   │   ├── 📁 lib                — config, goalsLib (week / goal / cycle / weight logic), task (one task line:
+│   │   │                           read it, change it), items (watch / read / game notes), helpers
+│   │   └── 📁 widgets            — one file per widget, render(dv, input)
+│   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css
+│   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
+├── 📁 00 System
+│   ├── 📁 Assets                 — sounds, task stickers (stickers/)
+│   ├── 📁 Data                   — Shop.md, Celestial Market.md, Supplies.md
+│   ├── 📁 Scripts                — notify.js (desktop reminders, Templater startup), QuickAdd/MirrorMobileConfig.js
+│   └── 📁 Templates              — Daily Note.md, recipe.md, task.md
+├── 📁 02 Areas
+│   ├── 📁 Health & Body/Cycle.md — cycle start dates
+│   └── 📁 Personal
+│       ├── Goals.md
+│       ├── 📁 Daily Notes
+│       └── 📁 Tasks              — Master.md (all tasks), Calendar.md, Kanban.md
+├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
+├── Dashboard.md, Week.md, Mobile.md, 📁 Mobile
+```
 
 ## 🛠 Development
-
-The plugin is built with esbuild (TypeScript, JS modules) and Sass. Node 24:
 
 ```sh
 cd plugin
@@ -269,11 +243,6 @@ npm test                                   # unit tests
 WINX_VAULT=/path/to/your/vault npm run dev # build into <vault>/.obsidian/plugins/winx on every save
 ```
 
-Then enable **Winx** in Settings → Community plugins. After a rebuild run **Winx: Reload** (Cmd+P) instead of restarting Obsidian, and reopen the open notes: widgets already drawn keep the old code. `npm run build` makes `plugin/dist/` (`main.js`, `styles.css`, `manifest.json`).
+After a rebuild run **Winx: Reload** (Cmd+P) and reopen the open notes (widgets already drawn keep the old code). `npm run build` makes `plugin/dist/` (`main.js`, `styles.css`, `manifest.json`); a Sass error fails it.
 
-`tests/obsidian/styles-snapshot.js` records the computed styles of every element on a set of pages (run it inside Obsidian); `compare-snapshots.mjs` diffs two such records, to check that a style change moved nothing it shouldn't.
-
-## 📱 Phone
-
-The plugin works on the phone (no desktop-only APIs). A vault that syncs from this repo builds the plugin in its sync job and ships it with the other plugins.
-
+`tests/obsidian/styles-snapshot.js` records the computed styles of every element on a set of pages (run it inside Obsidian); `compare-snapshots.mjs` diffs two such records, to check a style change moved nothing it shouldn't.
