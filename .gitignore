@@ -1,3 +1,5 @@
 .DS_Store
 .obsidian/workspace.json
 00 System/Data/pomodoro.json
+plugin/node_modules/
+plugin/dist/
