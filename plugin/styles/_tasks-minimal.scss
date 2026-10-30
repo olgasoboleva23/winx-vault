@@ -1,0 +1,65 @@
+/* ============================================
+ * WINX THEME — Tasks Minimal
+ * File: tasks-minimal.css
+ *
+ * Hides tags except difficulty stars (area shows as the group heading),
+ * fades task metadata
+ * until hover.
+ * ============================================ */
+
+@use "mixins" as *;
+
+:is(.dashboard, .kanban-board) {
+  .task-list-item .tag:not([data-tag-name^="#⭐"]) {
+    display: none;
+  }
+
+  /* difficulty: stars only, without the word */
+  :is(.task-list-item, .winx-cal) .tag[data-tag-name^="#⭐"] {
+    font-size: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+    top: -1px;   /* line it up with the text's middle */
+    /* own gold star (emoji can't be painted inside): a band of light sweeps across it.
+       One 14px tile per star, width set per difficulty below */
+    &::before {
+      content: "";
+      display: block;
+      height: 11px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='11' viewBox='0 0 14 11'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff1a8'/%3E%3Cstop offset='.55' stop-color='%23ffd24d'/%3E%3Cstop offset='1' stop-color='%23e0a12e'/%3E%3C/linearGradient%3E%3ClinearGradient id='s' gradientUnits='userSpaceOnUse' x1='0' y1='0' x2='4' y2='4'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='0'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='.95'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3CanimateTransform attributeName='gradientTransform' type='translate' values='-8 -8;-8 -8;10 10' keyTimes='0;.6;1' dur='2.8s' repeatCount='indefinite'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M5.50 0.60L7.20 3.55L10.54 4.26L8.26 6.80L8.62 10.19L5.50 8.80L2.38 10.19L2.74 6.80L0.46 4.26L3.80 3.55Z' fill='url(%23g)' stroke='%23c89540' stroke-width='.9' stroke-linejoin='round'/%3E%3Cpath d='M5.50 0.60L7.20 3.55L10.54 4.26L8.26 6.80L8.62 10.19L5.50 8.80L2.38 10.19L2.74 6.80L0.46 4.26L3.80 3.55Z' fill='url(%23s)'/%3E%3C/svg%3E") 0 0 / 14px 11px repeat-x;
+    }
+  }
+  .tag[data-tag-name="#⭐easy"]::before { width: 11px; }
+  .tag[data-tag-name="#⭐⭐medium"]::before { width: 25px; }
+  .tag[data-tag-name="#⭐⭐⭐hard"]::before { width: 39px; }
+  .tag[data-tag-name="#⭐⭐⭐⭐epic"]::before { width: 53px; }
+
+  /* beats the blue !important heading color in winx-layout.css */
+  h4.tasks-group-heading {
+    color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep)) !important;
+    /* pill like the Celestial Market group headers */
+    width: fit-content;
+    padding: 0.15rem 0.8rem;
+    border-radius: $pill;
+    background: fade(var(--winx-border), 40%);
+    line-height: 1.4;
+    & p { margin: 0; }   /* Tasks wraps the text in a <p> with its own margins */
+  }
+
+  .task-list-item {
+    :is(.task-extras, .tasks-list-text > *:not(.task-description)) {
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    &:not(:hover) {
+      :is(.task-extras, .tasks-list-text > *:not(.task-description)) {
+        opacity: 0;
+      }
+    }
+  }
+}

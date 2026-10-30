@@ -1,0 +1,79 @@
+/* ── "Yesterday?" strip above Today ── */
+
+@use "../mixins" as *;
+.winx-yesterday {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  column-gap: 18px;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: $radius-l;
+  /* the Kanban card's blue */
+  border: 1px solid rgb(168 200 240);
+  background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240), rgb(232 213 245));
+  box-shadow: 0 0 16px rgb(168 200 240 / 60%);
+
+  .winx-yesterday-head { grid-column: 1 / -1; font-family: "Cinzel", serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: 2px; }
+  .winx-yesterday-row {
+    @include row;
+    gap: $gap-s;
+    padding: 3px 0;
+    font-size: $text-l;
+    color: var(--winx-text-dark);
+
+    span { flex: 1; }
+    &[draggable="true"] { cursor: grab; }
+    em { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }
+    border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
+  }
+  button {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: $round;
+    border: 1px solid var(--winx-border);
+    background: rgb(255 255 255 / 80%);
+    color: var(--winx-purple-deep);
+    box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
+    font-size: $text-l;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+    &:hover { transform: scale(1.08); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
+  }
+}
+body.is-mobile .winx-yesterday button { width: 34px; height: 34px; font-size: $text-xl; }
+.callout[data-callout="card"][data-callout-metadata~="hero"] > .callout-title { display: none; }
+
+/* calendar bottom panel: No date | Regulars tabs */
+.winx-cal-tabs {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 4px;
+  button.winx-cal-head { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
+  button.winx-cal-head.on { opacity: 1; color: var(--winx-purple-deep); border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
+}
+.winx-cal-late { color: #b0306a; font-weight: 600; }
+.winx-board-card.paused { opacity: 0.55; }
+.winx-cal-fold { cursor: pointer; }
+.winx-cal-groupcard.dashed { background: none; border: 1.5px dashed fade(var(--winx-purple-deep), 35%); }
+/* Missed inside the calendar: rounded colored rows like the day entries */
+.winx-cal {
+  .winx-yesterday .winx-yesterday-row { margin: 2px 4px 2px 0; padding: 3px 6px; border-bottom: none; border-radius: $radius-m; }
+  .winx-yesterday .winx-yesterday-row[data-area] { border-radius: $radius-m; }
+}
+.winx-cal-zone.plan { font-family: "Cinzel", serif; font-size: $text-xl; text-align: center; }
+.winx-cal-month .winx-cal-zone { font-size: $text-m; }
+/* Missed rows: ✏️ 🗑 sit in the row, before the date */
+.winx-cal .winx-yesterday-row { position: relative; }
+/* desktop: they float over the end of the text on hover (opacity only, so the row height stays) */
+body:not(.is-mobile) .winx-cal .winx-yesterday-row .winx-board-btns { right: 104px; }
+body.is-mobile .winx-cal .winx-yesterday-row .winx-board-btns { margin: 0; }
+
+/* Missed in the calendar: the card's fairy wings in two corners */
+.winx-cal .winx-yesterday {
+  position: relative;
+  @include wings(40px, 3px);
+  .winx-yesterday-head { padding-left: 34px; }
+  > * { position: relative; z-index: 1; }
+}

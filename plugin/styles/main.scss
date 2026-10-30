@@ -1,0 +1,27 @@
+// Winx styles. The order is the order Obsidian applied the old snippets (by name), then finance (it used to be
+// injected last); widgets/ has one file per widget, the rest is the shared look (tokens, cards, layout, …).
+// Keep the order: rules of the same weight win by order.
+@use "animations";
+@use "assets";
+@use "callout-grid";
+@use "cards";
+@use "widgets/celestial-market";
+@use "fonts";
+@use "widgets/heatmap";
+@use "kanban";
+@use "layout";
+@use "widgets/pomodoro";
+@use "widgets/shop";
+@use "tasks-minimal";
+@use "tokens";
+@use "widgets/base";
+@use "widgets/goals-cycle";
+@use "widgets/supplies";
+@use "widgets/scroll-cards";
+@use "widgets/mobile";
+@use "widgets/weight";
+@use "widgets/task-cards";
+@use "widgets/calendar";
+@use "widgets/missed";
+@use "widgets/dashboard";
+@use "widgets/finance";   // was injected by the widget itself, after everything else: last

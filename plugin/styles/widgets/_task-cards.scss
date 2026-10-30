@@ -1,0 +1,62 @@
+/* ── Task cards (calendar backlog) ── */
+
+@use "../mixins" as *;
+.winx-board-card {
+  position: relative;
+  padding: 7px 8px;
+  border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
+  color: var(--winx-text-dark);
+  cursor: grab;
+  transition: background 0.15s ease;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: fade(white, 35%); border-radius: $radius-m; }
+  &.dragging { opacity: 0.4; }
+}
+.winx-board-text { font-size: 14px; line-height: 1.35; }
+.winx-board-meta { margin-top: 2px; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
+
+/* round buttons on a task: ⏭ ✏️ 🗑 */
+:is(.winx-board-backlog, .winx-cal) .winx-board-btns {
+  display: flex;
+  gap: $gap-xs;
+}
+body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  translate: 0 -50%;
+  padding-left: 18px;
+  background: linear-gradient(90deg, transparent, var(--winx-pink-light) 18px);
+  border-radius: $pill;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+body:not(.is-mobile) :is(.winx-board-card, .winx-cal-task, .winx-yesterday-row):hover .winx-board-btns { opacity: 1; pointer-events: auto; }
+body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top: 6px; }
+:is(.winx-board-backlog, .winx-cal) .winx-board-btns button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: $round;
+  border: 1px solid var(--winx-border);
+  background: rgb(255 255 255 / 85%);
+  box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
+  font-size: $text-l;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
+}
+body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { width: 34px; height: 34px; font-size: $text-xl; }
+:is(.winx-board-backlog, .winx-cal) .winx-board-btns button.winx-board-del.armed {
+  width: auto;
+  padding: 0 8px;
+  border-color: #d0457a;
+  background: #d0457a;
+  color: #fff;
+  font-size: $text-m;
+}
+.winx-board-backlog { margin-top: 12px; }

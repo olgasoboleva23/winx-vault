@@ -1,0 +1,55 @@
+/* ============================================
+ * WINX THEME — Animations
+ * File: winx-animations.css
+ *
+ * • @keyframes winx-twinkle (col star sparkles)
+ * • Date input golden styling (.mb-input-type-date)
+ * ============================================ */
+
+@use "mixins" as *;
+
+@keyframes winx-twinkle {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+/* Progress bar shimmer — used by .winx-progress-fill in widgets.css */
+@keyframes winx-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Icon glow pulse — used by .winx-icon-circle in widgets.css */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    filter: brightness(100%)
+      drop-shadow(0 0 8px alpha(--winx-gold, 90%))
+      drop-shadow(0 0 16px alpha(--winx-gold, 50%));
+  }
+  50% {
+    filter: brightness(130%)
+      drop-shadow(0 0 8px alpha(--winx-gold, 90%))
+      drop-shadow(0 0 16px alpha(--winx-gold, 50%));
+  }
+}
+
+/* ── Accessibility — stop decorative motion ── */
+@media (prefers-reduced-motion: reduce) {
+  :is(.dashboard, .kanban-board, .winx-pomodoro) :is(*, *::before, *::after),
+  .winx-icon-circle,
+  .winx-progress-fill {
+    animation: none !important;
+  }
+}
