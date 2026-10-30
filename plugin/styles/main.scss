@@ -13,3 +13,4 @@
 @use "tasks-minimal";
 @use "tokens";
 @use "widgets";
+@use "finance";   // was injected by the widget itself, after everything else: last
