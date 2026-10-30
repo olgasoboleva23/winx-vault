@@ -1,7 +1,6 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, WorkspaceLeaf } from "obsidian";
-import { H } from "../lib/helpers.js";
-import { L } from "../lib/goalsLib.js";
 import layout from "./layout.md";
+import { addDays, todayYmd } from "../lib/dates.js";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn by Obsidian's
 // markdown renderer, as a note in reading view would be, for the tab's date. The date is the tab's own (no date:
@@ -41,10 +40,10 @@ export class DashboardView extends ItemView {
 
   // another day: the cards draw again in place (the pomodoro isn't touched), the date row and Quests anew
   private go(date: string | null) {
-    this.date = date === H.today() ? null : date;
+    this.date = date === todayYmd() ? null : date;
     this.app.workspace.requestSaveLayout();
     if (!this.body) return this.render();
-    this.shownDate = this.date ?? H.today();
+    this.shownDate = this.date ?? todayYmd();
     this.body.dataset.date = this.shownDate;
     this.dateRow();
     this.quests();
@@ -52,7 +51,7 @@ export class DashboardView extends ItemView {
   }
 
   private render() {
-    const date = this.shownDate = this.date ?? H.today();
+    const date = this.shownDate = this.date ?? todayYmd();
     if (this.page) this.removeChild(this.page);
     this.page = this.addChild(new Component());
     this.contentEl.empty();
@@ -75,7 +74,7 @@ export class DashboardView extends ItemView {
     slot.createDiv({ cls: "mb-input-type-date" }).createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
     slot.createEl("button", { text: "‹", attr: { "aria-label": "previous", "data-action": "prev" } });
     slot.createEl("button", { text: "›", attr: { "aria-label": "next", "data-action": "next" } });
-    if (this.shownDate !== H.today()) slot.createEl("button", { text: "today", cls: "winx-cal-today", attr: { "data-action": "today" } });
+    if (this.shownDate !== todayYmd()) slot.createEl("button", { text: "today", cls: "winx-cal-today", attr: { "data-action": "today" } });
   }
 
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)
@@ -98,8 +97,8 @@ export class DashboardView extends ItemView {
     this.registerDomEvent(el, "click", e => {
       const t = e.target as HTMLElement;
       const act = t.closest?.(".winx-dash-date [data-action]") as HTMLElement | null;
-      if (act?.dataset.action === "prev") return this.go(L.addDays(this.shownDate, -1));
-      if (act?.dataset.action === "next") return this.go(L.addDays(this.shownDate, 1));
+      if (act?.dataset.action === "prev") return this.go(addDays(this.shownDate, -1));
+      if (act?.dataset.action === "next") return this.go(addDays(this.shownDate, 1));
       if (act?.dataset.action === "today") return this.go(null);
       // [[links]] in the layout open their note, as in a note (Cmd/Ctrl: a new tab)
       const link = t.closest?.("a.internal-link[data-href]") as HTMLAnchorElement | null;
@@ -114,6 +113,6 @@ export class DashboardView extends ItemView {
     }));
     this.registerDomEvent(el, "winx-drawn" as any, () => window.setTimeout(() => el.removeClass("busy"), 200));
     // following today: a new day moves the dashboard on
-    this.registerInterval(window.setInterval(() => { if (!this.date && this.shownDate !== H.today()) this.go(null); }, 60_000));
+    this.registerInterval(window.setInterval(() => { if (!this.date && this.shownDate !== todayYmd()) this.go(null); }, 60_000));
   }
 }

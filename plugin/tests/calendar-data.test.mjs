@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { L } from "../src/lib/goalsLib.js";
+import { weekOf } from "../src/lib/dates.js";
 import { T, collect, missed, sortBacklog, sortPool, sortRegulars, backlogMeta, poolMeta, regularHistory } from "../src/calendar/data.js";
 
 // Dataview-like tasks: { status, text, path, line }
@@ -11,7 +11,7 @@ const TODAY = "2026-10-28";   // a Wednesday
 const AREAS = ["#area/body", "#area/mind", "#area/base"];
 
 test("days: open on their date, done on their ✅ date, 🔁 repeats faded in the future only", () => {
-  const days = L.weekOf(TODAY);   // 26.10 … 01.11
+  const days = weekOf(TODAY);   // 26.10 … 01.11
   const tasks = [
     task(" ", "#area/body walk 📅 2026-10-30"),
     task("x", "#area/mind read ✅ 2026-10-27"),
@@ -34,7 +34,7 @@ test("days: open on their date, done on their ✅ date, 🔁 repeats faded in th
 });
 
 test("a day lists open, then repeats, then done", () => {
-  const days = L.weekOf(TODAY);
+  const days = weekOf(TODAY);
   const m = collect({ days, today: TODAY, poolLines: [], tasks: [
     task("x", "tea ✅ 2026-10-29"),
     task(" ", "yoga 🔁 every day 📅 2026-10-28"),
@@ -44,7 +44,7 @@ test("a day lists open, then repeats, then done", () => {
 });
 
 test("pool lines become pool items with their own Task", () => {
-  const m = collect({ tasks: [], days: L.weekOf(TODAY), today: TODAY, poolLines: [
+  const m = collect({ tasks: [], days: weekOf(TODAY), today: TODAY, poolLines: [
     { text: "#⭐easy #area/base take out trash", path: "Tasks/Pool.md", line: 2 },
   ] });
   assert.equal(m.pool.length, 1);

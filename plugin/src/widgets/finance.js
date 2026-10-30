@@ -3,6 +3,7 @@
 // The data (02 Areas/Finance) stays in the vault; styles in styles/_finance.scss.
 import { html } from "../ui/html.js";
 import { Widget } from "./widget.js";
+import { dm } from "../lib/dates.js";
 
 const LEDGER = "02 Areas/Finance/Ledger";
 const RULES = "02 Areas/Finance/rules.json";
@@ -87,7 +88,7 @@ export class Finance extends Widget {
       ${totals.transfers > 0 ? html`<div class="winx-fin-section">transfers ${money(totals.transfers)} — not counted as spending</div>` : ""}
       ${categories.length ? html`<div class="winx-fin-section">Categories</div><div class="winx-fin-rows">${categories.map(([name, value], i) => bar(name, value, categories[0][1], PALETTE[i % PALETTE.length], budgets[name]))}</div>` : ""}
       ${window6.length > 1 ? html`<div class="winx-fin-section">Spending by month</div><div class="winx-fin-trend">${window6.map((m, i) => html`<div class="winx-fin-bar${m === current ? " is-current" : ""}"><div class="col" style="height: ${Math.max(spends[i] / peak * 100, 3)}%;" aria-label="${money(spends[i])}"></div><small>${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small></div>`)}</div>` : ""}
-      ${latest.length ? html`<div class="winx-fin-section">Recent transactions</div><div class="winx-fin-list">${latest.map(r => html`<div class="winx-fin-item"><span class="d">${r.date.slice(8) + "." + r.date.slice(5, 7)}</span><span class="t">${r.category} · ${r.description}</span><span class="a">${money(r.amount)}</span></div>`)}</div>` : ""}
+      ${latest.length ? html`<div class="winx-fin-section">Recent transactions</div><div class="winx-fin-list">${latest.map(r => html`<div class="winx-fin-item"><span class="d">${dm(r.date)}</span><span class="t">${r.category} · ${r.description}</span><span class="a">${money(r.amount)}</span></div>`)}</div>` : ""}
     </div>`;
   }
 }

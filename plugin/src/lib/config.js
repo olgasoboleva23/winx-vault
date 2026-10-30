@@ -3,13 +3,7 @@ const difficulties = [
   { label: "⭐ Easy", tag: "#⭐easy", xp: 5, gold: 2, prop: "easy" },
   { label: "⭐⭐ Medium", tag: "#⭐⭐medium", xp: 10, gold: 5, prop: "medium" },
   { label: "⭐⭐⭐ Hard", tag: "#⭐⭐⭐hard", xp: 20, gold: 10, prop: "hard" },
-  {
-    label: "⭐⭐⭐⭐ Epic",
-    tag: "#⭐⭐⭐⭐epic",
-    xp: 50,
-    gold: 25,
-    prop: "epic",
-  },
+  { label: "⭐⭐⭐⭐ Epic", tag: "#⭐⭐⭐⭐epic", xp: 50, gold: 25, prop: "epic" },
 ];
 
 const areas = [

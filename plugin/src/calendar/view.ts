@@ -1,10 +1,12 @@
 import { ItemView, Notice, TAbstractFile, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
-import { H } from "../lib/helpers.js";
 import { actionOf } from "../widgets/parse.js";
 import { T, collect, findTask, missed, taskKey } from "./data.js";
 import { baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
+import config from "../lib/config.js";
+import { todayYmd } from "../lib/dates.js";
+import { AudioEngine, isMuted } from "../lib/sounds.js";
 
 // The calendar tab: the week (7 day columns) or the month around a date, the tasks of 02 Areas/Personal/Tasks on
 // their days, "Missed?" above, and the No date | Regulars | Pool panel below. Its state (date, view, tab, folds)
@@ -29,7 +31,7 @@ export class CalendarView extends ItemView {
   actions: any = null;
   private stale = false;   // the tasks changed while the tab was hidden: redraw when it shows
   private dragged: any = null;
-  private sounds = { move: new H.AudioEngine("00 System/Assets/winx music/snd_scroll_menu.wav"), gem: new H.AudioEngine("00 System/Assets/winx music/snd_pickup_gem01.wav") };
+  private sounds = { move: new AudioEngine("00 System/Assets/winx music/snd_scroll_menu.wav"), gem: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem01.wav") };
 
   constructor(leaf: WorkspaceLeaf) { super(leaf); }
   getViewType() { return VIEW_TYPE; }
@@ -68,7 +70,7 @@ export class CalendarView extends ItemView {
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));   // a sidebar or split shown
     // a new day: following today, the days move on; and "today" in every action is the new one
     this.registerInterval(window.setInterval(() => {
-      if (this.ctx && this.ctx.today !== H.today()) this.contentEl.isShown() ? this.draw() : (this.stale = true);
+      if (this.ctx && this.ctx.today !== todayYmd()) this.contentEl.isShown() ? this.draw() : (this.stale = true);
     }, 60_000));
   }
   onResize() { this.catchUp(); }
@@ -106,10 +108,9 @@ export class CalendarView extends ItemView {
     const say = (text: string) => { this.ctx = null; this.root.empty(); this.root.setText(text); };   // no calendar to redraw in place
     if (!dv) return say("✦ the calendar needs the Dataview plugin");
     if (!dv.index?.initialized) return say("✦ waiting for Dataview…");   // index-ready draws again
-    const today = H.today(), days = shownDays(this.state, today);
+    const today = todayYmd(), days = shownDays(this.state, today);
     const tasks = dv.pages(`"${TASKS_DIR.slice(0, -1)}"`).file.tasks.array();
     const poolLines = (dv.page(POOL)?.file.lists.array() ?? []).filter((l: any) => !l.task);
-    const config = await H.loadConfig();
     const old = this.ctx?.root;
     const root = createDiv({ cls: `winx-cal ${this.state.view}` });
     const ctx: any = this.ctx = {
@@ -229,7 +230,7 @@ export class CalendarView extends ItemView {
       if (!this.dragged) return;
       const t = this.dragged, done = z.dataset.done === "1";
       this.dragged = null;
-      if (!H.isMuted()) (done ? this.sounds.gem : this.sounds.move).play({ gain: 0.25 });
+      if (!isMuted()) (done ? this.sounds.gem : this.sounds.move).play({ gain: 0.25 });
       await this.actions.place(t, z.dataset.drop || null, done);
     });
 

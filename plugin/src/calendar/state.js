@@ -1,6 +1,6 @@
+import { monthGrid, weekOf } from "../lib/dates.js";
 // The calendar tab's state: what Obsidian saves with the workspace layout and gives back after a restart.
 // `date` null = follow today (the week or month of today, moving on by itself); a date = the one picked.
-import { L } from "../lib/goalsLib.js";
 
 export const DEFAULT = Object.freeze({ date: null, view: "week", showDone: false, tab: "nodate", unfolded: [], backlogOpen: false, bdaysOpen: false });
 
@@ -23,8 +23,8 @@ export function readState(saved) {
 }
 
 export const baseDate  = (state, today) => state.date ?? today;
-export const shownDays = (state, today) => state.view === "month" ? L.monthGrid(baseDate(state, today)) : L.weekOf(baseDate(state, today));
+export const shownDays = (state, today) => state.view === "month" ? monthGrid(baseDate(state, today)) : weekOf(baseDate(state, today));
 // the state's date for a picked one: null (follow today) when it falls in today's week (week view) or month
 export const dateFor = (date, view, today) => !date || (view === "month"
   ? date.slice(0, 7) === today.slice(0, 7)
-  : L.weekOf(date)[0] === L.weekOf(today)[0]) ? null : date;
+  : weekOf(date)[0] === weekOf(today)[0]) ? null : date;
