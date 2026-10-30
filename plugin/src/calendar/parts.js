@@ -2,12 +2,13 @@
 // with data-action inside it. The view puts data-part on a part's top elements, finds the part an event came
 // from and calls its handler (task buttons — ✏️ 🗑 ⏭ ⭐ ✓ — are the view's own, the same everywhere).
 // No whitespace between tags: inline elements must lay out as the old createEl calls did.
-import { H } from "../lib/helpers.js";
-import { L } from "../lib/goalsLib.js";
 import { html } from "../ui/html.js";
 import { TaskButtons, TaskCard, TaskRow, TaskText } from "./components.js";
-import { T, dm, sortBacklog, sortPool, sortRegulars, backlogMeta, poolMeta, regularHistory } from "./data.js";
+import { T, sortBacklog, sortPool, sortRegulars, backlogMeta, poolMeta, regularHistory } from "./data.js";
 import { dateFor } from "./state.js";
+import { addDays, addMonths, dm } from "../lib/dates.js";
+import { ruleText } from "../lib/repeats.js";
+import { AudioEngine, isMuted } from "../lib/sounds.js";
 
 const M = d => window.moment(d);
 const PART = name => html` data-part="${name}"`;
@@ -23,7 +24,7 @@ export class Part {
 export class Header extends Part {
   on = {
     date: (e, el) => el.value && this.ctx.set({ date: dateFor(el.value, this.ctx.view, this.ctx.today) }, ["header", "missed", "grid"]),
-    mute: (e, el) => { app.saveLocalStorage("winx-mute", H.isMuted() ? null : "1"); el.textContent = H.isMuted() ? "🔇" : "🔊"; },
+    mute: (e, el) => { app.saveLocalStorage("winx-mute", isMuted() ? null : "1"); el.textContent = isMuted() ? "🔇" : "🔊"; },
     newTask: () => app.commands.executeCommandById("winx:new-task"),
     prev: () => this.step(-1),
     next: () => this.step(1),
@@ -39,16 +40,16 @@ export class Header extends Part {
     },
   };
   go(date) { this.ctx.set({ date: dateFor(date, this.ctx.view, this.ctx.today) }, ["header", "missed", "grid"]); }
-  step(n) { const { view, base } = this.ctx; this.go(view === "week" ? L.addDays(base, 7 * n) : L.addMonths(base, n)); }
+  step(n) { const { view, base } = this.ctx; this.go(view === "week" ? addDays(base, 7 * n) : addMonths(base, n)); }
   routineDays() { return this.ctx.days.filter(d => this.ctx.model.byDay[d].some(e => T(e.t).isRecurring)); }
   render() {
     const { state, days, today, base, view, model, shown } = this.ctx;
     const { areaIcons, areaMap } = this.ctx.config;
     // while dragging, a bar of 7 days sticks to the top: the shown week, or in the month view the next 7 days
-    const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => L.addDays(today, i));
+    const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
     const legend = Object.keys(areaIcons).filter(g => days.some(d => model.byDay[d].some(e => shown[e.kind] && T(e.t).area === g)));
     const other = view === "week" ? "month" : "week";
-    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div><div class="winx-cal-busy"${PART("header")}><div class="winx-cal-busy-pill" title="saving…"><span>✦</span></div></div><div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${H.isMuted() ? "🔇" : "🔊"}</button><button class="winx-cal-today" title="new task (Winx: New task)" data-action="newTask">＋ task</button><div class="winx-cal-legend">${legend.map(g => html`<span data-area="${g.slice(6)}">${areaMap[g] ?? g.slice(6)}</span>`)}</div></div><div class="winx-cal-nav"${PART("header")}><button aria-label="previous" data-action="prev">‹</button><span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span><button aria-label="next" data-action="next">›</button>${days.includes(today) ? "" : html`<button class="winx-cal-today" data-action="today">today</button>`}<button class="winx-cal-today" title="switch to the ${other} view" aria-label="switch to the ${other} view" data-action="switchView">${view}</button><button class="winx-cal-filter${state.showDone ? " on" : ""}" data-action="showDone">✓ done</button><button class="winx-cal-filter" title="unfold / fold every day's 🔁 box" data-action="repeats">🔁 repeats</button></div>`;
+    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div><div class="winx-cal-busy"${PART("header")}><div class="winx-cal-busy-pill" title="saving…"><span>✦</span></div></div><div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button><button class="winx-cal-today" title="new task (Winx: New task)" data-action="newTask">＋ task</button><div class="winx-cal-legend">${legend.map(g => html`<span data-area="${g.slice(6)}">${areaMap[g] ?? g.slice(6)}</span>`)}</div></div><div class="winx-cal-nav"${PART("header")}><button aria-label="previous" data-action="prev">‹</button><span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span><button aria-label="next" data-action="next">›</button>${days.includes(today) ? "" : html`<button class="winx-cal-today" data-action="today">today</button>`}<button class="winx-cal-today" title="switch to the ${other} view" aria-label="switch to the ${other} view" data-action="switchView">${view}</button><button class="winx-cal-filter${state.showDone ? " on" : ""}" data-action="showDone">✓ done</button><button class="winx-cal-filter" title="unfold / fold every day's 🔁 box" data-action="repeats">🔁 repeats</button></div>`;
   }
   // after the grid: the repeats button lit while every routine day is unfolded
   mount(root) {
@@ -59,7 +60,7 @@ export class Header extends Part {
 
 // ── "Missed?": open tasks whose day has passed, only while today is on screen ──
 export class Missed extends Part {
-  sounds = { done: new H.AudioEngine("00 System/Assets/winx music/snd_pickup_gem02.wav"), today: new H.AudioEngine("00 System/Assets/star.wav") };
+  sounds = { done: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem02.wav"), today: new AudioEngine("00 System/Assets/star.wav") };
   on = {
     missedDone: (e, el) => this.act(el, this.sounds.done, t => this.view.actions.doneOnItsDay(t)),
     missedToday: (e, el) => this.act(el, this.sounds.today, t => this.view.actions.toToday(t)),
@@ -69,7 +70,7 @@ export class Missed extends Part {
     if (!t) return;
     row.remove();
     if (!box.querySelector(".winx-yesterday-row")) box.remove();
-    if (!H.isMuted()) sound.play({ gain: 0.25 });
+    if (!isMuted()) sound.play({ gain: 0.25 });
     await write(t);
   }
   render() {
@@ -175,7 +176,7 @@ export class Panel extends Part {
       // birthdays (a fixed yearly rule) fold into one card; the rest by area, the most neglected first; paused last
       const { rest, bdays } = sortRegulars(regulars, AREAS, done, today);
       const next = t => T(t).date;
-      const meta = t => html`${L.ruleText(T(t).rule)}  ·  ${next(t) ? html`<span${next(t) < today ? html` class="winx-cal-late"` : ""}>next ${dm(next(t))}</span>` : html`<span>⏸ paused</span>`}  ·  ${regularHistory(t, done, skips)}`;
+      const meta = t => html`${ruleText(T(t).rule)}  ·  ${next(t) ? html`<span${next(t) < today ? html` class="winx-cal-late"` : ""}>next ${dm(next(t))}</span>` : html`<span>⏸ paused</span>`}  ·  ${regularHistory(t, done, skips)}`;
       const pause = t => next(t)
         ? html`<button title="pause: drop its dates" aria-label="pause" data-action="pause">⏸</button>`
         : html`<button title="resume: from today, on the first day its rule allows" aria-label="resume" data-action="pause">▶</button>`;
@@ -189,5 +190,4 @@ export class Panel extends Part {
     const tabs = [["nodate", `No date · ${backlog.length}`], ["regulars", `Regulars · ${regulars.length}`], ["pool", `Pool · ${pool.length}`]];
     return html`<div class="winx-cal-backlog winx-board-backlog" data-drop=""${PART("panel")}><div class="winx-cal-tabs">${tabs.map(([key, text]) => html`<button class="winx-cal-head${key === state.tab ? " on" : ""}" data-action="tab" data-tab="${key}">${text}</button>`)}</div><div class="winx-cal-backlog-grid">${list}</div>${after}</div>`;
   }
-  mount() {}
 }

@@ -1,17 +1,18 @@
 // Shop: the gold balance and the rewards of Shop.md (name:: … cost:: …); an affordable one is bought with a click
 // (logged to Purchases.md), the rest are greyed out.
 import { Notice } from "obsidian";
-import { H } from "../lib/helpers.js";
 import { html } from "../ui/html.js";
 import { Widget } from "./widget.js";
+import { AudioEngine } from "../lib/sounds.js";
+import { balance, logPurchase } from "../lib/rewards.js";
 
 export class Shop extends Widget {
-  sound = new H.AudioEngine("00 System/Assets/star.wav");
+  sound = new AudioEngine("00 System/Assets/star.wav");
   on = {
     buy: async (e, el) => {
       const { name } = el.dataset, cost = Number(el.dataset.cost);
       this.sound.play();
-      await H.PurchaseLog.append(name, cost);
+      await logPurchase(name, cost);
       new Notice(`✨ Bought ${name} for ${cost} gold`);
       await this.draw();
     },
@@ -22,7 +23,7 @@ export class Shop extends Widget {
       const name = list.text.match(/name::\s*(.+)/), cost = list.text.match(/cost::\s*(\d+)/);
       if (name && cost) items.push({ name: name[1].trim(), cost: Number(cost[1]) });
     }
-    return { items, balance: await H.Wallet.balance(this.dv, await H.loadConfig()) };
+    return { items, balance: balance(this.dv) };
   }
   view({ items, balance }) {
     return html`<div class="winx-shop-balance"><span class="winx-shop-balance-icon">✨</span><span>Gold</span><span class="winx-shop-balance-amount">${balance}</span></div>

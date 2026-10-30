@@ -6,7 +6,8 @@
 // Wrap a Dataview task with Task.of(t) (t is kept as .src, for its path and line) or a raw line with new Task(line).
 // A pool line (Pool.md: a task to pick when it's time, "- #⭐easy #area/base take out trash") is the same without
 // checkbox, rule or dates; its copies on the days are ordinary tasks with the same text.
-import { L } from "./goalsLib.js";
+import { addDays, diffDays } from "./dates.js";
+import { projectRepeats } from "./repeats.js";
 
 const DATE   = "\\d{4}-\\d{2}-\\d{2}";
 const FIELDS = "📅⏳✅❌🛫➕";   // a date field starts with one of these; a 🔁 rule runs up to the next one
@@ -109,17 +110,17 @@ export class Task {
   pause() { return drop(this.line, "📅⏳🛫"); }
   resume(today) {
     const rule = this.rule ?? "";
-    const day  = /^every (\d+ )?weeks? on /i.test(rule) ? L.projectRepeats(rule, L.addDays(today, -1), L.addDays(today, 30))[0] ?? today : today;
+    const day  = /^every (\d+ )?weeks? on /i.test(rule) ? projectRepeats(rule, addDays(today, -1), addDays(today, 30))[0] ?? today : today;
     return `${this.pause().trimEnd()} 📅 ${day}`;
   }
 
   // ── the Tasks plugin's output of ticking a task today (the done line, plus the next copy of a 🔁 task) ──
   // as if ticked on `date`: ✅ moves there, and a "when done" next copy moves back with it
   static backdateDone(toggled, date, today) {
-    const shift = L.diffDays(date, today);
+    const shift = diffDays(date, today);
     return toggled.split("\n").map(l =>
       DONE.test(l) ? new Task(l).place(date, true)
-      : /when done/.test(l) ? l.replace(/([📅⏳🛫])\s*(\d{4}-\d{2}-\d{2})/gu, (_, e, d) => `${e} ${L.addDays(d, shift)}`)
+      : /when done/.test(l) ? l.replace(/([📅⏳🛫])\s*(\d{4}-\d{2}-\d{2})/gu, (_, e, d) => `${e} ${addDays(d, shift)}`)
       : l).join("\n");
   }
   // as a skip of this time: the done line turns cancelled ("- [-] … ❌ date"), so the rule moves on
@@ -128,3 +129,11 @@ export class Task {
     return toggled.split("\n").map(l => /^\s*- \[x\]/.test(l) ? l.replace(/^(\s*- \[)x/, "$1-").replace(/✅(\s*\d{4}-\d{2}-\d{2})/u, "❌$1") : l).join("\n");
   }
 }
+
+// How many things are on today's plate, same rules as the old Kanban2 Today column:
+// picked for today (⏳ today), routines due by today, deadlines due by today.
+// tasks: [{done, recurring, due?, scheduled?}] with "YYYY-MM-DD" dates.
+export const todayCount = (tasks, date) => tasks.filter(t => !t.done && (
+  t.recurring ? (t.due ?? t.scheduled) !== undefined && (t.due ?? t.scheduled) <= date
+              : t.scheduled === date || (t.due !== undefined && t.due <= date)
+)).length;

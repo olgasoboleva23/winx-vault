@@ -1,7 +1,8 @@
 // The calendar's model, no DOM: tasks laid out on the shown days, the three bottom tabs (No date, Regulars,
 // Pool) sorted, and their meta lines. Tasks are Dataview tasks ({ status, text, path, line }), each with its Task.
-import { L } from "../lib/goalsLib.js";
 import { Task } from "../lib/task.js";
+import { diffDays, dm } from "../lib/dates.js";
+import { projectRepeats } from "../lib/repeats.js";
 
 export const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
 
@@ -22,7 +23,7 @@ export function collect({ tasks, poolLines, days, today }) {
     const d = task.date;
     if (!d) { if (!task.isRecurring) backlog.push(t); continue; }
     if (d >= today) byDay[d]?.push({ t, kind: "open" });
-    if (task.rule) for (const g of L.projectRepeats(task.rule, d, last)) if (g > today) byDay[g]?.push({ t, kind: "ghost" });
+    if (task.rule) for (const g of projectRepeats(task.rule, d, last)) if (g > today) byDay[g]?.push({ t, kind: "ghost" });
   }
   for (const d of days) byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
   const pool = poolLines.map(l => { const p = { text: l.text, path: l.path, line: l.line, pool: true }; p.winxTask = new Task(`- ${l.text}`, p); return p; });
@@ -57,23 +58,22 @@ export const sortPool = (list, areaOrder, done) => {
 export const sortRegulars = (list, areaOrder, done, today) => {
   const rank = rankBy(areaOrder);
   const next = t => T(t).date;
-  const late = t => next(t) && next(t) < today ? L.diffDays(today, next(t)) : -1;
+  const late = t => next(t) && next(t) < today ? diffDays(today, next(t)) : -1;
   const bdays = list.filter(t => T(t).isBirthday).sort((a, b) => (next(a) ?? "9").localeCompare(next(b) ?? "9"));
   const rest = list.filter(t => !T(t).isBirthday)
     .sort((a, b) => rank(a) - rank(b) || !next(a) - !next(b) || late(b) - late(a) || lastDone(a, done).localeCompare(lastDone(b, done)));
   return { rest, bdays };
 };
 
-export const dm = d => `${d.slice(8, 10)}.${d.slice(5, 7)}`;   // "08.06"
 const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 
 export const backlogMeta = (t, done, today) => {
   const created = T(t).created, h = T(t).history(done);
-  return [created && `waiting ${L.diffDays(today, created)} d`, h && doneText(h)].filter(Boolean).join("  ·  ");
+  return [created && `waiting ${diffDays(today, created)} d`, h && doneText(h)].filter(Boolean).join("  ·  ");
 };
 export const poolMeta = (t, done, today) => {
   const h = T(t).history(done);
-  return h ? `${doneText(h)} · ${L.diffDays(today, h.last)} d ago` : "never done";
+  return h ? `${doneText(h)} · ${diffDays(today, h.last)} d ago` : "never done";
 };
 export const regularHistory = (t, done, skips) => {
   const h = T(t).history(done), s = T(t).history(skips);

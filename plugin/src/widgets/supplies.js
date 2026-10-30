@@ -1,24 +1,22 @@
 // Supplies: what is bought again and again (from the Celestial Market's done items), how long since the last
 // time against the usual gap, and "running low" to put one back on the shopping list.
 import { Notice } from "obsidian";
-import { H } from "../lib/helpers.js";
-import { L } from "../lib/goalsLib.js";
 import { html } from "../ui/html.js";
 import { Button } from "../ui/component.js";
 import { Widget } from "./widget.js";
+import { todayYmd } from "../lib/dates.js";
+import { addToMarket, marketCats, marketState, supplyStats } from "../lib/market.js";
 
 export class Supplies extends Widget {
   on = {
-    low: async (e, el) => { await H.addToMarket(el.dataset.name, el.dataset.tag); new Notice(`✦ ${el.dataset.name} → Celestial Market`); },
+    low: async (e, el) => { await addToMarket(el.dataset.name, el.dataset.tag); new Notice(`✦ ${el.dataset.name} → Celestial Market`); },
   };
   async data() {
-    const { marketCategories } = await H.loadConfig();
-    const { history, open } = H.marketState(this.dv);
-    const cats = [...marketCategories, { label: "✦ Other", tag: "#other" }];
-    return { stats: L.supplyStats(history, H.today()), open, cats };
+    const { history, open } = marketState(this.dv);
+    return { stats: supplyStats(history, todayYmd()), open };
   }
-  view({ stats, open, cats }) {
-    const groupOf = s => cats.some(c => c.tag === s.tag) ? s.tag : "#other";
+  view({ stats, open }) {
+    const groupOf = s => marketCats.some(c => c.tag === s.tag) ? s.tag : "#other";
     const row = s => {
       const listed = open.has(s.name);
       const info = listed ? "on the shopping list ✦" : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}` : `bought ${s.buys} times`;
@@ -27,7 +25,7 @@ export class Supplies extends Widget {
     };
     return html`<div class="winx-supplies">
       ${stats.length ? "" : html`<div>Nothing bought twice yet</div>`}
-      ${cats.map(cat => { const items = stats.filter(s => groupOf(s) === cat.tag); return items.length ? html`<div class="market-group-header">${cat.label}</div>${items.map(row)}` : ""; })}
+      ${marketCats.map(cat => { const items = stats.filter(s => groupOf(s) === cat.tag); return items.length ? html`<div class="market-group-header">${cat.label}</div>${items.map(row)}` : ""; })}
     </div>`;
   }
 }

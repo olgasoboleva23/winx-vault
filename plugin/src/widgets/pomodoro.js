@@ -1,14 +1,13 @@
 // Pomodoro: a 25/5 focus timer in a ring, session stars, and its settings; state in 00 System/Data/pomodoro.json.
 // The timer runs on through redraws (its live state lives in this module) and stops when the block goes.
-import { H } from "../lib/helpers.js";
 import { html, raw } from "../ui/html.js";
 import { Widget } from "./widget.js";
+import { todayYmd } from "../lib/dates.js";
+import { AudioEngine } from "../lib/sounds.js";
 
 const PATH = "00 System/Data/pomodoro.json";
 const DEFAULTS = { focusMin: 25, breakMin: 5 };
 
-// ===== HELPERS =====
-const { AudioEngine } = H;
 
 // ===== ICONS =====
 const icons = {
@@ -167,7 +166,7 @@ class PomodoroTimer {
       sessionType: this.sessionType,
       elapsed:     this.#elapsed,
       sessions:    this.sessions,
-      date:        H.today(),
+      date:        todayYmd(),
       savedAt:     Date.now(),
     };
   }
@@ -288,7 +287,7 @@ class PomodoroUI {
 
   async #save({ updateStats = false, focusMin = 0 } = {}) {
     const data  = await Storage.load();
-    const today = H.today();
+    const today = todayYmd();
 
     data.settings = this.timer.settings;
     data.current  = this.timer.serialize();
@@ -361,7 +360,7 @@ export class Pomodoro extends Widget {
   static followsChanges = false;   // the timer redraws itself every second; a redraw would restart its markup
   async data() {
     const saved = await Storage.load();
-    return { saved, current: saved?.current?.date === H.today() ? saved.current : null };
+    return { saved, current: saved?.current?.date === todayYmd() ? saved.current : null };
   }
   view() {
     return html`<div class="winx-pomodoro">
@@ -401,7 +400,7 @@ export class Pomodoro extends Widget {
     </div></div>`;
   }
   after(root, { saved, current }) {
-    const ui = new PomodoroUI(root.querySelector(".winx-pomodoro"), new PomodoroTimer(saved?.settings, current), new H.AudioEngine("00 System/Assets/sparkle.wav"));
+    const ui = new PomodoroUI(root.querySelector(".winx-pomodoro"), new PomodoroTimer(saved?.settings, current), new AudioEngine("00 System/Assets/sparkle.wav"));
     ui.mount();
     this.keep(ui);   // its destroy() stops the interval and the timeout
   }

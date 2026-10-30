@@ -1,10 +1,12 @@
 // Weight: line chart of the last 30 days, the last value, change vs a week ago, a field to log today's weight,
 // a button to the list. The same widget on the dashboard and the phone's Weight page.
-import { H } from "../lib/helpers.js";
-import { L } from "../lib/goalsLib.js";
 import { html } from "../ui/html.js";
 import { Button } from "../ui/component.js";
 import { Widget } from "./widget.js";
+import { addDays, dm, todayYmd } from "../lib/dates.js";
+import { edit } from "../lib/files.js";
+import { parseWeights, upsertWeight } from "../lib/weight.js";
+import { chartColor } from "../ui/chart.js";
 
 const PATH = "02 Areas/Appearance/Weight.md";
 const DAYS = 30;
@@ -15,8 +17,7 @@ export class Weight extends Widget {
       const box = form.querySelector("input[name=kg]");
       const kg = Number(String(box.value).replace(",", "."));
       if (!kg || kg <= 0) return;
-      const today = H.today();
-      await this.app.vault.process(this.app.vault.getAbstractFileByPath(PATH), c => L.upsertWeight(c, today, kg));
+      await edit(PATH, c => upsertWeight(c, todayYmd(), kg));
       box.value = "";
     },
     list: () => this.app.workspace.openLinkText(PATH, "", false),
@@ -24,10 +25,10 @@ export class Weight extends Widget {
   async data() {
     const file = this.app.vault.getAbstractFileByPath(PATH);
     if (!file) return { missing: true };
-    const ws = L.parseWeights(await this.app.vault.cachedRead(file)), today = H.today();
+    const ws = parseWeights(await this.app.vault.cachedRead(file)), today = todayYmd();
     const last = ws.at(-1);
-    const ref = last && [...ws].reverse().find(w => w.date <= L.addDays(last.date, -7));
-    const days = Array.from({ length: DAYS }, (_, i) => L.addDays(today, i - DAYS + 1));
+    const ref = last && [...ws].reverse().find(w => w.date <= addDays(last.date, -7));
+    const days = Array.from({ length: DAYS }, (_, i) => addDays(today, i - DAYS + 1));
     const byDay = new Map(ws.map(w => [w.date, w.kg]));
     return { last, delta: ref ? +(last.kg - ref.kg).toFixed(1) : null, days, vals: days.map(d => byDay.get(d) ?? null) };
   }
@@ -48,7 +49,7 @@ export class Weight extends Widget {
     const box = root.querySelector(".winx-weight"), list = box.querySelector(".winx-weight-list");
     this.keep(await window.renderChart({
       type: "line",
-      data: { labels: days.map(d => `${d.slice(8, 10)}.${d.slice(5, 7)}`), datasets: [{ label: "⚖️ Weight", data: vals, spanGaps: true, borderColor: H.chartColor("--winx-pink-deep"), backgroundColor: H.chartColor("--winx-pink-deep", 0.3), tension: 0.3 }] },
+      data: { labels: days.map(dm), datasets: [{ label: "⚖️ Weight", data: vals, spanGaps: true, borderColor: chartColor("--winx-pink-deep"), backgroundColor: chartColor("--winx-pink-deep", 0.3), tension: 0.3 }] },
       options: { plugins: { legend: { display: false } }, scales: { y: { suggestedMin: Math.min(...seen) - 0.5, suggestedMax: Math.max(...seen) + 0.5 } } },
     }, box));
     box.append(list);   // the chart went last: the button back under it
