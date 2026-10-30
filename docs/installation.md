@@ -66,7 +66,7 @@ The plugin works on the phone (no desktop-only code). It only has to get there: 
 | Plugin | Version | Purpose |
 |---|---|---|
 | **Winx** | this repo, `plugin/` | Widgets, task window, commands, all styles |
-| **Dataview** | 0.5.68 | Data for the widgets (their `dataviewjs` blocks) |
+| **Dataview** | 0.5.68 | Data for the widgets and the calendar (its index of tasks and pages) |
 | **Tasks** | 7.23.1 | Task format, the edit dialog, ticking 🔁 tasks |
 | **Templater** | 2.19.3 | Daily note template |
 | **QuickAdd** | 2.12.0 | Work task and Recipe notes |

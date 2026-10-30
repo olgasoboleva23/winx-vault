@@ -14,11 +14,12 @@
 | **Quests** | Tasks due today, grouped by life area |
 | **Celestial Market** | Pending shopping items grouped by category |
 
-A note shows a widget with a Dataview block:
+A note shows a widget with a `winx` block: the widget's name, then `key: value` lines. `card: Title` draws it inside a dashboard card (`meta: scroll` / `scroll tall` for the scrolling ones):
 
 ````
-```dataviewjs
-await winx.render("weight", dv);
+```winx
+weight
+card: Weight
 ```
 ````
 

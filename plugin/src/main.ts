@@ -4,19 +4,16 @@ import { L } from "./lib/goalsLib.js";
 import { Task } from "./lib/task.js";
 import { H } from "./lib/helpers.js";
 import { registerCommands } from "./commands.ts";
-import { render } from "./widgets/index.js";
 import { blocks, drawBlock } from "./widgets/blocks.js";
 import { Widget } from "./widgets/widget.js";
 import { html } from "./ui/html.js";
 
-// The Winx plugin: widgets for the notes' dataviewjs blocks (window.winx.render), the task window and the
-// commands, and the styles (styles.css, built from styles/*.scss).
+// The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the commands, and the
+// styles (styles.css, built from styles/*.scss).
 
 export default class WinxPlugin extends Plugin {
   async onload() {
     (window as any).winx = {
-      // a note's block: await winx.render("weight", dv, input)
-      render,
       // the shared code, for 00 System/Scripts/notify.js (Templater's startup script)
       L, Task, H,
       // the widget classes, to try one from the console: winx.blocks.x = class extends winx.Widget { … }
