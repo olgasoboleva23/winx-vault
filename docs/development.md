@@ -8,8 +8,9 @@
 ├── 📁 plugin — the Winx plugin
 │   ├── 📁 src
 │   │   ├── main.ts               — loads everything; the ```winx block, the calendar tab, the commands
-│   │   ├── 📁 calendar           — the calendar tab: view.ts (state, redraws), data.js (the model, tested),
-│   │   │                           state.js (tested), header, grid, panel, missed, card, drag, swipe, actions
+│   │   ├── 📁 calendar           — the calendar tab: view.ts (state, redraws, one set of listeners), parts.js (Header,
+│   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js and
+│   │   │                           state.js (the model and the tab's state, tested), actions.js (what it writes)
 │   │   ├── commands.ts           — the Cmd+P commands
 │   │   ├── 📁 ui                 — form.ts (one window instead of a chain of prompts), html.js (markup in backticks),
 │   │   │                           component.js (Component, Button, Card)
@@ -69,4 +70,8 @@ export class Weight extends Widget {
 - A click on an element with `data-action="name"` (a change for an input, a submit for a form) calls `on.name`.
 - The base draws the widget, and again a second after Dataview's index or its own note changes; a hidden widget when it shows; one someone is typing in after they leave the field (typed text stays). `static followsChanges = false` draws it once (the pomodoro).
 - Add a new one to `blocks` in `plugin/src/widgets/blocks.js`; a note shows it with a `winx` block (see [Dashboard](dashboard.md)).
+
+## The calendar
+
+The calendar tab is built the same way: its parts (`Header`, `Missed`, `Grid`, `Panel` in `plugin/src/calendar/parts.js`) are classes with `render()` (markup in `html`) and `on` (handlers by `data-action`); a task's row and card are components (`components.js`). Elements carry the task's key (`data-task`), so one set of listeners on the tab handles every click, tick, drag (`data-drag` → `data-drop`) and swipe (`data-swipeable`) and finds the task by it.
 

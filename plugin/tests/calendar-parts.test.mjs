@@ -14,7 +14,7 @@ test("TaskText: stars (a pale ☆ without a difficulty), the text, the stickers 
 
 test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons for an open one", () => {
   const open = new TaskRow({ task: info({ canSkip: true }), kind: "open", compact: false, tick: true }).html;
-  assert.match(open, /^<div class="winx-cal-task open" data-area="body" data-task="7" draggable="true" data-drag="7" data-swipe="7">/);
+  assert.match(open, /^<div class="winx-cal-task open" data-area="body" data-task="7" draggable="true" data-drag="7" data-swipeable="7">/);
   assert.match(open, /<input type="checkbox" class="task-list-item-checkbox" aria-label="done" data-action="tick">/);
   assert.match(open, /<div class="winx-board-btns"><button class="winx-btn round winx-cal-diffbtn" data-action="difficulty" title="difficulty" aria-label="difficulty">⭐<\/button><button class="winx-btn round" data-action="skip" title="skip this time" aria-label="skip this time">⏭<\/button>/);
   const ghost = new TaskRow({ task: info(), kind: "ghost", compact: false, tick: true }).html;
@@ -29,7 +29,7 @@ test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons 
 
 test("TaskCard: a panel card, its meta line and buttons", () => {
   const card = new TaskCard({ task: info(), meta: "waiting 3 d", extra: "" }).html;
-  assert.match(card, /^<div class="winx-board-card" draggable="true" data-task="7" data-drag="7" data-swipe="7"><div class="winx-board-text"><span class="tag"/);
+  assert.match(card, /^<div class="winx-board-card" draggable="true" data-task="7" data-drag="7" data-swipeable="7"><div class="winx-board-text"><span class="tag"/);
   assert.match(card, /<div class="winx-board-meta">waiting 3 d<\/div><div class="winx-board-btns">/);
   const pool = new TaskCard({ task: info({ pool: true }), meta: "never done" }).html;
   assert.match(pool, /data-action="edit"/);
