@@ -26,23 +26,7 @@
     em { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }
     border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
   }
-  button {
-    width: $btn-s;
-    height: $btn-s;
-    padding: 0;
-    border-radius: $round;
-    border: 1px solid var(--winx-border);
-    background: rgb(255 255 255 / 80%);
-    color: var(--winx-purple-deep);
-    box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
-    font-size: $text-l;
-    cursor: pointer;
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
-
-    &:hover { transform: scale(1.08); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
-  }
 }
-body.is-mobile .winx-yesterday button { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
 .callout[data-callout="card"][data-callout-metadata~="hero"] > .callout-title { display: none; }
 
 /* calendar bottom panel: No date | Regulars tabs */

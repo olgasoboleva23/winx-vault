@@ -35,22 +35,6 @@ body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
 }
 body:not(.is-mobile) :is(.winx-board-card, .winx-cal-task, .winx-yesterday-row):hover .winx-board-btns { opacity: 1; pointer-events: auto; }
 body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top: $space-s; }
-:is(.winx-board-backlog, .winx-cal) .winx-board-btns button {
-  width: $btn-s;
-  height: $btn-s;
-  padding: 0;
-  border-radius: $round;
-  border: 1px solid var(--winx-border);
-  background: rgb(255 255 255 / 85%);
-  box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
-  font-size: $text-l;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
-}
-body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns button.winx-board-del.armed {
   width: auto;
   padding: 0 $space-m;

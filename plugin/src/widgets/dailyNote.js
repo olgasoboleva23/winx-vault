@@ -21,5 +21,5 @@ export class DailyNote extends Widget {
     },
   };
   async data() { return { date: ymd(this.dv.current()?.date) }; }
-  view({ date }) { return date ? new Button({ text: "✦ Open", action: "open", kind: "pill", cls: "winx-open-note-btn" }) : { html: "" }; }
+  view({ date }) { return date ? new Button({ text: "✦ Open", action: "open", kind: "pill" }) : { html: "" }; }
 }

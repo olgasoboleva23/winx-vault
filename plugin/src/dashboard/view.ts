@@ -2,6 +2,8 @@ import { Component, ItemView, Keymap, MarkdownRenderer, WorkspaceLeaf, sanitizeH
 import layout from "./layout.md";
 import { addDays, todayYmd } from "../lib/dates.js";
 import { busyPill, dimOnWrite } from "../ui/busy.js";
+import { Button } from "../ui/component.js";
+import { html } from "../ui/html.js";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn by Obsidian's
 // markdown renderer, as a note in reading view would be, for the tab's date. The date is the tab's own (no date:
@@ -72,9 +74,8 @@ export class DashboardView extends ItemView {
     slot.className = "winx-dash-date winx-cal-nav";
     slot.empty();
     slot.createDiv({ cls: "mb-input-type-date" }).createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
-    slot.createEl("button", { text: "‹", attr: { "aria-label": "previous", "data-action": "prev" } });
-    slot.createEl("button", { text: "›", attr: { "aria-label": "next", "data-action": "next" } });
-    if (this.shownDate !== todayYmd()) slot.createEl("button", { text: "today", cls: "winx-cal-today", attr: { "data-action": "today" } });
+    const today = this.shownDate !== todayYmd() ? new Button({ text: "today", kind: "chip", action: "today" }) : "";
+    slot.append(sanitizeHTMLToDom(html`${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${today}`.html));
   }
 
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)

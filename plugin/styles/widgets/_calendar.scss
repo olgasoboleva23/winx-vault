@@ -5,40 +5,7 @@
   @include row;
   gap: $space-l;
   margin-bottom: $space-l;
-
-  button:not(.winx-cal-mute) {
-    width: $btn-l;
-    height: $btn-l;
-    padding: 0;
-    border-radius: $round;
-    border: 1px solid var(--winx-border);
-    background: rgb(255 255 255 / 75%);
-    color: var(--winx-purple-deep);
-    box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
-    font-size: $text-3xl;
-    line-height: 1;
-    cursor: pointer;
-  }
-  button.winx-cal-today, button.winx-cal-filter { width: auto; padding: 0 $space-xl; border-radius: $pill; font-size: $text-m; }
-  button.winx-cal-filter { opacity: 0.55; box-shadow: none; }
-  button:not(.winx-cal-filter) + button.winx-cal-filter { margin-left: auto; }
-  button.winx-cal-filter.on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
 }
-/* ‹ ›: the font draws them below the middle; a chevron (Obsidian's icon) sits in the centre of the circle */
-.winx-cal-nav button:is([data-action="prev"], [data-action="next"]) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0;
-  &::before {
-    content: "";
-    width: 16px;
-    height: 16px;
-    background: currentColor;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 18-6-6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
-  }
-}
-.winx-cal-nav button[data-action="next"]::before { transform: scaleX(-1); }
 .winx-cal-top { @include row; gap: $space-s; margin-bottom: $space-l; }
 .winx-cal-top button.winx-cal-mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
 .winx-cal-title { font-family: "Cinzel", serif; font-size: $text-3xl; color: var(--winx-lavender); min-width: 220px; text-align: center; }

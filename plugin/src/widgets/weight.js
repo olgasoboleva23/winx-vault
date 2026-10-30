@@ -39,7 +39,7 @@ export class Weight extends Widget {
         ? html`<span class="winx-weight-now">${last.kg} kg</span>${delta !== null ? html`<span class="winx-weight-delta">${delta > 0 ? "+" : ""}${delta} vs week ago</span>` : ""}`
         : html`<span class="winx-weight-delta">no entries yet</span>`}</div>
       <form class="winx-weight-add" data-action="save"><input name="kg" type="number" step="0.1" inputmode="decimal" placeholder="today, kg"><button type="submit">Save</button></form>
-      ${new Button({ text: "✦ list", action: "list", kind: "pill", cls: "winx-open-note-btn winx-weight-list" })}
+      ${new Button({ text: "✦ list", action: "list", kind: "pill", cls: "winx-weight-list" })}
     </div>`;
   }
   // the chart between the field and the list button: one point per logged day, gaps bridged by the line
