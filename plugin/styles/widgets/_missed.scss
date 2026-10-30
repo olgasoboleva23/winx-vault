@@ -59,8 +59,10 @@ body.is-mobile .winx-yesterday button { width: 34px; height: 34px; font-size: 16
 .winx-cal-fold { cursor: pointer; }
 .winx-cal-groupcard.dashed { background: none; border: 1.5px dashed fade(var(--winx-purple-deep), 35%); }
 /* Missed inside the calendar: rounded colored rows like the day entries */
-.winx-cal .winx-yesterday .winx-yesterday-row { margin: 2px 4px 2px 0; padding: 3px 6px; border-bottom: none; border-radius: 10px; }
-.winx-cal .winx-yesterday .winx-yesterday-row[data-area] { border-radius: 10px; }
+.winx-cal {
+  .winx-yesterday .winx-yesterday-row { margin: 2px 4px 2px 0; padding: 3px 6px; border-bottom: none; border-radius: 10px; }
+  .winx-yesterday .winx-yesterday-row[data-area] { border-radius: 10px; }
+}
 .winx-cal-zone.plan { font-family: "Cinzel", serif; font-size: 16px; text-align: center; }
 .winx-cal-month .winx-cal-zone { font-size: 12px; }
 /* Missed rows: ✏️ 🗑 sit in the row, before the date */

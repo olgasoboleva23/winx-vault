@@ -246,8 +246,10 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
 @keyframes winx-spin { to { transform: rotate(360deg); } }
 /* phone swipes: right = done (green), left = skip / no date (lilac); the row follows the finger */
 body.is-mobile :is(.winx-cal-task, .winx-yesterday-row, .winx-board-card) { touch-action: pan-y; }
-.winx-cal [data-swipe] { transition: none; }
-.winx-cal [data-swipe="done"] { box-shadow: -40px 0 0 -6px rgb(120 200 150 / 70%); }
+.winx-cal {
+  [data-swipe] { transition: none; }
+  [data-swipe="done"] { box-shadow: -40px 0 0 -6px rgb(120 200 150 / 70%); }
+}
 .winx-cal :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px alpha(--winx-purple-deep, 40%); }
 
 /* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
