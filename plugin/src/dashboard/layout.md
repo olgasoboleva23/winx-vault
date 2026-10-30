@@ -1,15 +1,7 @@
----
-date: 2026-07-28
-cssclasses:
-  - dashboard
-pomodoro:
-  sessions: 1
-  minutes: 25
----
 
 >[!grid]
 >>[!col]
-> >`INPUT[date:date]`
+> ><div class="winx-dash-date"></div>
 > >
 > >```winx
 > >dailyNote
@@ -59,16 +51,20 @@ pomodoro:
 > > ```
 > >
 > > > [!card|scroll] Quests
-> > > ```tasks
-due on {{query.file.property('date')}}
-path includes Tasks
-group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
-short mode
-sort by tags
-> > > ```
+> > > <div class="winx-dash-quests"></div>
 > >
 > > ```winx
 > > celestialMarket
 > > card: Celestial Market
 > > meta: scroll
 > > ```
+
+%% the Quests card's Tasks query, for the tab's day (the dashboard draws it into the card) %%
+
+```tasks
+due on {{date}}
+path includes Tasks
+group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
+short mode
+sort by tags
+```

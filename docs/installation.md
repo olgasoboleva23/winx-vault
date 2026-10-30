@@ -13,9 +13,9 @@ You need [Node.js](https://nodejs.org) 24 and Obsidian 1.9 or newer.
    mkdir -p ../.obsidian/plugins/winx && cp dist/* ../.obsidian/plugins/winx/
    ```
 3. **Open the `winx-vault` folder as a vault** in Obsidian, trust its plugins (Settings → Community plugins → Turn on). The other plugins (below) are already in `.obsidian/plugins/`.
-4. Open `Dashboard.md`.
+4. Click ✨ on the left: the dashboard and the calendar open as two pinned tabs.
 
-Without step 2 every card shows "winx is not defined": the notes ask the plugin to draw them.
+Without step 2 there is no ✨, and the notes' cards stay empty: the plugin draws them.
 
 ## Into your own vault
 
@@ -25,7 +25,7 @@ Copy the plugin and what it reads:
 |---|---|
 | `plugin/dist/*` (after `npm run build`) | `.obsidian/plugins/winx/` — then turn **Winx** on in Community plugins |
 | the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
-| `Dashboard.md`, `Week.md`, `Mobile.md`, `Mobile/` | anywhere (they hold the widget blocks) |
+| `Week.md`, `Mobile.md`, `Mobile/` | anywhere (they hold the widget blocks) |
 | `02 Areas/Personal/Tasks/` (`Master.md`, `Pool.md`, `Kanban.md`), `Goals.md`, `00 System/Data/`, `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
 
 The paths the widgets read are in the widget files (`plugin/src/widgets/*.js`, `plugin/src/calendar/view.ts`, constants at the top) and `plugin/src/lib/config.js`.

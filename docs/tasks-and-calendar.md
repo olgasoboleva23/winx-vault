@@ -28,7 +28,7 @@ QuickAdd keeps two Templater choices: **Work task** (`task.md` → `01 Projects`
 
 ## 📅 Calendar
 
-A tab of its own: **Winx: Open calendar** (Cmd+P) or the 📅 icon on the left. The tasks of `02 Areas/Personal/Tasks` on a week or a month. Pin the tab, drag it to a sidebar or a window; it keeps its week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
+A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (with the dashboard). The tasks of `02 Areas/Personal/Tasks` on a week or a month. Pin the tab, drag it to a sidebar or a window; it keeps its week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
 
 ![Calendar](../calendar.png)
 
