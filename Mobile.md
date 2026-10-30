@@ -4,6 +4,6 @@ cssclasses:
   - mobile
 ---
 
-```dataviewjs
-await winx.render("mobileHome", dv);
+```winx
+mobileHome
 ```
