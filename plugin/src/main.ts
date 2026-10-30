@@ -5,6 +5,9 @@ import { Task } from "./lib/task.js";
 import { H } from "./lib/helpers.js";
 import { registerCommands } from "./commands.ts";
 import { render } from "./widgets/index.js";
+import { blocks, drawBlock } from "./widgets/blocks.js";
+import { Widget } from "./widgets/widget.js";
+import { html } from "./ui/html.js";
 
 // The Winx plugin: widgets for the notes' dataviewjs blocks (window.winx.render), the task window and the
 // commands, and the styles (styles.css, built from styles/*.scss).
@@ -16,10 +19,14 @@ export default class WinxPlugin extends Plugin {
       render,
       // the shared code, for 00 System/Scripts/notify.js (Templater's startup script)
       L, Task, H,
+      // the widget classes, to try one from the console: winx.blocks.x = class extends winx.Widget { … }
+      blocks, Widget, html,
     };
     H.watchCaches((emitter: any, name: string, cb: any) => this.registerEvent(emitter.on(name, cb)));
     H.installSounds(this);
     registerCommands(this);
+    // a ```winx block in a note: a widget class by name (widgets/blocks.js)
+    this.registerMarkdownCodeBlockProcessor("winx", drawBlock);
     // the calendar: its own tab; the command and the ribbon icon open it, or go to the one already open
     this.registerView(VIEW_TYPE, leaf => new CalendarView(leaf));
     this.addCommand({ id: "open-calendar", name: "Open calendar", callback: () => this.openCalendar() });
