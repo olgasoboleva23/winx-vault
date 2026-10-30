@@ -8,7 +8,9 @@
 // It draws on load and again a moment after Dataview's index or its own note changes; a hidden block when it
 // shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
 // listeners when the block goes.
+// A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
 import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
+import { Card } from "../ui/component.js";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
 
@@ -82,7 +84,9 @@ export class Widget extends MarkdownRenderChild {
     this.drop();
     // what someone typed and hasn't saved stays: fields by their name get their text back
     const typed = [...this.containerEl.querySelectorAll("input[name], textarea[name]")].filter(f => f.value).map(f => [f.name, f.value]);
-    this.containerEl.replaceChildren(sanitizeHTMLToDom(this.view(data).html));
+    const body = this.view(data), { card, meta } = this.args;
+    const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body }) : body;
+    this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
     for (const [name, value] of typed) { const f = this.containerEl.querySelector(`[name="${CSS.escape(name)}"]`); if (f && !f.value) f.value = value; }
     await this.after(this.containerEl, data);
   }

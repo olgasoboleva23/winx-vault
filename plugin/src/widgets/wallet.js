@@ -1,15 +1,13 @@
+// Gold left to spend (earned from tasks minus Purchases.md) and a link to the shop. Not on a page now.
 import { H } from "../lib/helpers.js";
+import { html } from "../ui/html.js";
+import { Widget } from "./widget.js";
 
-export default async function (dv, input) {
-  const config = await H.loadConfig();
-
-  const balance = await H.Wallet.balance(dv, config);
-
-  const wallet = dv.container.createEl("div", { cls: "winx-wallet" });
-  wallet.createEl("span", { text: `✨ Gold: ${balance}`, cls: "winx-wallet-amount" });
-  wallet.createEl("a", {
-    text: "🛍 Shop",
-    href: "00 System/Data/Shop.md",
-    cls: "internal-link winx-wallet-link",
-  });
+export class Wallet extends Widget {
+  async data() { return { balance: await H.Wallet.balance(this.dv, await H.loadConfig()) }; }
+  view({ balance }) {
+    return html`<div class="winx-wallet">
+      <span class="winx-wallet-amount">✨ Gold: ${balance}</span><a class="internal-link winx-wallet-link" href="00 System/Data/Shop.md">🛍 Shop</a>
+    </div>`;
+  }
 }
