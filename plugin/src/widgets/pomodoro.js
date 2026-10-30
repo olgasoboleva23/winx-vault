@@ -110,11 +110,14 @@ export class Pomodoro extends Widget {
     this.arm(); this.tick();
     const every = setInterval(() => this.tick(), 1000);
     this.keep({ destroy: () => { clearInterval(every); clearTimeout(this.ending); } });
-    // back to the window: at once (timers in a window in the background run late)
-    this.registerDomEvent(document, "visibilitychange", () => document.hidden || this.tick());
-    this.registerDomEvent(window, "focus", () => this.tick());
   }
 
+  onload() {
+    // back to the window: at once (timers in a window in the background run late)
+    this.registerDomEvent(document, "visibilitychange", () => document.hidden || this.timer && this.tick());
+    this.registerDomEvent(window, "focus", () => this.timer && this.tick());
+    return super.onload();
+  }
   q(sel) { return this.box.querySelector(sel); }
   async act(change) { change(this.timer); this.arm(); this.tick(); await this.save(); }
   // the end of a running session: the next one starts by itself
