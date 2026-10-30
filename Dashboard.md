@@ -53,10 +53,10 @@ pomodoro:
 > > > 💰 [[Finance|Open finance]]
 >
 > > [!col]
-> > > [!card] XP Today
-> > > ```dataviewjs
-> > > await winx.render("xpToday", dv);
-> > > ```
+> > ```winx
+> > xpToday
+> > card: XP Today
+> > ```
 > >
 > > > [!card|scroll] Quests
 > > > ```tasks
@@ -67,7 +67,8 @@ short mode
 sort by tags
 > > > ```
 > >
-> > > [!card|scroll] Celestial Market
-> > > ```dataviewjs
-> > > await winx.render("celestialMarket", dv);
-> > > ```
+> > ```winx
+> > celestialMarket
+> > card: Celestial Market
+> > meta: scroll
+> > ```

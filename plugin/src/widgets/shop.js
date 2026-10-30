@@ -1,60 +1,32 @@
+// Shop: the gold balance and the rewards of Shop.md (name:: … cost:: …); an affordable one is bought with a click
+// (logged to Purchases.md), the rest are greyed out.
+import { Notice } from "obsidian";
 import { H } from "../lib/helpers.js";
+import { html } from "../ui/html.js";
+import { Widget } from "./widget.js";
 
-export default async function (dv, input) {
-  const { AudioEngine, Wallet, PurchaseLog } = H;
-  const config = await H.loadConfig();
-
-  class ShopUI {
-    constructor(container, dv, audio) {
-      this.container = container;
-      this.dv        = dv;
-      this.audio     = audio;
+export class Shop extends Widget {
+  sound = new H.AudioEngine("00 System/Assets/star.wav");
+  on = {
+    buy: async (e, el) => {
+      const { name } = el.dataset, cost = Number(el.dataset.cost);
+      this.sound.play();
+      await H.PurchaseLog.append(name, cost);
+      new Notice(`✨ Bought ${name} for ${cost} gold`);
+      await this.draw();
+    },
+  };
+  async data() {
+    const items = [];
+    for (const list of this.dv.pages('"00 System/Data/Shop"').file.lists) {
+      const name = list.text.match(/name::\s*(.+)/), cost = list.text.match(/cost::\s*(\d+)/);
+      if (name && cost) items.push({ name: name[1].trim(), cost: Number(cost[1]) });
     }
-
-    async render() {
-      this.container.innerHTML = "";
-      const balance = await Wallet.balance(this.dv, config);
-
-      const bal = this.container.createEl("div", { cls: "winx-shop-balance" });
-      bal.createEl("span", { text: "✨", cls: "winx-shop-balance-icon" });
-      bal.createEl("span", { text: "Gold" });
-      bal.createEl("span", { text: balance, cls: "winx-shop-balance-amount" });
-
-      const list = this.container.createEl("div", { cls: "winx-shop-items" });
-      for (const item of this.#parseItems()) {
-        this.#renderItem(list, item, balance);
-      }
-    }
-
-    #parseItems() {
-      const items = [];
-      for (const list of this.dv.pages('"00 System/Data/Shop"').file.lists) {
-        const nameMatch = list.text.match(/name::\s*(.+)/);
-        const costMatch = list.text.match(/cost::\s*(\d+)/);
-        if (!nameMatch || !costMatch) continue;
-        items.push({ name: nameMatch[1].trim(), cost: Number(costMatch[1]) });
-      }
-      return items;
-    }
-
-    #renderItem(parent, { name, cost }, balance) {
-      const affordable = balance >= cost;
-      const btn = parent.createEl("button", { cls: "winx-shop-item" });
-      btn.createEl("span", { text: name, cls: "winx-shop-item-name" });
-      btn.createEl("span", { text: `${cost} ✨`, cls: "winx-shop-item-cost" });
-
-      if (!affordable) { btn.disabled = true; return; }
-
-      btn.onclick = async () => {
-        this.audio.play();
-        await PurchaseLog.append(name, cost);
-        new Notice(`✨ Bought ${name} for ${cost} gold`);
-        await this.render();
-      };
-    }
+    return { items, balance: await H.Wallet.balance(this.dv, await H.loadConfig()) };
   }
-
-  dv.container.classList.add("winx-shop");
-  const shop = new ShopUI(dv.container, dv, new AudioEngine("00 System/Assets/star.wav"));
-  await shop.render();
+  view({ items, balance }) {
+    return html`<div class="winx-shop-balance"><span class="winx-shop-balance-icon">✨</span><span>Gold</span><span class="winx-shop-balance-amount">${balance}</span></div>
+      <div class="winx-shop-items">${items.map(({ name, cost }) => html`<button class="winx-shop-item"${balance >= cost ? html` data-action="buy" data-name="${name}" data-cost="${cost}"` : html` disabled`}><span class="winx-shop-item-name">${name}</span><span class="winx-shop-item-cost">${cost} ✨</span></button>`)}</div>`;
+  }
+  after(root) { root.addClass("winx-shop"); }
 }
