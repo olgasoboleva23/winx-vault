@@ -3,23 +3,23 @@
 @use "../mixins" as *;
 .winx-cal-nav, .winx-cal-top {
   @include row;
-  gap: $gap-l;
-  margin-bottom: 10px;
+  gap: $space-l;
+  margin-bottom: $space-l;
 
   button:not(.winx-cal-mute) {
-    width: 30px;
-    height: 30px;
+    width: $btn-l;
+    height: $btn-l;
     padding: 0;
     border-radius: $round;
     border: 1px solid var(--winx-border);
     background: rgb(255 255 255 / 75%);
     color: var(--winx-purple-deep);
     box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
-    font-size: 18px;
+    font-size: $text-3xl;
     line-height: 1;
     cursor: pointer;
   }
-  button.winx-cal-today, button.winx-cal-filter { width: auto; padding: 0 12px; border-radius: $pill; font-size: $text-m; }
+  button.winx-cal-today, button.winx-cal-filter { width: auto; padding: 0 $space-xl; border-radius: $pill; font-size: $text-m; }
   button.winx-cal-filter { opacity: 0.55; box-shadow: none; }
   button:not(.winx-cal-filter) + button.winx-cal-filter { margin-left: auto; }
   button.winx-cal-filter.on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
@@ -39,14 +39,14 @@
   }
 }
 .winx-cal-nav button[data-action="next"]::before { transform: scaleX(-1); }
-.winx-cal-top { @include row; gap: $gap-s; margin-bottom: 10px; }
-.winx-cal-top button.winx-cal-mute { width: auto; padding: 0 6px; background: none; border: none; box-shadow: none; font-size: $text-xl; cursor: pointer; }
-.winx-cal-title { font-family: "Cinzel", serif; font-size: 18px; color: var(--winx-lavender); min-width: 220px; text-align: center; }
+.winx-cal-top { @include row; gap: $space-s; margin-bottom: $space-l; }
+.winx-cal-top button.winx-cal-mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
+.winx-cal-title { font-family: "Cinzel", serif; font-size: $text-3xl; color: var(--winx-lavender); min-width: 220px; text-align: center; }
 .callout .winx-cal-title { color: var(--winx-purple-deep); }   /* on a pink card */
 .winx-cal-week {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: $gap-m;
+  gap: $space-m;
   align-items: stretch;
 }
 .winx-cal-day, .winx-cal-cell {
@@ -58,10 +58,10 @@
   &.today { border-color: rgb(168 200 240); background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240) 60%, rgb(232 213 245)); }   /* the Missed strip's blue */
   &.over  { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
 }
-.winx-cal-day { min-height: 220px; padding: 8px 6px; }
+.winx-cal-day { min-height: 220px; padding: $space-m $space-s; }
 .winx-cal-day, .winx-cal-cell { position: relative; }
 /* while dragging, today and past days split into ✓ done / ⏳ plan halves */
-.winx-cal-zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $gap-xs; padding: 4px; }
+.winx-cal-zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
 .winx-cal.dragging .winx-cal-zones { display: flex; flex-direction: column; }
 .winx-cal-zone {
   flex: 1;
@@ -78,12 +78,12 @@
 /* drop bar: sticky at the top while dragging (zero height, so nothing below jumps) */
 /* the dataviewjs block scrolls on its own (overflow: auto), which would pin the bar inside it */
 .block-language-dataviewjs:has(> .winx-cal) { overflow: visible !important; }
-.winx-cal-dropbar { position: sticky; top: 8px; z-index: 5; height: 0; }
+.winx-cal-dropbar { position: sticky; top: $space-m; z-index: 5; height: 0; }
 .winx-cal-dropbar-in {
   display: none;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: $gap-s;
-  padding: 6px;
+  gap: $space-s;
+  padding: $space-s;
   border-radius: $radius-xl;
   border: 1px solid var(--winx-gold-deep);
   background: rgb(255 248 252 / 95%);
@@ -91,7 +91,7 @@
 }
 .winx-cal.dragging .winx-cal-dropbar-in { display: grid; }
 .winx-cal-chip {
-  padding: 10px 4px;
+  padding: $space-l $space-xs;
   border-radius: $radius-m;
   border: 1px dashed var(--winx-border);
   text-align: center;
@@ -104,8 +104,8 @@
   &.over  { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
 }
 .winx-cal-backlog {
-  margin-top: 14px;
-  padding: 8px 10px;
+  margin-top: $space-2xl;
+  padding: $space-m $space-l;
   border-radius: $radius-xl;
   border: 1px solid var(--winx-border);
   background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
@@ -113,26 +113,26 @@
 
   &.over { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
   .winx-cal-head { text-align: left; }
-  button.winx-cal-more { margin-top: 6px; padding: 2px 12px; border-radius: $pill; border: 1px solid var(--winx-border); background: rgb(255 255 255 / 75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer; }
+  button.winx-cal-more { margin-top: $space-s; padding: $space-2xs $space-xl; border-radius: $pill; border: 1px solid var(--winx-border); background: rgb(255 255 255 / 75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer; }
 }
-.winx-cal-backlog-grid { columns: 260px; column-gap: 12px; }   /* masonry: area cards fill the columns top to bottom */
+.winx-cal-backlog-grid { columns: 260px; column-gap: $space-xl; }   /* masonry: area cards fill the columns top to bottom */
 .winx-cal-groupcard {
   break-inside: avoid;
-  margin-bottom: 12px;
-  padding: 6px 8px;
+  margin-bottom: $space-xl;
+  padding: $space-s $space-m;
   border-radius: $radius-xl;
   background: fade(var(--winx-border), 25%);
   .winx-board-card:last-child { border-bottom: none; }
 }
 .winx-cal-head {
-  margin-bottom: 4px;
+  margin-bottom: $space-xs;
   text-align: center;
   font-family: "Cinzel", serif;
   color: var(--winx-purple-deep);
 }
 .winx-cal-task {
   position: relative;
-  padding: 4px 5px;
+  padding: $space-xs 5px;
   border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
   font-size: $text-l;
   line-height: 1.3;
@@ -144,7 +144,7 @@
   &.ghost   { opacity: 0.5; }
   &.done    { opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
   &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
-  > input.task-list-item-checkbox { position: absolute; left: 4px; top: 5px; margin: 0; }
+  > input.task-list-item-checkbox { position: absolute; left: $space-xs; top: 5px; margin: 0; }
 }
 /* difficulty: stars and the pale ☆ open a picker */
 .winx-cal :is(.tag[data-tag-name^="#⭐"], .winx-cal-nostar) { cursor: pointer; }
@@ -155,13 +155,13 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
   z-index: 50;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 6px;
+  gap: $space-2xs;
+  padding: $space-s;
   border-radius: $radius-l;
   border: 1px solid var(--winx-gold-deep);
   background: rgb(255 248 252 / 97%);
   box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
-  button { justify-content: flex-start; padding: 4px 12px; font-family: var(--font-text); border: none; box-shadow: none; background: none; color: var(--winx-purple-deep); font-size: $text-l; cursor: pointer; }
+  button { justify-content: flex-start; padding: $space-xs $space-xl; font-family: var(--font-text); border: none; box-shadow: none; background: none; color: var(--winx-purple-deep); font-size: $text-l; cursor: pointer; }
   button:hover { background: fade(var(--winx-border), 40%); }
 }
 /* area colors: a stripe on the left of each task, dots in the legend */
@@ -182,12 +182,12 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
 .winx-cal-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: $gap-l;
+  gap: $space-l;
   margin-left: auto;
   font-size: $text-m;
   color: var(--winx-lavender);
   span { text-transform: capitalize; }
-  span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 4px; border-radius: $round; background: var(--area); }
+  span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: $space-xs; border-radius: $round; background: var(--area); }
 }
 /* stickers from ![[...]] in the task text */
 .winx-cal-sticker { height: 24px; width: auto; vertical-align: middle; }
@@ -200,8 +200,8 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
 /* backlog area headings: pills like the Kanban's group headings */
 .winx-cal-group {
   width: fit-content;
-  margin: 2px 0 4px;
-  padding: 0.15rem 0.8rem;
+  margin: $space-2xs 0 $space-xs;
+  padding: $space-2xs $space-xl;
   border-radius: $pill;
   background: fade(var(--winx-border), 40%);
   color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep));
@@ -215,16 +215,16 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
 .winx-cal-month {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: $gap-s;
+  gap: $space-s;
 }
 .winx-cal-wd { text-align: center; font-family: "Cinzel", serif; font-size: $text-m; color: var(--winx-lavender); }
 .winx-cal-cell {
   min-height: 92px;
-  padding: 4px 5px;
+  padding: $space-xs 5px;
   cursor: pointer;
 
   &.outside { opacity: 0.5; }
-  .winx-cal-task { padding: 1px 2px; border: none; font-size: $text-s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .winx-cal-task { padding: 1px $space-2xs; border: none; font-size: $text-s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 .winx-cal-num { font-size: $text-m; font-weight: 600; color: var(--winx-purple-deep); }
 /* a tick waits 2 s before it's written: struck through, a gold shimmer runs over it */
@@ -237,18 +237,18 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
 @keyframes winx-tick-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
 /* after a write, until the redraw: the days and the tabs dim, and a pink pill with a spinning ✦ sticks to the top
    (zero height, like the drop bar; the Kanban arrow's look). calendar.js adds .busy */
-.winx-cal-busy { position: sticky; top: 8px; z-index: 6; height: 0; display: flex; justify-content: center; }
+.winx-cal-busy { position: sticky; top: $space-m; z-index: 6; height: 0; display: flex; justify-content: center; }
 .winx-cal-busy-pill {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 30px;
+  width: $pill-w;
+  height: $pill-h;
   border-radius: $pill;
   background: alpha(--winx-pink-deep, 85%);
   box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
   color: #fff;
-  font-size: 18px;
+  font-size: $text-3xl;
   span { animation: winx-spin 0.9s linear infinite; }
 }
 .winx-cal.busy {
@@ -273,7 +273,7 @@ body.is-mobile :is(.winx-cal-task, .winx-yesterday-row, .winx-board-card) { touc
   &.open { padding: 0 3px 3px; }
 }
 .winx-cal-routine-time {
-  margin: 4px 0 1px 6px;
+  margin: $space-xs 0 1px $space-s;
   cursor: pointer;
   font-size: $text-s;
   color: var(--winx-purple-deep);
@@ -282,17 +282,17 @@ body.is-mobile :is(.winx-cal-task, .winx-yesterday-row, .winx-board-card) { touc
 .winx-cal-routine-pill {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 10px;
+  gap: $space-2xs $space-l;
   span { white-space: nowrap; }
-  padding: 3px 10px;
+  padding: 3px $space-l;
   font-size: $text-m;
   color: var(--winx-purple-deep);
   cursor: pointer;
 }
 .winx-cal-marks {
   display: flex;
-  gap: $gap-m;
-  padding: 2px 4px;
+  gap: $space-m;
+  padding: $space-2xs $space-xs;
   font-size: $text-s;
   color: var(--winx-purple-deep);
   opacity: 0.7;

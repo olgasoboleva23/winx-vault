@@ -11,14 +11,14 @@
 .winx-xp {
   --s: 10px;
   display: grid;
-  gap: 2px;
+  gap: $space-2xs;
   font-size: $text-xs;
   color: var(--winx-text-dark);
 
   .winx-bonus {
-    font-size: 9px;
+    font-size: $text-2xs;
     color: var(--winx-purple);
-    margin-bottom: 4px;
+    margin-bottom: $space-xs;
     opacity: 0.85;
   }
 }
@@ -26,7 +26,7 @@
 .winx-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: $space-s;
 }
 
 .winx-aura {
@@ -74,10 +74,10 @@
 .winx-legend {
   display: flex;
   justify-content: flex-end;
-  gap: $gap-l;
-  font-size: 9px;
+  gap: $space-l;
+  font-size: $text-2xs;
   opacity: 0.7;
-  margin-top: 6px;
+  margin-top: $space-s;
 }
 
 .leg-item {
@@ -89,11 +89,11 @@
   &::after {
     content: attr(data-tip);
     position: absolute;
-    bottom: calc(100% + 6px);
+    bottom: calc(100% + $space-s);
     right: 0;
     background: var(--winx-purple-deep);
     color: white;
-    font-size: 9px;
+    font-size: $text-2xs;
     white-space: nowrap;
     padding: 3px 7px;
     border-radius: 4px;

@@ -18,13 +18,13 @@
 
 .winx-pomodoro {
   overflow-x: visible !important;
-  padding-top: 10px;
+  padding-top: $space-l;
 
   .pomodoro {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: $space-2xl;
   }
 
   .ring {
@@ -46,8 +46,8 @@
     /* Wing decoration — SVG lives in winx-assets.css */
     .wing {
       position: absolute;
-      width: 56px;
-      height: 56px;
+      width: $deco;
+      height: $deco;
       background: var(--winx-wing-svg) 0 0 / contain no-repeat;
       pointer-events: none;
 
@@ -66,7 +66,7 @@
     &::before {
       content: "";
       position: absolute;
-      inset: 10px;
+      inset: $space-l;
       border-radius: $round;
       background: var(--winx-pink-light);
       border: 2px solid var(--winx-border);
@@ -95,7 +95,7 @@
       position: absolute;
       bottom: -20px;
       @include center;
-      gap: 12px;
+      gap: $space-xl;
       margin-top: -10px;
 
       .btn {
@@ -140,12 +140,12 @@
 
   .stars {
     display: flex;
-    gap: $gap-m;
+    gap: $space-m;
 
     .multiplier {
-      font-size: 14px;
+      font-size: $text-xl;
       font-weight: 500;
-      margin-left: 4px;
+      margin-left: $space-xs;
     }
 
     .s {
@@ -169,8 +169,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    margin-top: 14px;
+    gap: $space-2xs;
+    margin-top: $space-2xl;
 
     .mode-text {
       font-size: $text-l;
@@ -190,11 +190,11 @@
   .settings-panel {
     display: flex;
     flex-direction: column;
-    gap: $gap-s;
+    gap: $space-s;
     background: var(--winx-pink-light);
     border: 1px solid var(--winx-border);
     border-radius: $radius-m;
-    padding: 10px 14px;
+    padding: $space-l $space-2xl;
     width: 140px;
 
     &.hidden {
@@ -203,7 +203,7 @@
 
     label {
       @include row;
-      gap: $gap-s;
+      gap: $space-s;
       font-size: $text-s;
     }
 
@@ -214,7 +214,7 @@
       background: var(--winx-pink);
       text-align: center;
       font-size: $text-s;
-      padding: 2px 4px;
+      padding: $space-2xs $space-xs;
 
       /* app.css input:not(:disabled):hover is (0,3,1) — tie it or it wins */
       &:hover,
@@ -231,7 +231,7 @@
     .s-save {
       align-self: flex-end;
       font-size: $text-xs;
-      padding: 3px 10px;
+      padding: 3px $space-l;
       border-radius: $radius-s;
       border: 1px solid var(--winx-border);
       background: var(--winx-pink);
@@ -250,7 +250,7 @@
   /* ── Bottom bar ── */
   .bottom-bar {
     @include center;
-    gap: $gap-m;
+    gap: $space-m;
 
     .settings-info {
       font-size: $text-xs;

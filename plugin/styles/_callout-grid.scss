@@ -1,3 +1,4 @@
+@use "mixins" as *;
 /* ============================================
  * WINX THEME — Grid & Column Layout
  * File: callout-grid.css
@@ -116,6 +117,6 @@
 .is-phone :is(.dashboard, .kanban-board) {
   --file-margins: 12px 8px;
 
-  .callout[data-callout="grid"] { padding: 4px !important; }
-  .callout[data-callout="card"] { padding: 10px !important; }
+  .callout[data-callout="grid"] { padding: $space-xs !important; }
+  .callout[data-callout="card"] { padding: $space-l !important; }
 }

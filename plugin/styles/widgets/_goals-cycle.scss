@@ -3,13 +3,13 @@
 .winx-goals {
   display: flex;
   flex-direction: column;
-  gap: $gap-l;
+  gap: $space-l;
 }
 
 .winx-goal-head {
   display: flex;
   justify-content: space-between;
-  gap: $gap-m;
+  gap: $space-m;
   color: var(--winx-text-dark);
 }
 
@@ -18,8 +18,8 @@
 
 .winx-goal-dots {
   display: flex;
-  gap: $gap-s;
-  margin: 4px 0 2px;
+  gap: $space-s;
+  margin: $space-xs 0 $space-2xs;
 }
 
 .winx-dot {
@@ -41,7 +41,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: $gap-s;
+  gap: $space-s;
 }
 
 .winx-cycle-day {
@@ -52,4 +52,4 @@
   &.period { color: var(--winx-pink-deep); text-shadow: 0 0 8px var(--winx-pink); }
 }
 
-.winx-cycle-btns { display: flex; gap: $gap-m; flex-wrap: wrap; }
+.winx-cycle-btns { display: flex; gap: $space-m; flex-wrap: wrap; }

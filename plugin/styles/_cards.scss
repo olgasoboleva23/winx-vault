@@ -29,7 +29,7 @@
     border: 1px solid var(--winx-border) !important;
     border-radius: $radius-xl !important;
     overflow: visible !important;
-    padding: 12px;
+    padding: $space-xl;
     transition:
       border-color 0.3s ease,
       box-shadow 0.3s ease;
@@ -49,19 +49,19 @@
     &::after {
       content: "";
       position: absolute;
-      width: 56px;
-      height: 56px;
+      width: $deco;
+      height: $deco;
       background: var(--winx-wing-svg) 0 0 / contain no-repeat;
       pointer-events: none;
     }
 
     &::before {
-      top: 4px;
-      left: 4px;
+      top: $space-xs;
+      left: $space-xs;
     }
     &::after {
-      bottom: 4px;
-      right: 4px;
+      bottom: $space-xs;
+      right: $space-xs;
       transform: scale(-1, -1);
     }
 
@@ -72,7 +72,7 @@
       color: var(--winx-purple-deep) !important;
       letter-spacing: 2px !important;
       text-transform: uppercase !important;
-      font-size: $text-xl !important;
+      font-size: $text-2xl !important;
       padding-inline: 64px !important; /* room for wings */
     }
 
@@ -167,8 +167,8 @@
         content: "";
         position: absolute;
         z-index: 2 !important;
-        width: 56px;
-        height: 56px;
+        width: $deco;
+        height: $deco;
         translate: -16px -16px;          /* wider canvas for sparkles, star stays put */
         background: var(--winx-star-sparkle-svg) 0 0 / contain no-repeat;
         pointer-events: none;

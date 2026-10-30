@@ -8,15 +8,36 @@ $radius-s: 6px;
 $radius-m: 10px;
 $radius-l: 12px;
 $radius-xl: 14px;
-$gap-xs: 4px;
-$gap-s: 6px;
-$gap-m: 8px;
-$gap-l: 10px;
+
+// space: padding, margin, gap, and the offsets of a placed element (top, left …)
+$space-2xs: 2px;
+$space-xs: 4px;
+$space-s: 6px;
+$space-m: 8px;
+$space-l: 10px;
+$space-xl: 12px;
+$space-2xl: 14px;
+$space-3xl: 16px;
+$space-4xl: 20px;
+$space-5xl: 24px;
+
+$text-2xs: 9px;
 $text-xs: 10px;
 $text-s: 11px;
 $text-m: 12px;
 $text-l: 13px;
-$text-xl: 16px;
+$text-xl: 14px;
+$text-2xl: 16px;
+$text-3xl: 18px;
+
+$deco: 56px;        // the fairy wings, the stars, the round icon
+$pill-w: 56px;      // the scroll arrows and the busy ✦ pill
+$pill-h: 30px;
+$btn-s: 26px;       // round buttons: a task's buttons, Missed's ✓ ☀️
+$btn-m: 28px;       // the market's "bought"
+$btn-l: 30px;       // the calendar's ‹ ›
+$btn-touch: 34px;   // a task's buttons on the phone
+$tap: 44px;         // a row or a field on the phone: a finger's size
 
 // one line of things, centred across it
 @mixin row { display: flex; align-items: center; }
