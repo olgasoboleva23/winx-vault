@@ -2,14 +2,17 @@
 import { parseBlock } from "./parse.js";
 import { Cycle } from "./cycle.js";
 import { DailyNote } from "./dailyNote.js";
+import { Goals } from "./goals.js";
 import { Habits } from "./habits.js";
+import { LifeAreas } from "./lifeAreas.js";
 import { LevelToday } from "./levelToday.js";
 import { MobileHome } from "./mobileHome.js";
 import { Supplies } from "./supplies.js";
 import { Wallet } from "./wallet.js";
+import { WeeklyState } from "./weeklyState.js";
 
 // name → class; each widget adds itself here as it moves to a class
-export const blocks = { cycle: Cycle, dailyNote: DailyNote, habits: Habits, levelToday: LevelToday, mobileHome: MobileHome, supplies: Supplies, wallet: Wallet };
+export const blocks = { cycle: Cycle, dailyNote: DailyNote, goals: Goals, habits: Habits, levelToday: LevelToday, lifeAreas: LifeAreas, mobileHome: MobileHome, supplies: Supplies, wallet: Wallet, weeklyState: WeeklyState };
 
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);

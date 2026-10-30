@@ -4,7 +4,8 @@
 //   view(data)          its markup: html`…` (from ../ui/html.js), with Button / Card (../ui/component.js)
 //   on = { name(e, el) } what an element with data-action="name" does: a click (a button, any element),
 //                        a change (an input, a select) or a submit (a form)
-//   after(root, data)   what markup can't do (a chart: this.keep(chart) so it's destroyed on the next draw)
+//   after(root, data)   what markup can't do (a chart: this.keep(chart) so it's destroyed on the next draw);
+//                       root is where view() went (the card's content when there's a card)
 // It draws on load and again a moment after Dataview's index or its own note changes; a hidden block when it
 // shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
 // listeners when the block goes.
@@ -88,6 +89,8 @@ export class Widget extends MarkdownRenderChild {
     const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body }) : body;
     this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
     for (const [name, value] of typed) { const f = this.containerEl.querySelector(`[name="${CSS.escape(name)}"]`); if (f && !f.value) f.value = value; }
-    await this.after(this.containerEl, data);
+    // the widget's own place: inside the card when there is one
+    const root = card ? this.containerEl.querySelector(":scope > .callout > .callout-content") : this.containerEl;
+    await this.after(root, data);
   }
 }
