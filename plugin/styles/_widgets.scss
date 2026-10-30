@@ -78,7 +78,7 @@
 
   /* ── Date input — golden fairy-ticket style ── */
   /* ── Daily note button ── */
-  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) .winx-open-note-btn) > .callout-content {
+  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) > .winx-open-note-btn) > .callout-content {
     display: flex !important;
     align-items: center;
     justify-content: space-between;
