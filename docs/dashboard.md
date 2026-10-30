@@ -80,4 +80,4 @@ A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any
 
 ## 📝 Daily Note
 
-Notes (free text; the first lines show on the Week page) and an XP Log. Made from `00 System/Templates/Daily Note.md`, or by **✦ Open** on the dashboard for the selected day.
+Notes (free text) and an XP Log. Made from `00 System/Templates/Daily Note.md`, or by **✦ Open** on the dashboard for the selected day.
