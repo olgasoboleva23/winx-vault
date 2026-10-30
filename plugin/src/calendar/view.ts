@@ -165,12 +165,13 @@ export class CalendarView extends ItemView {
     // a tick waits 2 s (struck through, a gold shimmer) before it's written: unticking in time leaves the file alone.
     // The sound comes from installSounds (it listens to every .task-list-item-checkbox)
     tick: (e, box) => {
-      const row = box.closest(".winx-cal-task") as HTMLElement, cb = box as HTMLInputElement;
+      // the task now: a redraw in the 2 s (another tick written, ‹ ›) renumbers the keys
+      const row = box.closest(".winx-cal-task") as HTMLElement, cb = box as HTMLInputElement, t = this.taskOf(row);
       row.classList.toggle("ticking", cb.checked);
       window.clearTimeout(this.ticks.get(row));
       if (cb.checked) this.ticks.set(row, window.setTimeout(() => {
         cb.disabled = true; row.classList.add("done"); row.querySelector(".winx-board-btns")?.remove();
-        this.actions.tick(this.taskOf(row));
+        this.actions.tick(t);
       }, 2000));
     },
   };
