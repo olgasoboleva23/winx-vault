@@ -23,4 +23,5 @@
 @use "widgets/task-cards";
 @use "widgets/calendar";
 @use "widgets/missed";
+@use "widgets/dashboard";
 @use "widgets/finance";   // was injected by the widget itself, after everything else: last

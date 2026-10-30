@@ -35,6 +35,7 @@ const ctx = await esbuild.context({
   external: ["obsidian", "electron", "@codemirror/*", "@lezer/*"],
   sourcemap: watch ? "inline" : false,
   logLevel: "warning",
+  loader: { ".md": "text" },   // dashboard/layout.md: the dashboard's layout as text
   plugins: [extras],
 });
 if (watch) {

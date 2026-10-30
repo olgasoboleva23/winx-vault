@@ -1,5 +1,6 @@
-import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
+import { Plugin } from "obsidian";
 import { CalendarView, VIEW_TYPE } from "./calendar/view.ts";
+import { DashboardView, DASHBOARD_VIEW } from "./dashboard/view.ts";
 import { L } from "./lib/goalsLib.js";
 import { Task } from "./lib/task.js";
 import { H } from "./lib/helpers.js";
@@ -10,8 +11,6 @@ import { html } from "./ui/html.js";
 
 // The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the commands, and the
 // styles (styles.css, built from styles/*.scss).
-
-const DASHBOARD = "Dashboard.md";
 
 export default class WinxPlugin extends Plugin {
   async onload() {
@@ -27,9 +26,11 @@ export default class WinxPlugin extends Plugin {
     // a ```winx block in a note: a widget class by name (widgets/blocks.js)
     this.registerMarkdownCodeBlockProcessor("winx", drawBlock);
     // the calendar: its own tab; the command opens it, or goes to the one already open.
-    // The ✨ ribbon icon opens Winx: the dashboard note and the calendar as two pinned tabs (or goes back to them)
+    // The ✨ ribbon icon opens Winx: the dashboard and the calendar as two pinned tabs (or goes back to them)
     this.registerView(VIEW_TYPE, leaf => new CalendarView(leaf));
-    this.addCommand({ id: "open-calendar", name: "Open calendar", callback: () => this.openCalendar() });
+    this.registerView(DASHBOARD_VIEW, leaf => new DashboardView(leaf));
+    this.addCommand({ id: "open-calendar", name: "Open calendar", callback: () => this.open(VIEW_TYPE) });
+    this.addCommand({ id: "open-dashboard", name: "Open dashboard", callback: () => this.open(DASHBOARD_VIEW) });
     this.addRibbonIcon("sparkles", "Winx", () => this.openWinx());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",
@@ -42,29 +43,21 @@ export default class WinxPlugin extends Plugin {
     });
     console.log("winx loaded");
   }
-  async openCalendar() {
+  // a Winx tab, pinned: the one already open, or a new one
+  async open(type: string, reveal = true) {
     const { workspace } = this.app;
-    let leaf = workspace.getLeavesOfType(VIEW_TYPE)[0];
-    if (!leaf) { leaf = workspace.getLeaf("tab"); await leaf.setViewState({ type: VIEW_TYPE, active: true }); leaf.setPinned(true); }
-    workspace.revealLeaf(leaf);
+    let leaf = workspace.getLeavesOfType(type)[0];
+    if (!leaf) { leaf = workspace.getLeaf("tab"); await leaf.setViewState({ type, active: reveal }); leaf.setPinned(true); }
+    if (reveal) workspace.revealLeaf(leaf);
+    return leaf;
   }
-  // ponytail: the dashboard is the note Dashboard.md until it becomes a tab of its own
+  // ✨: back to the Winx tab used last, or both tabs opened (the dashboard shown)
   async openWinx() {
-    const { workspace, vault } = this.app;
-    const isDashboard = (l: WorkspaceLeaf) => (l.view as any).file?.path === DASHBOARD;
-    const open = [...workspace.getLeavesOfType(VIEW_TYPE), ...workspace.getLeavesOfType("markdown").filter(isDashboard)];
-    if (open.length) {   // the Winx tab used last
-      workspace.revealLeaf(open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0]);
-      return;
-    }
-    const file = vault.getAbstractFileByPath(DASHBOARD);
-    if (!(file instanceof TFile)) return this.openCalendar();
-    const dash = workspace.getLeaf("tab");
-    await dash.openFile(file);
-    dash.setPinned(true);
-    const cal = workspace.getLeaf("tab");
-    await cal.setViewState({ type: VIEW_TYPE });
-    cal.setPinned(true);
+    const { workspace } = this.app;
+    const open = [DASHBOARD_VIEW, VIEW_TYPE].flatMap(t => workspace.getLeavesOfType(t));
+    if (open.length) return workspace.revealLeaf(open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0]);
+    const dash = await this.open(DASHBOARD_VIEW, false);
+    await this.open(VIEW_TYPE, false);
     workspace.revealLeaf(dash);
   }
   onunload() { delete (window as any).winx; }

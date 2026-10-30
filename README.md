@@ -9,7 +9,7 @@ The repo is two things at once:
 - **an example vault** (open the repo folder in Obsidian) with demo notes, tasks and the dashboard;
 - **the Winx plugin** (`plugin/`): every widget, the calendar tab, the task window, the commands and all the styles. Notes only say where a widget goes.
 
-**Quick start:** build the plugin (`cd plugin && npm ci && npm run build`, then copy `plugin/dist/*` into `.obsidian/plugins/winx/`), open the folder as a vault, turn on community plugins, open `Dashboard.md`. Details in [Installation](docs/installation.md).
+**Quick start:** build the plugin (`cd plugin && npm ci && npm run build`, then copy `plugin/dist/*` into `.obsidian/plugins/winx/`), open the folder as a vault, turn on community plugins, click ✨ on the left. Details in [Installation](docs/installation.md).
 
 ## Docs
 

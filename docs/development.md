@@ -7,10 +7,11 @@
 ```
 ├── 📁 plugin — the Winx plugin
 │   ├── 📁 src
-│   │   ├── main.ts               — loads everything; the ```winx block, the calendar tab, the commands
+│   │   ├── main.ts               — loads everything; the ```winx block, the dashboard and calendar tabs, ✨, the commands
 │   │   ├── 📁 calendar           — the calendar tab: view.ts (state, redraws, one set of listeners), parts.js (Header,
 │   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js and
 │   │   │                           state.js (the model and the tab's state, tested), actions.js (what it writes)
+│   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
 │   │   ├── commands.ts           — the Cmd+P commands
 │   │   ├── 📁 ui                 — form.ts (one window instead of a chain of prompts), html.js (markup in backticks),
 │   │   │                           component.js (Component, Button, Card)
@@ -31,7 +32,7 @@
 │       ├── 📁 Daily Notes
 │       └── 📁 Tasks              — Master.md (all tasks), Pool.md, Kanban.md
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
-├── Dashboard.md, Week.md, Mobile.md, 📁 Mobile
+├── Week.md, Mobile.md, 📁 Mobile
 ```
 
 ## Build and test

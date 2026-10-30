@@ -6,12 +6,14 @@
 //                        a change (an input, a select) or a submit (a form)
 //   after(root, data)   what markup can't do (a chart: this.keep(chart) so it's destroyed on the next draw);
 //                       root is where view() went (the card's content when there's a card)
-// It draws on load and again a moment after Dataview's index or its own note changes; a hidden block when it
+// Until its first draw a card widget shows its card with a shimmering placeholder (a skeleton).
+// It draws on load and again a moment after Dataview's index or its own note changes (or the dashboard's date); a hidden block when it
 // shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
 // listeners when the block goes.
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
 import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../ui/component.js";
+import { html } from "../ui/html.js";
 import { actionOf } from "./parse.js";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
@@ -38,7 +40,11 @@ export class Widget extends MarkdownRenderChild {
     return api && {
       pages: q => api.pages(q, this.sourcePath),
       page: p => api.page(p, this.sourcePath),
-      current: () => api.page(this.sourcePath),
+      // the page: its note, with the date of the tab it's drawn in (the dashboard's data-date) over the note's
+      current: () => {
+        const page = api.page(this.sourcePath), date = this.containerEl.closest("[data-date]")?.dataset.date;
+        return date ? { ...page, date: api.date(date) } : page;
+      },
       date: d => api.date(d),
       api,
     };
@@ -64,10 +70,13 @@ export class Widget extends MarkdownRenderChild {
     if (this.constructor.followsChanges) {
       this.registerEvent(this.app.metadataCache.on("dataview:metadata-change", later));
       this.registerEvent(this.app.metadataCache.on("changed", f => f.path === this.sourcePath && later()));
+      // the dashboard tab's date changed: drawn again in place, at once
+      this.registerEvent(this.app.workspace.on("winx:date", () => this.containerEl.closest("[data-date]") && this.redraw()));
     }
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));
     this.register(() => { clearTimeout(this.timer); clearTimeout(this.leave); this.drop(); });
+    if (this.args.card) this.containerEl.replaceChildren(sanitizeHTMLToDom(new Card({ title: String(this.args.card), body: html`<div class="winx-skeleton"></div>` }).html));
     // a cold start: Dataview reads the vault after the notes open; draw once it has
     const api = this.app.plugins.plugins.dataview?.api;
     if (api && !api.index?.initialized && this.constructor.followsChanges) {
@@ -102,5 +111,6 @@ export class Widget extends MarkdownRenderChild {
     // the widget's own place: inside the card when there is one
     const root = card ? this.containerEl.querySelector(":scope > .callout > .callout-content") : this.containerEl;
     await this.after(root, data);
+    this.containerEl.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));   // the dashboard tab's ✦ pill goes
   }
 }

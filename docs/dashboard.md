@@ -2,6 +2,8 @@
 
 # 🖥 Dashboard
 
+A tab of its own: the ✨ icon on the left (it opens the dashboard and the calendar, both pinned, or goes back to the one you used last) or **Winx: Open dashboard** (Cmd+P). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/dashboard/layout.md`: the same callouts and `winx` blocks a note would have.
+
 | Card | What it shows |
 |---|---|
 | **Level** | Current level, total XP, progress to the next level |
@@ -14,7 +16,7 @@
 | **Quests** | Tasks due today, grouped by life area |
 | **Celestial Market** | Pending shopping items grouped by category |
 
-A note shows a widget with a `winx` block: the widget's name, then `key: value` lines. `card: Title` draws it inside a dashboard card (`meta: scroll` / `scroll tall` for the scrolling ones):
+Any note can show a widget too, with a `winx` block: the widget's name, then `key: value` lines. `card: Title` draws it inside a dashboard card (`meta: scroll` / `scroll tall` for the scrolling ones):
 
 ````
 ```winx
