@@ -25,7 +25,7 @@ Copy the plugin and what it reads:
 |---|---|
 | `plugin/dist/*` (after `npm run build`) | `.obsidian/plugins/winx/` — then turn **Winx** on in Community plugins |
 | the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
-| `Week.md`, `Mobile.md`, `Mobile/` | anywhere (they hold the widget blocks) |
+| `Mobile.md`, `Mobile/` | anywhere (they hold the widget blocks) |
 | `02 Areas/Personal/Tasks/` (`Master.md`, `Pool.md`, `Kanban.md`), `Goals.md`, `00 System/Data/`, `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
 
 The paths the widgets read are in the widget files (`plugin/src/widgets/*.js`, `plugin/src/calendar/view.ts`, constants at the top) and `plugin/src/lib/config.js`.
@@ -71,4 +71,4 @@ The plugin works on the phone (no desktop-only code). It only has to get there: 
 | **Templater** | 2.19.3 | Daily note template |
 | **QuickAdd** | 2.12.0 | Work task and Recipe notes |
 | **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
-| **Meta Bind** | 1.4.8 | `INPUT[slider]` and `INPUT[date]` inline inputs |
+| **Meta Bind** | 1.4.8 | `INPUT[slider]` in old daily notes (optional) |

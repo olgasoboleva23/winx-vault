@@ -25,7 +25,7 @@ card: Weight
 ```
 ````
 
-`Week.md` is the weekly review: goals × days, cycle day, tasks done and still open, the first lines of each daily note. `Mobile.md` and `Mobile/` are the same widgets laid out for a phone.
+`Mobile.md` and `Mobile/` are the same widgets laid out for a phone.
 
 ## 🎮 XP & Levels
 

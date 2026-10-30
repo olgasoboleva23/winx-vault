@@ -32,7 +32,7 @@
 │       ├── 📁 Daily Notes
 │       └── 📁 Tasks              — Master.md (all tasks), Pool.md, Kanban.md
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
-├── Week.md, Mobile.md, 📁 Mobile
+├── Mobile.md, 📁 Mobile
 ```
 
 ## Build and test
