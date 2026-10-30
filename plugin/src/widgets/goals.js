@@ -4,6 +4,7 @@
 // changes nothing.
 import { H } from "../lib/helpers.js";
 import { L } from "../lib/goalsLib.js";
+import { Task } from "../lib/task.js";
 import { html } from "../ui/html.js";
 import { Widget } from "./widget.js";
 
@@ -21,9 +22,10 @@ export class Goals extends Widget {
       rows: goals.map(goal => ({ goal, done: tasks.where(t => t.completed && t.completion && t.tags.includes(goal.tag)).map(t => H.ymd(t.completion)).array() })),
     };
   }
-  // a missed goal task: on to the next planned day ≥ today
+  // a missed goal task: on to the next planned day ≥ today. Only an open one ([ ]): a skipped ([-]) or done one
+  // keeps its date (Dataview calls only [x] completed)
   async rollMissed(goal, tasks, today) {
-    for (const t of tasks.where(t => !t.completed && t.due && t.tags.includes(goal.tag))) {
+    for (const t of tasks.where(t => Task.of(t).isOpen && t.due && t.tags.includes(goal.tag))) {
       const due = H.ymd(t.due);
       if (due >= today) continue;
       const next = L.nextPlannedDate(goal, today);
