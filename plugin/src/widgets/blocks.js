@@ -1,8 +1,10 @@
 // The ```winx block: the widget classes by name, and what the plugin does with a block.
 import { parseBlock } from "./parse.js";
+import { LevelToday } from "./levelToday.js";
+import { Wallet } from "./wallet.js";
 
 // name → class; each widget adds itself here as it moves to a class
-export const blocks = {};
+export const blocks = { levelToday: LevelToday, wallet: Wallet };
 
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);

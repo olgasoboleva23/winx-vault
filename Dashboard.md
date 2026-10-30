@@ -17,10 +17,10 @@ pomodoro:
 
 > [!grid]
 > > [!col]
-> > > [!card] Level
-> > > ```dataviewjs
-> > > await winx.render("levelToday", dv);
-> > > ```
+> > ```winx
+> > levelToday
+> > card: Level
+> > ```
 > > 
 > > > [!card] Pomodoro
 > > > ```dataviewjs
