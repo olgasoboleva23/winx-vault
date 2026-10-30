@@ -4,6 +4,7 @@
 // No whitespace between tags: inline elements must lay out as the old createEl calls did.
 import { html } from "../ui/html.js";
 import { busyPill } from "../ui/busy.js";
+import { Button } from "../ui/component.js";
 import { TaskButtons, TaskCard, TaskRow, TaskText } from "./components.js";
 import { T } from "./data.js";
 import { dateFor } from "./state.js";
@@ -50,7 +51,7 @@ export class Header extends Part {
     const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
     const legend = Object.keys(areaIcons).filter(g => days.some(d => model.byDay[d].some(e => shown[e.kind] && T(e.t).area === g)));
     const other = view === "week" ? "month" : "week";
-    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button><button class="winx-cal-today" title="new task (Winx: New task)" data-action="newTask">＋ task</button><div class="winx-cal-legend">${legend.map(g => html`<span data-area="${g.slice(6)}">${areaMap[g] ?? g.slice(6)}</span>`)}</div></div><div class="winx-cal-nav"${PART("header")}><button aria-label="previous" data-action="prev">‹</button><span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span><button aria-label="next" data-action="next">›</button>${days.includes(today) ? "" : html`<button class="winx-cal-today" data-action="today">today</button>`}<button class="winx-cal-today" title="switch to the ${other} view" aria-label="switch to the ${other} view" data-action="switchView">${view}</button><button class="winx-cal-filter${state.showDone ? " on" : ""}" data-action="showDone">✓ done</button><button class="winx-cal-filter" title="unfold / fold every day's 🔁 box" data-action="repeats">🔁 repeats</button></div>`;
+    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button>${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}<div class="winx-cal-legend">${legend.map(g => html`<span data-area="${g.slice(6)}">${areaMap[g] ?? g.slice(6)}</span>`)}</div></div><div class="winx-cal-nav"${PART("header")}>${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}<span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span>${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${days.includes(today) ? "" : new Button({ text: "today", kind: "chip", action: "today" })}${new Button({ text: view, kind: "chip", title: `switch to the ${other} view`, action: "switchView" })}${new Button({ text: "✓ done", kind: "toggle", on: state.showDone, action: "showDone" })}${new Button({ text: "🔁 repeats", kind: "toggle", title: "unfold / fold every day's 🔁 box", action: "repeats" })}</div>`;
   }
   // after the grid: the repeats button lit while every routine day is unfolded
   mount(root) {
@@ -77,7 +78,7 @@ export class Missed extends Part {
   render() {
     const { days, today, model: { missed } } = this.ctx;
     if (!days.includes(today) || !missed.length) return html``;
-    const row = t => { const task = this.view.info(t); return html`<div class="winx-yesterday-row"${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"><span>${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span><div class="winx-board-btns">${new TaskButtons({ task, star: false })}</div><em>${dm(T(t).date)}</em>${this.ctx.TASKS ? html`<button title="done on ${T(t).date}" data-action="missedDone">✓</button>` : ""}<button title="move to today" data-action="missedToday">☀️</button></div>`; };
+    const row = t => { const task = this.view.info(t); return html`<div class="winx-yesterday-row"${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"><span>${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span><div class="winx-board-btns">${new TaskButtons({ task, star: false })}</div><em>${dm(T(t).date)}</em>${this.ctx.TASKS ? new Button({ icon: "✓", title: `done on ${T(t).date}`, action: "missedDone" }) : ""}${new Button({ icon: "☀️", title: "move to today", action: "missedToday" })}</div>`; };
     return html`<div class="winx-yesterday"${PART("missed")}><div class="winx-yesterday-head">Missed?</div>${missed.map(row)}</div>`;
   }
 }
@@ -169,7 +170,7 @@ export class Panel extends Part {
       if (backlog.length > SHOWN) after = html`<button class="winx-cal-more" data-action="more">${cut ? `show all ${backlog.length}` : "show less"}</button>`;
     } else if (state.tab === "pool") {
       // by area, the longest since last done first (never done at the top)
-      const plus = t => html`<button title="add to today" aria-label="add to today" data-action="toToday">+📅</button>`;
+      const plus = t => new Button({ icon: "+📅", title: "add to today", action: "toToday" });
       list = pool.length ? byArea(pool, t => new TaskCard({ task: info(t), meta: model.poolMeta(t), extra: plus(t) }))
         : html`<div class="winx-board-meta">Empty: ✦ New task with «To pool» adds one here</div>`;
     } else {
@@ -178,8 +179,8 @@ export class Panel extends Part {
       const next = t => T(t).date;
       const meta = t => html`${ruleText(T(t).rule)}  ·  ${next(t) ? html`<span${next(t) < today ? html` class="winx-cal-late"` : ""}>next ${dm(next(t))}</span>` : html`<span>⏸ paused</span>`}  ·  ${model.regularHistory(t)}`;
       const pause = t => next(t)
-        ? html`<button title="pause: drop its dates" aria-label="pause" data-action="pause">⏸</button>`
-        : html`<button title="resume: from today, on the first day its rule allows" aria-label="resume" data-action="pause">▶</button>`;
+        ? new Button({ icon: "⏸", title: "pause: drop its dates", action: "pause" })
+        : new Button({ icon: "▶", title: "resume: from today, on the first day its rule allows", action: "pause" });
       list = byArea(rest, t => new TaskCard({ task: info(t), meta: meta(t), extra: pause(t), cls: next(t) ? "" : "paused" }));
       if (bdays.length) {
         const open = state.bdaysOpen;

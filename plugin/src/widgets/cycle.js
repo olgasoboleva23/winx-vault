@@ -27,8 +27,8 @@ export class Cycle extends Widget {
         : !info ? html`<div>no data yet</div>`
         : html`<div class="winx-cycle-day${info.isPeriod ? " period" : ""}">day ${info.day}</div><div class="winx-cycle-next">next ~${dm(info.nextStart)}, ${when}</div>`}
       <div class="winx-cycle-btns">
-        ${new Button({ text: ending ? "ended today" : "started today", action: "mark", kind: "pill", cls: "winx-open-note-btn", data: { kind: ending ? "end" : "start", day } })}
-        ${new Button({ text: "dates", action: "dates", kind: "pill", cls: "winx-open-note-btn" })}
+        ${new Button({ text: ending ? "ended today" : "started today", action: "mark", kind: "pill", data: { kind: ending ? "end" : "start", day } })}
+        ${new Button({ text: "dates", action: "dates", kind: "pill" })}
       </div>
     </div>`;
   }
