@@ -23,7 +23,6 @@
 > > > ```winx
 > > > goals
 > > > ```
-> > > 🗓 [[Week|Week]]
 > 
 > > [!col]
 > > ```winx
