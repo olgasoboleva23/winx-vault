@@ -1,73 +1,52 @@
-// Mobile shopping list: tap a row = bought (moves down, struck out);
-// tap a bought row = back on the list. Add field on top.
+// Mobile shopping list: tap a row = bought (moves down, struck out); tap a bought row = back on the list.
+// An add field on top.
 import { H } from "../lib/helpers.js";
 import { L } from "../lib/goalsLib.js";
+import { html } from "../ui/html.js";
+import { Widget } from "./widget.js";
 
-export default async function (dv) {   // takes no input: `input` below is its text box
-  const FILE_PATH = "00 System/Data/Celestial Market.md";
-  const page = dv.page("00 System/Data/Celestial Market");
-  if (!page) { dv.paragraph("Market file not found."); return; }
+const FILE_PATH = "00 System/Data/Celestial Market.md";
 
-  const { marketCategories } = await H.loadConfig();
-
-  const today = H.today();
-  const cats  = [...marketCategories, { label: "✦ Other", tag: "#other" }];
-  const catOf = t => t.tags?.find(tag => cats.some(c => c.tag === tag)) ?? "#other";
-  const name  = H.marketName;
-  const all   = page.file.tasks.array();
-  const open  = all.filter(t => !t.completed);
-  const bought = all.filter(t => t.completed && H.ymd(t.completion) === today);
-
-  // Rewrite one line; the change re-renders the widget.
-  const rewrite = async (t, fn) => {
-    const file = app.vault.getAbstractFileByPath(FILE_PATH);
-    await app.vault.process(file, c => {
-      const lines = c.split("\n");
-      if (lines[t.line] !== undefined && lines[t.line].includes(name(t))) lines[t.line] = fn(lines[t.line]);
-      return lines.join("\n");
-    });
+export class MobileShopping extends Widget {
+  on = {
+    add: async (e, form) => {
+      const input = form.querySelector("input[name=item]"), v = input.value.trim();
+      if (!v) return;
+      await H.addToMarket(v, form.querySelector("select[name=cat]").value);
+      input.value = "";
+    },
+    // instant feedback, the file write follows (and redraws)
+    toggle: async (e, row) => {
+      const bought = row.classList.contains("bought"), line = Number(row.dataset.line), name = row.dataset.name, today = H.today();
+      row.classList.toggle("bought");
+      await this.app.vault.process(this.app.vault.getAbstractFileByPath(FILE_PATH), c => {
+        const lines = c.split("\n");
+        if (lines[line] !== undefined && lines[line].includes(name)) lines[line] = bought ? L.unmarkBought(lines[line]) : L.markBought(lines[line], today);
+        return lines.join("\n");
+      });
+    },
   };
-
-  const root = dv.container.createEl("div", { cls: "winx-mshop" });
-
-  // Add field
-  const form  = root.createEl("form", { cls: "winx-mshop-add" });
-  const input = form.createEl("input", { attr: { type: "text", placeholder: "+ add item", enterkeyhint: "done" } });
-  const sel   = form.createEl("select");
-  for (const c of cats) sel.createEl("option", { text: c.label, attr: { value: c.tag } });
-  form.createEl("button", { text: "Add", attr: { type: "submit" } });
-  form.onsubmit = async e => {
-    e.preventDefault();
-    const v = input.value.trim();
-    if (!v) return;
-    await H.addToMarket(v, sel.value);
-    input.value = "";
-  };
-
-  const row = (parent, t, isBought) => {
-    const r = parent.createEl("button", { cls: `winx-mshop-row${isBought ? " bought" : ""}` });
-    r.createEl("span", { text: name(t), cls: "winx-mshop-name" });
-    r.createEl("span", { cls: "winx-mshop-mark" });
-    r.onclick = async () => {
-      r.classList.toggle("bought");          // instant feedback, the file write follows
-      await rewrite(t, isBought ? L.unmarkBought : line => L.markBought(line, today));
+  async data() {
+    const page = this.dv.page("00 System/Data/Celestial Market");
+    if (!page) return { missing: true };
+    const { marketCategories } = await H.loadConfig();
+    const today = H.today(), cats = [...marketCategories, { label: "✦ Other", tag: "#other" }];
+    const catOf = t => t.tags?.find(tag => cats.some(c => c.tag === tag)) ?? "#other";
+    const all = page.file.tasks.array(), open = all.filter(t => !t.completed);
+    return {
+      cats, open,
+      groups: cats.map(c => ({ c, items: open.filter(t => catOf(t) === c.tag) })).filter(g => g.items.length),
+      bought: all.filter(t => t.completed && H.ymd(t.completion) === today),
     };
-  };
-
-  if (!open.length) root.createEl("div", { text: "✨ All bought", cls: "winx-mshop-empty" });
-  for (const c of cats) {
-    const group = open.filter(t => catOf(t) === c.tag);
-    if (!group.length) continue;
-    const head = root.createEl("div", { cls: "market-group-header" });
-    head.createEl("span", { text: c.label });
-    head.createEl("span", { text: String(group.length), cls: "market-count" });
-    const list = root.createEl("div", { cls: "winx-mshop-list" });
-    for (const t of group) row(list, t, false);
   }
-
-  if (bought.length) {
-    root.createEl("div", { text: "bought today", cls: "winx-mshop-sep" });
-    const list = root.createEl("div", { cls: "winx-mshop-list" });
-    for (const t of bought) row(list, t, true);
+  view({ missing, cats, open, groups, bought }) {
+    if (missing) return html`<p>Market file not found.</p>`;
+    const row = (t, isBought) => html`<button class="winx-mshop-row${isBought ? " bought" : ""}" data-action="toggle" data-line="${t.line}" data-name="${H.marketName(t)}"><span class="winx-mshop-name">${H.marketName(t)}</span><span class="winx-mshop-mark"></span></button>`;
+    return html`<div class="winx-mshop">
+      <form class="winx-mshop-add" data-action="add"><input name="item" type="text" placeholder="+ add item" enterkeyhint="done"><select name="cat">${cats.map(c => html`<option value="${c.tag}">${c.label}</option>`)}</select><button type="submit">Add</button></form>
+      ${open.length ? "" : html`<div class="winx-mshop-empty">✨ All bought</div>`}
+      ${groups.map(({ c, items }) => html`<div class="market-group-header"><span>${c.label}</span><span class="market-count">${items.length}</span></div><div class="winx-mshop-list">${items.map(t => row(t, false))}</div>`)}
+      ${bought.length ? html`<div class="winx-mshop-sep">bought today</div><div class="winx-mshop-list">${bought.map(t => row(t, true))}</div>` : ""}
+    </div>`;
   }
 }

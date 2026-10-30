@@ -44,10 +44,10 @@ pomodoro:
 > > card: Cycle
 > > ```
 > >
-> > > [!card] Weight
-> > > ```dataviewjs
-> > > await winx.render("weight", dv);
-> > > ```
+> > ```winx
+> > weight
+> > card: Weight
+> > ```
 > >
 > > > [!card] Finance
 > > > 💰 [[Finance|Open finance]]

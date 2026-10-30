@@ -7,7 +7,7 @@ cssclasses:
 > [!back]
 > [[Mobile|← Mobile]]
 
-> [!card] Shopping
-> ```dataviewjs
-> await winx.render("mobileShopping", dv);
-> ```
+```winx
+mobileShopping
+card: Shopping
+```

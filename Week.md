@@ -6,7 +6,8 @@ cssclasses:
 
 `INPUT[date:date]`
 
-> [!card|scroll tall] Week
-> ```dataviewjs
-> await winx.render("week", dv);
-> ```
+```winx
+week
+card: Week
+meta: scroll tall
+```
