@@ -6,7 +6,8 @@
 //                        a change (an input, a select) or a submit (a form)
 //   after(root, data)   what markup can't do (a chart: this.keep(chart) so it's destroyed on the next draw)
 // It draws on load and again a moment after Dataview's index or its own note changes; a hidden block when it
-// shows, a block someone is typing in when they leave it. Obsidian drops its listeners when the block goes.
+// shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
+// listeners when the block goes.
 import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
@@ -53,14 +54,15 @@ export class Widget extends MarkdownRenderChild {
     this.registerDomEvent(this.containerEl, "click", act(["click"], "input, select, form"));
     this.registerDomEvent(this.containerEl, "change", act(["change"]));
     this.registerDomEvent(this.containerEl, "submit", act(["submit"]));
-    this.registerDomEvent(this.containerEl, "focusout", () => setTimeout(() => this.catchUp()));
+    // after leaving a field: a moment later, so a click on the widget's own button (which takes the focus) lands first
+    this.registerDomEvent(this.containerEl, "focusout", () => { clearTimeout(this.leave); this.leave = setTimeout(() => this.catchUp(), 500); });
 
     const later = () => { clearTimeout(this.timer); this.timer = setTimeout(() => this.redraw(), DELAY); };
     this.registerEvent(this.app.metadataCache.on("dataview:metadata-change", later));
     this.registerEvent(this.app.metadataCache.on("changed", f => f.path === this.sourcePath && later()));
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));
-    this.register(() => { clearTimeout(this.timer); this.drop(); });
+    this.register(() => { clearTimeout(this.timer); clearTimeout(this.leave); this.drop(); });
     await this.draw();
   }
 
@@ -78,7 +80,10 @@ export class Widget extends MarkdownRenderChild {
     this.stale = false;
     const data = await this.data();
     this.drop();
+    // what someone typed and hasn't saved stays: fields by their name get their text back
+    const typed = [...this.containerEl.querySelectorAll("input[name], textarea[name]")].filter(f => f.value).map(f => [f.name, f.value]);
     this.containerEl.replaceChildren(sanitizeHTMLToDom(this.view(data).html));
+    for (const [name, value] of typed) { const f = this.containerEl.querySelector(`[name="${CSS.escape(name)}"]`); if (f && !f.value) f.value = value; }
     await this.after(this.containerEl, data);
   }
 }
