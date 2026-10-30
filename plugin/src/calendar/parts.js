@@ -4,7 +4,7 @@
 // No whitespace between tags: inline elements must lay out as the old createEl calls did.
 import { html } from "../ui/html.js";
 import { TaskButtons, TaskCard, TaskRow, TaskText } from "./components.js";
-import { T, sortBacklog, sortPool, sortRegulars, backlogMeta, poolMeta, regularHistory } from "./data.js";
+import { T } from "./data.js";
 import { dateFor } from "./state.js";
 import { addDays, addMonths, dm } from "../lib/dates.js";
 import { ruleText } from "../lib/repeats.js";
@@ -74,7 +74,7 @@ export class Missed extends Part {
     await write(t);
   }
   render() {
-    const { days, today, missed } = this.ctx;
+    const { days, today, model: { missed } } = this.ctx;
     if (!days.includes(today) || !missed.length) return html``;
     const row = t => { const task = this.view.info(t); return html`<div class="winx-yesterday-row"${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"><span>${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span><div class="winx-board-btns">${new TaskButtons({ task, star: false })}</div><em>${dm(T(t).date)}</em>${this.ctx.TASKS ? html`<button title="done on ${T(t).date}" data-action="missedDone">✓</button>` : ""}<button title="move to today" data-action="missedToday">☀️</button></div>`; };
     return html`<div class="winx-yesterday"${PART("missed")}><div class="winx-yesterday-head">Missed?</div>${missed.map(row)}</div>`;
@@ -149,8 +149,7 @@ export class Panel extends Part {
   render() {
     const { state, today, model } = this.ctx;
     const { areaIcons, areaMap } = this.ctx.config;
-    const AREAS = Object.keys(areaIcons);
-    const { backlog, regulars, pool, done, skips } = model;
+    const { backlog, regulars, pool } = model;
     const info = t => this.view.info(t);
     // as on the Life Areas chart
     const areaTitle = g => { const name = areaMap[g] ?? (g ? g.slice(6) : "other"); return `${areaIcons[g] ?? "✦"} ${name[0].toUpperCase()}${name.slice(1)}`; };
@@ -164,19 +163,19 @@ export class Panel extends Part {
     let list = "", after = "";
     if (state.tab === "nodate") {
       // longest-waiting first (➕ created)
-      const sorted = sortBacklog(backlog, AREAS), cut = sorted.length > SHOWN && !state.backlogOpen;
-      list = byArea(cut ? sorted.slice(0, SHOWN) : sorted, t => new TaskCard({ task: info(t), meta: backlogMeta(t, done, today) }));
-      if (sorted.length > SHOWN) after = html`<button class="winx-cal-more" data-action="more">${cut ? `show all ${sorted.length}` : "show less"}</button>`;
+      const cut = backlog.length > SHOWN && !state.backlogOpen;
+      list = byArea(cut ? backlog.slice(0, SHOWN) : backlog, t => new TaskCard({ task: info(t), meta: model.backlogMeta(t) }));
+      if (backlog.length > SHOWN) after = html`<button class="winx-cal-more" data-action="more">${cut ? `show all ${backlog.length}` : "show less"}</button>`;
     } else if (state.tab === "pool") {
       // by area, the longest since last done first (never done at the top)
       const plus = t => html`<button title="add to today" aria-label="add to today" data-action="toToday">+📅</button>`;
-      list = pool.length ? byArea(sortPool(pool, AREAS, done), t => new TaskCard({ task: info(t), meta: poolMeta(t, done, today), extra: plus(t) }))
+      list = pool.length ? byArea(pool, t => new TaskCard({ task: info(t), meta: model.poolMeta(t), extra: plus(t) }))
         : html`<div class="winx-board-meta">Empty: ✦ New task with «To pool» adds one here</div>`;
     } else {
       // birthdays (a fixed yearly rule) fold into one card; the rest by area, the most neglected first; paused last
-      const { rest, bdays } = sortRegulars(regulars, AREAS, done, today);
+      const { rest, bdays } = regulars;
       const next = t => T(t).date;
-      const meta = t => html`${ruleText(T(t).rule)}  ·  ${next(t) ? html`<span${next(t) < today ? html` class="winx-cal-late"` : ""}>next ${dm(next(t))}</span>` : html`<span>⏸ paused</span>`}  ·  ${regularHistory(t, done, skips)}`;
+      const meta = t => html`${ruleText(T(t).rule)}  ·  ${next(t) ? html`<span${next(t) < today ? html` class="winx-cal-late"` : ""}>next ${dm(next(t))}</span>` : html`<span>⏸ paused</span>`}  ·  ${model.regularHistory(t)}`;
       const pause = t => next(t)
         ? html`<button title="pause: drop its dates" aria-label="pause" data-action="pause">⏸</button>`
         : html`<button title="resume: from today, on the first day its rule allows" aria-label="resume" data-action="pause">▶</button>`;
@@ -187,7 +186,7 @@ export class Panel extends Part {
         list = html`${list}<div class="winx-cal-groupcard dashed"><div class="winx-cal-group winx-cal-fold" title="${open ? "fold" : "show all"}" data-action="bdays">🎂 Birthdays · ${bdays.length}</div>${(open ? bdays : bdays.slice(0, 3)).map(t => new TaskCard({ task: info(t), meta: `yearly · ${dm(next(t))}` }))}${more}</div>`;
       }
     }
-    const tabs = [["nodate", `No date · ${backlog.length}`], ["regulars", `Regulars · ${regulars.length}`], ["pool", `Pool · ${pool.length}`]];
+    const tabs = [["nodate", `No date · ${backlog.length}`], ["regulars", `Regulars · ${regulars.rest.length + regulars.bdays.length}`], ["pool", `Pool · ${pool.length}`]];
     return html`<div class="winx-cal-backlog winx-board-backlog" data-drop=""${PART("panel")}><div class="winx-cal-tabs">${tabs.map(([key, text]) => html`<button class="winx-cal-head${key === state.tab ? " on" : ""}" data-action="tab" data-tab="${key}">${text}</button>`)}</div><div class="winx-cal-backlog-grid">${list}</div>${after}</div>`;
   }
 }

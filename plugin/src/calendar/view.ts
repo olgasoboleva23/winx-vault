@@ -1,6 +1,6 @@
 import { ItemView, Notice, TAbstractFile, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import { actionOf } from "../widgets/parse.js";
-import { T, collect, findTask, missed, taskKey } from "./data.js";
+import { CalendarData, T, findTask, taskKey } from "./data.js";
 import { baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
@@ -96,7 +96,7 @@ export class CalendarView extends ItemView {
   }
   // the task an element stands for, in this draw's data; a task that's gone or changed meanwhile: none (and a notice)
   taskOf(el: Element) {
-    const t = findTask((el.closest("[data-task]") as HTMLElement)?.dataset.task, this.ctx.all);
+    const t = findTask((el.closest("[data-task]") as HTMLElement)?.dataset.task, this.ctx.model.all);
     if (!t) new Notice("✦ task changed, try again");
     return t;
   }
@@ -116,14 +116,13 @@ export class CalendarView extends ItemView {
     const ctx: any = this.ctx = {
       root, state: this.state, today, days, base: baseDate(this.state, today), view: this.state.view,
       shown: { open: true, ghost: true, done: this.state.showDone },
-      model: collect({ tasks, poolLines, days, today }), missed: missed(tasks, today),
+      model: new CalendarData({ tasks, poolLines, days, today, areaOrder: Object.keys(config.areaIcons) }),
       config, TASKS: (this.app as any).plugins.plugins["obsidian-tasks-plugin"]?.apiV1,
       infos: new Map(),
       unfolded: new Set(this.state.unfolded), shows: [], syncRepeats: () => {},
       saveUnfolded: () => { this.state.unfolded = [...ctx.unfolded]; this.app.workspace.requestSaveLayout(); },
       set: (patch: object, parts: PartName[]) => this.set(patch, parts),
     };
-    ctx.all = [...tasks, ...ctx.model.pool];   // what a data-task key is looked up in
     this.actions = makeActions(ctx);
     this.els.clear();
     for (const p of PARTS) this.place(p, null);
@@ -245,7 +244,7 @@ export class CalendarView extends ItemView {
     }, { passive: true });
     this.registerDomEvent(el, "touchmove", e => {
       const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
-      const t = findTask(r.dataset.task, this.ctx?.all ?? []), left = t && this.left(t);
+      const t = findTask(r.dataset.task, this.ctx?.model.all ?? []), left = t && this.left(t);
       const mx = e.touches[0].clientX - s.x0, my = e.touches[0].clientY - s.y0;
       if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
       if (!s.on || (mx < 0 && !left)) return;
