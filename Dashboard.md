@@ -11,8 +11,8 @@ pomodoro:
 >>[!col]
 > >`INPUT[date:date]`
 > >
-> >```dataviewjs
-> >await winx.render("dailyNote", dv);
+> >```winx
+> >dailyNote
 > >```
 
 > [!grid]
