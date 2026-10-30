@@ -39,10 +39,10 @@ pomodoro:
 > > > await winx.render("lifeAreas", dv);
 > > > ```
 > >
-> > > [!card] Cycle
-> > > ```dataviewjs
-> > > await winx.render("cycle", dv);
-> > > ```
+> > ```winx
+> > cycle
+> > card: Cycle
+> > ```
 > >
 > > > [!card] Weight
 > > > ```dataviewjs

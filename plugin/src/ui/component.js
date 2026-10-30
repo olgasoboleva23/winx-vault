@@ -9,11 +9,12 @@ export class Component {
   get html() { return this.view(this.props).html; }
 }
 
-// kind: "round" (an icon), "pill" (a word), "cta" (the main one)
+// kind: "round" (an icon), "pill" (a word), "cta" (the main one); data: { name: "tea" } → data-name="tea"
 export class Button extends Component {
-  view({ icon, text, title, action, kind = "round", cls }) {
+  view({ icon, text, title, action, kind = "round", cls, data = {} }) {
     const label = title ? html` title="${title}" aria-label="${title}"` : "";
-    return html`<button class="winx-btn ${kind}${cls ? " " + cls : ""}"${action ? html` data-action="${action}"` : ""}${label}>${icon ?? text}</button>`;
+    const extra = Object.entries(data).map(([k, v]) => html` data-${k}="${v}"`);
+    return html`<button class="winx-btn ${kind}${cls ? " " + cls : ""}"${action ? html` data-action="${action}"` : ""}${extra}${label}>${icon ?? text}</button>`;
   }
 }
 

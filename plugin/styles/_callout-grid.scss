@@ -42,6 +42,12 @@
 }
 
 /* ── Dashboard: flex columns ── */
+/* a ```winx block that draws its own card: the block's wrapper steps out of the layout, so the card sits in the
+   column like a "> [!card]" callout does */
+.block-language-winx:has(> .callout[data-callout="card"]) {
+  display: contents;
+}
+
 .dashboard {
   /* overflow fix for card content (merged from theme.css) */
   .callout[data-callout="card"] > .callout-content {

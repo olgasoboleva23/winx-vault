@@ -13,6 +13,8 @@ test("Button: an action by name, a title, a kind", () => {
     '<button class="winx-btn round" data-action="remove" title="delete task" aria-label="delete task">🗑</button>');
   assert.equal(new Button({ text: "✦ list", action: "openList", kind: "pill", cls: "winx-open-note-btn" }).html,
     '<button class="winx-btn pill winx-open-note-btn" data-action="openList">✦ list</button>');
+  assert.equal(new Button({ text: "low", action: "low", data: { name: 'tea "green"', tag: "#food" } }).html,
+    '<button class="winx-btn round" data-action="low" data-name="tea &quot;green&quot;" data-tag="#food">low</button>');
 });
 
 test("Card: the markup Obsidian draws for a > [!card] callout, the body as it is", () => {

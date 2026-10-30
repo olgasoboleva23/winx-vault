@@ -1,33 +1,33 @@
+// Supplies: what is bought again and again (from the Celestial Market's done items), how long since the last
+// time against the usual gap, and "running low" to put one back on the shopping list.
+import { Notice } from "obsidian";
 import { H } from "../lib/helpers.js";
 import { L } from "../lib/goalsLib.js";
+import { html } from "../ui/html.js";
+import { Button } from "../ui/component.js";
+import { Widget } from "./widget.js";
 
-export default async function (dv, input) {
-  const { marketCategories } = await H.loadConfig();
-
-  const today = H.today();
-  const { history, open } = H.marketState(dv);
-  const stats = L.supplyStats(history, today);
-  const root  = dv.container.createEl("div", { cls: "winx-supplies" });
-
-  if (!stats.length) root.createEl("div", { text: "Nothing bought twice yet" });
-
-  const cats = [...marketCategories, { label: "✦ Other", tag: "#other" }];
-  for (const cat of cats) {
-    const items = stats.filter(s => (cats.some(c => c.tag === s.tag) ? s.tag : "#other") === cat.tag);
-    if (!items.length) continue;
-    root.createEl("div", { text: cat.label, cls: "market-group-header" });
-    for (const s of items) {
-      const row = root.createEl("div", { cls: `winx-supply${s.due ? " due" : ""}` });
-      row.createEl("span", { text: s.name, cls: "winx-supply-name" });
+export class Supplies extends Widget {
+  on = {
+    low: async (e, el) => { await H.addToMarket(el.dataset.name, el.dataset.tag); new Notice(`✦ ${el.dataset.name} → Celestial Market`); },
+  };
+  async data() {
+    const { marketCategories } = await H.loadConfig();
+    const { history, open } = H.marketState(this.dv);
+    const cats = [...marketCategories, { label: "✦ Other", tag: "#other" }];
+    return { stats: L.supplyStats(history, H.today()), open, cats };
+  }
+  view({ stats, open, cats }) {
+    const groupOf = s => cats.some(c => c.tag === s.tag) ? s.tag : "#other";
+    const row = s => {
       const listed = open.has(s.name);
-      const info = listed ? "on the shopping list ✦"
-        : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}`
-        : `bought ${s.buys} times`;
-      row.createEl("span", { text: info, cls: "winx-supply-info" });
-      if (!listed) {
-        const b = row.createEl("button", { text: "running low", cls: "winx-open-note-btn" });
-        b.onclick = async () => { await H.addToMarket(s.name, s.tag); new Notice(`✦ ${s.name} → Celestial Market`); };
-      }
-    }
+      const info = listed ? "on the shopping list ✦" : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}` : `bought ${s.buys} times`;
+      const low = new Button({ text: "running low", action: "low", kind: "pill", cls: "winx-open-note-btn", data: { name: s.name, tag: s.tag } });
+      return html`<div class="winx-supply${s.due ? " due" : ""}"><span class="winx-supply-name">${s.name}</span><span class="winx-supply-info">${info}</span>${listed ? "" : low}</div>`;
+    };
+    return html`<div class="winx-supplies">
+      ${stats.length ? "" : html`<div>Nothing bought twice yet</div>`}
+      ${cats.map(cat => { const items = stats.filter(s => groupOf(s) === cat.tag); return items.length ? html`<div class="market-group-header">${cat.label}</div>${items.map(row)}` : ""; })}
+    </div>`;
   }
 }
