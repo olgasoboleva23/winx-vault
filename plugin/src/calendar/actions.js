@@ -2,7 +2,7 @@
 // most come with an undo notice. A 🔁 task ticked goes through the Tasks plugin, so it gets its next copy.
 import { Task } from "../lib/task.js";
 import { T } from "./data.js";
-import { edit } from "../lib/files.js";
+import { edit as editFile } from "../lib/files.js";
 import { deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal } from "../lib/taskEdit.js";
 
 const MASTER = "02 Areas/Personal/Tasks/Master.md";
@@ -17,7 +17,7 @@ export function makeActions(ctx) {
   const tick    = t => editTaskLineWithUndo(t, line => TASKS.executeToggleTaskDoneCommand(line, t.path), "✓");
   const unplan  = t => editTaskLineWithUndo(t, line => new Task(line).place(null, false), "↩ no date");
   // a pool item's copy goes to the top of Master.md, like a new task: open on `day` (no date for null), or done that day
-  const fromPool = (t, day, done) => edit(MASTER, c => new Task(Task.fromPool(T(t).line, today)).place(day, done) + "\n" + c);
+  const fromPool = (t, day, done) => editFile(MASTER, c => new Task(Task.fromPool(T(t).line, today)).place(day, done) + "\n" + c);
   // a task dropped on `day` (null: the backlog): open and due that day, or done that day. An open 🔁 task done on
   // a day goes through the Tasks plugin (so it gets its next copy), then back to that day
   const place = async (t, day, done) => {
@@ -33,7 +33,7 @@ export function makeActions(ctx) {
   // ⏸ pause: drop its dates; ▶ resume: from today, on the first day its rule allows
   const pauseOrResume = t => {
     const paused = !T(t).date;
-    return editTaskLineWithUndo(t, line => paused ? new Task(line).resume(today) : new Task(line).pause(), Task, paused ? "▶" : "⏸");
+    return editTaskLineWithUndo(t, line => paused ? new Task(line).resume(today) : new Task(line).pause(), paused ? "▶" : "⏸");
   };
   const setDifficulty = (t, tag) => editTaskLineWithUndo(t, line => new Task(line).setDifficulty(tag), "⭐");
   const remove = t => deleteTaskLine(t);
