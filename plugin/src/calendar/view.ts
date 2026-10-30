@@ -1,7 +1,7 @@
-import { ItemView, TAbstractFile, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
+import { ItemView, Notice, TAbstractFile, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import { H } from "../lib/helpers.js";
 import { actionOf } from "../widgets/parse.js";
-import { T, collect, missed } from "./data.js";
+import { T, collect, findTask, missed, taskKey } from "./data.js";
 import { baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
@@ -10,7 +10,8 @@ import { Grid, Header, Missed, Panel } from "./parts.js";
 // their days, "Missed?" above, and the No date | Regulars | Pool panel below. Its state (date, view, tab, folds)
 // is the tab's own: Obsidian saves it with the layout, so a pinned calendar comes back as it was.
 // The parts are classes (parts.js): markup in html``, handlers by data-action. One set of listeners on the tab
-// handles every click, tick, drag and swipe, and finds the task by the element's data-task key.
+// handles every click, tick, drag and swipe, and finds the task by the element's data-task key (file, line,
+// status, words: the same task in every draw, never another one — see data.js).
 // Parts redraw on their own: a tab or a fold the panel; a date, the week/month or ✓ done everything, from
 // fresh data; a change to the tasks (Dataview's index) everything too.
 export const VIEW_TYPE = "winx-calendar";
@@ -77,12 +78,11 @@ export class CalendarView extends ItemView {
 
   private dataview(): any { return (this.app as any).plugins.plugins.dataview?.api; }
 
-  // what a component needs about a task; each task gets a key (data-task) in this draw's map
+  // what a component needs about a task, with its key (data-task)
   info(t: any) {
     const ctx = this.ctx, known = ctx.infos.get(t);
     if (known) return known;
-    const task = T(t), key = ctx.tasks.size, area = task.area;
-    ctx.tasks.set(String(key), t);
+    const task = T(t), key = taskKey(t), area = task.area;
     const i = {
       key, area: area?.slice(6) ?? null, difficulty: task.difficulty, text: task.text, pool: !!t.pool,
       label: `${ctx.config.areaIcons[area] ?? ""} ${task.text}`.trim(),
@@ -92,7 +92,12 @@ export class CalendarView extends ItemView {
     ctx.infos.set(t, i);
     return i;
   }
-  taskOf(el: Element) { return this.ctx.tasks.get((el.closest("[data-task]") as HTMLElement)?.dataset.task); }
+  // the task an element stands for, in this draw's data; a task that's gone or changed meanwhile: none (and a notice)
+  taskOf(el: Element) {
+    const t = findTask((el.closest("[data-task]") as HTMLElement)?.dataset.task, this.ctx.all);
+    if (!t) new Notice("✦ task changed, try again");
+    return t;
+  }
 
   // the whole calendar, with fresh data
   private async draw() {
@@ -112,11 +117,12 @@ export class CalendarView extends ItemView {
       shown: { open: true, ghost: true, done: this.state.showDone },
       model: collect({ tasks, poolLines, days, today }), missed: missed(tasks, today),
       config, TASKS: (this.app as any).plugins.plugins["obsidian-tasks-plugin"]?.apiV1,
-      tasks: new Map(), infos: new Map(),
+      infos: new Map(),
       unfolded: new Set(this.state.unfolded), shows: [], syncRepeats: () => {},
       saveUnfolded: () => { this.state.unfolded = [...ctx.unfolded]; this.app.workspace.requestSaveLayout(); },
       set: (patch: object, parts: PartName[]) => this.set(patch, parts),
     };
+    ctx.all = [...tasks, ...ctx.model.pool];   // what a data-task key is looked up in
     this.actions = makeActions(ctx);
     this.els.clear();
     for (const p of PARTS) this.place(p, null);
@@ -148,9 +154,9 @@ export class CalendarView extends ItemView {
   // ── the task's own buttons, the same in every part ──
   private ticks = new WeakMap<Element, number>();
   private taskOn: Record<string, (e: Event, el: HTMLElement) => any> = {
-    difficulty: (e, el) => { e.stopPropagation(); this.difficultyPicker(el, this.taskOf(el)); },
-    edit: (e, el) => this.actions.edit(this.taskOf(el)),
-    skip: (e, el) => { const t = this.taskOf(el); el.closest("[data-task]")?.remove(); this.actions.skip(t); },
+    difficulty: (e, el) => { e.stopPropagation(); const t = this.taskOf(el); if (t) this.difficultyPicker(el, t); },
+    edit: (e, el) => { const t = this.taskOf(el); if (t) this.actions.edit(t); },
+    skip: (e, el) => { const t = this.taskOf(el); if (!t) return; el.closest("[data-task]")?.remove(); this.actions.skip(t); },
     // 🗑: the first click arms it for 3 s, the second removes the task's line (with undo)
     remove: async (e, el) => {
       if (!el.classList.contains("armed")) {
@@ -159,17 +165,18 @@ export class CalendarView extends ItemView {
         return;
       }
       const t = this.taskOf(el);
+      if (!t) return;
       el.closest("[data-task]")?.remove();
       await this.actions.remove(t);
     },
     // a tick waits 2 s (struck through, a gold shimmer) before it's written: unticking in time leaves the file alone.
     // The sound comes from installSounds (it listens to every .task-list-item-checkbox)
     tick: (e, box) => {
-      // the task now: a redraw in the 2 s (another tick written, ‹ ›) renumbers the keys
+      // the task as it is now: written 2 s later even if the calendar redraws meanwhile
       const row = box.closest(".winx-cal-task") as HTMLElement, cb = box as HTMLInputElement, t = this.taskOf(row);
       row.classList.toggle("ticking", cb.checked);
       window.clearTimeout(this.ticks.get(row));
-      if (cb.checked) this.ticks.set(row, window.setTimeout(() => {
+      if (cb.checked && t) this.ticks.set(row, window.setTimeout(() => {
         cb.disabled = true; row.classList.add("done"); row.querySelector(".winx-board-btns")?.remove();
         this.actions.tick(t);
       }, 2000));
@@ -237,7 +244,7 @@ export class CalendarView extends ItemView {
     }, { passive: true });
     this.registerDomEvent(el, "touchmove", e => {
       const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
-      const t = this.taskOf(r), left = this.left(t);
+      const t = findTask(r.dataset.task, this.ctx?.all ?? []), left = t && this.left(t);
       const mx = e.touches[0].clientX - s.x0, my = e.touches[0].clientY - s.y0;
       if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
       if (!s.on || (mx < 0 && !left)) return;
@@ -246,8 +253,10 @@ export class CalendarView extends ItemView {
     this.registerDomEvent(el, "touchend", e => {
       const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
       r.style.transform = ""; delete r.dataset.swipe;
+      if (!s.on || Math.abs(s.dx) <= 80) return;
       const t = this.taskOf(r);
-      if (s.on && s.dx > 80) this.right(r, t); else if (s.on && s.dx < -80) this.left(t)?.();
+      if (!t) return;
+      if (s.dx > 80) this.right(r, t); else this.left(t)?.();
     });
   }
   private left(t: any) { return this.actions.canSkip(t) ? () => this.actions.skip(t) : T(t).date ? () => this.actions.unplan(t) : null; }

@@ -103,3 +103,21 @@ test("meta lines", () => {
   assert.equal(regularHistory(task(" ", "run 🔁 every day"), done, skips), "done 2× · last 08.06 · skipped 1×");
   assert.equal(regularHistory(task(" ", "walk 🔁 every day"), done, []), "never done");
 });
+
+test("a task's key finds the same task again: by its line, after lines moved, never another task", async () => {
+  const { taskKey, findTask } = await import("../src/calendar/data.js");
+  const at = (line, status, text) => ({ status, text, path: "Tasks/Master.md", line });
+  const workout = at(10, " ", "#area/body workout 📅 2026-10-30"), skipped = at(11, "-", "#area/body workout 📅 2026-10-28 ❌ 2026-10-28");
+  const key = taskKey(workout);
+  assert.equal(findTask(key, [workout, skipped]), workout);
+  // a new task on top of the file: every line one lower
+  const moved = [at(0, " ", "new thing"), at(11, " ", "#area/body workout 📅 2026-10-30"), at(12, "-", "#area/body workout 📅 2026-10-28 ❌ 2026-10-28")];
+  assert.equal(findTask(key, moved), moved[1]);                 // the open one, not the skipped one with the same text
+  assert.equal(findTask(taskKey(skipped), moved), moved[2]);
+  // gone (deleted or renamed): nothing, rather than a neighbour
+  assert.equal(findTask(key, [at(10, " ", "#area/body stretch")]), null);
+  // a pool item (no checkbox)
+  const pool = { text: "#area/base take out trash", path: "Tasks/Pool.md", line: 2, pool: true };
+  assert.equal(findTask(taskKey(pool), [{ ...pool, line: 3 }]).line, 3);
+  assert.equal(findTask("nonsense", [workout]), null);
+});
