@@ -1,5 +1,5 @@
 // Run inside Obsidian (obsidian eval): opens each page (live preview; "view:<type>" opens a plugin tab of that type),
-// waits for its widgets, and writes the computed styles of every visible element (and its ::before / ::after) under
+// "view:<type>|{json}" with that state), waits for its widgets, and writes the computed styles of every visible element (and its ::before / ::after) under
 // ROOT (a selector; default: the whole page) to OUT as JSON, keyed by the element's path below it.
 // Two snapshots (old snippets on / plugin styles on) must match: tests/obsidian/compare-snapshots.mjs.
 (async (OUT, PAGES, ROOT = null) => {
@@ -13,7 +13,7 @@
   // live preview: the reading view isn't drawn while the window is hidden behind others
   const leaf = app.workspace.getLeaf(false), was = leaf.getViewState();
   for (const page of PAGES) {
-    if (page.startsWith("view:")) await leaf.setViewState({ type: page.slice(5) });
+    if (page.startsWith("view:")) { const [type, state] = page.slice(5).split("|"); await leaf.setViewState({ type, state: state ? JSON.parse(state) : {} }); }
     else await leaf.setViewState({ type: "markdown", state: { file: app.metadataCache.getFirstLinkpathDest(page, "").path, mode: "source" } });
     await wait(5000);
     const root = leaf.view.containerEl.querySelector(ROOT ?? ".markdown-source-view");
@@ -24,7 +24,7 @@
       for (const pseudo of [null, "::before", "::after"]) {
         const cs = getComputedStyle(e, pseudo);
         if (pseudo && (cs.content === "none" || cs.content === "normal")) continue;
-        shot[`${ROOT ? "" : page + " "}${path(e)}${pseudo ?? ""}`] = PROPS.map(p => cs.getPropertyValue(p)).join("|");
+        shot[`${ROOT && PAGES.length === 1 ? "" : page + " "}${path(e)}${pseudo ?? ""}`] = PROPS.map(p => cs.getPropertyValue(p)).join("|");
       }
     }
   }
