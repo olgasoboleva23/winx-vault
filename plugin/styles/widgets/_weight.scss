@@ -1,0 +1,15 @@
+/* ── Weight ── */
+.winx-weight { display: grid; gap: 8px; }
+.winx-weight-head { display: flex; align-items: baseline; gap: 10px; }
+.winx-weight-now { font-family: "Cinzel", serif; font-size: 22px; color: var(--winx-text-dark); }
+.winx-weight-delta { font-size: 12px; color: var(--winx-purple-deep); }
+.winx-weight-list { justify-self: start; }
+.winx-weight .winx-weight-add {
+  display: flex;
+  gap: 6px;
+
+  input, button { min-height: 44px; border-radius: 12px; border: 1px solid var(--winx-border); box-shadow: none; }
+  input  { flex: 1; min-width: 0; padding: 0 12px; font-size: 18px; background: rgb(255 255 255 / 65%); color: var(--winx-text-dark); }
+  button { padding: 0 18px; font-weight: 600; color: #fff; border-color: transparent;
+           background: linear-gradient(135deg, var(--winx-pink), var(--winx-pink-deep)); }
+}

@@ -1,0 +1,68 @@
+/* ── Goals, Cycle, Week widgets ── */
+.winx-goals {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.winx-goal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--winx-text-dark);
+}
+
+.winx-goal-name { font-weight: 600; }
+.winx-goal-count, .winx-goal-min, .winx-cycle-next { font-size: 12px; color: var(--winx-purple-deep); }
+
+.winx-goal-dots {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 2px;
+}
+
+.winx-dot {
+  display: inline-block;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--winx-border);
+  background: rgb(255 255 255 / 40%);
+
+  &.done    { background: var(--winx-gold); border-color: var(--winx-gold-deep); }
+  &.missed  { border-color: var(--winx-pink-deep); border-style: dashed; }
+  &.planned { border-color: var(--winx-purple); }
+  &.sel     { box-shadow: 0 0 6px var(--winx-pink-deep); }
+}
+
+.winx-cycle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.winx-cycle-day {
+  font-family: "Cinzel", serif;
+  font-size: 26px;
+  color: var(--winx-text-dark);
+
+  &.period { color: var(--winx-pink-deep); text-shadow: 0 0 8px var(--winx-pink); }
+}
+
+.winx-week {
+  border-collapse: collapse;
+  color: var(--winx-text-dark);
+
+  th, td { padding: 4px 6px; text-align: center; }
+  th { font-size: 12px; color: var(--winx-purple-deep); }
+  td:first-child { text-align: left; }
+  td.period { background: var(--winx-pink); border-radius: 6px; }
+}
+
+/* the table comes with a <tbody> (HTML markup): Obsidian clips cells there (tbody > tr > td), not in the week */
+table.winx-week > tbody > tr > :is(td, th) { overflow: visible; }
+.winx-week-day { font-size: 12px; color: var(--winx-purple-deep); margin-top: 6px; }
+
+.winx-cycle-btns { display: flex; gap: 8px; flex-wrap: wrap; }
