@@ -1,18 +1,20 @@
 /* ── Task cards (calendar backlog) ── */
+
+@use "../mixins" as *;
 .winx-board-card {
   position: relative;
   padding: 7px 8px;
-  border-bottom: 1px dashed color-mix(in srgb, var(--winx-gold-deep) 35%, transparent);
+  border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
   color: var(--winx-text-dark);
   cursor: grab;
   transition: background 0.15s ease;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: color-mix(in srgb, white 35%, transparent); border-radius: 10px; }
+  &:hover { background: fade(white, 35%); border-radius: 10px; }
   &.dragging { opacity: 0.4; }
 }
 .winx-board-text { font-size: 14px; line-height: 1.35; }
-.winx-board-meta { margin-top: 2px; font-size: 11px; color: color-mix(in srgb, var(--winx-purple-deep) 75%, transparent); }
+.winx-board-meta { margin-top: 2px; font-size: 11px; color: fade(var(--winx-purple-deep), 75%); }
 
 /* round buttons on a task: ⏭ ✏️ 🗑 */
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
@@ -40,13 +42,13 @@ body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top
   border-radius: 50%;
   border: 1px solid var(--winx-border);
   background: rgb(255 255 255 / 85%);
-  box-shadow: 0 0 6px rgb(from var(--winx-pink-deep) r g b / 35%);
+  box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 
-  &:hover { transform: scale(1.12); box-shadow: 0 0 10px rgb(from var(--winx-gold) r g b / 90%); }
+  &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
 }
 body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { width: 34px; height: 34px; font-size: 16px; }
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns button.winx-board-del.armed {

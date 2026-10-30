@@ -1,4 +1,6 @@
 /* ── Calendar (week / month) ── */
+
+@use "../mixins" as *;
 .winx-cal-nav, .winx-cal-top {
   display: flex;
   align-items: center;
@@ -13,7 +15,7 @@
     border: 1px solid var(--winx-border);
     background: rgb(255 255 255 / 75%);
     color: var(--winx-purple-deep);
-    box-shadow: 0 0 6px rgb(from var(--winx-pink-deep) r g b / 35%);
+    box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
@@ -21,7 +23,7 @@
   button.winx-cal-today, button.winx-cal-filter { width: auto; padding: 0 12px; border-radius: 999px; font-size: 12px; }
   button.winx-cal-filter { opacity: 0.55; box-shadow: none; }
   button:not(.winx-cal-filter) + button.winx-cal-filter { margin-left: auto; }
-  button.winx-cal-filter.on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px rgb(from var(--winx-gold) r g b / 70%); }
+  button.winx-cal-filter.on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
 }
 .winx-cal-top { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
 .winx-cal-top button.winx-cal-mute { width: auto; padding: 0 6px; background: none; border: none; box-shadow: none; font-size: 16px; cursor: pointer; }
@@ -40,7 +42,7 @@
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
 
   &.today { border-color: rgb(168 200 240); background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240) 60%, rgb(232 213 245)); }   /* the Missed strip's blue */
-  &.over  { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px rgb(from var(--winx-gold) r g b / 90%); }
+  &.over  { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
 }
 .winx-cal-day { min-height: 220px; padding: 8px 6px; }
 .winx-cal-day, .winx-cal-cell { position: relative; }
@@ -59,7 +61,7 @@
   color: var(--winx-purple-deep);
   transition: background 0.15s ease, box-shadow 0.15s ease;
 
-  &.over { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px rgb(from var(--winx-gold) r g b / 90%); }
+  &.over { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
 }
 /* drop bar: sticky at the top while dragging (zero height, so nothing below jumps) */
 /* the dataviewjs block scrolls on its own (overflow: auto), which would pin the bar inside it */
@@ -73,7 +75,7 @@
   border-radius: 14px;
   border: 1px solid var(--winx-gold-deep);
   background: rgb(255 248 252 / 95%);
-  box-shadow: 0 4px 16px rgb(from var(--winx-purple-deep) r g b / 35%);
+  box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
 }
 .winx-cal.dragging .winx-cal-dropbar-in { display: grid; }
 .winx-cal-chip {
@@ -87,7 +89,7 @@
   transition: background 0.15s ease, box-shadow 0.15s ease;
 
   &.today { border-color: rgb(168 200 240); }
-  &.over  { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px rgb(from var(--winx-gold) r g b / 90%); }
+  &.over  { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
 }
 .winx-cal-backlog {
   margin-top: 14px;
@@ -97,7 +99,7 @@
   background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
   transition: box-shadow 0.15s ease;
 
-  &.over { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px rgb(from var(--winx-gold) r g b / 90%); }
+  &.over { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
   .winx-cal-head { text-align: left; }
   button.winx-cal-more { margin-top: 6px; padding: 2px 12px; border-radius: 999px; border: 1px solid var(--winx-border); background: rgb(255 255 255 / 75%); color: var(--winx-purple-deep); font-size: 12px; cursor: pointer; }
 }
@@ -107,7 +109,7 @@
   margin-bottom: 12px;
   padding: 6px 8px;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--winx-border) 25%, transparent);
+  background: fade(var(--winx-border), 25%);
   .winx-board-card:last-child { border-bottom: none; }
 }
 .winx-cal-head {
@@ -119,14 +121,14 @@
 .winx-cal-task {
   position: relative;
   padding: 4px 5px;
-  border-bottom: 1px dashed color-mix(in srgb, var(--winx-gold-deep) 30%, transparent);
+  border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
   font-size: 13px;
   line-height: 1.3;
   color: var(--winx-text-dark);
 
   &:last-child { border-bottom: none; }
   &[draggable="true"] { cursor: grab; }
-  &[draggable="true"]:hover { background: color-mix(in srgb, white 35%, transparent); border-radius: 8px; }
+  &[draggable="true"]:hover { background: fade(white, 35%); border-radius: 8px; }
   &.ghost   { opacity: 0.5; }
   &.done    { opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
   &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
@@ -146,9 +148,9 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
   border-radius: 12px;
   border: 1px solid var(--winx-gold-deep);
   background: rgb(255 248 252 / 97%);
-  box-shadow: 0 4px 16px rgb(from var(--winx-purple-deep) r g b / 35%);
+  box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
   button { justify-content: flex-start; padding: 4px 12px; font-family: var(--font-text); border: none; box-shadow: none; background: none; color: var(--winx-purple-deep); font-size: 13px; cursor: pointer; }
-  button:hover { background: color-mix(in srgb, var(--winx-border) 40%, transparent); }
+  button:hover { background: fade(var(--winx-border), 40%); }
 }
 /* area colors: a stripe on the left of each task, dots in the legend */
 .winx-cal [data-area] {
@@ -164,7 +166,7 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
   &[data-area="personal"]  { --area: #e88fc0; }
   &[data-area="health"]    { --area: #5ec4c4; }
 }
-.winx-cal :is(.winx-cal-task, .winx-yesterday-row)[data-area] { border-left: 3px solid var(--area); border-radius: 2px; background: color-mix(in srgb, var(--area) 30%, transparent); }
+.winx-cal :is(.winx-cal-task, .winx-yesterday-row)[data-area] { border-left: 3px solid var(--area); border-radius: 2px; background: fade(var(--area), 30%); }
 .winx-cal-legend {
   display: flex;
   flex-wrap: wrap;
@@ -189,22 +191,13 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
   margin: 2px 0 4px;
   padding: 0.15rem 0.8rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--winx-border) 40%, transparent);
+  background: fade(var(--winx-border), 40%);
   color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep));
   font-weight: 600;
 }
 /* today's column gets the card's fairy wings in two corners */
 .winx-cal-day.today {
-  &::before, &::after {
-    content: "";
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background: var(--winx-wing-svg) no-repeat center / contain;
-    pointer-events: none;
-  }
-  &::before { top: 3px; left: 3px; }
-  &::after  { bottom: 3px; right: 3px; transform: scale(-1, -1); }
+  @include wings(30px, 3px);
   > :not(.winx-cal-zones) { position: relative; z-index: 1; }
 }
 .winx-cal-month {
@@ -225,7 +218,7 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
 /* a tick waits 2 s before it's written: struck through, a gold shimmer runs over it */
 .winx-cal-task.ticking {
   text-decoration: line-through;
-  background-image: linear-gradient(100deg, transparent 30%, rgb(from var(--winx-gold) r g b / 55%) 50%, transparent 70%);
+  background-image: linear-gradient(100deg, transparent 30%, alpha(--winx-gold, 55%) 50%, transparent 70%);
   background-size: 250% 100%;
   animation: winx-tick-shimmer 1s ease-in-out 2;
 }
@@ -240,8 +233,8 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
   width: 56px;
   height: 30px;
   border-radius: 999px;
-  background: rgb(from var(--winx-pink-deep) r g b / 85%);
-  box-shadow: 0 0 12px rgb(from var(--winx-pink-deep) r g b / 60%), 0 0 4px #fff inset;
+  background: alpha(--winx-pink-deep, 85%);
+  box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
   color: #fff;
   font-size: 18px;
   span { animation: winx-spin 0.9s linear infinite; }
@@ -255,13 +248,13 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
 body.is-mobile :is(.winx-cal-task, .winx-yesterday-row, .winx-board-card) { touch-action: pan-y; }
 .winx-cal [data-swipe] { transition: none; }
 .winx-cal [data-swipe="done"] { box-shadow: -40px 0 0 -6px rgb(120 200 150 / 70%); }
-.winx-cal :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px rgb(from var(--winx-purple-deep) r g b / 40%); }
+.winx-cal :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px alpha(--winx-purple-deep, 40%); }
 
 /* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
 .winx-cal-routine {
   margin: 3px 0;
   border-radius: 14px;
-  border: 1px dashed rgb(from var(--winx-purple-deep) r g b / 35%);
+  border: 1px dashed alpha(--winx-purple-deep, 35%);
   background: rgb(255 255 255 / 40%);
   &.open { padding: 0 3px 3px; }
 }

@@ -1,0 +1,26 @@
+// Shared helpers for the styles. They print plain CSS (nothing here is output by itself).
+@use "sass:string";
+
+// a token's colour at some opacity: alpha(--winx-gold, 90%) → rgb(from var(--winx-gold) r g b / 90%)
+@function alpha($token, $opacity) {
+  @return string.unquote("rgb(from var(#{$token}) r g b / #{$opacity})");
+}
+
+// a colour faded into transparent: fade(var(--winx-border), 40%) → color-mix(in srgb, var(--winx-border) 40%, transparent)
+@function fade($color, $amount) {
+  @return string.unquote("color-mix(in srgb, #{$color} #{$amount}, transparent)");
+}
+
+// the fairy wings in two corners (top left, and mirrored bottom right), on ::before / ::after
+@mixin wings($size, $inset) {
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    width: $size;
+    height: $size;
+    background: var(--winx-wing-svg) no-repeat center / contain;
+    pointer-events: none;
+  }
+  &::before { top: $inset; left: $inset; }
+  &::after  { bottom: $inset; right: $inset; transform: scale(-1, -1); }
+}

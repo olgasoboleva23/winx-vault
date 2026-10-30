@@ -12,6 +12,8 @@
  *   • Blue hover glow instead of gold/pink
  * ============================================ */
 
+@use "mixins" as *;
+
 .kanban-board .callout[data-callout="card"] {
   aspect-ratio: 4 / 3 !important;
   overflow: hidden !important;
@@ -28,6 +30,6 @@
 
   &:hover {
     border-color: var(--winx-blue-deep);
-    box-shadow: 0 0 16px rgb(from var(--winx-blue) r g b / 60%);
+    box-shadow: 0 0 16px alpha(--winx-blue, 60%);
   }
 }

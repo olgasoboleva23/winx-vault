@@ -6,6 +6,8 @@
  * • Date input golden styling (.mb-input-type-date)
  * ============================================ */
 
+@use "mixins" as *;
+
 @keyframes winx-twinkle {
   0%,
   100% {
@@ -33,13 +35,13 @@
   0%,
   100% {
     filter: brightness(100%)
-      drop-shadow(0 0 8px rgb(from var(--winx-gold) r g b / 90%))
-      drop-shadow(0 0 16px rgb(from var(--winx-gold) r g b / 50%));
+      drop-shadow(0 0 8px alpha(--winx-gold, 90%))
+      drop-shadow(0 0 16px alpha(--winx-gold, 50%));
   }
   50% {
     filter: brightness(130%)
-      drop-shadow(0 0 8px rgb(from var(--winx-gold) r g b / 90%))
-      drop-shadow(0 0 16px rgb(from var(--winx-gold) r g b / 50%));
+      drop-shadow(0 0 8px alpha(--winx-gold, 90%))
+      drop-shadow(0 0 16px alpha(--winx-gold, 50%));
   }
 }
 
