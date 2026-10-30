@@ -1,4 +1,6 @@
 /* ===== WALLET ===== */
+
+@use "../mixins" as *;
 .winx-wallet {
   display: inline-flex;
   align-items: center;
@@ -13,7 +15,7 @@
   border-radius: 999px;
   color: var(--winx-text-dark);
   font-weight: 600;
-  box-shadow: 0 2px 8px rgb(from var(--winx-pink-deep) r g b / 15%);
+  box-shadow: 0 2px 8px alpha(--winx-pink-deep, 15%);
   margin-top: 10px;
 
   & .winx-wallet-amount {
@@ -58,8 +60,8 @@
     color: white;
     font-size: 1.4em;
     font-weight: 600;
-    box-shadow: 0 4px 16px rgb(from var(--winx-purple-deep) r g b / 25%);
-    text-shadow: 0 1px 2px rgb(from var(--winx-text-dark) r g b / 30%);
+    box-shadow: 0 4px 16px alpha(--winx-purple-deep, 25%);
+    text-shadow: 0 1px 2px alpha(--winx-text-dark, 30%);
 
     & .winx-shop-balance-icon {
       font-size: 1.3em;
@@ -120,7 +122,7 @@
     &:not(:disabled):hover {
       background: var(--winx-pink);
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgb(from var(--winx-pink-deep) r g b / 30%);
+      box-shadow: 0 6px 16px alpha(--winx-pink-deep, 30%);
     }
 
     &:disabled {

@@ -7,6 +7,8 @@
  * until hover.
  * ============================================ */
 
+@use "mixins" as *;
+
 :is(.dashboard, .kanban-board) {
   .task-list-item .tag:not([data-tag-name^="#⭐"]) {
     display: none;
@@ -44,7 +46,7 @@
     width: fit-content;
     padding: 0.15rem 0.8rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--winx-border) 40%, transparent);
+    background: fade(var(--winx-border), 40%);
     line-height: 1.4;
     & p { margin: 0; }   /* Tasks wraps the text in a <p> with its own margins */
   }

@@ -6,6 +6,8 @@
  * @keyframes winx-shimmer, pulse-glow → winx-animations.css
  * ============================================ */
 
+@use "../mixins" as *;
+
 :is(.dashboard, .kanban-board) {
   .winx-stat-card {
     display: flex;
@@ -101,7 +103,7 @@
     font-family: "Cinzel", serif !important;
     font-size: 14px !important;
     letter-spacing: 1px !important;
-    box-shadow: 0 0 8px rgb(from var(--winx-gold) r g b / 40%) !important;
+    box-shadow: 0 0 8px alpha(--winx-gold, 40%) !important;
   }
 
   .mb-input-type-date input {
@@ -119,8 +121,8 @@
 
     &:hover {
       box-shadow:
-        0 0 16px rgb(from var(--winx-gold) r g b / 70%),
-        0 0 8px rgb(from var(--winx-pink-deep) r g b / 50%);
+        0 0 16px alpha(--winx-gold, 70%),
+        0 0 8px alpha(--winx-pink-deep, 50%);
     }
   }
 }

@@ -1,20 +1,22 @@
 /* Finance widget (02 Areas/Finance.md): month summary, categories, 6-month trend, latest operations.
    Only --winx-* tokens, so re-theming carries through. */
+
+@use "../mixins" as *;
 .winx-fin { display: flex; flex-direction: column; gap: 14px; font-size: 14px; }
 .winx-fin-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .winx-fin-month { font-weight: 600; letter-spacing: .02em; color: var(--winx-text-dark); }
 .winx-fin-nav { display: flex; gap: 4px; }
 .winx-fin-nav button {
   all: unset; cursor: pointer; padding: 2px 9px; border-radius: 8px; line-height: 1.5;
-  background: rgb(from var(--winx-purple) r g b / 18%); color: var(--winx-text-dark);
+  background: alpha(--winx-purple, 18%); color: var(--winx-text-dark);
 }
-.winx-fin-nav button:hover { background: rgb(from var(--winx-pink) r g b / 32%); }
+.winx-fin-nav button:hover { background: alpha(--winx-pink, 32%); }
 .winx-fin-nav button[disabled] { opacity: .3; cursor: default; }
 
 .winx-fin-totals { display: flex; gap: 10px; }
 .winx-fin-total {
   flex: 1; padding: 8px 10px; border-radius: 12px; text-align: center;
-  background: rgb(from var(--winx-purple) r g b / 12%);
+  background: alpha(--winx-purple, 12%);
 }
 .winx-fin-total span { display: block; font-size: 11px; opacity: .7; margin-bottom: 2px; }
 .winx-fin-total b { font-size: 16px; font-weight: 600; }
@@ -28,7 +30,7 @@
 .winx-fin-row .over { color: var(--winx-pink-deep); font-weight: 600; }
 .winx-fin-track {
   grid-column: 1 / -1; height: 8px; border-radius: 5px; overflow: hidden;
-  background: rgb(from var(--winx-purple) r g b / 14%);
+  background: alpha(--winx-purple, 14%);
 }
 .winx-fin-fill { height: 100%; border-radius: 5px; transition: width .3s ease; }
 

@@ -15,6 +15,8 @@
  *     (avoids 6 separate nth-child selector blocks)
  * ============================================ */
 
+@use "mixins" as *;
+
 :is(.dashboard, .kanban-board) {
   /* ── Card ─────────────────────────────────── */
   .callout[data-callout="card"] {
@@ -80,8 +82,8 @@
     &:hover {
       border-color: var(--winx-pink-deep);
       box-shadow:
-        0 0 24px rgb(from var(--winx-gold) r g b / 70%),
-        0 0 8px rgb(from var(--winx-pink-deep) r g b / 60%);
+        0 0 24px alpha(--winx-gold, 70%),
+        0 0 8px alpha(--winx-pink-deep, 60%);
     }
 
     /* Dataview error */
@@ -175,7 +177,7 @@
         background-size: contain;
         pointer-events: none;
         animation: winx-twinkle 3s ease-in-out infinite;
-        filter: drop-shadow(0 0 3px rgb(from var(--winx-gold) r g b / 60%));
+        filter: drop-shadow(0 0 3px alpha(--winx-gold, 60%));
       }
 
       /* Position wired to scoped custom props above */
