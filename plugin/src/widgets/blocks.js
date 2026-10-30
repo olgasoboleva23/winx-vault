@@ -10,6 +10,7 @@ import { LifeAreas } from "./lifeAreas.js";
 import { LevelToday } from "./levelToday.js";
 import { MobileHome } from "./mobileHome.js";
 import { MobileShopping } from "./mobileShopping.js";
+import { Pomodoro } from "./pomodoro.js";
 import { Shop } from "./shop.js";
 import { Supplies } from "./supplies.js";
 import { Wallet } from "./wallet.js";
@@ -19,7 +20,7 @@ import { Weight } from "./weight.js";
 import { XpToday } from "./xpToday.js";
 
 // name → class; each widget adds itself here as it moves to a class
-export const blocks = { celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, goals: Goals, habits: Habits, levelToday: LevelToday, lifeAreas: LifeAreas, mobileHome: MobileHome, mobileShopping: MobileShopping, shop: Shop, supplies: Supplies, wallet: Wallet, week: Week, weeklyState: WeeklyState, weight: Weight, xpToday: XpToday };
+export const blocks = { celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, goals: Goals, habits: Habits, levelToday: LevelToday, lifeAreas: LifeAreas, mobileHome: MobileHome, mobileShopping: MobileShopping, pomodoro: Pomodoro, shop: Shop, supplies: Supplies, wallet: Wallet, week: Week, weeklyState: WeeklyState, weight: Weight, xpToday: XpToday };
 
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);

@@ -22,10 +22,10 @@ pomodoro:
 > > card: Level
 > > ```
 > > 
-> > > [!card] Pomodoro
-> > > ```dataviewjs
-> > > await winx.render("pomodoro", dv);
-> > > ```
+> > ```winx
+> > pomodoro
+> > card: Pomodoro
+> > ```
 > > 
 > > > [!card] Goals
 > > > ```winx

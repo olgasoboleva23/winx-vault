@@ -16,6 +16,8 @@ import { Card } from "../ui/component.js";
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
 
 export class Widget extends MarkdownRenderChild {
+  static followsChanges = true;   // false: drawn once (a widget that doesn't show vault data, like the pomodoro timer)
+
   constructor(el, sourcePath, args = {}) {
     super(el);
     this.sourcePath = sourcePath;
@@ -61,8 +63,10 @@ export class Widget extends MarkdownRenderChild {
     this.registerDomEvent(this.containerEl, "focusout", () => { clearTimeout(this.leave); this.leave = setTimeout(() => this.catchUp(), 500); });
 
     const later = () => { clearTimeout(this.timer); this.timer = setTimeout(() => this.redraw(), DELAY); };
-    this.registerEvent(this.app.metadataCache.on("dataview:metadata-change", later));
-    this.registerEvent(this.app.metadataCache.on("changed", f => f.path === this.sourcePath && later()));
+    if (this.constructor.followsChanges) {
+      this.registerEvent(this.app.metadataCache.on("dataview:metadata-change", later));
+      this.registerEvent(this.app.metadataCache.on("changed", f => f.path === this.sourcePath && later()));
+    }
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));
     this.register(() => { clearTimeout(this.timer); clearTimeout(this.leave); this.drop(); });
