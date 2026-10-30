@@ -1,61 +1,34 @@
+// XP Today: the page's day's XP (with the habit bonus), its aura level, ↑/↓ against the 7-day average, and the
+// month as a heatmap of daily levels.
 import { H } from "../lib/helpers.js";
+import { html } from "../ui/html.js";
+import { Widget } from "./widget.js";
 
-export default async function (dv, input) {
-  const { xpMap, levels, HABIT_BONUS_XP, HABIT_BONUS_THRESHOLD } = await H.loadConfig();
-
-  const sel   = H.pageDay(dv);
-  const start = sel.startOf("month");
-  const end   = sel.endOf("month");
-
-  const getLevel = xpVal => levels.find(l => xpVal <= l.max) ?? levels.at(-1);
-
-  // Pre-bucket task XP by completion date → O(tasks) instead of O(tasks × days)
-  const xpByDay = new Map();
-  for (const t of dv.pages('"02 Areas/Personal/Tasks"').file.tasks.where(t => t.completed && t.completion)) {
-    const day = H.ymd(t.completion);
-    xpByDay.set(day, (xpByDay.get(day) ?? 0) + H.taskXp(t, xpMap));
+export class XpToday extends Widget {
+  async data() {
+    const { xpMap, levels, HABIT_BONUS_XP, HABIT_BONUS_THRESHOLD } = await H.loadConfig();
+    const sel = H.pageDay(this.dv), start = sel.startOf("month"), end = sel.endOf("month");
+    const levelOf = xp => levels.find(l => xp <= l.max) ?? levels.at(-1);
+    // task XP by completion day
+    const xpByDay = new Map();
+    for (const t of this.dv.pages('"02 Areas/Personal/Tasks"').file.tasks.where(t => t.completed && t.completion)) {
+      const day = H.ymd(t.completion);
+      xpByDay.set(day, (xpByDay.get(day) ?? 0) + H.taskXp(t, xpMap));
+    }
+    const habitBonus = Object.values(H.collectHabitDays(this.dv, start, end)).filter(h => h.days.size >= HABIT_BONUS_THRESHOLD).length * HABIT_BONUS_XP;
+    const days = Array.from({ length: Math.floor(end.diff(start, "days").days) + 1 }, (_, i) => H.ymd(start.plus({ days: i })));
+    // the 7 days ending on the selected day (not the month's first week: future days would pull it down)
+    const last7 = Array.from({ length: 7 }, (_, i) => H.ymd(sel.minus({ days: 6 - i })));
+    const avg = Math.round(last7.reduce((a, d) => a + (xpByDay.get(d) ?? 0), 0) / 7);
+    const todayXP = (xpByDay.get(H.ymd(sel)) ?? 0) + habitBonus;
+    return { levels, habitBonus, avg, todayXP, aura: levelOf(todayXP).name, vals: days.map(d => levels.indexOf(levelOf(xpByDay.get(d) ?? 0))) };
   }
-
-  const habitBonus = Object.values(H.collectHabitDays(dv, start, end))
-    .filter(h => h.days.size >= HABIT_BONUS_THRESHOLD)
-    .length * HABIT_BONUS_XP;
-
-  // Generate all days in the month via Array.from — replaces for loop
-  const days = Array.from(
-    { length: Math.floor(end.diff(start, "days").days) + 1 },
-    (_, i) => H.ymd(start.plus({ days: i }))
-  );
-
-  // 7-day average over the week *ending at the selected date* — slicing the
-  // month array would average future (zero-XP) days mid-month.
-  const last7 = Array.from({ length: 7 }, (_, i) => H.ymd(sel.minus({ days: 6 - i })));
-  const avg   = Math.round(last7.reduce((a, d) => a + (xpByDay.get(d) ?? 0), 0) / 7);
-
-  const todayStr = H.ymd(sel);
-  const todayXP  = (xpByDay.get(todayStr) ?? 0) + habitBonus;
-  const aura     = getLevel(todayXP).name;
-  const vals     = days.map(d => levels.indexOf(getLevel(xpByDay.get(d) ?? 0)));
-
-  const legendHTML = levels.map(l =>
-    `<div class="leg-item" data-tip="${l.name}">
-       <span class="swatch ${l.cls}"></span>${l.max === Infinity ? "30+" : l.max}
-     </div>`
-  ).join("");
-
-  const bonusBadge = habitBonus > 0
-    ? `<div class="winx-bonus">🏅 +${habitBonus} habit bonus</div>`
-    : "";
-
-  dv.container.innerHTML = `
-  <div class="winx-xp">
-    <div class="winx-header">
-      <div class="winx-aura">🔮 ${aura} • ${todayXP} XP</div>
-      <div>${todayXP > avg ? "↑" : "↓"} 7d</div>
-    </div>
-    ${bonusBadge}
-    <div class="winx-grid">
-      ${vals.map(v => `<div class="winx-cell v${v}"></div>`).join("")}
-    </div>
-    <div class="winx-legend">${legendHTML}</div>
-  </div>`;
+  view({ levels, habitBonus, avg, todayXP, aura, vals }) {
+    return html`<div class="winx-xp">
+      <div class="winx-header"><div class="winx-aura">🔮 ${aura} • ${todayXP} XP</div><div>${todayXP > avg ? "↑" : "↓"} 7d</div></div>
+      ${habitBonus > 0 ? html`<div class="winx-bonus">🏅 +${habitBonus} habit bonus</div>` : ""}
+      <div class="winx-grid">${vals.map(v => html`<div class="winx-cell v${v}"></div>`)}</div>
+      <div class="winx-legend">${levels.map(l => html`<div class="leg-item" data-tip="${l.name}"><span class="swatch ${l.cls}"></span>${l.max === Infinity ? "30+" : l.max}</div>`)}</div>
+    </div>`;
+  }
 }

@@ -1,7 +1,7 @@
 # 🛍 Shop
 
-```dataviewjs
-await winx.render("shop", dv)
+```winx
+shop
 ```
 
 - name:: Cozy Coffee  
