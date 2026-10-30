@@ -12,6 +12,7 @@
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
 import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../ui/component.js";
+import { actionOf } from "./parse.js";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
 
@@ -48,17 +49,14 @@ export class Widget extends MarkdownRenderChild {
   keep(thing) { this.kept.push(thing); return thing; }
 
   async onload() {
-    const act = (types, ignore) => e => {
-      const el = e.target.closest?.("[data-action]");
-      if (!el || !this.containerEl.contains(el) || (ignore && el.matches(ignore)) || !types.includes(e.type)) return;
-      const fn = this.on[el.dataset.action];
+    const act = e => {
+      const el = actionOf(e.type, e.target, this.containerEl);
+      const fn = el && this.on[el.dataset.action];
       if (!fn) return;
       if (e.type === "submit") e.preventDefault();
       fn.call(this, e, el);
     };
-    this.registerDomEvent(this.containerEl, "click", act(["click"], "input, select, form"));
-    this.registerDomEvent(this.containerEl, "change", act(["change"]));
-    this.registerDomEvent(this.containerEl, "submit", act(["submit"]));
+    for (const type of ["click", "change", "submit"]) this.registerDomEvent(this.containerEl, type, act);
     // after leaving a field: a moment later, so a click on the widget's own button (which takes the focus) lands first
     this.registerDomEvent(this.containerEl, "focusout", () => { clearTimeout(this.leave); this.leave = setTimeout(() => this.catchUp(), 500); });
 
@@ -70,16 +68,24 @@ export class Widget extends MarkdownRenderChild {
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));
     this.register(() => { clearTimeout(this.timer); clearTimeout(this.leave); this.drop(); });
+    // a cold start: Dataview reads the vault after the notes open; draw once it has
+    const api = this.app.plugins.plugins.dataview?.api;
+    if (api && !api.index?.initialized && this.constructor.followsChanges) {
+      this.registerEvent(this.app.metadataCache.on("dataview:index-ready", () => this.draw()));
+      return;
+    }
     await this.draw();
   }
 
   // drawn now, or once it shows and nobody is typing in it
   redraw() {
     const busy = this.containerEl.contains(document.activeElement) && document.activeElement.matches("input, textarea, select");
-    if (!this.containerEl.isShown() || busy) { this.stale = true; return; }
+    if (!this.shown || busy) { this.stale = true; return; }
     this.draw();
   }
   catchUp() { if (this.stale) this.redraw(); }
+  // on screen: a card widget's block has no box of its own (display: contents), so ask the card
+  get shown() { return (this.containerEl.firstElementChild ?? this.containerEl).isShown(); }
 
   drop() { for (const k of this.kept.splice(0)) k?.destroy?.(); }
 
