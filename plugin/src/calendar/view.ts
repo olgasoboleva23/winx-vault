@@ -3,6 +3,7 @@ import { actionOf } from "../widgets/parse.js";
 import { CalendarData, T, findTask, taskKey } from "./data.js";
 import { baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
+import { dimOnWrite } from "../ui/busy.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
 import config from "../lib/config.js";
 import { todayYmd } from "../lib/dates.js";
@@ -60,12 +61,8 @@ export class CalendarView extends ItemView {
       window.clearTimeout(timer);
       timer = window.setTimeout(() => this.contentEl.isShown() ? this.draw() : (this.stale = true), 100);
     }));
-    // a write to a task file: the calendar dims with a spinning ✦ until the redraw; 5 s at most
-    this.registerEvent(this.app.vault.on("modify", f => {
-      if (!f.path.startsWith(TASKS_DIR)) return;
-      this.ctx?.root.classList.add("busy");
-      window.setTimeout(() => this.ctx?.root.classList.remove("busy"), 5000);
-    }));
+    // a write to a task file: the calendar dims with a spinning ✦ until the redraw
+    dimOnWrite(this, (path: string) => path.startsWith(TASKS_DIR), () => this.ctx?.root);
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));   // a sidebar or split shown
     // a new day: following today, the days move on; and "today" in every action is the new one

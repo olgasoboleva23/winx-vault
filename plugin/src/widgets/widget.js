@@ -11,7 +11,7 @@
 // shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
 // listeners when the block goes.
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
-import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
+import { MarkdownRenderChild, debounce, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../ui/component.js";
 import { html } from "../ui/html.js";
 import { actionOf } from "./parse.js";
@@ -28,7 +28,6 @@ export class Widget extends MarkdownRenderChild {
     this.on = {};
     this.kept = [];
     this.stale = false;
-    this.timer = 0;
   }
 
   async data() { return {}; }
@@ -64,9 +63,8 @@ export class Widget extends MarkdownRenderChild {
     };
     for (const type of ["click", "change", "submit"]) this.registerDomEvent(this.containerEl, type, act);
     // after leaving a field: a moment later, so a click on the widget's own button (which takes the focus) lands first
-    this.registerDomEvent(this.containerEl, "focusout", () => { clearTimeout(this.leave); this.leave = setTimeout(() => this.catchUp(), 500); });
-
-    const later = () => { clearTimeout(this.timer); this.timer = setTimeout(() => this.redraw(), DELAY); };
+    const left = debounce(() => this.catchUp(), 500, true), later = debounce(() => this.redraw(), DELAY, true);
+    this.registerDomEvent(this.containerEl, "focusout", left);
     if (this.constructor.followsChanges) {
       this.registerEvent(this.app.metadataCache.on("dataview:metadata-change", later));
       this.registerEvent(this.app.metadataCache.on("changed", f => f.path === this.sourcePath && later()));
@@ -75,8 +73,8 @@ export class Widget extends MarkdownRenderChild {
     }
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));
-    this.register(() => { clearTimeout(this.timer); clearTimeout(this.leave); this.drop(); });
-    if (this.args.card) this.containerEl.replaceChildren(sanitizeHTMLToDom(new Card({ title: String(this.args.card), body: html`<div class="winx-skeleton"></div>` }).html));
+    this.register(() => { left.cancel(); later.cancel(); this.drop(); });
+    this.skeleton();
     // a cold start: Dataview reads the vault after the notes open; draw once it has
     const api = this.app.plugins.plugins.dataview?.api;
     if (api && !api.index?.initialized && this.constructor.followsChanges) {
@@ -87,14 +85,21 @@ export class Widget extends MarkdownRenderChild {
   }
 
   // drawn now, or once it shows and nobody is typing in it
-  redraw() {
-    const busy = this.containerEl.contains(document.activeElement) && document.activeElement.matches("input, textarea, select");
-    if (!this.shown || busy) { this.stale = true; return; }
-    this.draw();
-  }
+  redraw() { this.shown && !this.typing ? this.draw() : (this.stale = true); }
   catchUp() { if (this.stale) this.redraw(); }
   // on screen: a card widget's block has no box of its own (display: contents), so ask the card
   get shown() { return (this.containerEl.firstElementChild ?? this.containerEl).isShown(); }
+  get typing() { return this.containerEl.contains(document.activeElement) && document.activeElement.matches("input, textarea, select"); }
+
+  // a card widget before its first draw: its card with a shimmering placeholder
+  skeleton() {
+    if (this.args.card) this.containerEl.replaceChildren(sanitizeHTMLToDom(new Card({ title: String(this.args.card), body: html`<div class="winx-skeleton"></div>` }).html));
+  }
+  // what someone typed and hasn't saved: () => the fields (by their name) get their text back after a draw
+  keepTyped() {
+    const typed = [...this.containerEl.querySelectorAll("input[name], textarea[name]")].filter(f => f.value).map(f => [f.name, f.value]);
+    return () => { for (const [name, value] of typed) { const f = this.containerEl.querySelector(`[name="${CSS.escape(name)}"]`); if (f && !f.value) f.value = value; } };
+  }
 
   drop() { for (const k of this.kept.splice(0)) k?.destroy?.(); }
 
@@ -102,12 +107,11 @@ export class Widget extends MarkdownRenderChild {
     this.stale = false;
     const data = await this.data();
     this.drop();
-    // what someone typed and hasn't saved stays: fields by their name get their text back
-    const typed = [...this.containerEl.querySelectorAll("input[name], textarea[name]")].filter(f => f.value).map(f => [f.name, f.value]);
+    const restore = this.keepTyped();
     const body = this.view(data), { card, meta } = this.args;
     const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body }) : body;
     this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
-    for (const [name, value] of typed) { const f = this.containerEl.querySelector(`[name="${CSS.escape(name)}"]`); if (f && !f.value) f.value = value; }
+    restore();
     // the widget's own place: inside the card when there is one
     const root = card ? this.containerEl.querySelector(":scope > .callout > .callout-content") : this.containerEl;
     await this.after(root, data);
