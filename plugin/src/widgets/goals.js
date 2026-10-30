@@ -1,10 +1,7 @@
 // Goals: per goal "X of Y this week", Mon–Sun dots, the minimum version, and how often it was done.
-// It also moves a missed goal task (open, its date passed) to the goal's next planned day from today — see
-// docs/dashboard.md. The rewrite only touches a line that still has the old date, so the redraw it causes
-// changes nothing.
+// A missed goal task stays on its day (the calendar's Missed? lists it).
 import { H } from "../lib/helpers.js";
 import { L } from "../lib/goalsLib.js";
-import { Task } from "../lib/task.js";
 import { html } from "../ui/html.js";
 import { Widget } from "./widget.js";
 
@@ -16,25 +13,10 @@ export class Goals extends Widget {
     const selected = H.ymd(H.pageDay(this.dv)), today = H.today();
     const goals = this.dv.pages('"02 Areas/Personal/Goals"').file.lists.map(i => L.parseGoal(i.text)).where(Boolean).array();
     const tasks = this.dv.pages('"02 Areas/Personal/Tasks"').file.tasks;
-    for (const goal of goals) await this.rollMissed(goal, tasks, today);
     return {
       selected, today, week: L.weekOf(selected),
       rows: goals.map(goal => ({ goal, done: tasks.where(t => t.completed && t.completion && t.tags.includes(goal.tag)).map(t => H.ymd(t.completion)).array() })),
     };
-  }
-  // a missed goal task: on to the next planned day ≥ today. Only an open one ([ ]): a skipped ([-]) or done one
-  // keeps its date (Dataview calls only [x] completed)
-  async rollMissed(goal, tasks, today) {
-    for (const t of tasks.where(t => Task.of(t).isOpen && t.due && t.tags.includes(goal.tag))) {
-      const due = H.ymd(t.due);
-      if (due >= today) continue;
-      const next = L.nextPlannedDate(goal, today);
-      await this.app.vault.process(this.app.vault.getAbstractFileByPath(t.path), content => {
-        const lines = content.split("\n");
-        lines[t.line] = L.rollDue(lines[t.line], due, next);
-        return lines.join("\n");
-      });
-    }
   }
   view({ missing, selected, today, week, rows }) {
     if (missing) return html`<div>Create ${GOALS_PATH}</div>`;

@@ -38,13 +38,6 @@ const dayStatus = function (goal, date, doneSet, today) {
   return "none";
 };
 
-const nextPlannedDate = function (goal, from) {
-  if (!goal.days?.length) return from;
-  for (let i = 0; ; i++) if (goal.days.includes(weekday(addDays(from, i)))) return addDays(from, i);
-};
-
-// Replace "📅 oldDate" with "📅 newDate" on a task line; unchanged if absent.
-const rollDue = (line, oldDate, newDate) => line.replace(`📅 ${oldDate}`, `📅 ${newDate}`);
 
 // ends: recorded last days of a period. The end of a cycle is the first end
 // between its start and the next start. Without one, the period lasts the
@@ -207,4 +200,4 @@ const monthGrid = date => {
 };
 
 
-export const L = { addMonths, projectRepeats, monthGrid, weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, nextPlannedDate, rollDue, cycleInfo, supplyStats, reminders, markBought, unmarkBought, todayCount, parseWeights, upsertWeight, ruleText, levelInfo, diffDays };
+export const L = { addMonths, projectRepeats, monthGrid, weekOf, weekday, addDays, parseGoal, weeklyTarget, countDone, dayStatus, cycleInfo, supplyStats, reminders, markBought, unmarkBought, todayCount, parseWeights, upsertWeight, ruleText, levelInfo, diffDays };

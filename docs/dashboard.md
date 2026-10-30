@@ -74,15 +74,7 @@ A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any
 ```
 
 - `days` sets the weekly plan; otherwise `perWeek:: N` (`days` wins if both are given). A day counts when a done task with the tag has its `✅` on that day. Weeks start on Monday.
-- Use repeats without `when done` (`🔁 every week on Tuesday, Thursday`).
-
-### A missed goal task moves on by itself
-
-The **Goals** card moves a goal's open task whose date has passed to the goal's next planned day from today, when it draws (opening the dashboard is enough). Example: `days:: tue, thu`, the task is on Thursday 29.10 and not done; on Friday 30.10 the card rewrites its `📅 2026-10-29` to `📅 2026-11-03` (Tuesday). Without `days` (`perWeek:: N`), it moves to today.
-
-So a goal task never piles up as overdue, and it never shows in the calendar's **Missed?** (that lists only overdue tasks, and a goal task is never overdue for long). If you did it on the missed day, drag it from its new day onto that day's ✓ zone in the calendar: it is marked done on that day.
-
-Only the `📅` date of an open task with the goal's tag changes; done tasks and other tasks are left alone.
+- A missed goal task stays on its day: the calendar's **Missed?** lists it, to tick it for that day or move it to today.
 
 ## 📝 Daily Note
 
