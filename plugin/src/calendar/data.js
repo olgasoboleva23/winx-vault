@@ -79,3 +79,17 @@ export const regularHistory = (t, done, skips) => {
   const h = T(t).history(done), s = T(t).history(skips);
   return [h ? doneText(h) : "never done", s && `skipped ${s.count}×`].filter(Boolean).join(" · ");
 };
+
+// A task's key in the calendar's markup (data-task): its file, line, status and words. It names the same task
+// in every draw: findTask() takes the task at that line if it still has those words and that status, else the
+// nearest one in the file that has them (lines move when a task is added on top), else none — never another task.
+const words = t => t.pool ? Task.keyOf(`- ${t.text}`) : T(t).key;
+const stateOf = t => t.pool ? "p" : t.status;
+export const taskKey = t => [t.path, t.line, stateOf(t), words(t)].join("|");
+export function findTask(key, tasks) {
+  const [path, line, state, ...rest] = String(key).split("|");
+  if (!rest.length) return null;
+  const text = rest.join("|"), want = Number(line);
+  const same = tasks.filter(t => t.path === path && stateOf(t) === state && words(t) === text);
+  return same.sort((a, b) => Math.abs(a.line - want) - Math.abs(b.line - want))[0] ?? null;
+}

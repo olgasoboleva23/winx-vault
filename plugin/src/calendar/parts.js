@@ -66,6 +66,7 @@ export class Missed extends Part {
   };
   async act(el, sound, write) {
     const row = el.closest(".winx-yesterday-row"), box = row.parentElement, t = this.view.taskOf(row);
+    if (!t) return;
     row.remove();
     if (!box.querySelector(".winx-yesterday-row")) box.remove();
     if (!H.isMuted()) sound.play({ gain: 0.25 });
@@ -134,10 +135,12 @@ export class Panel extends Part {
     tab: (e, el) => this.ctx.set({ tab: el.dataset.tab }, ["panel"]),
     more: () => this.ctx.set({ backlogOpen: !this.ctx.state.backlogOpen }, ["panel"]),
     bdays: () => this.ctx.set({ bdaysOpen: !this.ctx.state.bdaysOpen }, ["panel"]),
-    toToday: (e, el) => this.view.actions.fromPool(this.view.taskOf(el), this.ctx.today, false),
+    toToday: (e, el) => { const t = this.view.taskOf(el); if (t) this.view.actions.fromPool(t, this.ctx.today, false); },
     // at once; the redraw follows the write
     pause: (e, el) => {
-      const t = this.view.taskOf(el), paused = !T(t).date;
+      const t = this.view.taskOf(el);
+      if (!t) return;
+      const paused = !T(t).date;
       el.closest(".winx-board-card")?.toggleClass("paused", !paused); el.disabled = true;
       this.view.actions.pauseOrResume(t);
     },
