@@ -9,16 +9,19 @@
 │   ├── 📁 src
 │   │   ├── main.ts               — loads everything; the ```winx block, the dashboard and calendar tabs, ✨, the commands
 │   │   ├── 📁 calendar           — the calendar tab: view.ts (state, redraws, one set of listeners), parts.js (Header,
-│   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js and
-│   │   │                           state.js (the model and the tab's state, tested), actions.js (what it writes)
+│   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js
+│   │   │                           (CalendarData, the model) and state.js (the tab's state), actions.js (what it writes)
 │   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
 │   │   ├── commands.ts           — the Cmd+P commands
 │   │   ├── 📁 ui                 — form.ts (one window instead of a chain of prompts), html.js (markup in backticks),
-│   │   │                           component.js (Component, Button, Card)
-│   │   ├── 📁 lib                — config, goalsLib (week / goal / cycle / weight logic), task (one task line:
-│   │   │                           read it, change it), items (watch / read / game notes), helpers
+│   │   │                           component.js (Component, Button, Card), busy.js (the ✦ pill), chart.js
+│   │   ├── 📁 lib                — one file per topic: config, dates, repeats (🔁 rules), task (one task line: read it,
+│   │   │                           change it), taskEdit (rewrite a line, the task window), goals, cycle, weight, xp,
+│   │   │                           market, rewards (gold), sounds, items (watch / read / game notes), files (edit /
+│   │   │                           editLine / appendLine a note); the pure ones are tested
 │   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget
-│   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css
+│   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; _mixins.scss has the shared
+│   │                               sizes ($pill, $gap-s, $text-m …) and the row / center mixins
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
 ├── 📁 00 System
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)

@@ -10,16 +10,16 @@
   transition: background 0.15s ease;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: fade(white, 35%); border-radius: 10px; }
+  &:hover { background: fade(white, 35%); border-radius: $radius-m; }
   &.dragging { opacity: 0.4; }
 }
 .winx-board-text { font-size: 14px; line-height: 1.35; }
-.winx-board-meta { margin-top: 2px; font-size: 11px; color: fade(var(--winx-purple-deep), 75%); }
+.winx-board-meta { margin-top: 2px; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
 
 /* round buttons on a task: ⏭ ✏️ 🗑 */
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
   display: flex;
-  gap: 4px;
+  gap: $gap-xs;
 }
 body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
   position: absolute;
@@ -28,7 +28,7 @@ body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
   translate: 0 -50%;
   padding-left: 18px;
   background: linear-gradient(90deg, transparent, var(--winx-pink-light) 18px);
-  border-radius: 999px;
+  border-radius: $pill;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
@@ -39,24 +39,24 @@ body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top
   width: 26px;
   height: 26px;
   padding: 0;
-  border-radius: 50%;
+  border-radius: $round;
   border: 1px solid var(--winx-border);
   background: rgb(255 255 255 / 85%);
   box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
-  font-size: 13px;
+  font-size: $text-l;
   line-height: 1;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 
   &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
 }
-body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { width: 34px; height: 34px; font-size: 16px; }
+body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { width: 34px; height: 34px; font-size: $text-xl; }
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns button.winx-board-del.armed {
   width: auto;
   padding: 0 8px;
   border-color: #d0457a;
   background: #d0457a;
   color: #fff;
-  font-size: 12px;
+  font-size: $text-m;
 }
 .winx-board-backlog { margin-top: 12px; }

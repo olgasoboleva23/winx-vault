@@ -27,7 +27,7 @@
       var(--winx-pink)
     ) !important;
     border: 1px solid var(--winx-border) !important;
-    border-radius: 14px !important;
+    border-radius: $radius-xl !important;
     overflow: visible !important;
     padding: 12px;
     transition:
@@ -51,9 +51,7 @@
       position: absolute;
       width: 56px;
       height: 56px;
-      background-image: var(--winx-wing-svg);
-      background-repeat: no-repeat;
-      background-size: contain;
+      background: var(--winx-wing-svg) 0 0 / contain no-repeat;
       pointer-events: none;
     }
 
@@ -74,7 +72,7 @@
       color: var(--winx-purple-deep) !important;
       letter-spacing: 2px !important;
       text-transform: uppercase !important;
-      font-size: 16px !important;
+      font-size: $text-xl !important;
       padding-inline: 64px !important; /* room for wings */
     }
 
@@ -172,9 +170,7 @@
         width: 56px;
         height: 56px;
         translate: -16px -16px;          /* wider canvas for sparkles, star stays put */
-        background-image: var(--winx-star-sparkle-svg);
-        background-repeat: no-repeat;
-        background-size: contain;
+        background: var(--winx-star-sparkle-svg) 0 0 / contain no-repeat;
         pointer-events: none;
         animation: winx-twinkle 3s ease-in-out infinite;
         filter: drop-shadow(0 0 3px alpha(--winx-gold, 60%));

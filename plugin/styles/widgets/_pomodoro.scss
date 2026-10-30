@@ -1,3 +1,4 @@
+@use "../mixins" as *;
 /* ============================================
  * WINX THEME — Pomodoro Widget
  * File: pomodoro.css
@@ -31,7 +32,7 @@
 
     width: 180px;
     height: 180px;
-    border-radius: 50%;
+    border-radius: $round;
     position: relative;
     display: grid;
     place-items: center;
@@ -47,9 +48,7 @@
       position: absolute;
       width: 56px;
       height: 56px;
-      background-image: var(--winx-wing-svg);
-      background-repeat: no-repeat;
-      background-size: contain;
+      background: var(--winx-wing-svg) 0 0 / contain no-repeat;
       pointer-events: none;
 
       &.left {
@@ -68,7 +67,7 @@
       content: "";
       position: absolute;
       inset: 10px;
-      border-radius: 50%;
+      border-radius: $round;
       background: var(--winx-pink-light);
       border: 2px solid var(--winx-border);
     }
@@ -95,14 +94,12 @@
     .controls {
       position: absolute;
       bottom: -20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      @include center;
       gap: 12px;
       margin-top: -10px;
 
       .btn {
-        border-radius: 50%;
+        border-radius: $round;
         border: 2px solid var(--winx-border);
         background: var(--winx-pink);
         display: grid;
@@ -143,7 +140,7 @@
 
   .stars {
     display: flex;
-    gap: 8px;
+    gap: $gap-m;
 
     .multiplier {
       font-size: 14px;
@@ -176,14 +173,14 @@
     margin-top: 14px;
 
     .mode-text {
-      font-size: 13px;
+      font-size: $text-l;
       font-weight: 600;
       color: var(--winx-text-dark);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
     .session-count {
-      font-size: 10px;
+      font-size: $text-xs;
       color: var(--winx-purple);
       opacity: 0.7;
     }
@@ -193,10 +190,10 @@
   .settings-panel {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: $gap-s;
     background: var(--winx-pink-light);
     border: 1px solid var(--winx-border);
-    border-radius: 10px;
+    border-radius: $radius-m;
     padding: 10px 14px;
     width: 140px;
 
@@ -205,10 +202,9 @@
     }
 
     label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
+      @include row;
+      gap: $gap-s;
+      font-size: $text-s;
     }
 
     input {
@@ -217,7 +213,7 @@
       border-radius: 4px;
       background: var(--winx-pink);
       text-align: center;
-      font-size: 11px;
+      font-size: $text-s;
       padding: 2px 4px;
 
       /* app.css input:not(:disabled):hover is (0,3,1) — tie it or it wins */
@@ -234,9 +230,9 @@
 
     .s-save {
       align-self: flex-end;
-      font-size: 10px;
+      font-size: $text-xs;
       padding: 3px 10px;
-      border-radius: 6px;
+      border-radius: $radius-s;
       border: 1px solid var(--winx-border);
       background: var(--winx-pink);
       cursor: pointer;
@@ -253,13 +249,11 @@
 
   /* ── Bottom bar ── */
   .bottom-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    @include center;
+    gap: $gap-m;
 
     .settings-info {
-      font-size: 10px;
+      font-size: $text-xs;
       color: var(--winx-purple);
       opacity: 0.6;
     }
@@ -270,7 +264,7 @@
     min-width: 22px;
     height: 22px;
     aspect-ratio: 1 / 1;
-    border-radius: 50%;
+    border-radius: $round;
     border: 1px solid var(--winx-border);
     background: transparent;
     display: grid;

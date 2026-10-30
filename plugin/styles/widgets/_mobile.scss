@@ -24,7 +24,7 @@
       align-items: center;
       min-height: 44px;
       padding: 0 18px;
-      border-radius: 999px;
+      border-radius: $pill;
       background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
       border: 1px solid var(--winx-border);
       color: var(--winx-purple-deep);
@@ -35,11 +35,10 @@
 
   /* Tasks plugin lists: tall rows, big checkboxes */
   .plugin-tasks-query-result .task-list-item {
-    display: flex;
-    align-items: center;
+    @include row;
     min-height: var(--winx-touch);
     padding: 6px 4px;
-    font-size: 16px;
+    font-size: $text-xl;
     border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
   }
   .plugin-tasks-query-result .task-list-item-checkbox {
@@ -61,7 +60,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: $gap-xs;
   min-height: 128px;
   border-radius: 18px;
   border: 1px solid var(--winx-border);
@@ -74,29 +73,29 @@
 }
 .winx-tile-icon { font-size: 34px; line-height: 1; }
 .winx-tile-title { font-family: "Cinzel", serif; font-size: 17px; color: var(--winx-purple-deep); }
-.winx-tile-sub { font-size: 13px; color: var(--winx-pink-deep); }
+.winx-tile-sub { font-size: $text-l; color: var(--winx-pink-deep); }
 
 /* Mobile shopping */
 .winx-mshop {
   display: grid;
-  gap: 6px;
+  gap: $gap-s;
 
   .market-group-header { margin-top: 10px; }
 }
 /* doubled class beats Obsidian's own input/button/select styles */
 .winx-mshop .winx-mshop-add {
   display: flex;
-  gap: 6px;
+  gap: $gap-s;
 
   input, select, button {
     min-height: 44px;
-    border-radius: 12px;
+    border-radius: $radius-l;
     border: 1px solid var(--winx-border);
     background: rgb(255 255 255 / 65%);
     color: var(--winx-text-dark);
     box-shadow: none;
   }
-  input  { flex: 1; min-width: 0; padding: 0 12px; font-size: 16px; }
+  input  { flex: 1; min-width: 0; padding: 0 12px; font-size: $text-xl; }
   input::placeholder { color: var(--winx-purple); }
   select { max-width: 34%; padding: 0 8px; }
   button {
@@ -109,8 +108,7 @@
 }
 .winx-mshop-list { display: grid; }
 .winx-mshop .winx-mshop-row {
-  display: flex;
-  align-items: center;
+  @include row;
   justify-content: space-between;
   gap: 12px;
   width: 100%;
@@ -134,7 +132,7 @@
   flex: none;
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: $round;
   border: 2px solid var(--winx-pink-deep);
   background: rgb(255 255 255 / 50%);
 }
@@ -152,7 +150,7 @@
 .winx-mshop-sep {
   margin-top: 14px;
   text-align: center;
-  font-size: 12px;
+  font-size: $text-m;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--winx-purple);

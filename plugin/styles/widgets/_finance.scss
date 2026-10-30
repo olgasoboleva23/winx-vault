@@ -3,9 +3,9 @@
 
 @use "../mixins" as *;
 .winx-fin { display: flex; flex-direction: column; gap: 14px; font-size: 14px; }
-.winx-fin-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.winx-fin-head { @include row; justify-content: space-between; gap: $gap-m; }
 .winx-fin-month { font-weight: 600; letter-spacing: .02em; color: var(--winx-text-dark); }
-.winx-fin-nav { display: flex; gap: 4px; }
+.winx-fin-nav { display: flex; gap: $gap-xs; }
 .winx-fin-nav button {
   all: unset; cursor: pointer; padding: 2px 9px; border-radius: 8px; line-height: 1.5;
   background: alpha(--winx-purple, 18%); color: var(--winx-text-dark);
@@ -13,18 +13,18 @@
 .winx-fin-nav button:hover { background: alpha(--winx-pink, 32%); }
 .winx-fin-nav button[disabled] { opacity: .3; cursor: default; }
 
-.winx-fin-totals { display: flex; gap: 10px; }
+.winx-fin-totals { display: flex; gap: $gap-l; }
 .winx-fin-total {
-  flex: 1; padding: 8px 10px; border-radius: 12px; text-align: center;
+  flex: 1; padding: 8px 10px; border-radius: $radius-l; text-align: center;
   background: alpha(--winx-purple, 12%);
 }
-.winx-fin-total span { display: block; font-size: 11px; opacity: .7; margin-bottom: 2px; }
-.winx-fin-total b { font-size: 16px; font-weight: 600; }
+.winx-fin-total span { display: block; font-size: $text-s; opacity: .7; margin-bottom: 2px; }
+.winx-fin-total b { font-size: $text-xl; font-weight: 600; }
 .winx-fin-total.is-neg b { color: var(--winx-pink-deep); }
 .winx-fin-total.is-pos b { color: var(--winx-gold-deep); }
 
-.winx-fin-section { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .65; }
-.winx-fin-rows { display: flex; flex-direction: column; gap: 6px; }
+.winx-fin-section { font-size: $text-s; text-transform: uppercase; letter-spacing: .08em; opacity: .65; }
+.winx-fin-rows { display: flex; flex-direction: column; gap: $gap-s; }
 .winx-fin-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
 .winx-fin-row .amt { font-variant-numeric: tabular-nums; }
 .winx-fin-row .over { color: var(--winx-pink-deep); font-weight: 600; }
@@ -34,15 +34,15 @@
 }
 .winx-fin-fill { height: 100%; border-radius: 5px; transition: width .3s ease; }
 
-.winx-fin-trend { display: flex; align-items: flex-end; gap: 6px; height: 78px; }
-.winx-fin-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+.winx-fin-trend { display: flex; align-items: flex-end; gap: $gap-s; height: 78px; }
+.winx-fin-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: $gap-xs; height: 100%; }
 .winx-fin-bar .col { width: 100%; margin-top: auto; border-radius: 5px 5px 0 0;
   background: linear-gradient(to top, var(--winx-purple), var(--winx-pink)); }
 .winx-fin-bar.is-current .col { background: linear-gradient(to top, var(--winx-gold-deep), var(--winx-gold)); }
-.winx-fin-bar small { font-size: 10px; opacity: .7; }
+.winx-fin-bar small { font-size: $text-xs; opacity: .7; }
 
 .winx-fin-list { display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; }
-.winx-fin-item { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: baseline; }
+.winx-fin-item { display: grid; grid-template-columns: auto 1fr auto; gap: $gap-m; align-items: baseline; }
 .winx-fin-item .d { opacity: .55; font-variant-numeric: tabular-nums; }
 .winx-fin-item .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .winx-fin-item .a { font-variant-numeric: tabular-nums; opacity: .85; }

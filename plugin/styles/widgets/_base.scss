@@ -10,8 +10,7 @@
 
 :is(.dashboard, .kanban-board) {
   .winx-stat-card {
-    display: flex;
-    align-items: center;
+    @include row;
     gap: 16px;
   }
 
@@ -19,21 +18,16 @@
     flex: 0 0 auto;
     width: 56px;
     height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-image: var(--winx-star-icon);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    border-radius: $round;
+    @include center;
+    background: var(--winx-star-icon) center / contain no-repeat;
   }
 
   .winx-stat-body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $gap-xs;
   }
 
   .winx-stat-text {
@@ -44,7 +38,7 @@
   .winx-progress-bar {
     margin-top: 6px;
     height: 10px;
-    border-radius: 6px;
+    border-radius: $radius-s;
     background: rgb(255 255 255 / 40%);
     position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
   }
@@ -59,23 +53,8 @@
     );
     background-size: 200% 100%;
     animation: winx-shimmer 3s linear infinite;
-    border-radius: 6px;
+    border-radius: $radius-s;
     position: relative;
-
-    /* sparkles flying off the tip of the filled part.
-       Off: add the class winx-sparkle to the fill (or drop it from the selector) to bring them back */
-    &.winx-sparkle::after {
-      content: "";
-      position: absolute;
-      right: -20px;
-      top: 50%;
-      width: 40px;
-      height: 24px;
-      translate: 0 -50%;
-      background: var(--winx-tip-sparkle-svg) center / 100% 100% no-repeat;
-      filter: drop-shadow(0 0 1.5px rgb(255 255 255 / 90%));
-      pointer-events: none;
-    }
   }
 
   /* ── Date input — golden fairy-ticket style ── */
@@ -85,11 +64,10 @@
     align-items: center;
     justify-content: space-between;
     flex-direction: row !important;
-    gap: 8px;
+    gap: $gap-m;
   }
 
   .mb-input-type-date input,
-  .mb-input-type-inlineSelect select,
   .winx-open-note-btn {
     background: linear-gradient(
       135deg,
@@ -97,7 +75,7 @@
       var(--winx-pink)
     ) !important;
     border: 1.5px solid var(--winx-gold) !important;
-    border-radius: 10px !important;
+    border-radius: $radius-m !important;
     padding: 6px 14px !important;
     color: var(--winx-gold-deep) !important;
     font-family: "Cinzel", serif !important;
