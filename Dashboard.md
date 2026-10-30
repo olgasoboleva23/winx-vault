@@ -28,16 +28,16 @@ pomodoro:
 > > > ```
 > > 
 > > > [!card] Goals
-> > > ```dataviewjs
-> > > await winx.render("goals", dv);
+> > > ```winx
+> > > goals
 > > > ```
 > > > 🗓 [[Week|Week]]
 > 
 > > [!col]
-> > > [!card] Life Areas
-> > > ```dataviewjs
-> > > await winx.render("lifeAreas", dv);
-> > > ```
+> > ```winx
+> > lifeAreas
+> > card: Life Areas
+> > ```
 > >
 > > ```winx
 > > cycle
