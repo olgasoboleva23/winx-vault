@@ -1,3 +1,4 @@
+@use "../mixins" as *;
 /* ============================================
  * WINX THEME — Heatmap / XP Grid
  * File: heatmap.css
@@ -11,7 +12,7 @@
   --s: 10px;
   display: grid;
   gap: 2px;
-  font-size: 10px;
+  font-size: $text-xs;
   color: var(--winx-text-dark);
 
   .winx-bonus {
@@ -73,15 +74,14 @@
 .winx-legend {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: $gap-l;
   font-size: 9px;
   opacity: 0.7;
   margin-top: 6px;
 }
 
 .leg-item {
-  display: flex;
-  align-items: center;
+  @include row;
   gap: 3px;
   position: relative;
   cursor: default;

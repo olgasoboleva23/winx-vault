@@ -45,7 +45,7 @@
     /* pill like the Celestial Market group headers */
     width: fit-content;
     padding: 0.15rem 0.8rem;
-    border-radius: 999px;
+    border-radius: $pill;
     background: fade(var(--winx-border), 40%);
     line-height: 1.4;
     & p { margin: 0; }   /* Tasks wraps the text in a <p> with its own margins */

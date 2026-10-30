@@ -1,5 +1,27 @@
-// Shared helpers for the styles. They print plain CSS (nothing here is output by itself).
+// Shared helpers for the styles: sizes, functions and mixins. Nothing here is output by itself.
 @use "sass:string";
+
+// sizes the widgets share
+$round: 50%;      // a circle
+$pill: 999px;     // a pill
+$radius-s: 6px;
+$radius-m: 10px;
+$radius-l: 12px;
+$radius-xl: 14px;
+$gap-xs: 4px;
+$gap-s: 6px;
+$gap-m: 8px;
+$gap-l: 10px;
+$text-xs: 10px;
+$text-s: 11px;
+$text-m: 12px;
+$text-l: 13px;
+$text-xl: 16px;
+
+// one line of things, centred across it
+@mixin row { display: flex; align-items: center; }
+// one thing in the middle of its box, both ways
+@mixin center { display: flex; align-items: center; justify-content: center; }
 
 // a token's colour at some opacity: alpha(--winx-gold, 90%) → rgb(from var(--winx-gold) r g b / 90%)
 @function alpha($token, $opacity) {
