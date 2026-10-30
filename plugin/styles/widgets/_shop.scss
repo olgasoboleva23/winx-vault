@@ -1,13 +1,13 @@
 @use "../mixins" as *;
 /* ===== SHOP ===== */
 .winx-shop {
-  padding: 0.5rem 0;
+  padding: $space-m 0;
 
   & .winx-shop-balance {
     @include center;
-    gap: 0.6rem;
-    padding: 1.2rem;
-    margin-bottom: 1.5rem;
+    gap: $space-l;
+    padding: $space-4xl;
+    margin-bottom: $space-5xl;
     background: var(--winx-twilight);
     border: 2px solid var(--winx-border);
     border-radius: 18px;
@@ -31,14 +31,14 @@
   & .winx-shop-items {
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: $space-xl;
   }
 
   & .winx-shop-item {
     @include row;
     justify-content: space-between;
     width: 100%;
-    padding: 0.9rem 1.2rem;
+    padding: $space-2xl $space-4xl;
     background: var(--winx-pink-light);
     border: 1px solid var(--winx-border);
     border-radius: $radius-xl;
@@ -58,8 +58,8 @@
     & .winx-shop-item-cost {
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
-      padding: 0.25rem 0.75rem;
+      gap: $space-xs;
+      padding: $space-xs $space-xl;
       background: linear-gradient(
         135deg,
         var(--winx-gold-bright),

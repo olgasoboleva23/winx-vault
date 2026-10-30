@@ -11,13 +11,13 @@
 :is(.dashboard, .kanban-board) {
   .winx-stat-card {
     @include row;
-    gap: 16px;
+    gap: $space-3xl;
   }
 
   .winx-icon-circle {
     flex: 0 0 auto;
-    width: 56px;
-    height: 56px;
+    width: $deco;
+    height: $deco;
     border-radius: $round;
     @include center;
     background: var(--winx-star-icon) center / contain no-repeat;
@@ -27,16 +27,16 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: $gap-xs;
+    gap: $space-xs;
   }
 
   .winx-stat-text {
     color: var(--winx-text-dark);
-    font-size: 14px;
+    font-size: $text-xl;
   }
 
   .winx-progress-bar {
-    margin-top: 6px;
+    margin-top: $space-s;
     height: 10px;
     border-radius: $radius-s;
     background: rgb(255 255 255 / 40%);
@@ -64,7 +64,7 @@
     align-items: center;
     justify-content: space-between;
     flex-direction: row !important;
-    gap: $gap-m;
+    gap: $space-m;
   }
 
   .mb-input-type-date input,
@@ -76,10 +76,10 @@
     ) !important;
     border: 1.5px solid var(--winx-gold) !important;
     border-radius: $radius-m !important;
-    padding: 6px 14px !important;
+    padding: $space-s $space-2xl !important;
     color: var(--winx-gold-deep) !important;
     font-family: "Cinzel", serif !important;
-    font-size: 14px !important;
+    font-size: $text-xl !important;
     letter-spacing: 1px !important;
     box-shadow: 0 0 8px alpha(--winx-gold, 40%) !important;
   }

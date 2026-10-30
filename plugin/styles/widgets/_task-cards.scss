@@ -3,7 +3,7 @@
 @use "../mixins" as *;
 .winx-board-card {
   position: relative;
-  padding: 7px 8px;
+  padding: 7px $space-m;
   border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
   color: var(--winx-text-dark);
   cursor: grab;
@@ -13,17 +13,17 @@
   &:hover { background: fade(white, 35%); border-radius: $radius-m; }
   &.dragging { opacity: 0.4; }
 }
-.winx-board-text { font-size: 14px; line-height: 1.35; }
-.winx-board-meta { margin-top: 2px; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
+.winx-board-text { font-size: $text-xl; line-height: 1.35; }
+.winx-board-meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
 
 /* round buttons on a task: ⏭ ✏️ 🗑 */
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
   display: flex;
-  gap: $gap-xs;
+  gap: $space-xs;
 }
 body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
   position: absolute;
-  right: 4px;
+  right: $space-xs;
   top: 50%;
   translate: 0 -50%;
   padding-left: 18px;
@@ -34,10 +34,10 @@ body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
   transition: opacity 0.15s ease;
 }
 body:not(.is-mobile) :is(.winx-board-card, .winx-cal-task, .winx-yesterday-row):hover .winx-board-btns { opacity: 1; pointer-events: auto; }
-body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top: 6px; }
+body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top: $space-s; }
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns button {
-  width: 26px;
-  height: 26px;
+  width: $btn-s;
+  height: $btn-s;
   padding: 0;
   border-radius: $round;
   border: 1px solid var(--winx-border);
@@ -50,13 +50,13 @@ body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top
 
   &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
 }
-body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { width: 34px; height: 34px; font-size: $text-xl; }
+body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns button { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
 :is(.winx-board-backlog, .winx-cal) .winx-board-btns button.winx-board-del.armed {
   width: auto;
-  padding: 0 8px;
+  padding: 0 $space-m;
   border-color: #d0457a;
   background: #d0457a;
   color: #fff;
   font-size: $text-m;
 }
-.winx-board-backlog { margin-top: 12px; }
+.winx-board-backlog { margin-top: $space-xl; }

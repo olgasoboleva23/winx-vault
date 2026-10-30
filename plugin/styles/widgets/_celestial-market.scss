@@ -9,7 +9,7 @@
 
 .winx-celestial-market {
   display: grid;
-  gap: 0.6rem;
+  gap: $space-l;
 
   .market-list { display: grid; }
 
@@ -17,8 +17,8 @@
   .market-item {
     position: relative;
     @include row;
-    gap: 0.6rem;
-    padding: 0.4rem 0.15rem 0.4rem 0.5rem;
+    gap: $space-l;
+    padding: $space-s $space-2xs $space-s $space-m;
     border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
     transition: background 0.15s ease;
 
@@ -29,15 +29,15 @@
   .market-text {
     flex: 1;
     color: var(--winx-text-dark);
-    font-size: 0.92rem;
+    font-size: $text-xl;
   }
 
   /* round "bought" button: pink circle, white tick */
   /* same look as the scroll arrows, but round: pink, glowing white mark, sparkles on hover */
   .market-buy {
     flex: none;
-    width: 28px;
-    height: 28px;
+    width: $btn-m;
+    height: $btn-m;
     padding: 0;
     border: none;
     border-radius: $round;
@@ -66,8 +66,8 @@
       position: absolute;
       right: -14px;
       top: 50%;
-      width: 56px;
-      height: 56px;
+      width: $deco;
+      height: $deco;
       translate: 0 -50%;
       background: var(--winx-star-sparkle-svg) center / contain no-repeat;
       animation: winx-bought-flash 0.65s ease-out forwards;
@@ -79,23 +79,23 @@
   .market-footer {
     text-align: center;
     color: var(--winx-purple);
-    font-size: 0.72rem;
+    font-size: $text-m;
     text-transform: uppercase;
     letter-spacing: 0.12em;
   }
 
   .market-empty {
     text-align: center;
-    padding-block: 1rem;
+    padding-block: $space-3xl;
     color: var(--winx-purple-deep);
-    font-size: 0.9rem;
+    font-size: $text-xl;
     letter-spacing: 0.05em;
   }
 
   .market-open {
     cursor: pointer;
     color: var(--winx-purple-deep);
-    margin-inline-start: 0.75rem;
+    margin-inline-start: $space-xl;
     opacity: 0.8;
     transition: opacity 0.15s ease;
 
@@ -118,13 +118,13 @@
 /* Category pill, shared by the market widget and the Supplies page */
 :is(.winx-celestial-market, .winx-supplies, .winx-mshop) .market-group-header {
   @include row;
-  gap: 0.45rem;
+  gap: $space-m;
   width: fit-content;
-  margin: 0.6rem 0 0.25rem;
-  padding: 0.2rem 0.75rem;
+  margin: $space-l 0 $space-xs;
+  padding: $space-xs $space-xl;
   border-radius: $pill;
   background: fade(var(--winx-border), 40%);
-  font-size: 0.68rem;
+  font-size: $text-s;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--winx-purple-deep);
@@ -133,11 +133,11 @@
 }
 
 :is(.winx-celestial-market, .winx-mshop) .market-count {
-  min-width: 1.3rem;
-  padding: 0 0.35rem;
+  min-width: 20px;
+  padding: 0 $space-s;
   border-radius: $pill;
   text-align: center;
-  font-size: 0.62rem;
+  font-size: $text-xs;
   letter-spacing: 0;
   color: #fff;
   background: var(--winx-pink-deep);

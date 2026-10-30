@@ -1,16 +1,16 @@
 @use "../mixins" as *;
 /* ── Weight ── */
-.winx-weight { display: grid; gap: $gap-m; }
-.winx-weight-head { display: flex; align-items: baseline; gap: $gap-l; }
+.winx-weight { display: grid; gap: $space-m; }
+.winx-weight-head { display: flex; align-items: baseline; gap: $space-l; }
 .winx-weight-now { font-family: "Cinzel", serif; font-size: 22px; color: var(--winx-text-dark); }
 .winx-weight-delta { font-size: $text-m; color: var(--winx-purple-deep); }
 .winx-weight-list { justify-self: start; }
 .winx-weight .winx-weight-add {
   display: flex;
-  gap: $gap-s;
+  gap: $space-s;
 
-  input, button { min-height: 44px; border-radius: $radius-l; border: 1px solid var(--winx-border); box-shadow: none; }
-  input  { flex: 1; min-width: 0; padding: 0 12px; font-size: 18px; background: rgb(255 255 255 / 65%); color: var(--winx-text-dark); }
+  input, button { min-height: $tap; border-radius: $radius-l; border: 1px solid var(--winx-border); box-shadow: none; }
+  input  { flex: 1; min-width: 0; padding: 0 $space-xl; font-size: $text-3xl; background: rgb(255 255 255 / 65%); color: var(--winx-text-dark); }
   button { padding: 0 18px; font-weight: 600; color: #fff; border-color: transparent;
            background: linear-gradient(135deg, var(--winx-pink), var(--winx-pink-deep)); }
 }

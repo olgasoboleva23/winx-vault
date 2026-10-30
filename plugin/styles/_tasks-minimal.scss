@@ -44,7 +44,7 @@
     color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep)) !important;
     /* pill like the Celestial Market group headers */
     width: fit-content;
-    padding: 0.15rem 0.8rem;
+    padding: $space-2xs $space-xl;
     border-radius: $pill;
     background: fade(var(--winx-border), 40%);
     line-height: 1.4;

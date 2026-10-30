@@ -7,7 +7,7 @@
 
   .metadata-container { display: none !important; }   /* properties only take room on a phone */
 
-  .callout[data-callout="card"] { margin-bottom: 12px; }
+  .callout[data-callout="card"] { margin-bottom: $space-xl; }
   .callout[data-callout="card"]::before,
   .callout[data-callout="card"]::after { display: none; }   /* no wings on a phone */
 
@@ -16,13 +16,13 @@
     background: none !important;
     border: none !important;
     padding: 0 !important;
-    margin-bottom: 12px;
+    margin-bottom: $space-xl;
 
     > .callout-title { display: none; }
     a.internal-link {
       display: inline-flex;
       align-items: center;
-      min-height: 44px;
+      min-height: $tap;
       padding: 0 18px;
       border-radius: $pill;
       background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
@@ -37,15 +37,15 @@
   .plugin-tasks-query-result .task-list-item {
     @include row;
     min-height: var(--winx-touch);
-    padding: 6px 4px;
-    font-size: $text-xl;
+    padding: $space-s $space-xs;
+    font-size: $text-2xl;
     border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
   }
   .plugin-tasks-query-result .task-list-item-checkbox {
-    width: 26px;
-    height: 26px;
+    width: $btn-s;
+    height: $btn-s;
     flex: none;
-    margin-inline-end: 12px;
+    margin-inline-end: $space-xl;
   }
 }
 
@@ -53,14 +53,14 @@
 .winx-tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: $space-xl;
 }
 .winx-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: $gap-xs;
+  gap: $space-xs;
   min-height: 128px;
   border-radius: 18px;
   border: 1px solid var(--winx-border);
@@ -78,28 +78,28 @@
 /* Mobile shopping */
 .winx-mshop {
   display: grid;
-  gap: $gap-s;
+  gap: $space-s;
 
-  .market-group-header { margin-top: 10px; }
+  .market-group-header { margin-top: $space-l; }
 }
 /* doubled class beats Obsidian's own input/button/select styles */
 .winx-mshop .winx-mshop-add {
   display: flex;
-  gap: $gap-s;
+  gap: $space-s;
 
   input, select, button {
-    min-height: 44px;
+    min-height: $tap;
     border-radius: $radius-l;
     border: 1px solid var(--winx-border);
     background: rgb(255 255 255 / 65%);
     color: var(--winx-text-dark);
     box-shadow: none;
   }
-  input  { flex: 1; min-width: 0; padding: 0 12px; font-size: $text-xl; }
+  input  { flex: 1; min-width: 0; padding: 0 $space-xl; font-size: $text-2xl; }
   input::placeholder { color: var(--winx-purple); }
-  select { max-width: 34%; padding: 0 8px; }
+  select { max-width: 34%; padding: 0 $space-m; }
   button {
-    padding: 0 16px;
+    padding: 0 $space-3xl;
     font-weight: 600;
     color: #fff;
     border-color: transparent;
@@ -110,11 +110,11 @@
 .winx-mshop .winx-mshop-row {
   @include row;
   justify-content: space-between;
-  gap: 12px;
+  gap: $space-xl;
   width: 100%;
   min-height: 52px;
   height: auto;
-  padding: 8px 6px 8px 10px;
+  padding: $space-m $space-s $space-m $space-l;
   border: none;
   border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
   border-radius: 0;
@@ -130,8 +130,8 @@
 .winx-mshop-name { flex: 1; white-space: normal; }
 .winx-mshop-mark {
   flex: none;
-  width: 28px;
-  height: 28px;
+  width: $btn-m;
+  height: $btn-m;
   border-radius: $round;
   border: 2px solid var(--winx-pink-deep);
   background: rgb(255 255 255 / 50%);
@@ -148,11 +148,11 @@
   }
 }
 .winx-mshop-sep {
-  margin-top: 14px;
+  margin-top: $space-2xl;
   text-align: center;
   font-size: $text-m;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--winx-purple);
 }
-.winx-mshop-empty { text-align: center; padding: 1rem; color: var(--winx-purple-deep); }
+.winx-mshop-empty { text-align: center; padding: $space-3xl; color: var(--winx-purple-deep); }

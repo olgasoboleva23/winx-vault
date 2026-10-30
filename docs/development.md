@@ -21,7 +21,7 @@
 │   │   │                           editLine / appendLine a note); the pure ones are tested
 │   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget
 │   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; _mixins.scss has the shared
-│   │                               sizes ($pill, $gap-s, $text-m …) and the row / center mixins
+│   │                               sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
 ├── 📁 00 System
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)
