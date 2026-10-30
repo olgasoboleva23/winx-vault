@@ -1,260 +1,93 @@
-// Finance widget — reads the per-month ledgers written by
-// 00 System/Scripts/finance/import_statement.py and renders a month summary,
-// category breakdown, 6-month trend and the latest operations.
-//
-// The data it reads (02 Areas/Finance) stays in the vault; this repo has the code only.
-//
-// Styles are injected from this file rather than kept in plugin/styles, so the
-// widget stays self-contained; they only use --winx-* tokens, so re-theming
-// still carries through.
-//
-// Usage (a note's dataviewjs block):  await winx.render("finance", dv);
+// Finance: the per-month ledgers written by 00 System/Scripts/finance/import_statement.py — a month's totals,
+// categories against their budgets, a 6-month trend and the latest operations; ◀ ▶ step through the months.
+// The data (02 Areas/Finance) stays in the vault; styles in styles/_finance.scss.
+import { html } from "../ui/html.js";
+import { Widget } from "./widget.js";
 
-export default async function (dv, input) {
-  const LEDGER = "02 Areas/Finance/Ledger";
-  const RULES = "02 Areas/Finance/rules.json";
-  const TRANSFER = "Переводы";
+const LEDGER = "02 Areas/Finance/Ledger";
+const RULES = "02 Areas/Finance/rules.json";
+const TRANSFER = "Переводы";
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTHS_SHORT = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+// palette cycled across categories, in winx token order
+const PALETTE = ["--winx-pink", "--winx-gold", "--winx-purple", "--winx-lavender", "--winx-blue", "--winx-pink-deep", "--winx-gold-deep", "--winx-purple-light"];
+const money = n => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(Math.round(n)) + " ₽";
 
-  const MONTHS = ["January", "February", "March", "April", "May", "June",
-                  "July", "August", "September", "October", "November", "December"];
-  const MONTHS_SHORT = ["jan", "feb", "mar", "apr", "may", "jun",
-                        "jul", "aug", "sep", "oct", "nov", "dec"];
-
-  // Palette cycled across categories, in winx token order.
-  const PALETTE = ["--winx-pink", "--winx-gold", "--winx-purple", "--winx-lavender",
-                   "--winx-blue", "--winx-pink-deep", "--winx-gold-deep", "--winx-purple-light"];
-
-  const money = (n) =>
-    new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(Math.round(n)) + " ₽";
-
-  // ===== data =====================================================================
-  async function loadRules() {
-    try {
-      return JSON.parse(await app.vault.adapter.read(RULES));
-    } catch {
-      return { budgets: {} };
-    }
+// transfers move money between your own accounts or split bills: kept in the ledger, not spending or income
+function summarize(rows) {
+  const totals = { spent: 0, income: 0, transfers: 0, categories: {} };
+  for (const row of rows) {
+    if (row.category === TRANSFER) totals.transfers += Math.abs(row.amount);
+    else if (row.amount < 0) { totals.spent += -row.amount; totals.categories[row.category] = (totals.categories[row.category] ?? 0) + -row.amount; }
+    else totals.income += row.amount;
   }
+  return totals;
+}
 
-  // Parses the pipe tables directly — no dependency on dataview inline fields,
-  // so a hand-added cash row behaves exactly like an imported one.
-  async function loadLedger() {
-    const listing = await app.vault.adapter.list(LEDGER).catch(() => null);
+export class Finance extends Widget {
+  current = null;   // the shown month, "YYYY-MM"
+  on = {
+    prev: () => { this.current = this.months[this.months.indexOf(this.current) - 1]; this.draw(); },
+    next: () => { this.current = this.months[this.months.indexOf(this.current) + 1]; this.draw(); },
+  };
+
+  async loadRules() {
+    try { return JSON.parse(await this.app.vault.adapter.read(RULES)); } catch { return { budgets: {} }; }
+  }
+  // the pipe tables themselves (no Dataview fields), so a hand-added cash row works like an imported one
+  async loadLedger() {
+    const listing = await this.app.vault.adapter.list(LEDGER).catch(() => null);
     if (!listing) return {};
-
     const months = {};
-    for (const file of listing.files.filter((f) => f.endsWith(".md"))) {
-      const month = file.slice(file.lastIndexOf("/") + 1, -3);
+    for (const file of listing.files.filter(f => f.endsWith(".md"))) {
       const rows = [];
-      for (const line of (await app.vault.adapter.read(file)).split("\n")) {
+      for (const line of (await this.app.vault.adapter.read(file)).split("\n")) {
         const text = line.trim();
         if (!text.startsWith("|")) continue;
-        const cells = text.slice(1, -1).split("|").map((c) => c.trim());
-        if (cells.length !== 5) continue;
-        if (cells[0] === "date" || /^[-:\s]+$/.test(cells[0])) continue;
+        const cells = text.slice(1, -1).split("|").map(c => c.trim());
+        if (cells.length !== 5 || cells[0] === "date" || /^[-:\s]+$/.test(cells[0])) continue;
         const amount = Number(cells[2]);
-        if (!Number.isFinite(amount)) continue;
-        rows.push({ date: cells[0], time: cells[1], amount, category: cells[3], description: cells[4] });
+        if (Number.isFinite(amount)) rows.push({ date: cells[0], time: cells[1], amount, category: cells[3], description: cells[4] });
       }
-      if (rows.length) months[month] = rows;
+      if (rows.length) months[file.slice(file.lastIndexOf("/") + 1, -3)] = rows;
     }
     return months;
   }
 
-  // Transfers are money moving between your own accounts or split bills — they
-  // are kept in the ledger but excluded from spending and income.
-  function summarize(rows) {
-    const totals = { spent: 0, income: 0, transfers: 0, categories: {} };
-    for (const row of rows) {
-      if (row.category === TRANSFER) {
-        totals.transfers += Math.abs(row.amount);
-      } else if (row.amount < 0) {
-        totals.spent += -row.amount;
-        totals.categories[row.category] = (totals.categories[row.category] ?? 0) + -row.amount;
-      } else {
-        totals.income += row.amount;
-      }
+  async data() {
+    const [ledger, rules] = await Promise.all([this.loadLedger(), this.loadRules()]);
+    this.months = Object.keys(ledger).sort();
+    if (!this.months.includes(this.current)) {
+      const now = new Date(), thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      this.current = this.months.includes(thisMonth) ? thisMonth : this.months.at(-1);
     }
-    return totals;
+    return { ledger, budgets: rules.budgets ?? {}, months: this.months, current: this.current };
   }
 
-  // ===== rendering ================================================================
-  function injectStyles() {
-    if (document.getElementById("winx-finance-styles")) return;
-    const style = document.createElement("style");
-    style.id = "winx-finance-styles";
-    style.textContent = `
-      .winx-fin { display: flex; flex-direction: column; gap: 14px; font-size: 14px; }
-      .winx-fin-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-      .winx-fin-month { font-weight: 600; letter-spacing: .02em; color: var(--winx-text-dark); }
-      .winx-fin-nav { display: flex; gap: 4px; }
-      .winx-fin-nav button {
-        all: unset; cursor: pointer; padding: 2px 9px; border-radius: 8px; line-height: 1.5;
-        background: rgb(from var(--winx-purple) r g b / 18%); color: var(--winx-text-dark);
-      }
-      .winx-fin-nav button:hover { background: rgb(from var(--winx-pink) r g b / 32%); }
-      .winx-fin-nav button[disabled] { opacity: .3; cursor: default; }
-
-      .winx-fin-totals { display: flex; gap: 10px; }
-      .winx-fin-total {
-        flex: 1; padding: 8px 10px; border-radius: 12px; text-align: center;
-        background: rgb(from var(--winx-purple) r g b / 12%);
-      }
-      .winx-fin-total span { display: block; font-size: 11px; opacity: .7; margin-bottom: 2px; }
-      .winx-fin-total b { font-size: 16px; font-weight: 600; }
-      .winx-fin-total.is-neg b { color: var(--winx-pink-deep); }
-      .winx-fin-total.is-pos b { color: var(--winx-gold-deep); }
-
-      .winx-fin-section { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .65; }
-      .winx-fin-rows { display: flex; flex-direction: column; gap: 6px; }
-      .winx-fin-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
-      .winx-fin-row .amt { font-variant-numeric: tabular-nums; }
-      .winx-fin-row .over { color: var(--winx-pink-deep); font-weight: 600; }
-      .winx-fin-track {
-        grid-column: 1 / -1; height: 8px; border-radius: 5px; overflow: hidden;
-        background: rgb(from var(--winx-purple) r g b / 14%);
-      }
-      .winx-fin-fill { height: 100%; border-radius: 5px; transition: width .3s ease; }
-
-      .winx-fin-trend { display: flex; align-items: flex-end; gap: 6px; height: 78px; }
-      .winx-fin-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
-      .winx-fin-bar .col { width: 100%; margin-top: auto; border-radius: 5px 5px 0 0;
-        background: linear-gradient(to top, var(--winx-purple), var(--winx-pink)); }
-      .winx-fin-bar.is-current .col { background: linear-gradient(to top, var(--winx-gold-deep), var(--winx-gold)); }
-      .winx-fin-bar small { font-size: 10px; opacity: .7; }
-
-      .winx-fin-list { display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; }
-      .winx-fin-item { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: baseline; }
-      .winx-fin-item .d { opacity: .55; font-variant-numeric: tabular-nums; }
-      .winx-fin-item .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .winx-fin-item .a { font-variant-numeric: tabular-nums; opacity: .85; }
-      .winx-fin-empty { opacity: .6; font-style: italic; }
-    `;
-    document.head.appendChild(style);
-  }
-
-  function bar(parent, label, value, max, color, budget) {
-    const row = parent.createDiv({ cls: "winx-fin-row" });
-    row.createSpan({ text: label });
-    const amount = row.createSpan({ cls: "amt" });
-    if (budget) {
-      const pct = Math.round((value / budget) * 100);
-      amount.setText(`${money(value)} / ${money(budget)} · ${pct}%`);
-      if (value > budget) amount.addClass("over");
-    } else {
-      amount.setText(money(value));
-    }
-    const fill = row.createDiv({ cls: "winx-fin-track" }).createDiv({ cls: "winx-fin-fill" });
-    const ratio = budget ? Math.min(value / budget, 1) : value / (max || 1);
-    fill.style.width = `${Math.max(ratio * 100, 1.5)}%`;
-    fill.style.background = budget && value > budget
-      ? "var(--winx-pink-deep)"
-      : `var(${color})`;
-  }
-
-  // ===== main =====================================================================
-  injectStyles();
-
-  const [ledger, rules] = await Promise.all([loadLedger(), loadRules()]);
-  const budgets = rules.budgets ?? {};
-  const available = Object.keys(ledger).sort();
-
-  const root = dv.container.createDiv({ cls: "winx-fin" });
-
-  if (!available.length) {
-    root.createDiv({
-      cls: "winx-fin-empty",
-      text: "The ledger is empty. Export a statement from SberBank Online to 02 Areas/Finance/Statements "
-          + "and run 00 System/Scripts/finance/import.sh",
-    });
-    return;
-  }
-
-  const now = new Date();
-  const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  let current = available.includes(thisMonth) ? thisMonth : available[available.length - 1];
-
-  function render() {
-    root.empty();
-    const rows = ledger[current] ?? [];
-    const totals = summarize(rows);
-    const [year, month] = current.split("-");
-
-    // header + month navigation
-    const head = root.createDiv({ cls: "winx-fin-head" });
-    head.createDiv({ cls: "winx-fin-month", text: `${MONTHS[Number(month) - 1]} ${year}` });
-    const nav = head.createDiv({ cls: "winx-fin-nav" });
-    const index = available.indexOf(current);
-    const prev = nav.createEl("button", { text: "◀" });
-    const next = nav.createEl("button", { text: "▶" });
-    if (index <= 0) prev.setAttr("disabled", "true");
-    else prev.onclick = () => { current = available[index - 1]; render(); };
-    if (index >= available.length - 1) next.setAttr("disabled", "true");
-    else next.onclick = () => { current = available[index + 1]; render(); };
-
-    // totals
-    const totalsEl = root.createDiv({ cls: "winx-fin-totals" });
-    const net = totals.income - totals.spent;
-    const cards = [
-      ["Spent", totals.spent, "is-neg"],
-      ["Received", totals.income, "is-pos"],
-      ["Net", net, net < 0 ? "is-neg" : "is-pos"],
-    ];
-    for (const [label, value, cls] of cards) {
-      const card = totalsEl.createDiv({ cls: `winx-fin-total ${cls}` });
-      card.createSpan({ text: label });
-      card.createEl("b", { text: money(value) });
-    }
-    if (totals.transfers > 0) {
-      root.createDiv({
-        cls: "winx-fin-section",
-        text: `transfers ${money(totals.transfers)} — not counted as spending`,
-      });
-    }
-
-    // categories
+  view({ ledger, budgets, months, current }) {
+    if (!months.length) return html`<div class="winx-fin"><div class="winx-fin-empty">The ledger is empty. Export a statement from SberBank Online to 02 Areas/Finance/Statements and run 00 System/Scripts/finance/import.sh</div></div>`;
+    const rows = ledger[current] ?? [], totals = summarize(rows), [year, month] = current.split("-");
+    const index = months.indexOf(current), net = totals.income - totals.spent;
     const categories = Object.entries(totals.categories).sort((a, b) => b[1] - a[1]);
-    if (categories.length) {
-      root.createDiv({ cls: "winx-fin-section", text: "Categories" });
-      const list = root.createDiv({ cls: "winx-fin-rows" });
-      const max = categories[0][1];
-      categories.forEach(([name, value], i) => {
-        bar(list, name, value, max, PALETTE[i % PALETTE.length], budgets[name]);
-      });
-    }
-
-    // 6-month trend
-    const window6 = available.slice(Math.max(0, index - 5), index + 1);
-    if (window6.length > 1) {
-      root.createDiv({ cls: "winx-fin-section", text: "Spending by month" });
-      const trend = root.createDiv({ cls: "winx-fin-trend" });
-      const spends = window6.map((m) => summarize(ledger[m]).spent);
-      const peak = Math.max(...spends, 1);
-      window6.forEach((m, i) => {
-        const cell = trend.createDiv({ cls: `winx-fin-bar${m === current ? " is-current" : ""}` });
-        const col = cell.createDiv({ cls: "col" });
-        col.style.height = `${Math.max((spends[i] / peak) * 100, 3)}%`;
-        col.setAttr("aria-label", money(spends[i]));
-        cell.createEl("small", { text: MONTHS_SHORT[Number(m.split("-")[1]) - 1] });
-      });
-    }
-
-    // latest operations
-    const latest = rows
-      .filter((r) => r.category !== TRANSFER)
-      .sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))
-      .slice(0, 8);
-    if (latest.length) {
-      root.createDiv({ cls: "winx-fin-section", text: "Recent transactions" });
-      const list = root.createDiv({ cls: "winx-fin-list" });
-      for (const row of latest) {
-        const item = list.createDiv({ cls: "winx-fin-item" });
-        item.createSpan({ cls: "d", text: row.date.slice(8) + "." + row.date.slice(5, 7) });
-        item.createSpan({ cls: "t", text: `${row.category} · ${row.description}` });
-        item.createSpan({ cls: "a", text: money(row.amount) });
-      }
-    }
+    const window6 = months.slice(Math.max(0, index - 5), index + 1);
+    const spends = window6.map(m => summarize(ledger[m]).spent), peak = Math.max(...spends, 1);
+    const latest = rows.filter(r => r.category !== TRANSFER).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)).slice(0, 8);
+    const bar = (name, value, max, color, budget) => {
+      const ratio = budget ? Math.min(value / budget, 1) : value / (max || 1);
+      const fill = budget && value > budget ? "var(--winx-pink-deep)" : `var(${color})`;
+      return html`<div class="winx-fin-row"><span>${name}</span>${budget
+        ? html`<span class="amt${value > budget ? " over" : ""}">${money(value)} / ${money(budget)} · ${Math.round(value / budget * 100)}%</span>`
+        : html`<span class="amt">${money(value)}</span>`}<div class="winx-fin-track"><div class="winx-fin-fill" style="width: ${Math.max(ratio * 100, 1.5)}%; background: ${fill};"></div></div></div>`;
+    };
+    return html`<div class="winx-fin">
+      <div class="winx-fin-head"><div class="winx-fin-month">${MONTHS[Number(month) - 1]} ${year}</div>
+        <div class="winx-fin-nav"><button${index <= 0 ? html` disabled="true"` : html` data-action="prev"`}>◀</button><button${index >= months.length - 1 ? html` disabled="true"` : html` data-action="next"`}>▶</button></div></div>
+      <div class="winx-fin-totals">${[["Spent", totals.spent, "is-neg"], ["Received", totals.income, "is-pos"], ["Net", net, net < 0 ? "is-neg" : "is-pos"]]
+        .map(([label, value, cls]) => html`<div class="winx-fin-total ${cls}"><span>${label}</span><b>${money(value)}</b></div>`)}</div>
+      ${totals.transfers > 0 ? html`<div class="winx-fin-section">transfers ${money(totals.transfers)} — not counted as spending</div>` : ""}
+      ${categories.length ? html`<div class="winx-fin-section">Categories</div><div class="winx-fin-rows">${categories.map(([name, value], i) => bar(name, value, categories[0][1], PALETTE[i % PALETTE.length], budgets[name]))}</div>` : ""}
+      ${window6.length > 1 ? html`<div class="winx-fin-section">Spending by month</div><div class="winx-fin-trend">${window6.map((m, i) => html`<div class="winx-fin-bar${m === current ? " is-current" : ""}"><div class="col" style="height: ${Math.max(spends[i] / peak * 100, 3)}%;" aria-label="${money(spends[i])}"></div><small>${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small></div>`)}</div>` : ""}
+      ${latest.length ? html`<div class="winx-fin-section">Recent transactions</div><div class="winx-fin-list">${latest.map(r => html`<div class="winx-fin-item"><span class="d">${r.date.slice(8) + "." + r.date.slice(5, 7)}</span><span class="t">${r.category} · ${r.description}</span><span class="a">${money(r.amount)}</span></div>`)}</div>` : ""}
+    </div>`;
   }
-
-  render();
 }
