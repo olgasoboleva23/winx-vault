@@ -14,3 +14,14 @@ export function parseBlock(source) {
   }
   return { name, args };
 }
+
+// The element whose data-action an event in a widget runs, or null: a click on a button (or anything else that
+// isn't a field or a form), a field's change when the field itself has the action (not its form's), a form's submit.
+export function actionOf(type, target, root) {
+  const el = target.closest?.("[data-action]");
+  if (!el || !root.contains(el)) return null;
+  if (type === "click") return el.matches("input, select, textarea, form") || target.closest("input, select, textarea") ? null : el;
+  if (type === "change") return el === target ? el : null;
+  if (type === "submit") return el.matches("form") ? el : null;
+  return null;
+}

@@ -1,6 +1,6 @@
 // Week (Week.md): goals × days with the cycle day as the last row, the tasks done and still open (Dataview's own
 // task lists, ticks work), and each daily note's link with the first 3 lines under "## 📝 Notes".
-import { MarkdownRenderer } from "obsidian";
+import { Component, MarkdownRenderer } from "obsidian";
 import { H } from "../lib/helpers.js";
 import { L } from "../lib/goalsLib.js";
 import { html } from "../ui/html.js";
@@ -48,8 +48,11 @@ export class Week extends Widget {
   // what Dataview and Obsidian draw: the task lists (with working ticks) and the notes' links
   async after(root, { doneByDay, notDone, notes }) {
     const dv = this.dv.api, slot = name => root.querySelector(`[data-slot="${name}"]`);
-    for (const [i, [, tasks]] of doneByDay.entries()) await dv.taskList(tasks, false, slot(`done-${i}`), this, this.sourcePath);
-    await dv.taskList(notDone, false, slot("notdone"), this, this.sourcePath);
-    for (const md of notes) await MarkdownRenderer.render(this.app, md, slot("notes").createDiv(), this.sourcePath, this);
+    // what they mount belongs to this draw: dropped on the next one (or when the block goes)
+    const part = this.addChild(new Component());
+    this.keep({ destroy: () => this.removeChild(part) });
+    for (const [i, [, tasks]] of doneByDay.entries()) await dv.taskList(tasks, false, slot(`done-${i}`), part, this.sourcePath);
+    await dv.taskList(notDone, false, slot("notdone"), part, this.sourcePath);
+    for (const md of notes) await MarkdownRenderer.render(this.app, md, slot("notes").createDiv(), this.sourcePath, part);
   }
 }
