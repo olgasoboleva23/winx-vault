@@ -1,6 +1,6 @@
 // Finance: the per-month ledgers written by 00 System/Scripts/finance/import_statement.py — a month's totals,
 // categories against their budgets, a 6-month trend and the latest operations; ◀ ▶ step through the months.
-// The data (02 Areas/Finance) stays in the vault; styles in styles/_finance.scss.
+// The data (02 Areas/Finance) stays in the vault; styles in styles/widgets/_finance.scss (blocks winx-fin, winx-fin-month).
 import { html } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { dm } from "../core/dates.js";
@@ -67,7 +67,7 @@ export class Finance extends Widget {
   }
 
   view({ ledger, budgets, months, current }) {
-    if (!months.length) return html`<div class="winx-fin"><div class="winx-fin-empty">The ledger is empty. Export a statement from SberBank Online to 02 Areas/Finance/Statements and run 00 System/Scripts/finance/import.sh</div></div>`;
+    if (!months.length) return html`<div class="winx-fin"><div class="winx-fin__empty">The ledger is empty. Export a statement from SberBank Online to 02 Areas/Finance/Statements and run 00 System/Scripts/finance/import.sh</div></div>`;
     const rows = ledger[current] ?? [], totals = summarize(rows), [year, month] = current.split("-");
     const index = months.indexOf(current), net = totals.income - totals.spent;
     const categories = Object.entries(totals.categories).sort((a, b) => b[1] - a[1]);
@@ -77,19 +77,19 @@ export class Finance extends Widget {
     const bar = (name, value, max, color, budget) => {
       const ratio = budget ? Math.min(value / budget, 1) : value / (max || 1);
       const fill = budget && value > budget ? "var(--winx-pink-deep)" : `var(${color})`;
-      return html`<div class="winx-fin-row"><span>${name}</span>${budget
-        ? html`<span class="amt${value > budget ? " over" : ""}">${money(value)} / ${money(budget)} · ${Math.round(value / budget * 100)}%</span>`
-        : html`<span class="amt">${money(value)}</span>`}<div class="winx-fin-track"><div class="winx-fin-fill" style="width: ${Math.max(ratio * 100, 1.5)}%; background: ${fill};"></div></div></div>`;
+      return html`<div class="winx-fin__row"><span>${name}</span>${budget
+        ? html`<span class="winx-fin__amt${value > budget ? " winx-fin__amt--over" : ""}">${money(value)} / ${money(budget)} · ${Math.round(value / budget * 100)}%</span>`
+        : html`<span class="winx-fin__amt">${money(value)}</span>`}<div class="winx-fin__track"><div class="winx-fin__fill" style="width: ${Math.max(ratio * 100, 1.5)}%; background: ${fill};"></div></div></div>`;
     };
     return html`<div class="winx-fin">
-      <div class="winx-fin-head"><div class="winx-fin-month">${MONTHS[Number(month) - 1]} ${year}</div>
-        <div class="winx-fin-nav"><button${index <= 0 ? html` disabled="true"` : html` data-action="prev"`}>◀</button><button${index >= months.length - 1 ? html` disabled="true"` : html` data-action="next"`}>▶</button></div></div>
-      <div class="winx-fin-totals">${[["Spent", totals.spent, "is-neg"], ["Received", totals.income, "is-pos"], ["Net", net, net < 0 ? "is-neg" : "is-pos"]]
-        .map(([label, value, cls]) => html`<div class="winx-fin-total ${cls}"><span>${label}</span><b>${money(value)}</b></div>`)}</div>
-      ${totals.transfers > 0 ? html`<div class="winx-fin-section">transfers ${money(totals.transfers)} — not counted as spending</div>` : ""}
-      ${categories.length ? html`<div class="winx-fin-section">Categories</div><div class="winx-fin-rows">${categories.map(([name, value], i) => bar(name, value, categories[0][1], PALETTE[i % PALETTE.length], budgets[name]))}</div>` : ""}
-      ${window6.length > 1 ? html`<div class="winx-fin-section">Spending by month</div><div class="winx-fin-trend">${window6.map((m, i) => html`<div class="winx-fin-bar${m === current ? " is-current" : ""}"><div class="col" style="height: ${Math.max(spends[i] / peak * 100, 3)}%;" aria-label="${money(spends[i])}"></div><small>${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small></div>`)}</div>` : ""}
-      ${latest.length ? html`<div class="winx-fin-section">Recent transactions</div><div class="winx-fin-list">${latest.map(r => html`<div class="winx-fin-item"><span class="d">${dm(r.date)}</span><span class="t">${r.category} · ${r.description}</span><span class="a">${money(r.amount)}</span></div>`)}</div>` : ""}
+      <div class="winx-fin__head"><div class="winx-fin__title">${MONTHS[Number(month) - 1]} ${year}</div>
+        <div class="winx-fin__nav"><button class="winx-fin__nav-btn"${index <= 0 ? html` disabled="true"` : html` data-action="prev"`}>◀</button><button class="winx-fin__nav-btn"${index >= months.length - 1 ? html` disabled="true"` : html` data-action="next"`}>▶</button></div></div>
+      <div class="winx-fin__totals">${[["Spent", totals.spent, "neg"], ["Received", totals.income, "pos"], ["Net", net, net < 0 ? "neg" : "pos"]]
+        .map(([label, value, sign]) => html`<div class="winx-fin__total winx-fin__total--${sign}"><span class="winx-fin__total-label">${label}</span><b class="winx-fin__total-value">${money(value)}</b></div>`)}</div>
+      ${totals.transfers > 0 ? html`<div class="winx-fin__section">transfers ${money(totals.transfers)} — not counted as spending</div>` : ""}
+      ${categories.length ? html`<div class="winx-fin__section">Categories</div><div class="winx-fin__rows">${categories.map(([name, value], i) => bar(name, value, categories[0][1], PALETTE[i % PALETTE.length], budgets[name]))}</div>` : ""}
+      ${window6.length > 1 ? html`<div class="winx-fin__section">Spending by month</div><div class="winx-fin__trend">${window6.map((m, i) => html`<div class="winx-fin__bar${m === current ? " winx-fin__bar--current" : ""}"><div class="winx-fin__col" style="height: ${Math.max(spends[i] / peak * 100, 3)}%;" aria-label="${money(spends[i])}"></div><small class="winx-fin__bar-label">${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small></div>`)}</div>` : ""}
+      ${latest.length ? html`<div class="winx-fin__section">Recent transactions</div><div class="winx-fin__list">${latest.map(r => html`<div class="winx-fin__item"><span class="winx-fin__item-date">${dm(r.date)}</span><span class="winx-fin__item-text">${r.category} · ${r.description}</span><span class="winx-fin__item-sum">${money(r.amount)}</span></div>`)}</div>` : ""}
     </div>`;
   }
 }
@@ -100,6 +100,6 @@ export class FinanceMonth extends Finance {
     const link = new NoteLink({ text: "💰 open finance", path: "Finance", kind: "text" });
     if (!months.length) return html`<div class="winx-fin-month">${link}</div>`;
     const { spent, income } = summarize(ledger[current]);
-    return html`<div class="winx-fin-month"><div>${MONTHS[Number(current.split("-")[1]) - 1]}: spent <b>${money(spent)}</b> · income <b>${money(income)}</b></div>${link}</div>`;
+    return html`<div class="winx-fin-month"><div>${MONTHS[Number(current.split("-")[1]) - 1]}: spent <b class="winx-fin-month__sum">${money(spent)}</b> · income <b class="winx-fin-month__sum">${money(income)}</b></div>${link}</div>`;
   }
 }
