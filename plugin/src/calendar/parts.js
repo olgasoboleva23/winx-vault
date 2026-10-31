@@ -28,6 +28,8 @@ export class Part {
 export class Header extends Part {
   on = {
     date: (e, el) => this.go(el.value || null),   // emptied (the phone's "Reset"): today
+    // a piece of the balance bar: only that area's tasks; again: all
+    area: (e, el) => { const a = `#area/${el.dataset.area}`; this.view.area = a === this.view.area ? null : a; this.ctx.set({}, ["grid"]); },
     mute: (e, el) => { toggleMute(); el.textContent = isMuted() ? "🔇" : "🔊"; },
     newTask: () => app.commands.executeCommandById("winx:new-task"),
     dashboard: () => app.commands.executeCommandById("winx:open-dashboard"),
@@ -50,9 +52,9 @@ export class Header extends Part {
   // done / all, the done part brighter;
   // an area with none this week a grey icon after it
   balance() {
-    const { areas } = this.ctx.config, b = this.ctx.model.balance(areas.map(a => a.tag));
+    const { areas } = this.ctx.config, b = (this.ctx.everything ?? this.ctx.model).balance(areas.map(a => a.tag)), picked = this.view.area;
     const name = tag => areas.find(a => a.tag === tag).label, has = b.filter(x => x.planned), none = b.filter(x => !x.planned);
-    return html`<div class="winx-cal-balance"${PART("header")}><div class="winx-balance-bar">${has.map(x => html`<div data-area="${x.area.slice(6)}" style="flex: ${x.planned}" title="${name(x.area)}: ${x.done} of ${x.planned} done"><span>${name(x.area).split(" ")[0]} ${x.done}/${x.planned}</span><b><i style="width: ${Math.round(x.done / x.planned * 100)}%"></i></b></div>`)}</div>${none.length ? html`<div class="winx-balance-none" title="nothing this week">${none.map(x => html`<span title="${name(x.area)}: nothing this week">${name(x.area).split(" ")[0]}</span>`)}</div>` : ""}</div>`;
+    return html`<div class="winx-cal-balance"${PART("header")}><div class="winx-balance-bar${picked ? " picked" : ""}">${has.map(x => html`<div class="${x.area === picked ? "on" : ""}" data-area="${x.area.slice(6)}" data-action="area" style="flex: ${x.planned}" title="${name(x.area)}: ${x.done} of ${x.planned} done"><span>${name(x.area).split(" ")[0]} ${x.done}/${x.planned}</span><b><i style="width: ${Math.round(x.done / x.planned * 100)}%"></i></b></div>`)}</div>${none.length ? html`<div class="winx-balance-none" title="nothing this week">${none.map(x => html`<span title="${name(x.area)}: nothing this week">${name(x.area).split(" ")[0]}</span>`)}</div>` : ""}</div>`;
   }
   routineDays() { return this.ctx.days.filter(d => this.ctx.model.byDay[d].some(e => T(e.t).isRecurring)); }
   render() {

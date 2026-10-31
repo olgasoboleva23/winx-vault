@@ -98,6 +98,8 @@ export class CalendarView extends ItemView {
     return t;
   }
 
+  area: string | null = null;   // the area tab picked over the week ("#area/body"): only its tasks shown; null: all
+
   // the whole calendar, with fresh data
   private async draw() {
     this.stale = false;
@@ -108,12 +110,19 @@ export class CalendarView extends ItemView {
     const today = todayYmd(), days = shownDays(this.state, today);
     const tasks = dv.pages(`"${TASKS_DIR.slice(0, -1)}"`).file.tasks.array();
     const poolLines = (dv.page(POOL)?.file.lists.array() ?? []).filter((l: any) => !l.task);
+    // the data, all of it or one area's tasks and pool lines
+    const data = (area: string | null) => new CalendarData({
+      tasks: area ? tasks.filter((t: any) => T(t).area === area) : tasks,
+      poolLines: area ? poolLines.filter((l: any) => l.text.includes(area)) : poolLines,
+      days, today, areaOrder: Object.keys(config.areaIcons),
+    });
     const old = this.ctx?.root;
     const root = createDiv({ cls: `winx-cal ${this.state.view}` });
     const ctx: any = this.ctx = {
       root, state: this.state, today, days, base: baseDate(this.state, today), view: this.state.view,
       shown: { open: true, ghost: true, done: this.state.showDone },
-      model: new CalendarData({ tasks, poolLines, days, today, areaOrder: Object.keys(config.areaIcons) }),
+      model: data(this.area),
+      everything: this.area ? data(null) : null,   // the tabs' counts, whatever tab is picked
       config, TASKS: (this.app as any).plugins.plugins["obsidian-tasks-plugin"]?.apiV1,
       infos: new Map(),
       unfolded: new Set(this.state.unfolded), shows: [], syncRepeats: () => {},

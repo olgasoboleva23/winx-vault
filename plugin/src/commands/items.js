@@ -53,11 +53,14 @@ ${k.steps.map(s => `- [ ] ${s}`).join("\n")}
 `;
 }
 
-// in the kind's folder, without characters a file name can't have; " 1", " 2"… when taken (`exists(path)`)
-export function itemPath(kind, title, exists) {
-  const { folder } = KINDS[kind];
+// in the folder, without characters a file name can't have; " 1", " 2"… when taken (`exists(path)`)
+export function itemPath(folder, title, exists) {
   const name = title.replace(/[\\/:*?"<>|#^[\]]/g, "").trim() || "Untitled";
   let path = `${folder}/${name}.md`;
   for (let i = 1; exists(path); i++) path = `${folder}/${name} ${i}.md`;
   return path;
 }
+
+// a template's text for a new note: QuickAdd's {{date}} / {{title}} and Templater's tp.file.title
+export const fillTemplate = (text, title, today) =>
+  text.replace(/{{date}}/g, today).replace(/{{title}}|<%\s*tp\.file\.title\s*%>/g, title);
