@@ -3,6 +3,7 @@
 import { Notice } from "obsidian";
 import config from "../core/config.js";
 import { edit, editLine } from "../core/files.js";
+import { tasksApi } from "../core/plugins.js";
 import { Task } from "./task.js";
 import { Form } from "../uikit/form.ts";
 
@@ -31,7 +32,7 @@ export const taskWindow = async (preset = {}, required = false) => {
 // Cancelling either changes nothing. A pool line (t.pool) goes through the dialog as a task and comes back
 // as a pool line (any dates set there are dropped).
 export const editTaskModal = async t => {
-  const api  = app.plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
+  const api  = tasksApi();
   const line = (await app.vault.cachedRead(app.vault.getAbstractFileByPath(t.path))).split("\n")[t.line];
   if (!api || Task.keyOf(line ?? "") !== Task.keyOf(t.text)) return;
   const was  = new Task(line).picks;

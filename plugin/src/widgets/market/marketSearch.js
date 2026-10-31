@@ -5,11 +5,12 @@ import { Form } from "../../uikit/form.ts";
 import { dm } from "../../core/dates.js";
 import { addToMarket, marketCats, marketChoices, marketState } from "./market.js";
 import { findChoices } from "../../core/find.js";
+import { dataview } from "../../core/plugins.js";
 
 const catLabel = tag => marketCats.find(c => c.tag === tag)?.label ?? tag;
 
 export async function addMarketItem() {
-  const { history, open } = marketState(app.plugins.plugins.dataview.api);
+  const { history, open } = marketState(dataview());
   const choices = marketChoices(history, open);
   // a category header over the first row of each category
   const find = q => findChoices(choices, q).map((c, i, all) => ({ ...c, header: !c.isNew && c.tag !== all[i - 1]?.tag }));

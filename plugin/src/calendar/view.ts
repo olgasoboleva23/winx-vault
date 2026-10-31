@@ -1,9 +1,9 @@
-import { ItemView, Notice, TAbstractFile, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
-import { actionOf } from "../widgets/parse.js";
+import { ItemView, Notice, TAbstractFile, WorkspaceLeaf, debounce, sanitizeHTMLToDom } from "obsidian";
+import { useActions, useBusy, useNewDay, useRedraw } from "../core/use.js";
+import { dataview, tasksApi } from "../core/plugins.js";
 import { CalendarData, T, findTask, taskKey } from "./data.js";
 import { baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
-import { dimOnWrite } from "../uikit/busy.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
 import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
@@ -30,7 +30,7 @@ export class CalendarView extends ItemView {
   private parts: Record<PartName, any> = { header: new Header(this), missed: new Missed(this), grid: new Grid(this), panel: new Panel(this) };
   ctx: any = null;
   actions: any = null;
-  private stale = false;   // the tasks changed while the tab was hidden: redraw when it shows
+  private catchUp = () => {};   // a hidden tab that missed changes, drawn when it shows (useRedraw)
   private dragged: any = null;
   private sounds = { move: new AudioEngine("00 System/Assets/winx music/snd_scroll_menu.wav"), gem: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem01.wav") };
 
@@ -55,27 +55,20 @@ export class CalendarView extends ItemView {
     this.registerEvent((this.app.metadataCache as any).on("dataview:index-ready", () => this.draw()));
     this.draw();
     // a task file changed in Dataview's index: new data, every part (a hidden tab waits until it shows)
-    let timer = 0;
+    const { redraw, catchUp } = useRedraw(this, () => this.contentEl.isShown(), () => this.draw());
+    this.catchUp = catchUp;
+    const later = debounce(redraw, 100, true);
+    this.register(() => later.cancel());
     this.registerEvent((this.app.metadataCache as any).on("dataview:metadata-change", (_type: string, file: TAbstractFile) => {
-      if (!file?.path?.startsWith(TASKS_DIR)) return;
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => this.contentEl.isShown() ? this.draw() : (this.stale = true), 100);
+      if (file?.path?.startsWith(TASKS_DIR)) later();
     }));
     // a write to a task file: the calendar dims with a spinning ✦ until the redraw
-    dimOnWrite(this, (path: string) => path.startsWith(TASKS_DIR), () => this.ctx?.root, "winx-cal--busy");
-    this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
-    this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));   // a sidebar or split shown
+    useBusy(this, (path: string) => path.startsWith(TASKS_DIR), () => this.ctx?.root, "winx-cal--busy");
     // a new day: following today, the days move on; and "today" in every action is the new one
-    this.registerInterval(window.setInterval(() => {
-      if (this.ctx && this.ctx.today !== todayYmd()) this.contentEl.isShown() ? this.draw() : (this.stale = true);
-    }, 60_000));
+    useNewDay(this, redraw);
   }
   onResize() { this.catchUp(); }
-  // a hidden tab that missed changes, drawn when it shows
-  private catchUp() { if (this.stale && this.contentEl.isShown()) this.draw(); }
   async onClose() { this.contentEl.empty(); this.ctx = null; }
-
-  private dataview(): any { return (this.app as any).plugins.plugins.dataview?.api; }
 
   // what a component needs about a task, with its key (data-task)
   info(t: any) {
@@ -102,8 +95,7 @@ export class CalendarView extends ItemView {
 
   // the whole calendar, with fresh data
   private async draw() {
-    this.stale = false;
-    const dv = this.dataview();
+    const dv: any = dataview();
     const say = (text: string) => { this.ctx = null; this.root.empty(); this.root.setText(text); };   // no calendar to redraw in place
     if (!dv) return say("✦ the calendar needs the Dataview plugin");
     if (!dv.index?.initialized) return say("✦ waiting for Dataview…");   // index-ready draws again
@@ -123,7 +115,7 @@ export class CalendarView extends ItemView {
       shown: { open: true, ghost: true, done: this.state.showDone },
       model: data(this.area),
       everything: this.area ? data(null) : null,   // the tabs' counts, whatever tab is picked
-      config, TASKS: (this.app as any).plugins.plugins["obsidian-tasks-plugin"]?.apiV1,
+      config, TASKS: tasksApi(),
       infos: new Map(),
       unfolded: new Set(this.state.unfolded), shows: [], syncRepeats: () => {},
       saveUnfolded: () => { this.state.unfolded = [...ctx.unfolded]; this.app.workspace.requestSaveLayout(); },
@@ -191,16 +183,12 @@ export class CalendarView extends ItemView {
   // one set of listeners for the whole tab: actions, ticks, drags, swipes
   private listen() {
     const el = this.contentEl;
-    const act = (e: Event) => {
-      if (!this.ctx) return;
-      const target = actionOf(e.type, e.target, el);
-      if (!target) return;
-      const name = target.dataset.action, part = (target.closest("[data-part]") as HTMLElement)?.dataset.part as PartName;
-      const fn = this.parts[part]?.on[name] ?? this.taskOn[name];
-      if (fn) fn(e, target);
-    };
-    this.registerDomEvent(el, "click", act);
-    this.registerDomEvent(el, "change", act);
+    // an action: its part's handler, else the task's own (✏️ 🗑 ⏭ ⭐ ✓)
+    useActions(this, el, (name: string, target: HTMLElement) => {
+      if (!this.ctx) return null;
+      const part = (target.closest("[data-part]") as HTMLElement)?.dataset.part as PartName;
+      return this.parts[part]?.on[name] ?? this.taskOn[name];
+    });
 
     // drag a task (data-drag) onto a day's zone, a chip of the drop bar, or the panel (data-drop; "" = no date)
     const zone = (e: Event) => (e.target as HTMLElement).closest?.("[data-drop]") as HTMLElement | null;

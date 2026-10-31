@@ -8,6 +8,7 @@ import { pickTask } from "../tasks/taskSearch.js";
 import { addMarketItem } from "../widgets/market/marketSearch.js";
 import { logPurchase } from "../widgets/shop/wallet.js";
 import { appendLine, edit } from "../core/files.js";
+import { tasksApi } from "../core/plugins.js";
 
 const MASTER = "02 Areas/Personal/Tasks/Master.md";
 const POOL   = "02 Areas/Personal/Tasks/Pool.md";
@@ -25,10 +26,10 @@ export function registerCommands(plugin: Plugin) {
     const ready = !found.isNew && found.picks.difficulty && found.picks.area;
     const pick = ready ? found.picks : await taskWindow(found.picks ?? {}, true);
     if (!pick) return;
-    const tasksApi = (app as any).plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
-    if (!tasksApi) return void new Notice("✦ the Tasks plugin is off — task not saved");
+    const api = tasksApi();
+    if (!api) return void new Notice("✦ the Tasks plugin is off — task not saved");
     // ➕ shows how long it waits on the board
-    const result = await tasksApi.editTaskLineModal(`- [ ] ${[pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ")}  ➕ ${todayYmd()}`);
+    const result = await api.editTaskLineModal(`- [ ] ${[pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ")}  ➕ ${todayYmd()}`);
     if (!result) return;
     const line = new Task(result).setSticker(pick.sticker);   // after the text typed in the Tasks modal
     // a pool line (no checkbox, no dates) goes to the end of Pool.md, made on first use; a task to the top of Master.md

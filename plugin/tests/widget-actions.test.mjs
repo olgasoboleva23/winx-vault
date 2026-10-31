@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { actionOf } from "../src/widgets/parse.js";
+import { actionOf } from "../src/core/use.js";
 
 // tiny stand-ins for elements: a tag, an optional data-action, a parent
 const el = (tag, action, parent = null) => ({
