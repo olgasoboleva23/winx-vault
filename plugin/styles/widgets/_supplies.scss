@@ -1,13 +1,11 @@
 @use "../mixins" as *;
-/* ── Supplies ── */
-.winx-supply {
+/* ── Supplies (block winx-supplies) ── */
+.winx-supplies__row {
   @include row;
   gap: $space-l;
   padding: $space-xs 0;
   color: var(--winx-text-dark);
-
-  &.due .winx-supply-info { color: var(--winx-pink-deep); font-weight: 600; }
 }
-.winx-supply-name { flex: 1; }
-.winx-supply-info { font-size: $text-m; color: var(--winx-purple-deep); }
-.market-soon { font-size: $text-m; color: var(--winx-pink-deep); margin: $space-s 0 $space-2xs; }
+.winx-supplies__name { flex: 1; }
+.winx-supplies__info { font-size: $text-m; color: var(--winx-purple-deep); }
+.winx-supplies__row--due .winx-supplies__info { color: var(--winx-pink-deep); font-weight: 600; }

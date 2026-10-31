@@ -23,7 +23,7 @@ export class Supplies extends Widget {
       const listed = open.has(s.name);
       const info = listed ? "on the shopping list ✦" : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}` : `bought ${s.buys} times`;
       const low = new Button({ text: "running low", action: "low", kind: "pill", data: { name: s.name, tag: s.tag } });
-      return html`<div class="winx-supply${s.due ? " due" : ""}"><span class="winx-supply-name">${s.name}</span><span class="winx-supply-info">${info}</span>${listed ? "" : low}</div>`;
+      return html`<div class="winx-supplies__row${s.due ? " winx-supplies__row--due" : ""}"><span class="winx-supplies__name">${s.name}</span><span class="winx-supplies__info">${info}</span>${listed ? "" : low}</div>`;
     };
     return html`<div class="winx-supplies">
       ${stats.length ? "" : new Empty({ text: "Nothing bought twice yet" })}

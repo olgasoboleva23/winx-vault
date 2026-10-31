@@ -17,9 +17,9 @@ export class CelestialMarket extends Widget {
     add: () => addMarketItem(),
     // let the sparkle play first, then write (the write redraws the widget)
     buy: async (e, el) => {
-      const row = el.closest(".market-item");
-      if (row.classList.contains("bought")) return;
-      row.classList.add("bought");
+      const row = el.closest(".winx-market__item");
+      if (row.classList.contains("winx-market__item--bought")) return;
+      row.classList.add("winx-market__item--bought");
       await new Promise(r => setTimeout(r, 650));
       await editLine(MARKET, Number(el.dataset.line), line => new MarketItem(line).bought(todayYmd()));
     },
@@ -37,16 +37,16 @@ export class CelestialMarket extends Widget {
   cardButton() { return new Button({ icon: "+", title: "add item", action: "add", kind: "text", cls: "winx-widget__add" }); }
   view({ missing, items, groups, soon }) {
     if (missing) return new Missing({ path: MARKET });
-    const link = (text, path) => new NoteLink({ text, path, kind: "text", cls: "market-open" });
-    return html`<div class="winx-celestial-market">
-      <div class="market-list">
+    const link = (text, path) => new NoteLink({ text, path, kind: "text", cls: "winx-market__link" });
+    return html`<div class="winx-market">
+      <div class="winx-market__list">
         ${items.length ? "" : new Empty({ text: "✨ Merchant inventory cleared" })}
         ${groups.map(({ cat, items }) => html`
           ${new GroupHeader({ label: cat.label, count: items.length })}
-          ${items.map(t => html`<div class="market-item"><span class="market-text">${t.text.replace(/#[\w/]+/g, "").trim()}</span><button class="market-buy" aria-label="bought" title="bought" data-action="buy" data-line="${t.line}"></button></div>`)}`)}
+          ${items.map(t => html`<div class="winx-market__item"><span class="winx-market__text">${t.text.replace(/#[\w/]+/g, "").trim()}</span><button class="winx-market__buy" aria-label="bought" title="bought" data-action="buy" data-line="${t.line}"></button></div>`)}`)}
       </div>
-      ${soon.length ? html`<div class="market-soon">⏳ running low soon: ${soon.join(", ")}</div>` : ""}
-      <div class="market-footer"><span>${items.length} item${items.length === 1 ? "" : "s"} left</span>${link("✦ open market", "00 System/Data/Celestial Market")}${link("✦ supplies", "00 System/Data/Supplies")}</div>
+      ${soon.length ? html`<div class="winx-market__soon">⏳ running low soon: ${soon.join(", ")}</div>` : ""}
+      <div class="winx-market__footer"><span>${items.length} item${items.length === 1 ? "" : "s"} left</span>${link("✦ open market", "00 System/Data/Celestial Market")}${link("✦ supplies", "00 System/Data/Supplies")}</div>
     </div>`;
   }
 }
