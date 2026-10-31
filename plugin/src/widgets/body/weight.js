@@ -34,7 +34,7 @@ export class Weight extends Widget {
     level: (e, el) => el.parentElement.querySelectorAll("[data-action=level]").forEach(b => b.classList.toggle("winx-btn--on", b === el)),
     reason: (e, el) => el.classList.toggle("winx-btn--on"),
     logSave: async (e, el) => {
-      const box = el.closest(".winx-log-form"), level = box.querySelector("[data-action=level].winx-btn--on")?.dataset.level;
+      const box = el.closest(".winx-weight__log"), level = box.querySelector("[data-action=level].winx-btn--on")?.dataset.level;
       if (level === undefined) return;
       const reasons = [...box.querySelectorAll("[data-action=reason].winx-btn--on")].map(b => b.dataset.reason);
       await edit(LOG_PATH, c => new BodyLog(c).set(todayYmd(), Number(level), reasons));
@@ -57,29 +57,29 @@ export class Weight extends Widget {
     return { log, last, delta: ref ? +(last.kg - ref.kg).toFixed(1) : null, days, vals: days.map(d => byDay.get(d) ?? null) };
   }
   view(d) {
-    const toggle = d.log ? html`<div class="winx-weight-modes">${new Button({ text: "⚖️ weight", kind: "toggle", on: this.mode === "weight", action: "mode", data: { mode: "weight" } })}${new Button({ text: String(d.log.name ?? "log"), kind: "toggle", on: this.mode === "log", action: "mode", data: { mode: "log" } })}</div>` : "";
+    const toggle = d.log ? html`<div class="winx-weight__modes">${new Button({ text: "⚖️ weight", kind: "toggle", on: this.mode === "weight", action: "mode", data: { mode: "weight" } })}${new Button({ text: String(d.log.name ?? "log"), kind: "toggle", on: this.mode === "log", action: "mode", data: { mode: "log" } })}</div>` : "";
     return this.mode === "log" && d.log ? html`<div class="winx-weight">${toggle}${this.logView(d)}</div>` : html`<div class="winx-weight">${toggle}${this.weightView(d)}</div>`;
   }
   weightView({ missing, last, delta }) {
     if (missing) return new Missing({ path: PATH });
-    return html`<div class="winx-weight-head">${last
-        ? html`<span class="winx-weight-now">${last.kg} kg</span>${delta !== null ? html`<span class="winx-weight-delta">${delta > 0 ? "+" : ""}${delta} vs week ago</span>` : ""}`
-        : html`<span class="winx-weight-delta">no entries yet</span>`}</div>
+    return html`<div class="winx-weight__head">${last
+        ? html`<span class="winx-weight__now">${last.kg} kg</span>${delta !== null ? html`<span class="winx-weight__delta">${delta > 0 ? "+" : ""}${delta} vs week ago</span>` : ""}`
+        : html`<span class="winx-weight__delta">no entries yet</span>`}</div>
       ${new AddForm({ action: "save", input: { name: "kg", type: "number", step: "0.1", inputmode: "decimal", placeholder: "today, kg" }, submit: "Save" })}
-      ${new NoteLink({ text: "✦ list", path: PATH, cls: "winx-weight-list" })}`;
+      ${new NoteLink({ text: "✦ list", path: PATH, cls: "winx-weight__list" })}`;
   }
   logView({ log, today, entries }) {
     const now = entries.at(-1)?.date === today ? entries.at(-1) : null, reasons = (log.reasons ?? []).map(String);
-    return html`<div class="winx-log-form">
-        <div class="winx-log-row">${[0, 1, 2, 3].map(n => new Button({ text: String(n), kind: "toggle", on: now?.level === n, action: "level", data: { level: n } }))}</div>
-        <div class="winx-log-row">${reasons.map(r => new Button({ text: r, kind: "toggle", on: !!now?.reasons.includes(r), action: "reason", data: { reason: r } }))}</div>
+    return html`<div class="winx-weight__log">
+        <div class="winx-weight__log-row">${[0, 1, 2, 3].map(n => new Button({ text: String(n), kind: "toggle", on: now?.level === n, action: "level", data: { level: n } }))}</div>
+        <div class="winx-weight__log-row">${reasons.map(r => new Button({ text: r, kind: "toggle", on: !!now?.reasons.includes(r), action: "reason", data: { reason: r } }))}</div>
         ${new Button({ text: now ? "Update today" : "Save today", kind: "pill", action: "logSave" })}
       </div>
-      ${new NoteLink({ text: "✦ list", path: LOG_PATH, cls: "winx-weight-list" })}`;
+      ${new NoteLink({ text: "✦ list", path: LOG_PATH, cls: "winx-weight__list" })}`;
   }
   // the chart between the form and the list button
   async after(root, d) {
-    const box = root.querySelector(".winx-weight"), list = box?.querySelector(".winx-weight-list");
+    const box = root.querySelector(".winx-weight"), list = box?.querySelector(".winx-weight__list");
     if (!box || d.missing) return;
     if (this.mode === "log" && d.log) {
       const pink = chartColor("--winx-pink-deep"), shade = chartColor("--winx-purple", 0.18);

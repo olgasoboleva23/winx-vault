@@ -1,11 +1,11 @@
 @use "../mixins" as *;
-/* ── Weight ── */
+/* ── Weight (src/widgets/body/weight.js) ── */
 .winx-weight { display: grid; gap: $space-m; }
-.winx-weight-head { display: flex; align-items: baseline; gap: $space-l; }
-.winx-weight-now { font-family: "Cinzel", serif; font-size: 22px; color: var(--winx-text-dark); }
-.winx-weight-delta { font-size: $text-m; color: var(--winx-purple-deep); }
-.winx-weight-list { justify-self: start; }
+.winx-weight__head { display: flex; align-items: baseline; gap: $space-l; }
+.winx-weight__now { font-family: "Cinzel", serif; font-size: 22px; color: var(--winx-text-dark); }
+.winx-weight__delta { font-size: $text-m; color: var(--winx-purple-deep); }
+.winx-weight__list { justify-self: start; }
 /* weight ↔ the body log, and the log's form: a level 0–3, the reasons, save */
-.winx-weight-modes { display: flex; gap: $space-s; }
-.winx-log-form { display: grid; gap: $space-m; justify-items: start; }
-.winx-log-row { display: flex; flex-wrap: wrap; gap: $space-s; }
+.winx-weight__modes { display: flex; gap: $space-s; }
+.winx-weight__log { display: grid; gap: $space-m; justify-items: start; }
+.winx-weight__log-row { display: flex; flex-wrap: wrap; gap: $space-s; }

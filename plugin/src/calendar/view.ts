@@ -48,7 +48,7 @@ export class CalendarView extends ItemView {
 
   async onOpen() {
     // a note in reading view (fonts, margins), with the dashboard pages' background and fonts on top
-    this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard", "winx-cal-view"]);
+    this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
     this.root = this.contentEl.createEl("div");
     this.listen();
     // a cold start: Dataview reads the vault only once the layout is ready, after this tab opens; draw when it has

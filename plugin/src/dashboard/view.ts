@@ -70,9 +70,9 @@ export class DashboardView extends ItemView {
   // the day it shows, where the note had the Meta Bind field: the calendar's date field, round ‹ ›, "today" pill;
   // and 📅 to the calendar, on the phone only (its tabs are out of sight)
   private dateRow() {
-    const slot = this.body?.querySelector(".winx-dash-date");
+    const slot = this.body?.querySelector(".winx-dash__date");
     if (!slot) return;
-    slot.className = "winx-dash-date winx-nav";
+    slot.className = "winx-dash__date winx-nav";
     slot.empty();
     slot.createDiv({ cls: "mb-input-type-date" }).createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
     const today = this.shownDate !== todayYmd() ? new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" }) : "";
@@ -82,7 +82,7 @@ export class DashboardView extends ItemView {
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)
   private questsPart: Component | null = null;
   private quests() {
-    const slot = this.body?.querySelector(".winx-dash-quests") as HTMLElement | null;
+    const slot = this.body?.querySelector(".winx-dash__quests") as HTMLElement | null;
     if (!slot) return;
     if (this.questsPart) this.page!.removeChild(this.questsPart);
     this.questsPart = this.page!.addChild(new Component());
@@ -98,7 +98,7 @@ export class DashboardView extends ItemView {
     });
     this.registerDomEvent(el, "click", e => {
       const t = e.target as HTMLElement;
-      const act = t.closest?.(".winx-dash-date [data-action]") as HTMLElement | null;
+      const act = t.closest?.(".winx-dash__date [data-action]") as HTMLElement | null;
       if (act?.dataset.action === "prev") return this.go(addDays(this.shownDate, -1));
       if (act?.dataset.action === "next") return this.go(addDays(this.shownDate, 1));
       if (act?.dataset.action === "today") return this.go(null);

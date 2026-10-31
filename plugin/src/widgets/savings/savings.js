@@ -41,16 +41,16 @@ export class Savings extends Widget {
       const grey = j.pct === null ? 100 : Math.max(0, 100 - j.pct);
       const pastHalf = j.pct !== null && j.pct >= 50;
       return html`<div class="winx-jar">
-        <div class="winx-jar-goal">
-          <div class="winx-jar-pic">${j.img ? html`<img src="${j.img}" alt=""><img class="winx-jar-grey" src="${j.img}" alt="" style="clip-path: inset(0 0 ${100 - grey}% 0)">` : ""}</div>
-          <div><div class="winx-jar-name">✦ ${j.name}</div>
-            <div class="winx-jar-big">${pastHalf ? `left ${money(j.left)}` : money(j.saved)}</div>
-            <div class="winx-jar-note">${j.pct === null ? `saved · ${j.count} deposit${j.count === 1 ? "" : "s"}` : `${j.pct}% of ${money(j.price)}`}</div></div>
+        <div class="winx-jar__goal">
+          <div class="winx-jar__pic">${j.img ? html`<img class="winx-jar__img" src="${j.img}" alt=""><img class="winx-jar__img winx-jar__img--grey" src="${j.img}" alt="" style="clip-path: inset(0 0 ${100 - grey}% 0)">` : ""}</div>
+          <div><div class="winx-jar__name">✦ ${j.name}</div>
+            <div class="winx-jar__big">${pastHalf ? `left ${money(j.left)}` : money(j.saved)}</div>
+            <div class="winx-jar__note">${j.pct === null ? `saved · ${j.count} deposit${j.count === 1 ? "" : "s"}` : `${j.pct}% of ${money(j.price)}`}</div></div>
         </div>
-        ${j.pct !== null ? html`<div class="winx-jar-bar"><i style="width: ${Math.min(100, j.pct)}%"></i></div>` : ""}
-        <div class="winx-jar-stamps">${Array.from({ length: slots }, (_, i) => html`<span class="${i < j.count ? "on" : ""}">✦</span>`)}</div>
-        ${j.due ? html`<div class="winx-jar-due"><span>${j.due.payday === j.today ? "payday today" : `payday ${day(j.due.payday)}`}: <b>put in ${j.due.sum ? money(j.due.sum) : "your part"}</b></span>${new Button({ text: "✓ done", kind: "pill", action: "deposit", data: { path: j.path } })}</div>` : ""}
-        <div class="winx-jar-next">next payday: ${j.next.map(day).join(" · ")}</div>
+        ${j.pct !== null ? html`<div class="winx-jar__bar"><i class="winx-jar__fill" style="width: ${Math.min(100, j.pct)}%"></i></div>` : ""}
+        <div class="winx-jar__stamps">${Array.from({ length: slots }, (_, i) => html`<span class="winx-jar__stamp${i < j.count ? " winx-jar__stamp--on" : ""}">✦</span>`)}</div>
+        ${j.due ? html`<div class="winx-jar__due"><span>${j.due.payday === j.today ? "payday today" : `payday ${day(j.due.payday)}`}: <b class="winx-jar__due-sum">put in ${j.due.sum ? money(j.due.sum) : "your part"}</b></span>${new Button({ text: "✓ done", kind: "pill", action: "deposit", data: { path: j.path } })}</div>` : ""}
+        <div class="winx-jar__next">next payday: ${j.next.map(day).join(" · ")}</div>
       </div>`;
     })}</div>`;
   }

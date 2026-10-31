@@ -1,6 +1,6 @@
 @use "../mixins" as *;
 /* ============================================
- * WINX THEME — Heatmap / XP Grid
+ * WINX THEME — Heatmap / XP Grid (block winx-xp)
  * File: heatmap.css
  *
  * GitHub-style activity heatmap.
@@ -15,7 +15,7 @@
   font-size: $text-xs;
   color: var(--winx-text-dark);
 
-  .winx-bonus {
+  .winx-xp__bonus {
     font-size: $text-2xs;
     color: var(--winx-purple);
     margin-bottom: $space-xs;
@@ -23,17 +23,17 @@
   }
 }
 
-.winx-header {
+.winx-xp__header {
   display: flex;
   justify-content: space-between;
   margin-bottom: $space-s;
 }
 
-.winx-aura {
+.winx-xp__aura {
   font-weight: 600;
 }
 
-.winx-grid {
+.winx-xp__grid {
   display: grid;
   grid-template-columns: repeat(7, max-content);
   justify-content: start;
@@ -41,37 +41,37 @@
 }
 
 /* ── Cell — intensity via scoped custom prop ── */
-.winx-cell {
+.winx-xp__cell {
   width: var(--s);
   height: var(--s);
   border-radius: 2px;
 }
 
-.winx-cell,
-.leg-item .swatch {
+.winx-xp__cell,
+.winx-xp__swatch {
   background: var(--winx-purple-deep);
   opacity: var(--cell-opacity, 0.9);
 
-  &.v0 {
+  &--v0 {
     background: transparent;
     border: 1px solid var(--winx-border);
     --cell-opacity: 0.9;
   }
-  &.v1 {
+  &--v1 {
     --cell-opacity: 0.2;
   }
-  &.v2 {
+  &--v2 {
     --cell-opacity: 0.4;
   }
-  &.v3 {
+  &--v3 {
     --cell-opacity: 0.65;
   }
-  &.v4 {
+  &--v4 {
     --cell-opacity: 1;
   }
 }
 
-.winx-legend {
+.winx-xp__legend {
   display: flex;
   justify-content: flex-end;
   gap: $space-l;
@@ -80,7 +80,7 @@
   margin-top: $space-s;
 }
 
-.leg-item {
+.winx-xp__legend-item {
   @include row;
   gap: 3px;
   position: relative;
@@ -107,7 +107,7 @@
   }
 }
 
-.swatch {
+.winx-xp__swatch {
   width: 8px;
   height: 8px;
   border-radius: 2px;

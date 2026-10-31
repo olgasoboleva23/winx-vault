@@ -1,0 +1,42 @@
+@use "../mixins" as *;
+/* ── Goals (src/widgets/goals/goals.js): a block winx-goal per goal ── */
+.winx-goals {
+  display: flex;
+  flex-direction: column;
+  gap: $space-l;
+}
+
+.winx-goal__head {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-m;
+  color: var(--winx-text-dark);
+}
+
+.winx-goal__name { font-weight: 600; }
+.winx-goal__count, .winx-goal__min { font-size: $text-m; color: var(--winx-purple-deep); }
+
+.winx-goal__dots {
+  display: flex;
+  gap: $space-s;
+  margin: $space-xs 0 $space-2xs;
+}
+
+.winx-goal__dot {
+  display: inline-block;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: $round;
+  border: 1.5px solid var(--winx-border);
+  background: rgb(255 255 255 / 40%);
+
+  &--done    { background: var(--winx-gold); border-color: var(--winx-gold-deep); }
+  &--missed  { border-color: var(--winx-pink-deep); border-style: dashed; }
+  &--planned { border-color: var(--winx-purple); }
+  &--sel     { box-shadow: 0 0 6px var(--winx-pink-deep); }
+}
+
+
+/* Life Areas' caption under its chart (src/widgets/xp/lifeAreas.js) */
+.winx-areas__caption { text-align: center; font-size: $text-m; color: var(--winx-purple-deep); }

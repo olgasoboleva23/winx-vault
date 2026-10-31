@@ -1,7 +1,7 @@
 
 >[!grid]
 >>[!col]
-> ><div class="winx-dash-date"></div>
+> ><div class="winx-dash__date"></div>
 > >
 > >```winx
 > >dailyNote
@@ -58,7 +58,7 @@
 > > ```
 > >
 > > > [!card|scroll] Quests
-> > > <div class="winx-dash-quests"></div>
+> > > <div class="winx-dash__quests"></div>
 > >
 > > ```winx
 > > celestialMarket

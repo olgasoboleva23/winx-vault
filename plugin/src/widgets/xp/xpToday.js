@@ -27,10 +27,10 @@ export class XpToday extends Widget {
   }
   view({ levels, habitBonus, avg, todayXP, aura, vals }) {
     return html`<div class="winx-xp">
-      <div class="winx-header"><div class="winx-aura">🔮 ${aura} • ${todayXP} XP</div><div>${todayXP > avg ? "↑" : "↓"} 7d</div></div>
-      ${habitBonus > 0 ? html`<div class="winx-bonus">🏅 +${habitBonus} habit bonus</div>` : ""}
-      <div class="winx-grid">${vals.map(v => html`<div class="winx-cell v${v}"></div>`)}</div>
-      <div class="winx-legend">${levels.map(l => html`<div class="leg-item" data-tip="${l.name}"><span class="swatch ${l.cls}"></span>${l.max === Infinity ? "30+" : l.max}</div>`)}</div>
+      <div class="winx-xp__header"><div class="winx-xp__aura">🔮 ${aura} • ${todayXP} XP</div><div>${todayXP > avg ? "↑" : "↓"} 7d</div></div>
+      ${habitBonus > 0 ? html`<div class="winx-xp__bonus">🏅 +${habitBonus} habit bonus</div>` : ""}
+      <div class="winx-xp__grid">${vals.map(v => html`<div class="winx-xp__cell winx-xp__cell--v${v}"></div>`)}</div>
+      <div class="winx-xp__legend">${levels.map(l => html`<div class="winx-xp__legend-item" data-tip="${l.name}"><span class="winx-xp__swatch winx-xp__swatch--${l.cls}"></span>${l.max === Infinity ? "30+" : l.max}</div>`)}</div>
     </div>`;
   }
 }
