@@ -2,9 +2,9 @@
 // with data-action inside it. The view puts data-part on a part's top elements, finds the part an event came
 // from and calls its handler (task buttons — ✏️ 🗑 ⏭ ⭐ ✓ — are the view's own, the same everywhere).
 // No whitespace between tags: inline elements must lay out as the old createEl calls did.
-import { html } from "../ui/html.js";
-import { busyPill } from "../ui/busy.js";
-import { Button } from "../ui/component.js";
+import { html } from "../core/html.js";
+import { busyPill } from "../uikit/busy.js";
+import { Button } from "../uikit/button.js";
 import { TaskButtons, TaskCard, TaskRow, TaskText } from "./components.js";
 import { T } from "./data.js";
 import { dateFor } from "./state.js";

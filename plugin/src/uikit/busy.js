@@ -1,6 +1,6 @@
 // The ✦ pill of a Winx tab: a write to a note the tab shows dims it (class busy on el()) and spins the ✦ until
 // it's drawn again; 5 s at most.
-import { html } from "./html.js";
+import { html } from "../core/html.js";
 
 export const busyPill = (attrs = "") => html`<div class="winx-cal-busy"${attrs}><div class="winx-cal-busy-pill" title="saving…"><span>✦</span></div></div>`;
 

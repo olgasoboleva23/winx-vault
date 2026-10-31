@@ -1,5 +1,5 @@
 // Level and XP: total XP of the tasks done up to the page's day, the level it makes, progress to the next one.
-import { html } from "../../ui/html.js";
+import { html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import config from "../../core/config.js";
 import { pageDay, ymd } from "../../core/dates.js";

@@ -1,6 +1,6 @@
 // XP Today: the page's day's XP (with the habit bonus), its aura level, ↑/↓ against the 7-day average, and the
 // month as a heatmap of daily levels.
-import { html } from "../../ui/html.js";
+import { html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import config from "../../core/config.js";
 import { pageDay, ymd } from "../../core/dates.js";

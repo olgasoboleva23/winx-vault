@@ -1,5 +1,5 @@
-/* The looks of the Button component (src/ui/component.js), one block per kind. The pill (✦ Open) is in
-   _base.scss, with the date field it shares its look with. */
+/* Button (src/uikit/button.js), one block per kind. The pill (✦ Open) is in widgets/_base.scss, with the date
+   field it shares its look with. */
 @use "../mixins" as *;
 
 // round: an icon in a white circle (a task's ⭐ ⏭ ✏️ 🗑, the panel's +📅 ⏸ ▶, Missed's ✓ ☀️); bigger on the phone
@@ -59,3 +59,17 @@ button.winx-btn.toggle {
   &.on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
 }
 button:not(.toggle) + button.winx-btn.toggle { margin-left: auto; }
+
+// text: a word in the text's colour, no frame (the market's ✦ open market)
+button.winx-btn.text {
+  height: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--winx-purple-deep);
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}

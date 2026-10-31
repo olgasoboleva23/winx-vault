@@ -1,9 +1,10 @@
 // Goals: per goal "X of Y this week", Mon–Sun dots, the minimum version, and how often it was done.
 // A missed goal task stays on its day (the calendar's Missed? lists it).
-import { html } from "../../ui/html.js";
+import { html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import { dm, pageDay, todayYmd, weekOf, ymd } from "../../core/dates.js";
 import { Goal } from "./goal.js";
+import { Missing } from "../../uikit/empty.js";
 
 const GOALS_PATH = "02 Areas/Personal/Goals.md";
 
@@ -19,7 +20,7 @@ export class Goals extends Widget {
     };
   }
   view({ missing, selected, today, week, rows }) {
-    if (missing) return html`<div>Create ${GOALS_PATH}</div>`;
+    if (missing) return new Missing({ path: GOALS_PATH });
     return html`<div class="winx-goals">${rows.map(({ goal, done }) => {
       const doneSet = new Set(done), last = [...done].sort().at(-1);
       // "I've done this before": total and last time, from the ✅ dates already in the tasks

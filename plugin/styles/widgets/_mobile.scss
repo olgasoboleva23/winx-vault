@@ -82,30 +82,6 @@
 
   .market-group-header { margin-top: $space-l; }
 }
-/* doubled class beats Obsidian's own input/button/select styles */
-.winx-mshop .winx-mshop-add {
-  display: flex;
-  gap: $space-s;
-
-  input, select, button {
-    min-height: $tap;
-    border-radius: $radius-l;
-    border: 1px solid var(--winx-border);
-    background: rgb(255 255 255 / 65%);
-    color: var(--winx-text-dark);
-    box-shadow: none;
-  }
-  input  { flex: 1; min-width: 0; padding: 0 $space-xl; font-size: $text-2xl; }
-  input::placeholder { color: var(--winx-purple); }
-  select { max-width: 34%; padding: 0 $space-m; }
-  button {
-    padding: 0 $space-3xl;
-    font-weight: 600;
-    color: #fff;
-    border-color: transparent;
-    background: linear-gradient(135deg, var(--winx-pink), var(--winx-pink-deep));
-  }
-}
 .winx-mshop-list { display: grid; }
 .winx-mshop .winx-mshop-row {
   @include row;
@@ -155,4 +131,3 @@
   text-transform: uppercase;
   color: var(--winx-purple);
 }
-.winx-mshop-empty { text-align: center; padding: $space-3xl; color: var(--winx-purple-deep); }

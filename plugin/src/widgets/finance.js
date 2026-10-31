@@ -1,7 +1,7 @@
 // Finance: the per-month ledgers written by 00 System/Scripts/finance/import_statement.py — a month's totals,
 // categories against their budgets, a 6-month trend and the latest operations; ◀ ▶ step through the months.
 // The data (02 Areas/Finance) stays in the vault; styles in styles/_finance.scss.
-import { html } from "../ui/html.js";
+import { html } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { dm } from "../core/dates.js";
 

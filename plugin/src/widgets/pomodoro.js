@@ -1,7 +1,7 @@
 // Pomodoro: a 25/5 focus timer in a ring, session stars, and its settings; state in 00 System/Data/pomodoro.json
 // (settings, the current session, today's stats). A running session lives on in this module through redraws;
 // the ticking stops when the block goes.
-import { html, raw } from "../ui/html.js";
+import { html, raw } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { todayYmd } from "../core/dates.js";
 import { AudioEngine } from "../core/sounds.js";

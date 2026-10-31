@@ -4,7 +4,7 @@ import { Notice } from "obsidian";
 import config from "../core/config.js";
 import { edit, editLine } from "../core/files.js";
 import { Task } from "./task.js";
-import { Form } from "../ui/form.ts";
+import { Form } from "../uikit/form.ts";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
 // only if that line is still the same task.

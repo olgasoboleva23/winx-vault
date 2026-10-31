@@ -1,6 +1,6 @@
 // "✦ Open": the daily note of the page's date; made from the daily template (through Templater) if it's missing.
 import { Notice } from "obsidian";
-import { Button } from "../ui/component.js";
+import { Button } from "../uikit/button.js";
 import { Widget } from "./widget.js";
 import { ymd } from "../core/dates.js";
 

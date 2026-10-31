@@ -1,11 +1,13 @@
 // Supplies: what is bought again and again (from the Celestial Market's done items), how long since the last
 // time against the usual gap, and "running low" to put one back on the shopping list.
 import { Notice } from "obsidian";
-import { html } from "../../ui/html.js";
-import { Button } from "../../ui/component.js";
+import { html } from "../../core/html.js";
+import { Button } from "../../uikit/button.js";
 import { Widget } from "../widget.js";
 import { todayYmd } from "../../core/dates.js";
 import { addToMarket, marketCats, marketState, supplyStats } from "./market.js";
+import { Empty } from "../../uikit/empty.js";
+import { GroupHeader } from "../../uikit/groupHeader.js";
 
 export class Supplies extends Widget {
   on = {
@@ -24,8 +26,8 @@ export class Supplies extends Widget {
       return html`<div class="winx-supply${s.due ? " due" : ""}"><span class="winx-supply-name">${s.name}</span><span class="winx-supply-info">${info}</span>${listed ? "" : low}</div>`;
     };
     return html`<div class="winx-supplies">
-      ${stats.length ? "" : html`<div>Nothing bought twice yet</div>`}
-      ${marketCats.map(cat => { const items = stats.filter(s => groupOf(s) === cat.tag); return items.length ? html`<div class="market-group-header">${cat.label}</div>${items.map(row)}` : ""; })}
+      ${stats.length ? "" : new Empty({ text: "Nothing bought twice yet" })}
+      ${marketCats.map(cat => { const items = stats.filter(s => groupOf(s) === cat.tag); return items.length ? html`${new GroupHeader({ label: cat.label })}${items.map(row)}` : ""; })}
     </div>`;
   }
 }

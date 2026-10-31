@@ -1,16 +1,17 @@
 // Cycle: the day of the cycle on the page's date, the next start forecast, "started / ended today" and the dates.
-import { html } from "../../ui/html.js";
-import { Button } from "../../ui/component.js";
+import { html } from "../../core/html.js";
+import { Button } from "../../uikit/button.js";
 import { Widget } from "../widget.js";
 import { CycleLog } from "./cycleLog.js";
 import { dm, pageDay, ymd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
+import { Empty, Missing } from "../../uikit/empty.js";
+import { NoteLink } from "../../uikit/noteLink.js";
 
 const CYCLE_PATH = "02 Areas/Health & Body/Cycle.md";
 
 export class Cycle extends Widget {
   on = {
-    dates: () => this.app.workspace.openLinkText(CYCLE_PATH, "", false),
     mark: (e, el) => appendLine(CYCLE_PATH, `- ${el.dataset.kind}:: ${el.dataset.day}`, { header: "period:: 8\n\n", unique: true }),
   };
   async data() {
@@ -23,12 +24,12 @@ export class Cycle extends Widget {
     const ending = info?.isPeriod && !info.ended;
     const when = info && (info.daysUntil >= 0 ? `in ${info.daysUntil} d` : `${-info.daysUntil} d late`);
     return html`<div class="winx-cycle">
-      ${!page ? html`<div>Create ${CYCLE_PATH}</div>`
-        : !info ? html`<div>no data yet</div>`
+      ${!page ? new Missing({ path: CYCLE_PATH })
+        : !info ? new Empty({ text: "no data yet" })
         : html`<div class="winx-cycle-day${info.isPeriod ? " period" : ""}">day ${info.day}</div><div class="winx-cycle-next">next ~${dm(info.nextStart)}, ${when}</div>`}
       <div class="winx-cycle-btns">
         ${new Button({ text: ending ? "ended today" : "started today", action: "mark", kind: "pill", data: { kind: ending ? "end" : "start", day } })}
-        ${new Button({ text: "dates", action: "dates", kind: "pill" })}
+        ${new NoteLink({ text: "dates", path: CYCLE_PATH })}
       </div>
     </div>`;
   }

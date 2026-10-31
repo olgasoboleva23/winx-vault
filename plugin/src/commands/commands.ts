@@ -1,7 +1,7 @@
 import { Notice, Plugin } from "obsidian";
 import { Task } from "../tasks/task.js";
 import { KINDS, itemForm, itemNote, itemPath } from "./items.js";
-import { Form } from "../ui/form.ts";
+import { Form } from "../uikit/form.ts";
 import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
 import { taskWindow } from "../tasks/taskEdit.js";
