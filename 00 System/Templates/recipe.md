@@ -1,13 +1,13 @@
 ---
 type: recipe
-name:
+name: {{title}}
 tags: []
 source:
 time: ~
 difficulty:
 ---
 
-# Recipe name
+# {{title}}
 
 ## Ingredients
 

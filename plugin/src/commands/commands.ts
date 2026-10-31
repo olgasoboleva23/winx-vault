@@ -1,6 +1,6 @@
 import { Notice, Plugin } from "obsidian";
 import { Task } from "../tasks/task.js";
-import { KINDS, itemForm, itemNote, itemPath } from "./items.js";
+import { KINDS, itemForm, itemNote, itemPath, fillTemplate } from "./items.js";
 import { Form } from "../uikit/form.ts";
 import { todayYmd } from "../core/dates.js";
 import { taskWindow } from "../tasks/taskEdit.js";
@@ -46,9 +46,28 @@ export function registerCommands(plugin: Plugin) {
       const { rows, values, required } = itemForm(kind);
       const v = await Form.ask(app, KINDS[kind].title, rows, { values, required, submit: "Create" });
       if (!v) return;
-      const path = itemPath(kind, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
+      const path = itemPath(KINDS[kind].folder, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
       if (!app.vault.getFolderByPath(KINDS[kind].folder)) await app.vault.createFolder(KINDS[kind].folder);
       await app.workspace.getLeaf("tab").openFile(await app.vault.create(path, itemNote(kind, v, todayYmd())));
+    });
+  }
+
+  // a note from a template in 00 System/Templates, in its folder, opened in a new tab (what QuickAdd did);
+  // the work tasks' folder can be set as "workTasks" in the plugin's data.json
+  for (const [id, name, template, folder] of [
+    ["new-recipe", "New recipe", "recipe.md", "03 Resources/Collections/Recipes"],
+    ["new-work-task", "New work task", "task.md", ""],
+  ]) {
+    add(id, name, async () => {
+      const dir = folder || (await plugin.loadData())?.workTasks || "01 Projects/Work/tasks";
+      const file = app.vault.getFileByPath(`00 System/Templates/${template}`);
+      if (!file) return void new Notice(`✦ 00 System/Templates/${template} not found`);
+      const v = await Form.ask(app, `✦ ${name}`, [{ name: "Title", key: "title", text: "title" }], { required: ["title"], submit: "Create" });
+      if (!v) return;
+      const path = itemPath(dir, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
+      if (!app.vault.getFolderByPath(dir)) await app.vault.createFolder(dir);
+      const text = fillTemplate(await app.vault.read(file), path.split("/").pop()!.slice(0, -3), todayYmd());
+      await app.workspace.getLeaf("tab").openFile(await app.vault.create(path, text));
     });
   }
 

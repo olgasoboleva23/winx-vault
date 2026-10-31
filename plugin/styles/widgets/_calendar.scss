@@ -31,7 +31,10 @@
   flex: 1;
   display: flex;
   gap: 2px;
-  > div { min-width: 2.6em; }
+  > div { min-width: 2.6em; cursor: pointer; }
+  /* a picked area (a click shows only its tasks): the others fade */
+  &.picked > div:not(.on) { opacity: 0.4; }
+  > div.on span { color: var(--winx-purple-deep); font-weight: 600; }
   span { display: block; overflow: hidden; white-space: nowrap; text-overflow: clip; font-size: $text-xs; color: var(--winx-lavender); }
   b { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); }
   i { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
