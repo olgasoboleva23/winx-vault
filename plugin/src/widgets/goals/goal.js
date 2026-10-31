@@ -1,31 +1,32 @@
-// Goals.md items and how a week of them went; today's reminders (tested by tests/lib.test.mjs).
+// Goals.md items and how a week of them went; today's reminders (tested by tests/entities.test.mjs).
 import { weekday } from "../../core/dates.js";
 
 const DAY_NAMES = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 const DAY_NAMES_EN = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
-// Goal list item from Goals.md (Shop.md format): "name:: …" plus continuation lines.
-export const parseGoal = function (text) {
-  const field = k => text.match(new RegExp(`(?:^|\\s)${k}::[ \\t]*(.*)`, "m"))?.[1].trim() || null;
-  const name = field("name"), tag = field("tag");
-  if (!name || !tag) return null;
-  const daysRaw = field("days");
-  const days = daysRaw
-    ? daysRaw.toLowerCase().split(/[,\s]+/).map(d => (DAY_NAMES.indexOf(d) + 1) || (DAY_NAMES_EN.indexOf(d.slice(0, 3)) + 1)).filter(Boolean)
-    : null;
-  const perWeek = days ? null : Number(field("perWeek")) || null;
-  return { name, tag, days, perWeek, min: field("min"), plan: field("plan"), remind: field("remind") ?? "18:00" };
-};
-
-export const weeklyTarget = goal => goal.days?.length ?? goal.perWeek ?? 0;
-
-export const countDone = (doneDates, week) => new Set(doneDates.filter(d => week.includes(d))).size;
-
-export const dayStatus = function (goal, date, doneSet, today) {
-  if (doneSet.has(date)) return "done";
-  if (goal.days?.includes(weekday(date))) return date < today ? "missed" : "planned";
-  return "none";
-};
+// A goal of Goals.md (Shop.md format: "name:: …" plus continuation lines): its name, tag (the tasks that count),
+// planned weekdays (days, ISO 1–7) or a number per week, the minimum version, a plan and a reminder time.
+export class Goal {
+  static parse(text) {
+    const field = k => text.match(new RegExp(`(?:^|\\s)${k}::[ \\t]*(.*)`, "m"))?.[1].trim() || null;
+    const name = field("name"), tag = field("tag");
+    if (!name || !tag) return null;
+    const daysRaw = field("days");
+    const days = daysRaw
+      ? daysRaw.toLowerCase().split(/[,\s]+/).map(d => (DAY_NAMES.indexOf(d) + 1) || (DAY_NAMES_EN.indexOf(d.slice(0, 3)) + 1)).filter(Boolean)
+      : null;
+    return Object.assign(new Goal(), { name, tag, days, perWeek: days ? null : Number(field("perWeek")) || null, min: field("min"), plan: field("plan"), remind: field("remind") ?? "18:00" });
+  }
+  get weeklyTarget() { return this.days?.length ?? this.perWeek ?? 0; }
+  // how many days of `week` have a done task (doneDates: its ✅ dates)
+  doneIn(doneDates, week) { return new Set(doneDates.filter(d => week.includes(d))).size; }
+  // done | missed (a planned day gone by) | planned | none
+  statusOn(date, doneSet, today) {
+    if (doneSet.has(date)) return "done";
+    if (this.days?.includes(weekday(date))) return date < today ? "missed" : "planned";
+    return "none";
+  }
+}
 
 // Today's notifications from open tasks due today. A goal task fires at the
 // goal's remind time with its plan; a task with "HH:MM" in its text fires

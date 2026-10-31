@@ -5,7 +5,7 @@ import { Button } from "../../ui/component.js";
 import { Widget } from "../widget.js";
 import { addDays, dm, todayYmd } from "../../core/dates.js";
 import { edit } from "../../core/files.js";
-import { parseWeights, upsertWeight } from "./weightLog.js";
+import { WeightLog } from "./weightLog.js";
 import { chartColor } from "../../ui/chart.js";
 
 const PATH = "02 Areas/Appearance/Weight.md";
@@ -17,7 +17,7 @@ export class Weight extends Widget {
       const box = form.querySelector("input[name=kg]");
       const kg = Number(String(box.value).replace(",", "."));
       if (!kg || kg <= 0) return;
-      await edit(PATH, c => upsertWeight(c, todayYmd(), kg));
+      await edit(PATH, c => new WeightLog(c).set(todayYmd(), kg));
       box.value = "";
     },
     list: () => this.app.workspace.openLinkText(PATH, "", false),
@@ -25,7 +25,7 @@ export class Weight extends Widget {
   async data() {
     const file = this.app.vault.getAbstractFileByPath(PATH);
     if (!file) return { missing: true };
-    const ws = parseWeights(await this.app.vault.cachedRead(file)), today = todayYmd();
+    const ws = new WeightLog(await this.app.vault.cachedRead(file)).entries, today = todayYmd();
     const last = ws.at(-1);
     const ref = last && [...ws].reverse().find(w => w.date <= addDays(last.date, -7));
     const days = Array.from({ length: DAYS }, (_, i) => addDays(today, i - DAYS + 1));

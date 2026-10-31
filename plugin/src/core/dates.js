@@ -1,4 +1,4 @@
-// Dates as "YYYY-MM-DD" strings, weekdays ISO 1 = Monday … 7 = Sunday. Math in UTC (tested by tests/lib.test.mjs).
+// Dates as "YYYY-MM-DD" strings, weekdays ISO 1 = Monday … 7 = Sunday. Math in UTC (tested by tests/logic.test.mjs).
 // today / ymd / pageDay read Obsidian's moment and Dataview's dates: only called inside Obsidian.
 const DAY_MS = 86400000;
 const toMs   = date => Date.parse(date + "T00:00:00Z");

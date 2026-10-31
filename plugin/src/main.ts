@@ -3,7 +3,7 @@ import { CalendarView, VIEW_TYPE } from "./calendar/view.ts";
 import { DashboardView, DASHBOARD_VIEW } from "./dashboard/view.ts";
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./widgets/blocks.js";
-import { parseGoal, reminders } from "./widgets/goals/goal.js";
+import { Goal, reminders } from "./widgets/goals/goal.js";
 import { installSounds } from "./core/sounds.js";
 
 // The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the commands, and the
@@ -12,7 +12,7 @@ import { installSounds } from "./core/sounds.js";
 export default class WinxPlugin extends Plugin {
   async onload() {
     // for 00 System/Scripts/notify.js (Templater's startup script)
-    (window as any).winx = { L: { parseGoal, reminders } };
+    (window as any).winx = { L: { parseGoal: (text: string) => Goal.parse(text), reminders } };
     installSounds(this);
     registerCommands(this);
     // a ```winx block in a note: a widget class by name (widgets/blocks.js)

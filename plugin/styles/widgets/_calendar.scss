@@ -113,24 +113,6 @@
   &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
   > input.task-list-item-checkbox { position: absolute; left: $space-xs; top: 5px; margin: 0; }
 }
-/* difficulty: stars and the pale ☆ open a picker */
-.winx-cal :is(.tag[data-tag-name^="#⭐"], .winx-cal-nostar) { cursor: pointer; }
-.winx-cal-nostar { font-size: $text-s; color: var(--winx-gold-deep); opacity: 0.4; }
-body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
-.winx-cal-picker {
-  position: fixed;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  gap: $space-2xs;
-  padding: $space-s;
-  border-radius: $radius-l;
-  border: 1px solid var(--winx-gold-deep);
-  background: rgb(255 248 252 / 97%);
-  box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
-  button { justify-content: flex-start; padding: $space-xs $space-xl; font-family: var(--font-text); border: none; box-shadow: none; background: none; color: var(--winx-purple-deep); font-size: $text-l; cursor: pointer; }
-  button:hover { background: fade(var(--winx-border), 40%); }
-}
 /* area colors: a stripe on the left of each task, dots in the legend */
 .winx-cal [data-area] {
   --area: #b9a3c9;
@@ -145,7 +127,12 @@ body:not(.is-mobile) .winx-cal-diffbtn { display: none; }
   &[data-area="personal"]  { --area: #e88fc0; }
   &[data-area="health"]    { --area: #5ec4c4; }
 }
-.winx-cal :is(.winx-cal-task, .winx-yesterday-row)[data-area] { border-left: 3px solid var(--area); border-radius: 2px; background: fade(var(--area), 30%); }
+/* the area is the colour of the difficulty stars (no tint on the row) */
+.winx-cal :is(.winx-cal-task, .winx-yesterday-row)[data-area] .tag[data-tag-name^="#⭐"]::before {
+  background: var(--area);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='11' viewBox='0 0 14 11'%3E%3Cpath d='M5.50 0.60L7.20 3.55L10.54 4.26L8.26 6.80L8.62 10.19L5.50 8.80L2.38 10.19L2.74 6.80L0.46 4.26L3.80 3.55Z'/%3E%3C/svg%3E") 0 0 / 14px 11px repeat-x;
+  filter: drop-shadow(0 0 0.6px rgb(0 0 0 / 45%));
+}
 .winx-cal-legend {
   display: flex;
   flex-wrap: wrap;

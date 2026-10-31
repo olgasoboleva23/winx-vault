@@ -36,6 +36,8 @@ export class Task {
   get skippedOn()  { return field(this.line, "❌"); }
   get created()    { return field(this.line, "➕"); }
   get isPaused()   { return this.isOpen && this.isRecurring && !this.date; }   // a 🔁 task with its dates dropped
+  get canSkip()    { return this.isOpen && this.isRecurring && !!this.date; }  // ⏭ this time: a dated open 🔁 task
+  isOverdue(today) { return this.isOpen && !!this.date && this.date < today; }   // open, its day gone by
   get stickers()   { return [...this.line.matchAll(/!\[\[([^\]|]+)/g)].map(m => m[1]); }   // file names of ![[x.png|28]]
   // the words alone: no checkbox, sticker, tags, rule or date fields
   get text() {
@@ -65,12 +67,6 @@ export class Task {
     if (!ANY.test(this.line)) return this.line;
     const base = drop(this.line, "✅").replace(/^(\s*- \[)./, `$1${done ? "x" : " "}`).trimEnd();
     return done ? `${base} ✅ ${date}` : new Task(base).setDue(date);
-  }
-  // swap the difficulty tag for `tag`, or drop it (null); without one, the tag goes first after the checkbox
-  setDifficulty(tag) {
-    const re = /(^|\s)#⭐+[^\s]*/u;
-    if (re.test(this.line)) return tag ? this.line.replace(re, `$1${tag}`) : this.line.replace(re, "").replace(/(- \[.\])\s+/, "$1 ");
-    return tag ? this.line.replace(/^(\s*- \[.\])\s*/, `$1 ${tag} `) : this.line;
   }
   // set or clear (null) a tag a line has once, by its prefix ("#area/", "#time/"): swapped in place, or added
   // after the tags that open the line
@@ -108,6 +104,7 @@ export class Task {
   // allows: a weekday rule ("every week on Monday, …") its next such day, any other rule today.
   // ponytail: only weekday rules are matched; "every month on the 1st" resumes today too.
   pause() { return drop(this.line, "📅⏳🛫"); }
+  togglePause(today) { return this.isPaused ? this.resume(today) : this.pause(); }
   resume(today) {
     const rule = this.rule ?? "";
     const day  = /^every (\d+ )?weeks? on /i.test(rule) ? projectRepeats(rule, addDays(today, -1), addDays(today, 30))[0] ?? today : today;

@@ -10,7 +10,7 @@ import { T } from "./data.js";
 import { dateFor } from "./state.js";
 import { addDays, addMonths, dm } from "../core/dates.js";
 import { ruleText } from "../tasks/repeats.js";
-import { AudioEngine, isMuted } from "../core/sounds.js";
+import { AudioEngine, isMuted, toggleMute } from "../core/sounds.js";
 
 const M = d => window.moment(d);
 const PART = name => html` data-part="${name}"`;
@@ -26,7 +26,7 @@ export class Part {
 export class Header extends Part {
   on = {
     date: (e, el) => el.value && this.ctx.set({ date: dateFor(el.value, this.ctx.view, this.ctx.today) }, ["header", "missed", "grid"]),
-    mute: (e, el) => { app.saveLocalStorage("winx-mute", isMuted() ? null : "1"); el.textContent = isMuted() ? "🔇" : "🔊"; },
+    mute: (e, el) => { toggleMute(); el.textContent = isMuted() ? "🔇" : "🔊"; },
     newTask: () => app.commands.executeCommandById("winx:new-task"),
     prev: () => this.step(-1),
     next: () => this.step(1),
@@ -72,13 +72,13 @@ export class Missed extends Part {
     if (!t) return;
     row.remove();
     if (!box.querySelector(".winx-yesterday-row")) box.remove();
-    if (!isMuted()) sound.play({ gain: 0.25 });
+    sound.play({ gain: 0.25 });
     await write(t);
   }
   render() {
     const { days, today, model: { missed } } = this.ctx;
     if (!days.includes(today) || !missed.length) return html``;
-    const row = t => { const task = this.view.info(t); return html`<div class="winx-yesterday-row"${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"><span>${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span><div class="winx-board-btns">${new TaskButtons({ task, star: false })}</div><em>${dm(T(t).date)}</em>${this.ctx.TASKS ? new Button({ icon: "✓", title: `done on ${T(t).date}`, action: "missedDone" }) : ""}${new Button({ icon: "☀️", title: "move to today", action: "missedToday" })}</div>`; };
+    const row = t => { const task = this.view.info(t); return html`<div class="winx-yesterday-row"${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"><span>${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span><div class="winx-board-btns">${new TaskButtons({ task })}</div><em>${dm(T(t).date)}</em>${this.ctx.TASKS ? new Button({ icon: "✓", title: `done on ${T(t).date}`, action: "missedDone" }) : ""}${new Button({ icon: "☀️", title: "move to today", action: "missedToday" })}</div>`; };
     return html`<div class="winx-yesterday"${PART("missed")}><div class="winx-yesterday-head">Missed?</div>${missed.map(row)}</div>`;
   }
 }
@@ -143,8 +143,7 @@ export class Panel extends Part {
     pause: (e, el) => {
       const t = this.view.taskOf(el);
       if (!t) return;
-      const paused = !T(t).date;
-      el.closest(".winx-board-card")?.toggleClass("paused", !paused); el.disabled = true;
+      el.closest(".winx-board-card")?.toggleClass("paused", !T(t).isPaused); el.disabled = true;
       this.view.actions.pauseOrResume(t);
     },
   };

@@ -2,7 +2,7 @@
 import { html } from "../../ui/html.js";
 import { Button } from "../../ui/component.js";
 import { Widget } from "../widget.js";
-import { cycleInfo } from "./cycleLog.js";
+import { CycleLog } from "./cycleLog.js";
 import { dm, pageDay, ymd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
 
@@ -17,7 +17,7 @@ export class Cycle extends Widget {
     const day = ymd(pageDay(this.dv)), page = this.dv.page(CYCLE_PATH);
     if (!page) return { day, page: null };
     const pick = key => page.file.lists.map(i => i.text.match(new RegExp(`${key}::\\s*(\\d{4}-\\d{2}-\\d{2})`))?.[1]).where(Boolean).array();
-    return { day, page, info: cycleInfo(pick("start"), day, page.period ?? 8, pick("end")) };
+    return { day, page, info: new CycleLog(pick("start"), pick("end"), page.period ?? 8).on(day) };
   }
   view({ day, page, info }) {
     const ending = info?.isPeriod && !info.ended;

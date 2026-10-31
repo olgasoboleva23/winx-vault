@@ -1,7 +1,8 @@
 // The Celestial Market (the shopping list, 00 System/Data/Celestial Market.md) and the supplies bought from it.
-// supplyStats / markBought / unmarkBought are pure (tested by tests/lib.test.mjs); the rest reads Dataview's pages.
+// supplyStats is pure (tested by tests/logic.test.mjs); the rest reads Dataview's pages. One line: marketItem.js.
 import config from "../../core/config.js";
 import { diffDays, ymd } from "../../core/dates.js";
+import { MarketItem } from "./marketItem.js";
 import { appendLine } from "../../core/files.js";
 
 export const MARKET = "00 System/Data/Celestial Market.md";
@@ -27,25 +28,14 @@ export const supplyStats = function (history, today) {
   });
 };
 
-// Mark an open market line as bought today, the way the Tasks plugin does.
-// Lines that are not open tasks come back unchanged.
-export const markBought = (line, date) =>
-  /^\s*- \[ \]/.test(line) ? `${line.replace("- [ ]", "- [x]").trimEnd()} ✅ ${date}` : line;
-
-// Undo markBought: reopen a bought line and drop its ✅ date.
-export const unmarkBought = line =>
-  /^\s*- \[x\]/i.test(line) ? line.replace(/- \[x\]/i, "- [ ]").replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/u, "").trimEnd() : line;
-
-export const marketName = t => t.text.replace(/#[\w/]+/g, "").replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
-const marketTag = t => t.tags?.find(tag => !tag.includes("/")) ?? "#other";
 
 // { history: [{name, tag, date}] of bought items, open: Set of lowercased names still on the list }
 export function marketState(dv) {
   const tasks = dv.page(MARKET)?.file.tasks.array() ?? [];
   return {
     history: tasks.filter(t => t.completed && t.completion)
-      .map(t => ({ name: marketName(t), tag: marketTag(t), date: ymd(t.completion) })),
-    open: new Set(tasks.filter(t => !t.completed).map(t => marketName(t).toLowerCase())),
+      .map(t => { const i = MarketItem.of(t); return { name: i.name, tag: i.tag, date: ymd(t.completion) }; }),
+    open: new Set(tasks.filter(t => !t.completed).map(t => MarketItem.of(t).name.toLowerCase())),
   };
 }
 

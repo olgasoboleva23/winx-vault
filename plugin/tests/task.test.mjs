@@ -70,13 +70,6 @@ test("place", () => {
   assert.equal(T("not a task").place("2026-10-25", true), "not a task");
 });
 
-test("setDifficulty", () => {
-  assert.equal(T("- [ ] #⭐easy #area/body walk 📅 2026-10-27").setDifficulty("#⭐⭐⭐hard"), "- [ ] #⭐⭐⭐hard #area/body walk 📅 2026-10-27");
-  assert.equal(T("- [ ] #area/body walk").setDifficulty("#⭐⭐medium"), "- [ ] #⭐⭐medium #area/body walk");
-  assert.equal(T("- [ ] #⭐⭐medium #area/body walk").setDifficulty(null), "- [ ] #area/body walk");
-  assert.equal(T("  - [x] walk #⭐easy ✅ 2026-10-27").setDifficulty("#⭐⭐⭐⭐epic"), "  - [x] walk #⭐⭐⭐⭐epic ✅ 2026-10-27");
-});
-
 test("setTag, setSticker, picks", () => {
   const line = "- [ ] #⭐easy #area/base wash windows 🔁 every month 📅 2026-11-01 ➕ 2026-10-29";
   assert.equal(T(line).setTag("#time/", "#time/morning"), "- [ ] #⭐easy #area/base #time/morning wash windows 🔁 every month 📅 2026-11-01 ➕ 2026-10-29");
@@ -128,4 +121,18 @@ test("skipLines", () => {
   const skipped = Task.skipLines(ticked);
   assert.equal(skipped, "- [ ] stretch 🔁 every 3 days when done 📅 2026-10-29\n- [-] stretch 🔁 every 3 days when done 📅 2026-10-25 ❌ 2026-10-26");
   assert.equal(Task.keyOf(skipped.split("\n")[1]), Task.keyOf(ticked.split("\n")[0]));   // still the same task for history
+});
+
+test("pause state, skipping and overdue are the task's own", () => {
+  const open = new Task("- [ ] walk 🔁 every day 📅 2026-10-20"), paused = new Task("- [ ] walk 🔁 every week on Monday");
+  assert.equal(open.isPaused, false); assert.equal(paused.isPaused, true);
+  assert.equal(open.togglePause("2026-10-28"), "- [ ] walk 🔁 every day");                          // pause: dates go
+  assert.equal(paused.togglePause("2026-10-28"), "- [ ] walk 🔁 every week on Monday 📅 2026-11-02"); // resume: its next day
+  assert.equal(open.canSkip, true);                                                              // a dated 🔁 one
+  assert.equal(paused.canSkip, false);
+  assert.equal(new Task("- [ ] call 📅 2026-10-20").canSkip, false);                              // not a repeat
+  assert.equal(open.isOverdue("2026-10-28"), true);
+  assert.equal(open.isOverdue("2026-10-20"), false);
+  assert.equal(new Task("- [x] call 📅 2026-10-20 ✅ 2026-10-21").isOverdue("2026-10-28"), false);
+  assert.equal(paused.isOverdue("2026-10-28"), false);
 });

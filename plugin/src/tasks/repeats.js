@@ -1,4 +1,4 @@
-// 🔁 rules of the Tasks plugin: their future dates and their short words (tested by tests/lib.test.mjs).
+// 🔁 rules of the Tasks plugin: their future dates and their short words (tested by tests/logic.test.mjs).
 import { addDays, addMonths, diffDays, weekOf, weekday } from "../core/dates.js";
 
 // A 🔁 rule in short words: "every 3 days when done" → "every 3 days after done", weekdays → "Mon · Wed · Fri"

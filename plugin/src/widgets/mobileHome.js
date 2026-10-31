@@ -4,14 +4,14 @@ import { html } from "../ui/html.js";
 import { Widget } from "./widget.js";
 import { todayYmd, ymd } from "../core/dates.js";
 import { todayCount } from "../tasks/task.js";
-import { parseWeights } from "./body/weightLog.js";
+import { WeightLog } from "./body/weightLog.js";
 
 export class MobileHome extends Widget {
   on = { open: (e, el) => this.app.workspace.openLinkText(el.dataset.path, "", false) };
   async data() {
     const today = todayYmd();
     const wfile = this.app.vault.getAbstractFileByPath("02 Areas/Appearance/Weight.md");
-    const lastW = wfile ? parseWeights(await this.app.vault.cachedRead(wfile)).at(-1) : null;
+    const lastW = wfile ? new WeightLog(await this.app.vault.cachedRead(wfile)).last : null;
     const left  = this.dv.page("00 System/Data/Celestial Market")?.file.tasks.where(t => !t.completed).length ?? 0;
     const tasks = this.dv.pages('"02 Areas/Personal/Tasks"').file.tasks.array()
       .map(t => ({ done: t.completed, recurring: Task.of(t).isRecurring, due: ymd(t.due), scheduled: ymd(t.scheduled) }));
