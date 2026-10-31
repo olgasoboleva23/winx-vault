@@ -1,7 +1,7 @@
 /* ── Task cards (calendar backlog) ── */
 
 @use "../mixins" as *;
-.winx-board-card {
+.winx-task-card {
   position: relative;
   padding: 7px $space-m;
   border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
@@ -11,17 +11,17 @@
 
   &:last-child { border-bottom: none; }
   &:hover { background: fade(white, 35%); border-radius: $radius-m; }
-  &.dragging { opacity: 0.4; }
+  &--paused { opacity: 0.55; }
 }
-.winx-board-text { font-size: $text-xl; line-height: 1.35; }
-.winx-board-meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
+.winx-task-card__text { font-size: $text-xl; line-height: 1.35; }
+.winx-task-card__meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
 
 /* round buttons on a task: ⏭ ✏️ 🗑 */
-:is(.winx-board-backlog, .winx-cal) .winx-board-btns {
+.winx-cal .winx-task-btns {
   display: flex;
   gap: $space-xs;
 }
-body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
+body:not(.is-mobile) .winx-cal .winx-task-btns {
   position: absolute;
   right: $space-xs;
   top: 50%;
@@ -33,9 +33,9 @@ body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
   pointer-events: none;
   transition: opacity 0.15s ease;
 }
-body:not(.is-mobile) :is(.winx-board-card, .winx-cal-task, .winx-yesterday-row):hover .winx-board-btns { opacity: 1; pointer-events: auto; }
-body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top: $space-s; }
-:is(.winx-board-backlog, .winx-cal) .winx-board-btns button.winx-board-del.armed {
+body:not(.is-mobile) :is(.winx-task-card, .winx-cal__task, .winx-missed__row):hover .winx-task-btns { opacity: 1; pointer-events: auto; }
+body.is-mobile .winx-cal .winx-task-btns { margin-top: $space-s; }
+.winx-cal .winx-task-btns button.winx-task-btns__del--armed {
   width: auto;
   padding: 0 $space-m;
   border-color: #d0457a;
@@ -43,4 +43,3 @@ body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top
   color: #fff;
   font-size: $text-m;
 }
-.winx-board-backlog { margin-top: $space-xl; }
