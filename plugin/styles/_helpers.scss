@@ -2,3 +2,6 @@
 
 /* the phone only (the way between the dashboard and the calendar: 📅, ✦); the computer has its tabs */
 body:not(.is-mobile) .winx-is-phone-only { display: none !important; }
+
+/* hidden until shown (the pomodoro's settings) */
+.winx-is-hidden { display: none !important; }
