@@ -53,3 +53,34 @@
 }
 
 .winx-cycle-btns { display: flex; gap: $space-m; flex-wrap: wrap; }
+
+/* the tabs: the day pills of the last cycles, or the columns of their lengths */
+.winx-cycle-tabs { display: flex; gap: $space-s; margin-top: $space-s; }
+/* the current cycle and the 3 before it: a pill per day, the period pink, the fertile window and the ovulation lilac */
+.winx-cycle-rows { display: grid; gap: $space-m; align-self: stretch; margin-bottom: $space-s; }
+.winx-cycle-when { display: flex; justify-content: space-between; gap: $space-s; font-size: $text-s; color: alpha(--winx-purple-deep, 75%); }
+.winx-cycle-pills {
+  display: flex;
+  gap: 2px;
+  margin-top: $space-2xs;
+  i { flex: 0 1 8px; height: 12px; border-radius: 3px; background: alpha(--winx-purple, 22%); }
+  i.period { background: var(--winx-pink-deep); }
+  i.fertile { background: alpha(--winx-purple, 45%); }
+  i.ovulation { background: var(--winx-purple); box-shadow: 0 0 4px alpha(--winx-purple, 80%); }
+}
+/* the last cycles' lengths and periods: a column each, the average a line across */
+.winx-cycle-chart { align-self: stretch; margin-bottom: $space-s; }
+.winx-cycle-chart-title { display: flex; justify-content: space-between; font-size: $text-s; color: var(--winx-purple-deep); span { color: alpha(--winx-purple-deep, 65%); } }
+.winx-cycle-cols {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: $space-xs;
+  height: 56px;
+  margin: $space-xs 0 $space-xl;
+  i { position: relative; flex: 1; border-radius: $radius-s $radius-s 2px 2px; background: alpha(--winx-purple, 35%); }
+  i span { position: absolute; top: 100%; left: 0; right: 0; text-align: center; font-size: $text-2xs; font-style: normal; color: alpha(--winx-purple-deep, 70%); }
+  b { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--winx-pink-deep); z-index: 1; }
+}
+.winx-cycle-chart.per i { background: alpha(--winx-pink-deep, 55%); }
+.winx-cycle-chart.per b { border-color: var(--winx-purple-deep); }

@@ -25,7 +25,7 @@ card: Weight
 ```
 ````
 
-`Mobile.md` and `Mobile/` are the same widgets laid out for a phone.
+On a phone the same dashboard and calendar tabs are used (📅 / ✦ switch between them).
 
 ## 🎮 XP & Levels
 

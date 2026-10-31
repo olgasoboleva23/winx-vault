@@ -23,7 +23,8 @@ export class Part {
   render() { return html``; }
 }
 
-// ── the top: the drop bar (while dragging), the busy pill, date / sounds / ＋ task / ✦ to the dashboard (the phone), the navigation ──
+// ── the top: the drop bar (while dragging), the busy pill, date / sounds / ＋ task / ✦ to the dashboard (the phone), the navigation,
+// the week's balance by area ──
 export class Header extends Part {
   on = {
     date: (e, el) => this.go(el.value || null),   // emptied (the phone's "Reset"): today
@@ -45,13 +46,21 @@ export class Header extends Part {
   };
   go(date) { this.ctx.set({ date: dateFor(date, this.ctx.view, this.ctx.today) }, ["header", "missed", "grid"]); }
   step(n) { const { view, base } = this.ctx; this.go(view === "week" ? addDays(base, 7 * n) : addMonths(base, n)); }
+  // one bar of the week's tasks split by area (the six of the areas list), each piece labelled with its icon and
+  // done / all, the done part brighter;
+  // an area with none this week a grey icon after it
+  balance() {
+    const { areas } = this.ctx.config, b = this.ctx.model.balance(areas.map(a => a.tag));
+    const name = tag => areas.find(a => a.tag === tag).label, has = b.filter(x => x.planned), none = b.filter(x => !x.planned);
+    return html`<div class="winx-cal-balance"${PART("header")}><div class="winx-balance-bar">${has.map(x => html`<div data-area="${x.area.slice(6)}" style="flex: ${x.planned}" title="${name(x.area)}: ${x.done} of ${x.planned} done"><span>${name(x.area).split(" ")[0]} ${x.done}/${x.planned}</span><b><i style="width: ${Math.round(x.done / x.planned * 100)}%"></i></b></div>`)}</div>${none.length ? html`<div class="winx-balance-none" title="nothing this week">${none.map(x => html`<span title="${name(x.area)}: nothing this week">${name(x.area).split(" ")[0]}</span>`)}</div>` : ""}</div>`;
+  }
   routineDays() { return this.ctx.days.filter(d => this.ctx.model.byDay[d].some(e => T(e.t).isRecurring)); }
   render() {
     const { state, days, today, base, view, model, shown } = this.ctx;
     // while dragging, a bar of 7 days sticks to the top: the shown week, or in the month view the next 7 days
     const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
     const other = view === "week" ? "month" : "week";
-    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button>${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}${new Button({ text: "✦", title: "dashboard", kind: "chip", cls: "winx-cal-to-dash winx-phone-only", action: "dashboard" })}</div><div class="winx-cal-nav"${PART("header")}>${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}<span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span>${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${days.includes(today) ? "" : new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" })}${new Button({ text: view, kind: "chip", title: `switch to the ${other} view`, action: "switchView" })}${new Button({ text: "✓ done", kind: "toggle", on: state.showDone, action: "showDone" })}${new Button({ text: "🔁 repeats", kind: "toggle", title: "unfold / fold every day's 🔁 box", action: "repeats" })}</div>`;
+    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button>${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}${new Button({ text: "✦", title: "dashboard", kind: "chip", cls: "winx-cal-to-dash winx-phone-only", action: "dashboard" })}</div><div class="winx-cal-nav"${PART("header")}>${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}<span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span>${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${days.includes(today) ? "" : new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" })}${new Button({ text: view, kind: "chip", title: `switch to the ${other} view`, action: "switchView" })}${new Button({ text: "✓ done", kind: "toggle", on: state.showDone, action: "showDone" })}${new Button({ text: "🔁 repeats", kind: "toggle", title: "unfold / fold every day's 🔁 box", action: "repeats" })}</div>${view === "week" ? this.balance() : ""}`;
   }
   // after the grid: the repeats button lit while every routine day is unfolded
   mount(root) {
@@ -94,10 +103,11 @@ export class Grid extends Part {
       u.has(d) ? u.delete(d) : u.add(d);
       this.ctx.saveUnfolded(); this.show(box); this.ctx.syncRepeats();
     },
-    // month: a click on the day's number or empty space opens its week
+    // month: a click on the day's number or empty space opens its week; on the phone it picks the day shown under the grid
     day: (e, cell) => {
-      if (e.target === cell || e.target.matches(".winx-cal-num, .winx-cal-marks, .winx-cal-marks *"))
-        this.ctx.set({ date: dateFor(cell.dataset.day, "week", this.ctx.today), view: "week" }, ["header", "missed", "grid"]);
+      if (!(e.target === cell || e.target.matches(".winx-cal-num, .winx-cal-marks, .winx-cal-marks *, .winx-cal-dots, .winx-cal-dots *"))) return;
+      if (Platform.isMobile) { this.view.picked = cell.dataset.day; return this.ctx.set({}, ["grid"]); }
+      this.ctx.set({ date: dateFor(cell.dataset.day, "week", this.ctx.today), view: "week" }, ["header", "missed", "grid"]);
     },
   };
   show(box) {
@@ -117,8 +127,21 @@ export class Grid extends Part {
   zones(d) {
     return html`<div class="winx-cal-zones">${d <= this.ctx.today ? html`<div class="winx-cal-zone done" data-drop="${d}" data-done="1">✓</div>` : ""}<div class="winx-cal-zone plan" data-drop="${d}">📅 ${M(d).format("D MMM")}</div></div>`;
   }
+  // the phone's month cell: a dot per task (open pink, done gold), 3 at most and "+N"
+  dots(d) {
+    const es = this.ctx.model.byDay[d].filter(e => e.kind !== "ghost" && this.ctx.shown[e.kind]);
+    return html`<div class="winx-cal-dots">${es.slice(0, 3).map(e => html`<i class="${e.kind}"></i>`)}${es.length > 3 ? html`<span>+${es.length - 3}</span>` : ""}</div>`;
+  }
+  // the phone's month: the grid with dots, the picked day (today, or the month's first) as a day card under it
+  phoneMonth() {
+    const { days, today, base } = this.ctx;
+    const picked = days.includes(this.view.picked) ? this.view.picked : days.includes(today) && today.slice(0, 7) === base.slice(0, 7) ? today : base.slice(0, 8) + "01";
+    return html`<div class="winx-cal-phone-month"${PART("grid")}><div class="winx-cal-month">${days.slice(0, 7).map(d => html`<div class="winx-cal-wd">${M(d).format("dd")}</div>`)}${days.map(d => html`<div class="winx-cal-cell${d === today ? " today" : ""}${d === picked ? " picked" : ""}${d.slice(0, 7) !== base.slice(0, 7) ? " outside" : ""}" data-action="day" data-day="${d}"><div class="winx-cal-num">${String(+d.slice(8))}</div>${this.dots(d)}${this.zones(d)}</div>`)}</div>
+      <div class="winx-cal-day${picked === today ? " today" : ""}"><div class="winx-cal-head">${M(picked).format("dddd D MMMM")}</div>${this.fill(picked, false)}${this.zones(picked)}</div></div>`;
+  }
   render() {
     const { days, today, base, view } = this.ctx;
+    if (view === "month" && Platform.isMobile) return this.phoneMonth();
     if (view === "week") return html`<div class="winx-cal-week"${PART("grid")}>${days.map(d => html`<div class="winx-cal-day${d === today ? " today" : ""}"><div class="winx-cal-head">${M(d).format("ddd D")}</div>${this.fill(d, false)}${this.zones(d)}</div>`)}</div>`;
     return html`<div class="winx-cal-month"${PART("grid")}>${days.slice(0, 7).map(d => html`<div class="winx-cal-wd">${M(d).format("ddd")}</div>`)}${days.map(d => html`<div class="winx-cal-cell${d === today ? " today" : ""}${d.slice(0, 7) !== base.slice(0, 7) ? " outside" : ""}" data-action="day" data-day="${d}"><div class="winx-cal-num">${String(+d.slice(8))}</div>${this.fill(d, true)}${this.zones(d)}</div>`)}</div>`;
   }

@@ -15,3 +15,23 @@
   background-size: 200% 100%;
   animation: winx-shimmer 1.6s linear infinite;
 }
+/* HP / MP in the Level card (src/widgets/xp/levelToday.js): red and blue like a game's bars */
+.winx-vitals { display: grid; gap: $space-xs; margin-top: $space-m; }
+.winx-vital {
+  @include row;
+  gap: $space-s;
+  font-size: $text-s;
+  color: var(--winx-purple-deep);
+  b { width: 1.8em; font-family: "Cinzel", serif; letter-spacing: 1px; }
+  span { font-variant-numeric: tabular-nums; }
+}
+.winx-vital-bar {
+  flex: 1;
+  height: $space-m;
+  overflow: hidden;
+  border-radius: $pill;
+  background: alpha(--winx-purple, 20%);
+  i { display: block; height: 100%; border-radius: $pill; transition: width 0.3s; }
+}
+.winx-vital.hp i { background: linear-gradient(90deg, #c2304a, #ff6b81); box-shadow: 0 0 6px rgb(255 107 129 / 70%); }
+.winx-vital.mp i { background: linear-gradient(90deg, #2f5fc4, #6fa8ff); box-shadow: 0 0 6px rgb(111 168 255 / 70%); }

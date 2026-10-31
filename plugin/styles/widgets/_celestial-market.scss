@@ -108,7 +108,7 @@
 }
 
 /* Category pill, shared by the market widget and the Supplies page */
-:is(.winx-celestial-market, .winx-supplies, .winx-mshop) .market-group-header {
+:is(.winx-celestial-market, .winx-supplies) .market-group-header {
   @include row;
   gap: $space-m;
   width: fit-content;
@@ -124,7 +124,7 @@
   &:first-child { margin-top: 0; }
 }
 
-:is(.winx-celestial-market, .winx-mshop) .market-count {
+.winx-celestial-market .market-count {
   min-width: 20px;
   padding: 0 $space-s;
   border-radius: $pill;

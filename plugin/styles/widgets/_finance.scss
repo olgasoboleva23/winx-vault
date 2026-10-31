@@ -48,3 +48,6 @@
 .winx-fin-item .a { font-variant-numeric: tabular-nums; opacity: .85; }
 .winx-fin-empty { opacity: .6; font-style: italic; }
     
+
+/* the dashboard's Finance card (FinanceMonth): this month on one line, the link under it */
+.winx-fin-month { display: grid; gap: $space-s; justify-items: start; color: var(--winx-text-dark); b { color: var(--winx-purple-deep); } }

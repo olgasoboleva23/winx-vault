@@ -53,6 +53,8 @@
 /* desktop: they float over the end of the text on hover (opacity only, so the row height stays) */
 body:not(.is-mobile) .winx-cal .winx-yesterday-row .winx-board-btns { right: 104px; }
 body.is-mobile .winx-cal .winx-yesterday-row .winx-board-btns { margin: 0; }
+/* the phone: the task's text on its own line, the buttons and the date under it */
+body.is-mobile .winx-cal .winx-yesterday-row { flex-wrap: wrap; > span { flex-basis: 100%; } }
 
 /* Missed in the calendar: the card's fairy wings in two corners */
 .winx-cal .winx-yesterday {

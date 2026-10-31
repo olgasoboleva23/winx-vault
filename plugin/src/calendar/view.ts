@@ -199,6 +199,7 @@ export class CalendarView extends ItemView {
       const src = (e.target as HTMLElement).closest?.("[data-drag]") as HTMLElement | null;
       if (!src || !this.ctx) return;
       this.dragged = this.taskOf(src);
+      dragging = true;   // a drag, not a swipe: its finger moves don't tick or skip anything
       e.dataTransfer?.setData("text/plain", "");
       window.setTimeout(() => this.ctx?.root.classList.add("dragging"));   // later: zones covering the card at dragstart cancel the drag
     });
@@ -220,10 +221,14 @@ export class CalendarView extends ItemView {
     // phone: swipe a row right = done (a day's row: its checkbox; a Missed row: its ✓; a panel card: ticked, a pool
     // card: added to today), left = skip a 🔁 task / take an open one's date off. Only a mostly-sideways swipe
     // counts, so scrolling still works (touch-action: pan-y in the styles)
+    // A swipe stops its touches at the row, so Obsidian doesn't take a sideways one for opening a sidebar.
     const swipes = new WeakMap<Element, { x0: number; y0: number; dx: number; on: boolean }>();
+    let dragging = false;
     const row = (e: Event) => document.body.classList.contains("is-mobile") ? (e.target as HTMLElement).closest?.("[data-swipeable]") as HTMLElement | null : null;
     this.registerDomEvent(el, "touchstart", e => {
       const r = row(e); if (!r) return;
+      dragging = false;
+      e.stopPropagation();
       swipes.set(r, { x0: e.touches[0].clientX, y0: e.touches[0].clientY, dx: 0, on: false });
     }, { passive: true });
     this.registerDomEvent(el, "touchmove", e => {
@@ -231,13 +236,14 @@ export class CalendarView extends ItemView {
       const t = findTask(r.dataset.task, this.ctx?.model.all ?? []), left = t && this.left(t);
       const mx = e.touches[0].clientX - s.x0, my = e.touches[0].clientY - s.y0;
       if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
-      if (!s.on || (mx < 0 && !left)) return;
+      if (s.on) e.stopPropagation();
+      if (dragging || !s.on || (mx < 0 && !left)) return;
       s.dx = mx; r.style.transform = `translateX(${mx}px)`; r.dataset.swipe = mx > 0 ? "done" : this.actions.canSkip(t) ? "skip" : "nodate";
     }, { passive: true });
     this.registerDomEvent(el, "touchend", e => {
       const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
       r.style.transform = ""; delete r.dataset.swipe;
-      if (!s.on || Math.abs(s.dx) <= 80) return;
+      if (dragging || !s.on || Math.abs(s.dx) <= 80) return;
       const t = this.taskOf(r);
       if (!t) return;
       if (s.dx > 80) this.right(r, t); else this.left(t)?.();

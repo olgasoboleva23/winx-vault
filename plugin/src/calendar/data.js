@@ -47,6 +47,16 @@ export class CalendarData {
     this.regulars = this.sortRegulars(tasks.filter(t => T(t).isOpen && T(t).isRecurring));
   }
 
+  // the week's balance: for each of `areas` (tags), its tasks on the shown days (open + done; a 🔁 task's faded
+  // repeats don't count) and how many of them are done
+  balance(areas) {
+    const entries = Object.values(this.byDay).flat().filter(e => e.kind !== "ghost");
+    return areas.map(area => {
+      const mine = entries.filter(e => T(e.t).area === area);
+      return { area, planned: mine.length, done: mine.filter(e => e.kind === "done").length };
+    });
+  }
+
   // the place of a task's area in the areas' order, unknown areas last
   rank(t) { const i = this.areaOrder.indexOf(T(t).area); return i < 0 ? this.areaOrder.length : i; }
   lastDone(t) { return T(t).history(this.done)?.last ?? "0000"; }

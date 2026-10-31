@@ -82,7 +82,7 @@
       width: $btn-m;
       height: $btn-m;
       align-self: center;
-      margin: -$space-xs 0 -$space-xs $space-s;   /* centred on the title's line without making it taller */
+      margin: (-$space-xs) 0 (-$space-xs) $space-s;   /* centred on the title's line without making it taller */
       padding: 0;
       border: none;
       border-radius: $round;

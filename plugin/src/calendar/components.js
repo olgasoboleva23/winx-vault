@@ -43,6 +43,6 @@ export class TaskCard extends Component {
     const btns = task.pool
       ? html`${new Button({ icon: "✏️", title: "edit: difficulty, area, time, sticker, then text", action: "edit" })}${new Button({ icon: "🗑", title: "delete task", action: "remove", cls: "winx-board-del" })}`
       : new TaskButtons({ task });
-    return html`<div class="winx-board-card${cls ? " " + cls : ""}" draggable="true" data-task="${task.key}" data-drag="${task.key}" data-swipeable="${task.key}"><div class="winx-board-text">${new TaskText({ task })}</div><div class="winx-board-meta">${meta}</div><div class="winx-board-btns">${extra}${btns}</div></div>`;
+    return html`<div class="winx-board-card${cls ? " " + cls : ""}"${task.area ? html` data-area="${task.area}"` : ""} draggable="true" data-task="${task.key}" data-drag="${task.key}" data-swipeable="${task.key}"><div class="winx-board-text">${new TaskText({ task })}</div><div class="winx-board-meta">${meta}</div><div class="winx-board-btns">${extra}${btns}</div></div>`;
   }
 }
