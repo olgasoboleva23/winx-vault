@@ -3,8 +3,9 @@
 // Elements carry the key: data-task (which task), data-drag (draggable), data-swipeable (swipes on the phone);
 // buttons and the stars carry data-action, handled by the calendar view.
 // No whitespace between inline elements: the markup must lay out as the old createEl calls did.
-import { html } from "../ui/html.js";
-import { Button, Component } from "../ui/component.js";
+import { html } from "../core/html.js";
+import { Component } from "../uikit/component.js";
+import { Button } from "../uikit/button.js";
 
 // the difficulty stars (in the area's colour), the text, its stickers; the difficulty is changed in the task window (✏️)
 export class TaskText extends Component {

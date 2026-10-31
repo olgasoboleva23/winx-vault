@@ -1,0 +1,26 @@
+@use "../mixins" as *;
+/* AddForm: a field (+ a select) and a pink submit, a finger's height; the doubled class beats Obsidian's own
+   input / select / button styles */
+.winx-add-form.winx-add-form {
+  display: flex;
+  gap: $space-s;
+
+  input, select, button {
+    min-height: $tap;
+    border-radius: $radius-l;
+    border: 1px solid var(--winx-border);
+    background: rgb(255 255 255 / 65%);
+    color: var(--winx-text-dark);
+    box-shadow: none;
+  }
+  input  { flex: 1; min-width: 0; padding: 0 $space-xl; font-size: $text-2xl; }
+  input::placeholder { color: var(--winx-purple); }
+  select { max-width: 34%; padding: 0 $space-m; }
+  button {
+    padding: 0 18px;
+    font-weight: 600;
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--winx-pink), var(--winx-pink-deep));
+  }
+}

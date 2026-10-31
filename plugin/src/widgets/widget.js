@@ -1,9 +1,10 @@
 // The base of every widget: a ```winx block in a note, owned by the plugin while the block is on screen.
 // A widget is a class with the same parts:
 //   async data()        what it shows (this.dv: Dataview's pages / page / current() / date, this.args: the block's lines)
-//   view(data)          its markup: html`…` (from ../ui/html.js), with Button / Card (../ui/component.js)
+//   view(data)          its markup: html`…` (from ../core/html.js), with Button / Card (../uikit/)
 //   on = { name(e, el) } what an element with data-action="name" does: a click (a button, any element),
-//                        a change (an input, a select) or a submit (a form)
+//                        a change (an input, a select) or a submit (a form); "open" with data-path (NoteLink)
+//                        opens that note without a handler
 //   after(root, data)   what markup can't do (a chart: this.keep(chart) so it's destroyed on the next draw);
 //                       root is where view() went (the card's content when there's a card)
 // Until its first draw a card widget shows its card with a shimmering placeholder (a skeleton).
@@ -12,8 +13,8 @@
 // listeners when the block goes.
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
 import { MarkdownRenderChild, debounce, sanitizeHTMLToDom } from "obsidian";
-import { Card } from "../ui/component.js";
-import { html } from "../ui/html.js";
+import { Card } from "../uikit/card.js";
+import { html } from "../core/html.js";
 import { actionOf } from "./parse.js";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
@@ -56,7 +57,7 @@ export class Widget extends MarkdownRenderChild {
   async onload() {
     const act = e => {
       const el = actionOf(e.type, e.target, this.containerEl);
-      const fn = el && this.on[el.dataset.action];
+      const fn = el && (this.on[el.dataset.action] ?? (el.dataset.action === "open" && el.dataset.path ? () => this.app.workspace.openLinkText(el.dataset.path, this.sourcePath) : null));
       if (!fn) return;
       if (e.type === "submit") e.preventDefault();
       fn.call(this, e, el);

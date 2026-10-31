@@ -3,7 +3,7 @@ import { actionOf } from "../widgets/parse.js";
 import { CalendarData, T, findTask, taskKey } from "./data.js";
 import { baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
-import { dimOnWrite } from "../ui/busy.js";
+import { dimOnWrite } from "../uikit/busy.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
 import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";

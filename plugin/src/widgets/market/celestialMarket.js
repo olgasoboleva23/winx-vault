@@ -1,11 +1,14 @@
 // Celestial Market: the shopping list by category, a round ✓ per item (a sparkle, then it's written as bought),
 // what is running low soon, and links to the market and the supplies.
-import { html } from "../../ui/html.js";
+import { html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import { todayYmd } from "../../core/dates.js";
 import { editLine } from "../../core/files.js";
 import { MARKET, catOf, marketCats, marketState, supplyStats } from "./market.js";
 import { MarketItem } from "./marketItem.js";
+import { Empty, Missing } from "../../uikit/empty.js";
+import { GroupHeader } from "../../uikit/groupHeader.js";
+import { NoteLink } from "../../uikit/noteLink.js";
 
 export class CelestialMarket extends Widget {
   on = {
@@ -17,7 +20,6 @@ export class CelestialMarket extends Widget {
       await new Promise(r => setTimeout(r, 650));
       await editLine(MARKET, Number(el.dataset.line), line => new MarketItem(line).bought(todayYmd()));
     },
-    open: (e, el) => this.app.workspace.openLinkText(el.dataset.path, "", false),
   };
   async data() {
     const page = this.dv.page(MARKET);
@@ -30,13 +32,13 @@ export class CelestialMarket extends Widget {
     };
   }
   view({ missing, items, groups, soon }) {
-    if (missing) return html`<p>Market file not found.</p>`;
-    const link = (text, path) => html`<span class="market-open" data-action="open" data-path="${path}">${text}</span>`;
+    if (missing) return new Missing({ path: MARKET });
+    const link = (text, path) => new NoteLink({ text, path, kind: "text", cls: "market-open" });
     return html`<div class="winx-celestial-market">
       <div class="market-list">
-        ${items.length ? "" : html`<div class="market-empty">✨ Merchant inventory cleared</div>`}
+        ${items.length ? "" : new Empty({ text: "✨ Merchant inventory cleared" })}
         ${groups.map(({ cat, items }) => html`
-          <div class="market-group-header"><span>${cat.label}</span><span class="market-count">${items.length}</span></div>
+          ${new GroupHeader({ label: cat.label, count: items.length })}
           ${items.map(t => html`<div class="market-item"><span class="market-text">${t.text.replace(/#[\w/]+/g, "").trim()}</span><button class="market-buy" aria-label="bought" title="bought" data-action="buy" data-line="${t.line}"></button></div>`)}`)}
       </div>
       ${soon.length ? html`<div class="market-soon">⏳ running low soon: ${soon.join(", ")}</div>` : ""}

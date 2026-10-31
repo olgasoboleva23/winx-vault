@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { html, raw } from "../src/ui/html.js";
+import { html, raw } from "../src/core/html.js";
 
 test("put-in text is escaped", () => {
   assert.equal(html`<b>${"a < b & c"}</b>`.html, "<b>a &lt; b &amp; c</b>");

@@ -1,13 +1,12 @@
 // Mobile home: big tiles with live counts, each opens a mobile page.
 import { Task } from "../tasks/task.js";
-import { html } from "../ui/html.js";
+import { html } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { todayYmd, ymd } from "../core/dates.js";
 import { todayCount } from "../tasks/task.js";
 import { WeightLog } from "./body/weightLog.js";
 
 export class MobileHome extends Widget {
-  on = { open: (e, el) => this.app.workspace.openLinkText(el.dataset.path, "", false) };
   async data() {
     const today = todayYmd();
     const wfile = this.app.vault.getAbstractFileByPath("02 Areas/Appearance/Weight.md");

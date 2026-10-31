@@ -1,10 +1,10 @@
 // Life Areas: a radar of XP per area over the last 4 weeks up to the page's day, plus the habit bonus this month.
-import { html } from "../../ui/html.js";
+import { html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import config from "../../core/config.js";
 import { pageDay } from "../../core/dates.js";
 import { collectHabitDays, taskXp } from "./xp.js";
-import { chartColor } from "../../ui/chart.js";
+import { chartColor } from "../../core/chart.js";
 
 export class LifeAreas extends Widget {
   async data() {

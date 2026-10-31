@@ -1,0 +1,10 @@
+@use "../mixins" as *;
+/* Empty / Missing (src/uikit/empty.js) */
+// a list with nothing in it, a widget whose note isn't there
+.winx-empty {
+  text-align: center;
+  padding-block: $space-3xl;
+  color: var(--winx-purple-deep);
+  font-size: $text-xl;
+  letter-spacing: 0.05em;
+}

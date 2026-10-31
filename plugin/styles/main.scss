@@ -21,7 +21,9 @@
 @use "widgets/mobile";
 @use "widgets/weight";
 @use "widgets/task-cards";
-@use "widgets/buttons";
+@use "uikit/buttons";
+@use "uikit/empty";
+@use "uikit/add-form";
 @use "widgets/calendar";
 @use "widgets/missed";
 @use "widgets/dashboard";

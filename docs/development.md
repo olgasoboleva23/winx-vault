@@ -12,16 +12,19 @@
 │   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js
 │   │   │                           (CalendarData, the model) and state.js (the tab's state), actions.js (what it writes)
 │   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
-│   │   ├── commands.ts           — the Cmd+P commands
-│   │   ├── 📁 ui                 — form.ts (one window instead of a chain of prompts), html.js (markup in backticks),
-│   │   │                           component.js (Component, Button, Card), busy.js (the ✦ pill), chart.js
-│   │   ├── 📁 lib                — one file per topic: config, dates, repeats (🔁 rules), task (one task line: read it,
-│   │   │                           change it), taskEdit (rewrite a line, the task window), goals, cycle, weight, xp,
-│   │   │                           market, rewards (gold), sounds, items (watch / read / game notes), files (edit /
-│   │   │                           editLine / appendLine a note); the pure ones are tested
-│   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget
-│   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; _mixins.scss has the shared
-│   │                               sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins
+│   │   ├── 📁 commands           — commands.ts (the Cmd+P commands), items.js (watch / read / game notes)
+│   │   ├── 📁 core               — dates, files (edit / editLine / appendLine a note), config, sounds (and 🔇),
+│   │   │                           html.js (markup in backticks), chart.js
+│   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
+│   │   │                           taskEdit.js (rewrite a line with undo, the task window)
+│   │   ├── 📁 uikit              — the interface parts, props in, markup out: Button (round, nav, pill, chip, toggle,
+│   │   │                           text), Card, NoteLink, Empty / Missing, GroupHeader, AddForm; Form (one window of
+│   │   │                           fields), busy.js (the ✦ pill)
+│   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget;
+│   │                               a topic's own logic next to its widgets, as classes: market/ (MarketItem),
+│   │                               goals/ (Goal), body/ (CycleLog, WeightLog), xp/, shop/ (gold)
+│   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; uikit/ the parts' looks;
+│   │                               _mixins.scss has the shared sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
 ├── 📁 00 System
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)

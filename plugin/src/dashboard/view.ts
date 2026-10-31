@@ -1,9 +1,9 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import layout from "./layout.md";
 import { addDays, todayYmd } from "../core/dates.js";
-import { busyPill, dimOnWrite } from "../ui/busy.js";
-import { Button } from "../ui/component.js";
-import { html } from "../ui/html.js";
+import { busyPill, dimOnWrite } from "../uikit/busy.js";
+import { Button } from "../uikit/button.js";
+import { html } from "../core/html.js";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn by Obsidian's
 // markdown renderer, as a note in reading view would be, for the tab's date. The date is the tab's own (no date:
