@@ -31,12 +31,12 @@ export class Weight extends Widget {
     },
     mode: (e, el) => { this.mode = el.dataset.mode; this.draw(); },
     // a level: one of 0–3 on; a reason: any number on
-    level: (e, el) => el.parentElement.querySelectorAll("[data-action=level]").forEach(b => b.classList.toggle("on", b === el)),
-    reason: (e, el) => el.classList.toggle("on"),
+    level: (e, el) => el.parentElement.querySelectorAll("[data-action=level]").forEach(b => b.classList.toggle("winx-btn--on", b === el)),
+    reason: (e, el) => el.classList.toggle("winx-btn--on"),
     logSave: async (e, el) => {
-      const box = el.closest(".winx-log-form"), level = box.querySelector("[data-action=level].on")?.dataset.level;
+      const box = el.closest(".winx-log-form"), level = box.querySelector("[data-action=level].winx-btn--on")?.dataset.level;
       if (level === undefined) return;
-      const reasons = [...box.querySelectorAll("[data-action=reason].on")].map(b => b.dataset.reason);
+      const reasons = [...box.querySelectorAll("[data-action=reason].winx-btn--on")].map(b => b.dataset.reason);
       await edit(LOG_PATH, c => new BodyLog(c).set(todayYmd(), Number(level), reasons));
     },
   };

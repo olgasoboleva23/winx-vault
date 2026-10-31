@@ -76,7 +76,7 @@ export class DashboardView extends ItemView {
     slot.empty();
     slot.createDiv({ cls: "mb-input-type-date" }).createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
     const today = this.shownDate !== todayYmd() ? new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" }) : "";
-    slot.append(sanitizeHTMLToDom(html`${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${today}${new Button({ text: "📅", title: "calendar", kind: "chip", action: "calendar", cls: "winx-phone-only" })}`.html));
+    slot.append(sanitizeHTMLToDom(html`${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${today}${new Button({ text: "📅", title: "calendar", kind: "chip", action: "calendar", cls: "winx-is-phone-only" })}`.html));
   }
 
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)

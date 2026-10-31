@@ -8,5 +8,5 @@
 .winx-nav__title { font-family: "Cinzel", serif; font-size: $text-3xl; color: var(--winx-lavender); min-width: 220px; text-align: center; }
 .callout .winx-nav__title { color: var(--winx-purple-deep); }   /* on a pink card */
 /* the phone: ‹ the title › on the first line, the chips (today, week / month, ✓ done, 🔁) under it */
-body.is-mobile .winx-nav { flex-wrap: wrap; justify-content: center; row-gap: $space-s; button.winx-btn.toggle { margin-left: 0; } }
+body.is-mobile .winx-nav { flex-wrap: wrap; justify-content: center; row-gap: $space-s; button.winx-btn.winx-btn--toggle { margin-left: 0; } }
 body.is-mobile .winx-nav__title { flex: 1 0 calc(100% - 2 * (#{$btn-l} + #{$space-l})); min-width: 0; }

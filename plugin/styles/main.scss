@@ -31,3 +31,4 @@
 @use "widgets/missed";
 @use "widgets/dashboard";
 @use "widgets/finance";   // was injected by the widget itself, after everything else: last
+@use "helpers";   // global .winx-is-* helpers, after the blocks

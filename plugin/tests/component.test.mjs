@@ -12,20 +12,20 @@ test("a component goes into markup as it is, its props into its view", () => {
 
 test("Button: an action by name, a title, a kind", () => {
   assert.equal(new Button({ icon: "🗑", title: "delete task", action: "remove" }).html,
-    '<button class="winx-btn round" data-action="remove" title="delete task" aria-label="delete task">🗑</button>');
+    '<button class="winx-btn winx-btn--round" data-action="remove" title="delete task" aria-label="delete task">🗑</button>');
   assert.equal(new Button({ text: "✦ list", action: "openList", kind: "pill", cls: "winx-weight-list" }).html,
-    '<button class="winx-btn pill winx-weight-list" data-action="openList">✦ list</button>');
+    '<button class="winx-btn winx-btn--pill winx-weight-list" data-action="openList">✦ list</button>');
   assert.equal(new Button({ text: "low", action: "low", data: { name: 'tea "green"', tag: "#food" } }).html,
-    '<button class="winx-btn round" data-action="low" data-name="tea &quot;green&quot;" data-tag="#food">low</button>');
+    '<button class="winx-btn winx-btn--round" data-action="low" data-name="tea &quot;green&quot;" data-tag="#food">low</button>');
 });
 
 test("Button: a toggle is lit by on; a nav arrow keeps its sign for screen readers", () => {
   assert.equal(new Button({ text: "✓ done", kind: "toggle", on: true, action: "showDone" }).html,
-    '<button class="winx-btn toggle on" data-action="showDone">✓ done</button>');
+    '<button class="winx-btn winx-btn--toggle winx-btn--on" data-action="showDone">✓ done</button>');
   assert.equal(new Button({ text: "✓ done", kind: "toggle", on: false, action: "showDone" }).html,
-    '<button class="winx-btn toggle" data-action="showDone">✓ done</button>');
+    '<button class="winx-btn winx-btn--toggle" data-action="showDone">✓ done</button>');
   assert.equal(new Button({ icon: "›", kind: "nav", action: "next", title: "next" }).html,
-    '<button class="winx-btn nav" data-action="next" title="next" aria-label="next">›</button>');
+    '<button class="winx-btn winx-btn--nav" data-action="next" title="next" aria-label="next">›</button>');
 });
 
 test("Card: the markup Obsidian draws for a > [!card] callout, the body as it is", () => {
@@ -42,7 +42,7 @@ test("NoteLink, Empty / Missing, GroupHeader, AddForm", async () => {
   const { GroupHeader } = await import("../src/uikit/groupHeader.js");
   const { AddForm } = await import("../src/uikit/addForm.js");
   assert.equal(new NoteLink({ text: "dates", path: "02 Areas/Cycle.md" }).html,
-    '<button class="winx-btn pill" data-action="open" data-path="02 Areas/Cycle.md">dates</button>');
+    '<button class="winx-btn winx-btn--pill" data-action="open" data-path="02 Areas/Cycle.md">dates</button>');
   assert.equal(new Empty({ text: "✨ All bought" }).html, '<div class="winx-empty">✨ All bought</div>');
   assert.equal(new Missing({ path: "x/Goals.md" }).html, '<div class="winx-empty">Create x/Goals.md</div>');
   assert.equal(new GroupHeader({ label: "🌿 Harvest", count: 3 }).html, '<div class="market-group-header"><span>🌿 Harvest</span><span class="market-count">3</span></div>');

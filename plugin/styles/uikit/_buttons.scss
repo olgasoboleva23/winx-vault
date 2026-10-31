@@ -3,7 +3,7 @@
 @use "../mixins" as *;
 
 // round: an icon in a white circle (a task's ⭐ ⏭ ✏️ 🗑, the panel's +📅 ⏸ ▶, Missed's ✓ ☀️); bigger on the phone
-button.winx-btn.round {
+button.winx-btn.winx-btn--round {
   width: $btn-s;
   height: $btn-s;
   padding: 0;
@@ -19,10 +19,10 @@ button.winx-btn.round {
 
   &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
 }
-body.is-mobile button.winx-btn.round { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
+body.is-mobile button.winx-btn.winx-btn--round { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
 
 // nav ‹ ›, chip (＋ task, today, week), toggle (✓ done, 🔁 repeats): white on the calendar's and dashboard's rows
-button.winx-btn:is(.nav, .chip, .toggle) {
+button.winx-btn:is(.winx-btn--nav, .winx-btn--chip, .winx-btn--toggle) {
   height: $btn-l;
   padding: 0 $space-xl;
   border-radius: $pill;
@@ -35,7 +35,7 @@ button.winx-btn:is(.nav, .chip, .toggle) {
   cursor: pointer;
 }
 /* ‹ ›: the font draws them below the middle; a chevron (Obsidian's icon) sits in the centre of the circle */
-button.winx-btn.nav {
+button.winx-btn.winx-btn--nav {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -53,15 +53,15 @@ button.winx-btn.nav {
   &[data-action="next"]::before { transform: scaleX(-1); }
 }
 // dim until on; the first one goes to the row's right end
-button.winx-btn.toggle {
+button.winx-btn.winx-btn--toggle {
   opacity: 0.55;
   box-shadow: none;
-  &.on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
+  &.winx-btn--on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
 }
-button:not(.toggle) + button.winx-btn.toggle { margin-left: auto; }
+button:not(.winx-btn--toggle) + button.winx-btn.winx-btn--toggle { margin-left: auto; }
 
 // text: a word in the text's colour, no frame (the market's ✦ open market)
-button.winx-btn.text {
+button.winx-btn.winx-btn--text {
   height: auto;
   padding: 0;
   border: none;
@@ -74,5 +74,3 @@ button.winx-btn.text {
   cursor: pointer;
 }
 
-/* the phone only: the way between the dashboard and the calendar (📅, ✦); the computer has its tabs */
-body:not(.is-mobile) .winx-btn.winx-phone-only { display: none; }

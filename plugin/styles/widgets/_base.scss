@@ -59,7 +59,7 @@
 
   /* ── Date input — golden fairy-ticket style ── */
   /* ── Daily note button ── */
-  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) > .winx-btn.pill) > .callout-content {
+  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) > .winx-btn.winx-btn--pill) > .callout-content {
     display: flex !important;
     align-items: center;
     justify-content: space-between;
@@ -68,7 +68,7 @@
   }
 
   .mb-input-type-date input,
-  .winx-btn.pill {
+  .winx-btn.winx-btn--pill {
     background: linear-gradient(
       135deg,
       var(--winx-pink-light),
@@ -93,7 +93,7 @@
     }
   }
 
-  .winx-btn.pill {
+  .winx-btn.winx-btn--pill {
     cursor: pointer;
     transition: box-shadow 0.2s ease;
 

@@ -1,0 +1,4 @@
+/* Global helpers (.winx-is-*): the same on any element of any block */
+
+/* the phone only (the way between the dashboard and the calendar: 📅, ✦); the computer has its tabs */
+body:not(.is-mobile) .winx-is-phone-only { display: none !important; }

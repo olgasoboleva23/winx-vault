@@ -16,7 +16,7 @@ test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons 
   const open = new TaskRow({ task: info({ canSkip: true }), kind: "open", compact: false, tick: true }).html;
   assert.match(open, /^<div class="winx-cal__task winx-cal__task--open" data-area="body" data-task="7" draggable="true" data-drag="7" data-swipeable="7">/);
   assert.match(open, /<input type="checkbox" class="task-list-item-checkbox" aria-label="done" data-action="tick">/);
-  assert.match(open, /<div class="winx-task-btns"><button class="winx-btn round" data-action="skip" title="skip this time" aria-label="skip this time">⏭<\/button>/);
+  assert.match(open, /<div class="winx-task-btns"><button class="winx-btn winx-btn--round" data-action="skip" title="skip this time" aria-label="skip this time">⏭<\/button>/);
   const ghost = new TaskRow({ task: info(), kind: "ghost", compact: false, tick: true }).html;
   assert.match(ghost, /^<div class="winx-cal__task winx-cal__task--ghost" data-area="body" data-task="7">🔁 <span class="tag"/);
   assert.doesNotMatch(ghost, /checkbox|winx-task-btns|draggable/);
