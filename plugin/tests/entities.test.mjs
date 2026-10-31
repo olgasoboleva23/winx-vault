@@ -4,6 +4,7 @@ import { weekOf } from "../src/core/dates.js";
 import { Goal, reminders } from "../src/widgets/goals/goal.js";
 import { CycleLog } from "../src/widgets/body/cycleLog.js";
 import { WeightLog } from "../src/widgets/body/weightLog.js";
+import { BodyLog } from "../src/widgets/body/bodyLog.js";
 import { MarketItem } from "../src/widgets/market/marketItem.js";
 import { paydays, SavingsJar } from "../src/widgets/savings/savingsJar.js";
 
@@ -129,4 +130,33 @@ test("SavingsJar: saved, deposits, the payday's deposit until it's in, the halfw
   assert.equal(priced.pct, 53);
   assert.equal(priced.left, 28000);
   assert.equal(new SavingsJar("- 2026-10-16 10000", { price: 60000 }).pct, 17);
+});
+
+test("CycleLog.last: the latest finished cycles, their length and period length", () => {
+  const log = new CycleLog(["2026-07-01", "2026-07-29", "2026-08-27", "2026-09-27", "2026-10-27"], ["2026-07-06", "2026-08-03", "2026-09-04"]);
+  assert.deepEqual(log.last(3), [
+    { start: "2026-07-29", length: 29, period: 6 },
+    { start: "2026-08-27", length: 31, period: 9 },
+    { start: "2026-09-27", length: 30, period: null },   // no end recorded
+  ]);
+  assert.deepEqual(new CycleLog(["2026-10-27"]).last(4), []);   // the current one isn't finished
+});
+
+test("BodyLog: a level 0–3 and reasons per day; a day's entry replaced", () => {
+  const log = new BodyLog("---\nname: Log\n---\n- 2026-10-30 2 rain, sleep\n- 2026-10-31 0\nnot an entry\n");
+  assert.deepEqual(log.entries, [
+    { date: "2026-10-30", level: 2, reasons: ["rain", "sleep"] },
+    { date: "2026-10-31", level: 0, reasons: [] },
+  ]);
+  assert.equal(log.set("2026-10-31", 1, ["rain"]), "---\nname: Log\n---\n- 2026-10-30 2 rain, sleep\n- 2026-10-31 1 rain\nnot an entry\n");
+  assert.equal(new BodyLog("").set("2026-11-01", 3, []), "- 2026-11-01 3\n");
+});
+
+test("CycleLog.recent: the current cycle so far, then the finished ones, newest first; ovulation 14 days before the end", () => {
+  const log = new CycleLog(["2026-08-27", "2026-09-27", "2026-10-27"], ["2026-09-05", "2026-10-03"]);
+  assert.deepEqual(log.recent(3, "2026-10-31"), [
+    { start: "2026-10-27", end: "2026-10-31", days: 5, period: null, ovulation: null, current: true },
+    { start: "2026-09-27", end: "2026-10-26", days: 30, period: 7, ovulation: 16, current: false },
+    { start: "2026-08-27", end: "2026-09-26", days: 31, period: 10, ovulation: 17, current: false },
+  ]);
 });

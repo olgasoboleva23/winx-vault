@@ -4,6 +4,7 @@
 import { html } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { dm } from "../core/dates.js";
+import { NoteLink } from "../uikit/noteLink.js";
 
 const LEDGER = "02 Areas/Finance/Ledger";
 const RULES = "02 Areas/Finance/rules.json";
@@ -90,5 +91,15 @@ export class Finance extends Widget {
       ${window6.length > 1 ? html`<div class="winx-fin-section">Spending by month</div><div class="winx-fin-trend">${window6.map((m, i) => html`<div class="winx-fin-bar${m === current ? " is-current" : ""}"><div class="col" style="height: ${Math.max(spends[i] / peak * 100, 3)}%;" aria-label="${money(spends[i])}"></div><small>${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small></div>`)}</div>` : ""}
       ${latest.length ? html`<div class="winx-fin-section">Recent transactions</div><div class="winx-fin-list">${latest.map(r => html`<div class="winx-fin-item"><span class="d">${dm(r.date)}</span><span class="t">${r.category} · ${r.description}</span><span class="a">${money(r.amount)}</span></div>`)}</div>` : ""}
     </div>`;
+  }
+}
+
+// The dashboard's Finance card: this month's spent and income on one line, the full Finance note a tap away.
+export class FinanceMonth extends Finance {
+  view({ ledger, months, current }) {
+    const link = new NoteLink({ text: "💰 open finance", path: "Finance", kind: "text" });
+    if (!months.length) return html`<div class="winx-fin-month">${link}</div>`;
+    const { spent, income } = summarize(ledger[current]);
+    return html`<div class="winx-fin-month"><div>${MONTHS[Number(current.split("-")[1]) - 1]}: spent <b>${money(spent)}</b> · income <b>${money(income)}</b></div>${link}</div>`;
   }
 }

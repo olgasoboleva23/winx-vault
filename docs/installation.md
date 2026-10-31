@@ -25,7 +25,6 @@ Copy the plugin and what it reads:
 |---|---|
 | `plugin/dist/*` (after `npm run build`) | `.obsidian/plugins/winx/` — then turn **Winx** on in Community plugins |
 | the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
-| `Mobile.md`, `Mobile/` | anywhere (they hold the widget blocks) |
 | `02 Areas/Personal/Tasks/` (`Master.md`, `Pool.md`, `Kanban.md`), `Goals.md`, `00 System/Data/`, `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
 
 The paths the widgets read are in the widget files (`plugin/src/widgets/*.js`, `plugin/src/calendar/view.ts`, constants at the top) and `plugin/src/lib/config.js`.

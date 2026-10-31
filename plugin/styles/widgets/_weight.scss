@@ -5,3 +5,7 @@
 .winx-weight-now { font-family: "Cinzel", serif; font-size: 22px; color: var(--winx-text-dark); }
 .winx-weight-delta { font-size: $text-m; color: var(--winx-purple-deep); }
 .winx-weight-list { justify-self: start; }
+/* weight ↔ the body log, and the log's form: a level 0–3, the reasons, save */
+.winx-weight-modes { display: flex; gap: $space-s; }
+.winx-log-form { display: grid; gap: $space-m; justify-items: start; }
+.winx-log-row { display: flex; flex-wrap: wrap; gap: $space-s; }

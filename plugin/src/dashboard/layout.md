@@ -7,6 +7,7 @@
 > >dailyNote
 > >```
 
+
 > [!grid]
 > > [!col]
 > > ```winx
@@ -40,8 +41,10 @@
 > > card: Weight
 > > ```
 > >
-> > > [!card] Finance
-> > > 💰 [[Finance|Open finance]]
+> > ```winx
+> > financeMonth
+> > card: Finance
+> > ```
 > >
 > > ```winx
 > > savings

@@ -6,6 +6,8 @@ import { findChoices } from "../src/core/find.js";
 import { projectRepeats, ruleText } from "../src/tasks/repeats.js";
 import { todayCount } from "../src/tasks/task.js";
 import { levelInfo } from "../src/widgets/xp/xp.js";
+import { vitals } from "../src/widgets/xp/vitals.js";
+import { Task } from "../src/tasks/task.js";
 
 // 2026-10-19 is a Monday
 test("weeks", () => {
@@ -108,3 +110,15 @@ test("ruleText", () => {
   assert.equal(ruleText("every weekday"), "every weekday");   // unknown: as written
 });
 
+
+test("vitals: HP loses 2 a star for each missed task, gets 1 a star back for each done today; MP is today's focus", () => {
+  const T = l => new Task(l);
+  const v = vitals({
+    missed: [T("- [ ] #⭐⭐⭐hard #area/base clean 📅 2026-10-24"), T("- [ ] #⭐easy #area/body mask 📅 2026-10-22")],
+    doneToday: [T("- [x] #⭐⭐medium #area/mind read ✅ 2026-10-31")],
+    focus: 1,
+  });
+  assert.deepEqual(v, { hp: 44, hpMax: 50, damage: 8, heal: 2, mp: 1, mpMax: 4 });
+  assert.equal(vitals({ missed: Array(20).fill(T("- [ ] #⭐⭐⭐hard x 📅 2026-10-01")), doneToday: [], focus: 9 }).hp, 0);
+  assert.equal(vitals({ missed: [], doneToday: [T("- [x] #⭐⭐⭐hard x ✅ 2026-10-31")], focus: 9 }).mp, 4);
+});

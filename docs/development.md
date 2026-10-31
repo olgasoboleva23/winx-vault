@@ -22,23 +22,22 @@
 │   │   │                           fields), Search (a search window over a list), busy.js (the ✦ pill)
 │   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget;
 │   │                               a topic's own logic next to its widgets, as classes: market/ (MarketItem, the search),
-│   │                               goals/ (Goal), body/ (CycleLog, WeightLog), savings/ (SavingsJar, paydays), xp/, shop/ (gold)
+│   │                               goals/ (Goal), body/ (CycleLog, WeightLog, BodyLog), savings/ (SavingsJar, paydays), xp/ (HP / MP: vitals.js), shop/ (gold)
 │   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; uikit/ the parts' looks;
 │   │                               _mixins.scss has the shared sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
 ├── 📁 00 System
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)
-│   ├── 📁 Data                   — Shop.md, Celestial Market.md, Supplies.md
+│   ├── 📁 Data                   — the widgets' notes: Shop.md, Celestial Market.md, Supplies.md, Cycle.md (cycle dates),
+│   │                               Weight.md, Body log.md, Savings/ (a note per goal)
 │   ├── 📁 Scripts                — notify.js (desktop reminders, Templater startup), QuickAdd/MirrorMobileConfig.js
 │   └── 📁 Templates              — Daily Note.md, recipe.md, task.md
 ├── 📁 02 Areas
-│   ├── 📁 Health & Body/Cycle.md — cycle start dates
 │   └── 📁 Personal
 │       ├── Goals.md
 │       ├── 📁 Daily Notes
 │       └── 📁 Tasks              — Master.md (all tasks), Pool.md, Kanban.md
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
-├── Mobile.md, 📁 Mobile
 ```
 
 ## Build and test

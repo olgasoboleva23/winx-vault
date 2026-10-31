@@ -116,3 +116,18 @@ test("a task's key finds the same task again: by its line, after lines moved, ne
   assert.equal(findTask(taskKey(pool), [{ ...pool, line: 3 }]).line, 3);
   assert.equal(findTask("nonsense", [workout]), null);
 });
+
+test("balance: each area's tasks on the shown days (open + done, no 🔁 ghosts), how many done, in the given order", () => {
+  const m = data([
+    task(" ", "#⭐easy #area/body walk 📅 2026-10-30"),
+    task("x", "#⭐⭐medium #area/body gym ✅ 2026-10-27"),
+    task("x", "#⭐⭐⭐hard #area/mind course ✅ 2026-10-26"),
+    task(" ", "#⭐easy #area/body stretch 🔁 every day 📅 2026-10-28"),   // today + ghosts after it
+    task("x", "#⭐easy #area/body old ✅ 2026-10-19"),                    // last week
+  ]);
+  assert.deepEqual(m.balance(["#area/body", "#area/mind", "#area/base"]), [
+    { area: "#area/body", planned: 3, done: 1 },
+    { area: "#area/mind", planned: 1, done: 1 },
+    { area: "#area/base", planned: 0, done: 0 },
+  ]);
+});

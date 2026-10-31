@@ -10,6 +10,36 @@
 .winx-cal-top button.winx-cal-mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
 .winx-cal-title { font-family: "Cinzel", serif; font-size: $text-3xl; color: var(--winx-lavender); min-width: 220px; text-align: center; }
 .callout .winx-cal-title { color: var(--winx-purple-deep); }   /* on a pink card */
+/* the areas' colours: the balance bar's pieces and a stripe before each task */
+.winx-cal {
+  [data-area="body"]      { --area: #e8609a; }
+  [data-area="mind"]      { --area: #9b6bd6; }
+  [data-area="wealth"]    { --area: #e0a12e; }
+  [data-area="base"]      { --area: #4fb59a; }
+  [data-area="occasions"] { --area: #f08a5d; }
+  [data-area="rest"]      { --area: #6aa6e0; }
+  [data-area="learning"]  { --area: #7b8be0; }
+  [data-area="work"]      { --area: #8a7f9e; }
+  [data-area="personal"]  { --area: #e88fc0; }
+  [data-area="health"]    { --area: #5ec4c4; }
+}
+.winx-cal :is(.winx-cal-task, .winx-yesterday-row, .winx-board-card)[data-area] { border-left: 3px solid var(--area); }
+/* the week's balance: one thin bar split by area (its share of the week's tasks), the done part brighter;
+   the areas with nothing this week as grey icons after it */
+.winx-cal-balance { display: flex; align-items: flex-end; gap: $space-m; margin: (-$space-s) 0 $space-l; }
+.winx-balance-bar {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  > div { min-width: 2.6em; }
+  span { display: block; overflow: hidden; white-space: nowrap; text-overflow: clip; font-size: $text-xs; color: var(--winx-lavender); }
+  b { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); }
+  i { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
+}
+.winx-balance-none { display: flex; gap: $space-2xs; filter: grayscale(1); opacity: 0.6; font-size: $text-l; }
+/* the phone: ‹ the week › on the first line, the chips (today, week / month, ✓ done, 🔁) under it */
+body.is-mobile .winx-cal-nav { flex-wrap: wrap; justify-content: center; row-gap: $space-s; button.winx-btn.toggle { margin-left: 0; } }
+body.is-mobile .winx-cal-title { flex: 1 0 calc(100% - 2 * (#{$btn-l} + #{$space-l})); min-width: 0; }
 .winx-cal-week {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -156,6 +186,25 @@ body.is-mobile .winx-cal-day { min-height: 0; }
   .winx-cal-task { padding: 1px $space-2xs; border: none; font-size: $text-s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 .winx-cal-num { font-size: $text-m; font-weight: 600; color: var(--winx-purple-deep); }
+/* the phone's month: small cells with a dot per task, the picked day's card under the grid */
+.winx-cal-phone-month {
+  display: grid;
+  gap: $space-l;
+  .winx-cal-month { gap: $space-2xs; }
+  .winx-cal-cell { min-height: 48px; padding: $space-2xs; text-align: center; }
+  .winx-cal-cell.picked { border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 80%); }
+}
+.winx-cal-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  margin-top: $space-2xs;
+  i { width: 6px; height: 6px; border-radius: $round; background: var(--winx-pink-deep); }
+  i.done { background: var(--winx-gold-deep); }
+  span { font-size: $text-2xs; color: var(--winx-purple-deep); }
+}
 /* a tick waits 2 s before it's written: struck through, a gold shimmer runs over it */
 .winx-cal-task.ticking {
   text-decoration: line-through;
@@ -192,6 +241,12 @@ body.is-mobile :is(.winx-cal-task, .winx-yesterday-row, .winx-board-card) { touc
   [data-swipe="done"] { box-shadow: -40px 0 0 -6px rgb(120 200 150 / 70%); }
 }
 .winx-cal :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px alpha(--winx-purple-deep, 40%); }
+/* what the swipe will do, in the band it uncovers: ✓ done on the left, ⏭ skip / ↩ no date on the right */
+.winx-cal [data-swipe] { position: relative; overflow: visible; }
+.winx-cal [data-swipe]::after { position: absolute; top: 50%; transform: translateY(-50%); font-size: $text-xl; pointer-events: none; }
+.winx-cal [data-swipe="done"]::after { content: "✓"; left: -30px; color: #fff; font-weight: 700; }
+.winx-cal [data-swipe="skip"]::after { content: "⏭"; right: -32px; }
+.winx-cal [data-swipe="nodate"]::after { content: "↩"; right: -30px; color: #fff; font-weight: 700; }
 
 /* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
 .winx-cal-routine {

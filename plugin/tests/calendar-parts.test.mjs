@@ -29,7 +29,7 @@ test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons 
 
 test("TaskCard: a panel card, its meta line and buttons", () => {
   const card = new TaskCard({ task: info(), meta: "waiting 3 d", extra: "" }).html;
-  assert.match(card, /^<div class="winx-board-card" draggable="true" data-task="7" data-drag="7" data-swipeable="7"><div class="winx-board-text"><span class="tag"/);
+  assert.match(card, /^<div class="winx-board-card" data-area="body" draggable="true" data-task="7" data-drag="7" data-swipeable="7"><div class="winx-board-text"><span class="tag"/);
   assert.match(card, /<div class="winx-board-meta">waiting 3 d<\/div><div class="winx-board-btns">/);
   const pool = new TaskCard({ task: info({ pool: true }), meta: "never done" }).html;
   assert.match(pool, /data-action="edit"/);

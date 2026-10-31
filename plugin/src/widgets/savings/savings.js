@@ -10,7 +10,7 @@ import { Empty } from "../../uikit/empty.js";
 import { money } from "../finance.js";
 import { SavingsJar } from "./savingsJar.js";
 
-const FOLDER = "02 Areas/Finance/Savings";
+const FOLDER = "00 System/Data/Savings";
 const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const day = d => `${DAYS[weekday(d)]} ${dm(d)}`;
 
