@@ -1,70 +1,6 @@
 {
   "choices": [
     {
-      "id": "84c310a2-28a3-4b3b-b70d-3a11ea18e863",
-      "name": "Task",
-      "type": "Macro",
-      "command": false,
-      "runOnStartup": false,
-      "macro": {
-        "name": "Task",
-        "id": "48e8dab3-b697-411f-b89c-4b2169e64e13",
-        "commands": [
-          {
-            "name": "NewTask",
-            "type": "UserScript",
-            "id": "b67b56b9-8e7b-47c3-bd10-191106b5014d",
-            "path": "00 System/Scripts/QuickAdd/NewTask.js",
-            "settings": {}
-          }
-        ]
-      }
-    },
-    {
-      "id": "94231b2e-4bc4-4643-81a1-b18ea15772ea",
-      "name": "Watch item",
-      "type": "Macro",
-      "command": false,
-      "runOnStartup": false,
-      "macro": {
-        "name": "Watch item",
-        "id": "632bb6a9-7e22-46a3-9b5c-dd8b3b3798c9",
-        "commands": [
-          {
-            "name": "NewItem",
-            "type": "UserScript",
-            "id": "bd594062-7b91-4e5f-8ed7-6dd52d69ca89",
-            "path": "00 System/Scripts/QuickAdd/NewItem.js",
-            "settings": {
-              "Kind": "watch"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "cb208fb8-48d5-4744-aa54-722c94b9cd1c",
-      "name": "Game",
-      "type": "Macro",
-      "command": false,
-      "runOnStartup": false,
-      "macro": {
-        "name": "Game",
-        "id": "60032b9b-6e80-479c-aa3e-94d1d8686e67",
-        "commands": [
-          {
-            "name": "NewItem",
-            "type": "UserScript",
-            "id": "437c0819-ab90-4fca-8d29-5b1b1aad821a",
-            "path": "00 System/Scripts/QuickAdd/NewItem.js",
-            "settings": {
-              "Kind": "game"
-            }
-          }
-        ]
-      }
-    },
-    {
       "id": "d1f07a89-3348-4aff-9af0-db170804cfbf",
       "name": "Work task",
       "type": "Template",
@@ -123,68 +59,6 @@
       },
       "fileExistsMode": "Increment the file name",
       "setFileExistsBehavior": false
-    },
-    {
-      "id": "a13e1801-f0bb-4942-843c-e2285b0c6726",
-      "name": "Buy Reward",
-      "type": "Macro",
-      "command": false,
-      "runOnStartup": false,
-      "macro": {
-        "name": "Buy Reward",
-        "id": "dd3a057b-49b9-4209-93ba-1ab08d1b8994",
-        "commands": [
-          {
-            "name": "BuyReward",
-            "type": "UserScript",
-            "id": "64c0100c-34a1-4b88-be20-742da4c05146",
-            "path": "00 System/Scripts/QuickAdd/BuyReward.js",
-            "settings": {}
-          }
-        ]
-      }
-    },
-    {
-      "id": "44239900-8806-45bf-beff-78afe8339085",
-      "name": "Read item",
-      "type": "Macro",
-      "command": false,
-      "runOnStartup": false,
-      "macro": {
-        "name": "Read item",
-        "id": "9b063b3f-ce8e-41f1-886e-81b33a48eb27",
-        "commands": [
-          {
-            "name": "NewItem",
-            "type": "UserScript",
-            "id": "ceb94fae-5da2-436b-8f07-2b02e4549c2e",
-            "path": "00 System/Scripts/QuickAdd/NewItem.js",
-            "settings": {
-              "Kind": "read"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "480849c0-6b8a-4d53-b93c-6aa6077a82cc",
-      "name": "New Market Item",
-      "type": "Macro",
-      "command": false,
-      "runOnStartup": false,
-      "macro": {
-        "name": "New Market Item",
-        "id": "c1b5dff3-1bce-4ac1-8f3a-2e9471fdb871",
-        "commands": [
-          {
-            "name": "NewMarketItem",
-            "type": "UserScript",
-            "id": "d920e11f-6404-4d0a-ba1d-0357a270e20d",
-            "path": "00 System/Scripts/QuickAdd/NewMarketItem.js",
-            "settings": {}
-          }
-        ]
-      }
     }
   ],
   "inputPrompt": "single-line",

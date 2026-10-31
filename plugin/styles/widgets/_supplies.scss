@@ -1,0 +1,13 @@
+@use "../mixins" as *;
+/* ── Supplies ── */
+.winx-supply {
+  @include row;
+  gap: $space-l;
+  padding: $space-xs 0;
+  color: var(--winx-text-dark);
+
+  &.due .winx-supply-info { color: var(--winx-pink-deep); font-weight: 600; }
+}
+.winx-supply-name { flex: 1; }
+.winx-supply-info { font-size: $text-m; color: var(--winx-purple-deep); }
+.market-soon { font-size: $text-m; color: var(--winx-pink-deep); margin: $space-s 0 $space-2xs; }

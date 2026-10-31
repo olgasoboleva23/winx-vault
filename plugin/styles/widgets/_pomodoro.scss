@@ -1,0 +1,289 @@
+@use "../mixins" as *;
+/* ============================================
+ * WINX THEME — Pomodoro Widget
+ * File: pomodoro.css
+ *
+ * Wing decoration references var(--winx-wing-svg)
+ * from winx-assets.css — inline data URI removed.
+ * ============================================ */
+
+/* Register --p so the conic-gradient ring can transition
+ * smoothly between the once-per-second JS updates instead
+ * of jumping. */
+@property --p {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.winx-pomodoro {
+  overflow-x: visible !important;
+  padding-top: $space-l;
+
+  .pomodoro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-2xl;
+  }
+
+  .ring {
+    --p: 0;
+
+    width: 180px;
+    height: 180px;
+    border-radius: $round;
+    position: relative;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--winx-border);
+    transition: --p 1s linear;
+    background: conic-gradient(
+      var(--winx-pink-deep) calc(var(--p) * 360deg),
+      var(--winx-purple-light) 0
+    );
+
+    /* Wing decoration — SVG lives in winx-assets.css */
+    .wing {
+      position: absolute;
+      width: $deco;
+      height: $deco;
+      background: var(--winx-wing-svg) 0 0 / contain no-repeat;
+      pointer-events: none;
+
+      &.left {
+        left: -42px;
+        top: 50%;
+        transform: translateY(-50%) scaleX(-1);
+      }
+      &.right {
+        right: -42px;
+        top: 50%;
+        transform: translateY(-50%) rotate(180deg) scaleX(-1) scaleY(-1);
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: $space-l;
+      border-radius: $round;
+      background: var(--winx-pink-light);
+      border: 2px solid var(--winx-border);
+    }
+
+    .top-star {
+      position: absolute;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+
+      svg {
+        fill: var(--winx-gold);
+        stroke: var(--winx-border);
+      }
+    }
+
+    .time {
+      position: relative;
+      font-size: 30px;
+      color: var(--winx-text-dark);
+      z-index: 2;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: -20px;
+      @include center;
+      gap: $space-xl;
+      margin-top: -10px;
+
+      .btn {
+        border-radius: $round;
+        border: 2px solid var(--winx-border);
+        background: var(--winx-pink);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        padding: 0;
+
+        &:hover {
+          transform: scale(1.05);
+          transition: 0.15s ease;
+        }
+
+        svg {
+          fill: var(--winx-text-dark);
+        }
+
+        &.play {
+          width: 48px;
+          height: 48px;
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        &.reset-btn,
+        &.skip-btn {
+          width: 36px;
+          height: 36px;
+          svg {
+            width: 14px;
+            height: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  .stars {
+    display: flex;
+    gap: $space-m;
+
+    .multiplier {
+      font-size: $text-xl;
+      font-weight: 500;
+      margin-left: $space-xs;
+    }
+
+    .s {
+      width: 18px;
+      height: 18px;
+      opacity: 0.3;
+      svg {
+        fill: var(--winx-purple);
+      }
+
+      &.on {
+        opacity: 1;
+        svg {
+          fill: var(--winx-gold);
+        }
+      }
+    }
+  }
+
+  .mode-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-2xs;
+    margin-top: $space-2xl;
+
+    .mode-text {
+      font-size: $text-l;
+      font-weight: 600;
+      color: var(--winx-text-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .session-count {
+      font-size: $text-xs;
+      color: var(--winx-purple);
+      opacity: 0.7;
+    }
+  }
+
+  /* ── Settings panel ── */
+  .settings-panel {
+    display: flex;
+    flex-direction: column;
+    gap: $space-s;
+    background: var(--winx-pink-light);
+    border: 1px solid var(--winx-border);
+    border-radius: $radius-m;
+    padding: $space-l $space-2xl;
+    width: 140px;
+
+    &.hidden {
+      display: none;
+    }
+
+    label {
+      @include row;
+      gap: $space-s;
+      font-size: $text-s;
+    }
+
+    input {
+      width: 40px;
+      border: 1px solid var(--winx-border);
+      border-radius: 4px;
+      background: var(--winx-pink);
+      text-align: center;
+      font-size: $text-s;
+      padding: $space-2xs $space-xs;
+
+      /* app.css input:not(:disabled):hover is (0,3,1) — tie it or it wins */
+      &:hover,
+      &:focus {
+        background: var(--winx-pink);
+        border-color: var(--winx-border);
+      }
+    }
+
+    span {
+      opacity: 0.6;
+    }
+
+    .s-save {
+      align-self: flex-end;
+      font-size: $text-xs;
+      padding: 3px $space-l;
+      border-radius: $radius-s;
+      border: 1px solid var(--winx-border);
+      background: var(--winx-pink);
+      cursor: pointer;
+
+      &:hover {
+        background: var(--winx-pink-deep);
+      }
+    }
+
+    :is(.s-save, label, input) {
+      color: var(--winx-text-dark);
+    }
+  }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    @include center;
+    gap: $space-m;
+
+    .settings-info {
+      font-size: $text-xs;
+      color: var(--winx-purple);
+      opacity: 0.6;
+    }
+  }
+
+  .gear-btn {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    aspect-ratio: 1 / 1;
+    border-radius: $round;
+    border: 1px solid var(--winx-border);
+    background: transparent;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0;
+    transition: opacity 0.15s ease;
+    box-sizing: border-box;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--winx-purple);
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,93 @@
+@use "../mixins" as *;
+/* ===== SHOP ===== */
+.winx-shop {
+  padding: $space-m 0;
+
+  & .winx-shop-balance {
+    @include center;
+    gap: $space-l;
+    padding: $space-4xl;
+    margin-bottom: $space-5xl;
+    background: var(--winx-twilight);
+    border: 2px solid var(--winx-border);
+    border-radius: 18px;
+    color: white;
+    font-size: 1.4em;
+    font-weight: 600;
+    box-shadow: 0 4px 16px alpha(--winx-purple-deep, 25%);
+    text-shadow: 0 1px 2px alpha(--winx-text-dark, 30%);
+
+    & .winx-shop-balance-icon {
+      font-size: 1.3em;
+    }
+
+    & .winx-shop-balance-amount {
+      color: var(--winx-gold-bright);
+      font-weight: 700;
+      font-size: 1.2em;
+    }
+  }
+
+  & .winx-shop-items {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xl;
+  }
+
+  & .winx-shop-item {
+    @include row;
+    justify-content: space-between;
+    width: 100%;
+    padding: $space-2xl $space-4xl;
+    background: var(--winx-pink-light);
+    border: 1px solid var(--winx-border);
+    border-radius: $radius-xl;
+    color: var(--winx-text-dark);
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      background 0.15s ease;
+
+    & .winx-shop-item-name {
+      text-align: left;
+    }
+
+    & .winx-shop-item-cost {
+      display: inline-flex;
+      align-items: center;
+      gap: $space-xs;
+      padding: $space-xs $space-xl;
+      background: linear-gradient(
+        135deg,
+        var(--winx-gold-bright),
+        var(--winx-gold)
+      );
+      border: 1px solid var(--winx-border);
+      border-radius: $pill;
+      color: var(--winx-text-dark);
+      font-weight: 700;
+      font-size: 0.9em;
+    }
+
+    &:not(:disabled):hover {
+      background: var(--winx-pink);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px alpha(--winx-pink-deep, 30%);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background: var(--winx-purple-light);
+
+      & .winx-shop-item-cost {
+        background: var(--winx-border);
+        color: var(--winx-purple-deep);
+        filter: grayscale(0.5);
+      }
+    }
+  }
+}
