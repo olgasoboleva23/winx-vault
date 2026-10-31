@@ -4,7 +4,7 @@
 @use "animations";
 @use "assets";
 @use "callout-grid";
-@use "cards";
+@use "widgets/base";   // the widget's card, where the card snippet was
 @use "widgets/celestial-market";
 @use "fonts";
 @use "widgets/heatmap";
@@ -14,7 +14,7 @@
 @use "widgets/shop";
 @use "tasks-minimal";
 @use "tokens";
-@use "widgets/base";
+@use "widgets/level";
 @use "widgets/goals-cycle";
 @use "widgets/supplies";
 @use "widgets/scroll-cards";
@@ -25,6 +25,7 @@
 @use "uikit/empty";
 @use "uikit/add-form";
 @use "uikit/search";
+@use "uikit/syncing";
 @use "uikit/nav";
 @use "uikit/busy";
 @use "widgets/calendar";

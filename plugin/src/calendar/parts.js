@@ -179,7 +179,7 @@ export class Panel extends Part {
     const info = t => this.view.info(t);
     // as on the Life Areas chart
     const areaTitle = g => { const name = areaMap[g] ?? (g ? g.slice(6) : "other"); return `${areaIcons[g] ?? "✦"} ${name[0].toUpperCase()}${name.slice(1)}`; };
-    const group = (title, cards, extra = "", cls = "") => html`<div class="winx-cal__group-card${cls}"><div class="winx-cal__group">${title}</div>${cards}${extra}</div>`;
+    const group = (title, cards) => html`<div class="winx-cal__group-card"><div class="winx-cal__group">${title}</div>${cards}</div>`;
     // the cards of `items`, one group card per run of the same area
     const byArea = (items, card) => {
       const runs = [];

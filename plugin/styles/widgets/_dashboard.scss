@@ -7,31 +7,14 @@
   .markdown-preview-section { opacity: 0.55; transition: opacity 0.2s; pointer-events: none; }
 }
 .winx-dash-quests { display: contents; }   /* the Tasks query sits in the card as it did in the note */
-/* a card widget until its first draw */
-.winx-skeleton {
-  height: 72px;
-  border-radius: $radius-l;
-  background: linear-gradient(90deg, rgb(255 255 255 / 25%) 25%, rgb(255 255 255 / 60%) 50%, rgb(255 255 255 / 25%) 75%);
-  background-size: 200% 100%;
-  animation: winx-shimmer 1.6s linear infinite;
+/* the date row and the ✦ Open button of the daily note side by side in their column */
+:is(.dashboard, .kanban-board) {
+  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) > .winx-btn.winx-btn--pill) > .callout-content {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row !important;
+    gap: $space-m;
+  }
+
 }
-/* HP / MP in the Level card (src/widgets/xp/levelToday.js): red and blue like a game's bars */
-.winx-vitals { display: grid; gap: $space-xs; margin-top: $space-m; }
-.winx-vital {
-  @include row;
-  gap: $space-s;
-  font-size: $text-s;
-  color: var(--winx-purple-deep);
-  b { width: 1.8em; font-family: "Cinzel", serif; letter-spacing: 1px; }
-  span { font-variant-numeric: tabular-nums; }
-}
-.winx-vital-bar {
-  flex: 1;
-  height: $space-m;
-  overflow: hidden;
-  border-radius: $pill;
-  background: alpha(--winx-purple, 20%);
-  i { display: block; height: 100%; border-radius: $pill; transition: width 0.3s; }
-}
-.winx-vital.hp i { background: linear-gradient(90deg, #c2304a, #ff6b81); box-shadow: 0 0 6px rgb(255 107 129 / 70%); }
-.winx-vital.mp i { background: linear-gradient(90deg, #2f5fc4, #6fa8ff); box-shadow: 0 0 6px rgb(111 168 255 / 70%); }

@@ -1,5 +1,4 @@
-/* Button (src/uikit/button.js), one block per kind. The pill (✦ Open) is in widgets/_base.scss, with the date
-   field it shares its look with. */
+/* Button (src/uikit/button.js), block winx-btn: one set of rules per kind (a modifier) */
 @use "../mixins" as *;
 
 // round: an icon in a white circle (a task's ⭐ ⏭ ✏️ 🗑, the panel's +📅 ⏸ ▶, Missed's ✓ ☀️); bigger on the phone
@@ -74,3 +73,43 @@ button.winx-btn.winx-btn--text {
   cursor: pointer;
 }
 
+// pill: a word on the pink Cinzel ticket (✦ Open, running low, dates); the date fields (the calendar's, the
+// dashboard's) share its look
+:is(.dashboard, .kanban-board) {
+  .mb-input-type-date input,
+  .winx-btn.winx-btn--pill {
+    background: linear-gradient(
+      135deg,
+      var(--winx-pink-light),
+      var(--winx-pink)
+    ) !important;
+    border: 1.5px solid var(--winx-gold) !important;
+    border-radius: $radius-m !important;
+    padding: $space-s $space-2xl !important;
+    color: var(--winx-gold-deep) !important;
+    font-family: "Cinzel", serif !important;
+    font-size: $text-xl !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 0 8px alpha(--winx-gold, 40%) !important;
+  }
+
+  .mb-input-type-date input {
+    &::-webkit-calendar-picker-indicator {
+      opacity: 0;
+    }
+    &::-webkit-datetime-edit-text {
+      color: var(--winx-gold-deep) !important;
+    }
+  }
+
+  .winx-btn.winx-btn--pill {
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow:
+        0 0 16px alpha(--winx-gold, 70%),
+        0 0 8px alpha(--winx-pink-deep, 50%);
+    }
+  }
+}

@@ -1,113 +1,142 @@
-/* ============================================
- * WINX THEME — Widgets
- * File: widgets.css
- *
- * --winx-star-icon token → winx-assets.css
- * @keyframes winx-shimmer, pulse-glow → winx-animations.css
- * ============================================ */
+/* The widget's card, block winx-widget (src/uikit/card.js): a pink gradient, fairy wings, a glow on hover, a thin
+   scrollbar. The card is a callout, and cards written in Markdown ("> [!card] Quests", the Kanban) are the same
+   callout without our classes, so the look is on .callout[data-callout="card"]; what only a widget has is on
+   winx-widget__*. */
 
 @use "../mixins" as *;
 
 :is(.dashboard, .kanban-board) {
-  .winx-stat-card {
-    @include row;
-    gap: $space-3xl;
-  }
-
-  .winx-icon-circle {
-    flex: 0 0 auto;
-    width: $deco;
-    height: $deco;
-    border-radius: $round;
-    @include center;
-    background: var(--winx-star-icon) center / contain no-repeat;
-  }
-
-  .winx-stat-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: $space-xs;
-  }
-
-  .winx-stat-text {
-    color: var(--winx-text-dark);
-    font-size: $text-xl;
-  }
-
-  .winx-progress-bar {
-    margin-top: $space-s;
-    height: 10px;
-    border-radius: $radius-s;
-    background: rgb(255 255 255 / 40%);
-    position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
-  }
-
-  .winx-progress-fill {
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      var(--winx-pink-deep),
-      var(--winx-gold),
-      var(--winx-pink-deep)
-    );
-    background-size: 200% 100%;
-    animation: winx-shimmer 3s linear infinite;
-    border-radius: $radius-s;
+  /* ── Card ─────────────────────────────────── */
+  .callout[data-callout="card"] {
     position: relative;
-  }
-
-  /* ── Date input — golden fairy-ticket style ── */
-  /* ── Daily note button ── */
-  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) > .winx-btn.winx-btn--pill) > .callout-content {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    flex-direction: row !important;
-    gap: $space-m;
-  }
-
-  .mb-input-type-date input,
-  .winx-btn.winx-btn--pill {
     background: linear-gradient(
       135deg,
       var(--winx-pink-light),
       var(--winx-pink)
     ) !important;
-    border: 1.5px solid var(--winx-gold) !important;
-    border-radius: $radius-m !important;
-    padding: $space-s $space-2xl !important;
-    color: var(--winx-gold-deep) !important;
-    font-family: "Cinzel", serif !important;
-    font-size: $text-xl !important;
-    letter-spacing: 1px !important;
-    box-shadow: 0 0 8px alpha(--winx-gold, 40%) !important;
-  }
+    border: 1px solid var(--winx-border) !important;
+    border-radius: $radius-xl !important;
+    overflow: visible !important;
+    padding: $space-xl;
+    transition:
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
 
-  .mb-input-type-date input {
-    &::-webkit-calendar-picker-indicator {
-      opacity: 0;
+    /* Wings sit behind all card content */
+    &::before,
+    &::after {
+      z-index: 0;
     }
-    &::-webkit-datetime-edit-text {
-      color: var(--winx-gold-deep) !important;
+    > * {
+      position: relative;
+      z-index: 1;
     }
-  }
 
-  .winx-btn.winx-btn--pill {
-    cursor: pointer;
-    transition: box-shadow 0.2s ease;
+    /* Wing pseudo-elements */
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: $deco;
+      height: $deco;
+      background: var(--winx-wing-svg) 0 0 / contain no-repeat;
+      pointer-events: none;
+    }
 
+    &::before {
+      top: $space-xs;
+      left: $space-xs;
+    }
+    &::after {
+      bottom: $space-xs;
+      right: $space-xs;
+      transform: scale(-1, -1);
+    }
+
+    /* Title */
+    > .callout-title {
+      justify-content: center !important;
+      font-family: "Cinzel", serif !important;
+      color: var(--winx-purple-deep) !important;
+      letter-spacing: 2px !important;
+      text-transform: uppercase !important;
+      font-size: $text-2xl !important;
+      padding-inline: 64px !important; /* room for wings */
+    }
+    /* a widget's button next to the title (the market's +): the pink glowing circle of the market's ✓ */
+    > .callout-title .winx-btn.winx-widget__add {
+      @include center;
+      flex-shrink: 0;
+      width: $btn-m;
+      height: $btn-m;
+      align-self: center;
+      margin: (-$space-xs) 0 (-$space-xs) $space-s;   /* centred on the title's line without making it taller */
+      padding: 0;
+      border: none;
+      border-radius: $round;
+      background: alpha(--winx-pink-deep, 85%);
+      box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
+      color: #fff;
+      font-family: var(--font-text);
+      font-size: $text-3xl;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    /* Hover glow */
     &:hover {
+      border-color: var(--winx-pink-deep);
       box-shadow:
-        0 0 16px alpha(--winx-gold, 70%),
-        0 0 8px alpha(--winx-pink-deep, 50%);
+        0 0 24px alpha(--winx-gold, 70%),
+        0 0 8px alpha(--winx-pink-deep, 60%);
+    }
+
+    /* Dataview error */
+    .dataview-error-box {
+      border-color: var(--winx-pink-deep);
+    }
+
+    /* Custom scrollbar */
+    > .callout-content {
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--winx-pink-deep) transparent;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          to bottom,
+          var(--winx-purple),
+          var(--winx-pink-deep)
+        );
+        border-radius: 99px;
+        border: 1px solid rgb(255 255 255 / 30%);
+      }
     }
   }
 }
 
-/* Pulse glow applied globally (not scoped to dashboard/kanban) */
-.winx-icon-circle {
-  animation: pulse-glow 2s infinite alternate;
+/* a hero card: no title */
+.callout[data-callout="card"][data-callout-metadata~="hero"] > .callout-title { display: none; }
+
+/* a ```winx block that draws its own card: the block's wrapper steps out of the layout, so the card sits in the
+   column like a "> [!card]" callout does */
+.block-language-winx:has(> .winx-widget) {
+  display: contents;
+}
+
+/* a card widget until its first draw */
+.winx-widget__skeleton {
+  height: 72px;
+  border-radius: $radius-l;
+  background: linear-gradient(90deg, rgb(255 255 255 / 25%) 25%, rgb(255 255 255 / 60%) 50%, rgb(255 255 255 / 25%) 75%);
+  background-size: 200% 100%;
+  animation: winx-shimmer 1.6s linear infinite;
 }
 
 /* Obsidian 1.13 sets --corner-shape: superellipse(1.33) on .mod-macos, and app.css
@@ -117,20 +146,3 @@
   corner-shape: round;
 }
 
-/* the phone: "✦ syncing" at the top while Remotely Save syncs, the star spinning (src/main.ts) */
-.winx-syncing {
-  position: fixed;
-  z-index: var(--layer-notice);
-  top: calc(env(safe-area-inset-top) + #{$space-xs});
-  left: 50%;
-  transform: translateX(-50%);
-  align-items: center;
-  gap: $space-xs;
-  padding: $space-2xs $space-l;
-  border-radius: $pill;
-  background: alpha(--winx-pink-deep, 85%);
-  box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%);
-  color: #fff;
-  font-size: $text-m;
-  span { animation: winx-spin 1.2s linear infinite; }
-}
