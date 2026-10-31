@@ -1,0 +1,53 @@
+/* Finance widget (02 Areas/Finance.md): month summary, categories, 6-month trend, latest operations.
+   Only --winx-* tokens, so re-theming carries through. */
+
+@use "../mixins" as *;
+.winx-fin { display: flex; flex-direction: column; gap: $space-2xl; font-size: $text-xl; }
+.winx-fin-head { @include row; justify-content: space-between; gap: $space-m; }
+.winx-fin-month { font-weight: 600; letter-spacing: .02em; color: var(--winx-text-dark); }
+.winx-fin-nav { display: flex; gap: $space-xs; }
+.winx-fin-nav button {
+  all: unset; cursor: pointer; padding: $space-2xs 9px; border-radius: 8px; line-height: 1.5;
+  background: alpha(--winx-purple, 18%); color: var(--winx-text-dark);
+}
+.winx-fin-nav button:hover { background: alpha(--winx-pink, 32%); }
+.winx-fin-nav button[disabled] { opacity: .3; cursor: default; }
+
+.winx-fin-totals { display: flex; gap: $space-l; }
+.winx-fin-total {
+  flex: 1; padding: $space-m $space-l; border-radius: $radius-l; text-align: center;
+  background: alpha(--winx-purple, 12%);
+}
+.winx-fin-total span { display: block; font-size: $text-s; opacity: .7; margin-bottom: $space-2xs; }
+.winx-fin-total b { font-size: $text-2xl; font-weight: 600; }
+.winx-fin-total.is-neg b { color: var(--winx-pink-deep); }
+.winx-fin-total.is-pos b { color: var(--winx-gold-deep); }
+
+.winx-fin-section { font-size: $text-s; text-transform: uppercase; letter-spacing: .08em; opacity: .65; }
+.winx-fin-rows { display: flex; flex-direction: column; gap: $space-s; }
+.winx-fin-row { display: grid; grid-template-columns: 1fr auto; gap: $space-2xs $space-m; }
+.winx-fin-row .amt { font-variant-numeric: tabular-nums; }
+.winx-fin-row .over { color: var(--winx-pink-deep); font-weight: 600; }
+.winx-fin-track {
+  grid-column: 1 / -1; height: 8px; border-radius: 5px; overflow: hidden;
+  background: alpha(--winx-purple, 14%);
+}
+.winx-fin-fill { height: 100%; border-radius: 5px; transition: width .3s ease; }
+
+.winx-fin-trend { display: flex; align-items: flex-end; gap: $space-s; height: 78px; }
+.winx-fin-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: $space-xs; height: 100%; }
+.winx-fin-bar .col { width: 100%; margin-top: auto; border-radius: 5px 5px 0 0;
+  background: linear-gradient(to top, var(--winx-purple), var(--winx-pink)); }
+.winx-fin-bar.is-current .col { background: linear-gradient(to top, var(--winx-gold-deep), var(--winx-gold)); }
+.winx-fin-bar small { font-size: $text-xs; opacity: .7; }
+
+.winx-fin-list { display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; }
+.winx-fin-item { display: grid; grid-template-columns: auto 1fr auto; gap: $space-m; align-items: baseline; }
+.winx-fin-item .d { opacity: .55; font-variant-numeric: tabular-nums; }
+.winx-fin-item .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.winx-fin-item .a { font-variant-numeric: tabular-nums; opacity: .85; }
+.winx-fin-empty { opacity: .6; font-style: italic; }
+    
+
+/* the dashboard's Finance card (FinanceMonth): this month on one line, the link under it */
+.winx-fin-month { display: grid; gap: $space-s; justify-items: start; color: var(--winx-text-dark); b { color: var(--winx-purple-deep); } }

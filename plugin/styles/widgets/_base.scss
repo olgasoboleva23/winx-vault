@@ -1,0 +1,136 @@
+/* ============================================
+ * WINX THEME — Widgets
+ * File: widgets.css
+ *
+ * --winx-star-icon token → winx-assets.css
+ * @keyframes winx-shimmer, pulse-glow → winx-animations.css
+ * ============================================ */
+
+@use "../mixins" as *;
+
+:is(.dashboard, .kanban-board) {
+  .winx-stat-card {
+    @include row;
+    gap: $space-3xl;
+  }
+
+  .winx-icon-circle {
+    flex: 0 0 auto;
+    width: $deco;
+    height: $deco;
+    border-radius: $round;
+    @include center;
+    background: var(--winx-star-icon) center / contain no-repeat;
+  }
+
+  .winx-stat-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+  }
+
+  .winx-stat-text {
+    color: var(--winx-text-dark);
+    font-size: $text-xl;
+  }
+
+  .winx-progress-bar {
+    margin-top: $space-s;
+    height: 10px;
+    border-radius: $radius-s;
+    background: rgb(255 255 255 / 40%);
+    position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
+  }
+
+  .winx-progress-fill {
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      var(--winx-pink-deep),
+      var(--winx-gold),
+      var(--winx-pink-deep)
+    );
+    background-size: 200% 100%;
+    animation: winx-shimmer 3s linear infinite;
+    border-radius: $radius-s;
+    position: relative;
+  }
+
+  /* ── Date input — golden fairy-ticket style ── */
+  /* ── Daily note button ── */
+  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) > .winx-btn.pill) > .callout-content {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row !important;
+    gap: $space-m;
+  }
+
+  .mb-input-type-date input,
+  .winx-btn.pill {
+    background: linear-gradient(
+      135deg,
+      var(--winx-pink-light),
+      var(--winx-pink)
+    ) !important;
+    border: 1.5px solid var(--winx-gold) !important;
+    border-radius: $radius-m !important;
+    padding: $space-s $space-2xl !important;
+    color: var(--winx-gold-deep) !important;
+    font-family: "Cinzel", serif !important;
+    font-size: $text-xl !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 0 8px alpha(--winx-gold, 40%) !important;
+  }
+
+  .mb-input-type-date input {
+    &::-webkit-calendar-picker-indicator {
+      opacity: 0;
+    }
+    &::-webkit-datetime-edit-text {
+      color: var(--winx-gold-deep) !important;
+    }
+  }
+
+  .winx-btn.pill {
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow:
+        0 0 16px alpha(--winx-gold, 70%),
+        0 0 8px alpha(--winx-pink-deep, 50%);
+    }
+  }
+}
+
+/* Pulse glow applied globally (not scoped to dashboard/kanban) */
+.winx-icon-circle {
+  animation: pulse-glow 2s infinite alternate;
+}
+
+/* Obsidian 1.13 sets --corner-shape: superellipse(1.33) on .mod-macos, and app.css
+   applies it to every <button>/<input> — which turns our round controls into
+   squircles. Pin the shape back for anything inside a winx widget. */
+:is(.dashboard, .kanban-board, .winx-pomodoro, .winx-shop) :is(button, input) {
+  corner-shape: round;
+}
+
+/* the phone: "✦ syncing" at the top while Remotely Save syncs, the star spinning (src/main.ts) */
+.winx-syncing {
+  position: fixed;
+  z-index: var(--layer-notice);
+  top: calc(env(safe-area-inset-top) + #{$space-xs});
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  gap: $space-xs;
+  padding: $space-2xs $space-l;
+  border-radius: $pill;
+  background: alpha(--winx-pink-deep, 85%);
+  box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%);
+  color: #fff;
+  font-size: $text-m;
+  span { animation: winx-spin 1.2s linear infinite; }
+}

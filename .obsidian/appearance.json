@@ -1,21 +1,6 @@
 {
   "textFontFamily": "JetBrains Mono",
   "interfaceFontFamily": "JetBrains Mono",
-  "enabledCssSnippets": [
-    "winx-animations",
-    "winx-assets",
-    "winx-callout-grid",
-    "winx-cards",
-    "winx-fonts",
-    "winx-heatmap",
-    "winx-kanban",
-    "winx-layout",
-    "winx-pomodoro",
-    "winx-tasks-minimal",
-    "winx-tokens",
-    "winx-widgets",
-    "winx-shop",
-    "winx-celestial-market"
-  ],
+  "enabledCssSnippets": [],
   "theme": "obsidian"
 }

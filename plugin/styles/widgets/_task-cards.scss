@@ -1,0 +1,46 @@
+/* ── Task cards (calendar backlog) ── */
+
+@use "../mixins" as *;
+.winx-board-card {
+  position: relative;
+  padding: 7px $space-m;
+  border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
+  color: var(--winx-text-dark);
+  cursor: grab;
+  transition: background 0.15s ease;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: fade(white, 35%); border-radius: $radius-m; }
+  &.dragging { opacity: 0.4; }
+}
+.winx-board-text { font-size: $text-xl; line-height: 1.35; }
+.winx-board-meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
+
+/* round buttons on a task: ⏭ ✏️ 🗑 */
+:is(.winx-board-backlog, .winx-cal) .winx-board-btns {
+  display: flex;
+  gap: $space-xs;
+}
+body:not(.is-mobile) :is(.winx-board-backlog, .winx-cal) .winx-board-btns {
+  position: absolute;
+  right: $space-xs;
+  top: 50%;
+  translate: 0 -50%;
+  padding-left: 18px;
+  background: linear-gradient(90deg, transparent, var(--winx-pink-light) 18px);
+  border-radius: $pill;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+body:not(.is-mobile) :is(.winx-board-card, .winx-cal-task, .winx-yesterday-row):hover .winx-board-btns { opacity: 1; pointer-events: auto; }
+body.is-mobile :is(.winx-board-backlog, .winx-cal) .winx-board-btns { margin-top: $space-s; }
+:is(.winx-board-backlog, .winx-cal) .winx-board-btns button.winx-board-del.armed {
+  width: auto;
+  padding: 0 $space-m;
+  border-color: #d0457a;
+  background: #d0457a;
+  color: #fff;
+  font-size: $text-m;
+}
+.winx-board-backlog { margin-top: $space-xl; }
