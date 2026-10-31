@@ -1,7 +1,8 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, Platform, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import layout from "./layout.md";
 import { addDays, todayYmd } from "../core/dates.js";
-import { busyPill, dimOnWrite } from "../uikit/busy.js";
+import { busyPill } from "../uikit/busy.js";
+import { useActions, useBusy, useNewDay } from "../core/use.js";
 import { Button } from "../uikit/button.js";
 import { html } from "../core/html.js";
 
@@ -90,27 +91,27 @@ export class DashboardView extends ItemView {
     MarkdownRenderer.render(this.app, QUESTS.replaceAll("{{date}}", this.shownDate), slot, "", this.questsPart);
   }
 
+  private on: Record<string, (e: Event, el: HTMLElement) => any> = {
+    date: (e, el) => this.go((el as HTMLInputElement).value || null),   // emptied (the phone's "Reset"): today
+    prev: () => this.go(addDays(this.shownDate, -1)),
+    next: () => this.go(addDays(this.shownDate, 1)),
+    today: () => this.go(null),
+    calendar: () => (this.app as any).commands.executeCommandById("winx:open-calendar"),
+  };
+
   private listen() {
     const el = this.contentEl;
-    this.registerDomEvent(el, "change", e => {
-      const t = e.target as HTMLInputElement;
-      if (t.dataset.action === "date") this.go(t.value || null);   // emptied (the phone's "Reset"): today
-    });
+    // the date row's own actions (the widgets in the cards handle theirs)
+    useActions(this, el, (name: string, target: HTMLElement) => target.closest(".winx-dash__date") ? this.on[name] : null);
+    // [[links]] in the layout open their note, as in a note (Cmd/Ctrl: a new tab)
     this.registerDomEvent(el, "click", e => {
-      const t = e.target as HTMLElement;
-      const act = t.closest?.(".winx-dash__date [data-action]") as HTMLElement | null;
-      if (act?.dataset.action === "prev") return this.go(addDays(this.shownDate, -1));
-      if (act?.dataset.action === "next") return this.go(addDays(this.shownDate, 1));
-      if (act?.dataset.action === "today") return this.go(null);
-      if (act?.dataset.action === "calendar") return (this.app as any).commands.executeCommandById("winx:open-calendar");
-      // [[links]] in the layout open their note, as in a note (Cmd/Ctrl: a new tab)
-      const link = t.closest?.("a.internal-link[data-href]") as HTMLAnchorElement | null;
+      const link = (e.target as HTMLElement).closest?.("a.internal-link[data-href]") as HTMLAnchorElement | null;
       if (link) { e.preventDefault(); this.app.workspace.openLinkText(link.dataset.href!, "", Keymap.isModEvent(e)); }
     });
     // a write to the tasks or the data: dim with the ✦ pill until a widget draws again
-    dimOnWrite(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el, "winx-dash--busy");
+    useBusy(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el, "winx-dash--busy");
     this.registerDomEvent(el, "winx-drawn" as any, () => window.setTimeout(() => el.removeClass("winx-dash--busy"), 200));
     // following today: a new day moves the dashboard on
-    this.registerInterval(window.setInterval(() => { if (!this.date && this.shownDate !== todayYmd()) this.go(null); }, 60_000));
+    useNewDay(this, () => { if (!this.date) this.go(null); });
   }
 }

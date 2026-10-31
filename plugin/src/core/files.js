@@ -22,3 +22,6 @@ export async function appendLine(path, line, { header = "", unique = false } = {
   if (folder && !app.vault.getFolderByPath(folder)) await app.vault.createFolder(folder);
   await app.vault.create(path, `${header}${line}\n`);
 }
+
+// a JSON file (by the adapter: any file, not only notes), parsed; `fallback` when it's missing or not JSON
+export const readJson = (path, fallback = null) => app.vault.adapter.read(path).then(JSON.parse).catch(() => fallback);

@@ -15,7 +15,8 @@
 import { MarkdownRenderChild, debounce, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../uikit/card.js";
 import { html } from "../core/html.js";
-import { actionOf } from "./parse.js";
+import { useActions, useRedraw } from "../core/use.js";
+import { dataview } from "../core/plugins.js";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
 
@@ -28,7 +29,6 @@ export class Widget extends MarkdownRenderChild {
     this.args = args;
     this.on = {};
     this.kept = [];
-    this.stale = false;
   }
 
   async data() { return {}; }
@@ -36,7 +36,7 @@ export class Widget extends MarkdownRenderChild {
   after(root, data) {}
 
   get dv() {
-    const api = this.app.plugins.plugins.dataview?.api;
+    const api = dataview();
     return api && {
       pages: q => api.pages(q, this.sourcePath),
       page: p => api.page(p, this.sourcePath),
@@ -55,14 +55,10 @@ export class Widget extends MarkdownRenderChild {
   keep(thing) { this.kept.push(thing); return thing; }
 
   async onload() {
-    const act = e => {
-      const el = actionOf(e.type, e.target, this.containerEl);
-      const fn = el && (this.on[el.dataset.action] ?? (el.dataset.action === "open" && el.dataset.path ? () => this.app.workspace.openLinkText(el.dataset.path, this.sourcePath) : null));
-      if (!fn) return;
-      if (e.type === "submit") e.preventDefault();
-      fn.call(this, e, el);
-    };
-    for (const type of ["click", "change", "submit"]) this.registerDomEvent(this.containerEl, type, act);
+    useActions(this, this.containerEl, (name, el) => this.on[name]?.bind(this)
+      ?? (name === "open" && el.dataset.path ? () => this.app.workspace.openLinkText(el.dataset.path, this.sourcePath) : null), ["click", "change", "submit"]);
+    // drawn now, or once it shows and nobody is typing in it
+    ({ redraw: this.redraw, catchUp: this.catchUp } = useRedraw(this, () => this.shown && !this.typing, () => this.draw()));
     // after leaving a field: a moment later, so a click on the widget's own button (which takes the focus) lands first
     const left = debounce(() => this.catchUp(), 500, true), later = debounce(() => this.redraw(), DELAY, true);
     this.registerDomEvent(this.containerEl, "focusout", left);
@@ -72,12 +68,10 @@ export class Widget extends MarkdownRenderChild {
       // the dashboard tab's date changed: drawn again in place, at once
       this.registerEvent(this.app.workspace.on("winx:date", () => this.containerEl.closest("[data-date]") && this.redraw()));
     }
-    this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
-    this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));
     this.register(() => { left.cancel(); later.cancel(); this.drop(); });
     this.skeleton();
     // a cold start: Dataview reads the vault after the notes open; draw once it has
-    const api = this.app.plugins.plugins.dataview?.api;
+    const api = dataview();
     if (api && !api.index?.initialized && this.constructor.followsChanges) {
       this.registerEvent(this.app.metadataCache.on("dataview:index-ready", () => this.draw()));
       return;
@@ -85,9 +79,6 @@ export class Widget extends MarkdownRenderChild {
     await this.draw();
   }
 
-  // drawn now, or once it shows and nobody is typing in it
-  redraw() { this.shown && !this.typing ? this.draw() : (this.stale = true); }
-  catchUp() { if (this.stale) this.redraw(); }
   // on screen: a card widget's block has no box of its own (display: contents), so ask the card
   get shown() { return (this.containerEl.firstElementChild ?? this.containerEl).isShown(); }
   get typing() { return this.containerEl.contains(document.activeElement) && document.activeElement.matches("input, textarea, select"); }
@@ -105,7 +96,6 @@ export class Widget extends MarkdownRenderChild {
   drop() { for (const k of this.kept.splice(0)) k?.destroy?.(); }
 
   async draw() {
-    this.stale = false;
     const data = await this.data();
     this.drop();
     const restore = this.keepTyped();

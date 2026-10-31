@@ -3,10 +3,11 @@ import { Search } from "../uikit/search.ts";
 import config from "../core/config.js";
 import { dm } from "../core/dates.js";
 import { findChoices } from "../core/find.js";
+import { dataview } from "../core/plugins.js";
 import { taskChoices } from "./task.js";
 
 export function pickTask() {
-  const lists = app.plugins.plugins.dataview.api.pages('"02 Areas/Personal/Tasks"').file.lists.array();
+  const lists = dataview().pages('"02 Areas/Personal/Tasks"').file.lists.array();
   const choices = taskChoices(lists.map(l => l.task ? `- [${l.status}] ${l.text}` : `- ${l.text}`), config.areas.map(a => a.tag));
   const label = area => area ? `${config.areaIcons[area] ?? "✦"} ${config.areaMap[area] ?? area.slice(6)}` : "✦ other";
   const find = q => findChoices(choices, q).map((c, i, all) => ({ ...c, header: !c.isNew && (i === 0 || c.area !== all[i - 1].area) }));

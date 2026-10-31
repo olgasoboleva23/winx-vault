@@ -5,6 +5,8 @@ import { html } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { dm } from "../core/dates.js";
 import { NoteLink } from "../uikit/noteLink.js";
+import { money } from "../core/format.js";
+import { readJson } from "../core/files.js";
 
 const LEDGER = "02 Areas/Finance/Ledger";
 const RULES = "02 Areas/Finance/rules.json";
@@ -13,7 +15,6 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const MONTHS_SHORT = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 // palette cycled across categories, in winx token order
 const PALETTE = ["--winx-pink", "--winx-gold", "--winx-purple", "--winx-lavender", "--winx-blue", "--winx-pink-deep", "--winx-gold-deep", "--winx-purple-light"];
-export const money = n => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(Math.round(n)) + " ₽";
 
 // transfers move money between your own accounts or split bills: kept in the ledger, not spending or income
 function summarize(rows) {
@@ -33,9 +34,7 @@ export class Finance extends Widget {
     next: () => { this.current = this.months[this.months.indexOf(this.current) + 1]; this.draw(); },
   };
 
-  async loadRules() {
-    try { return JSON.parse(await this.app.vault.adapter.read(RULES)); } catch { return { budgets: {} }; }
-  }
+  loadRules() { return readJson(RULES, { budgets: {} }); }
   // the pipe tables themselves (no Dataview fields), so a hand-added cash row works like an imported one
   async loadLedger() {
     const listing = await this.app.vault.adapter.list(LEDGER).catch(() => null);

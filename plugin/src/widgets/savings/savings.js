@@ -7,7 +7,7 @@ import { dm, todayYmd, weekday } from "../../core/dates.js";
 import { edit } from "../../core/files.js";
 import { Button } from "../../uikit/button.js";
 import { Empty } from "../../uikit/empty.js";
-import { money } from "../finance.js";
+import { money } from "../../core/format.js";
 import { SavingsJar } from "./savingsJar.js";
 
 const FOLDER = "00 System/Data/Savings";

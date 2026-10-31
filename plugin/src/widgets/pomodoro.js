@@ -4,6 +4,7 @@
 import { html, raw } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { todayYmd } from "../core/dates.js";
+import { readJson } from "../core/files.js";
 import { AudioEngine } from "../core/sounds.js";
 
 const PATH = "00 System/Data/pomodoro.json";
@@ -20,7 +21,7 @@ const ICON = {
 // the running session: { sessionType, baseElapsed, startedAt }, in memory only (gone after a restart or a reload)
 let live = null;
 
-const load = async () => { try { return JSON.parse(await app.vault.adapter.read(PATH)); } catch { return {}; } };
+const load = () => readJson(PATH, {});
 
 // focus or break and its time: a stopped session counts `elapsed` (ms), a running one also the time since `start`
 class Timer {
