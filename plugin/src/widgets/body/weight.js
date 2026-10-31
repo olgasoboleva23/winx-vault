@@ -58,7 +58,7 @@ export class Weight extends Widget {
   }
   view(d) {
     const toggle = d.log ? html`<div class="winx-weight__modes">${new Button({ text: "⚖️ weight", kind: "toggle", on: this.mode === "weight", action: "mode", data: { mode: "weight" } })}${new Button({ text: String(d.log.name ?? "log"), kind: "toggle", on: this.mode === "log", action: "mode", data: { mode: "log" } })}</div>` : "";
-    return this.mode === "log" && d.log ? html`<div class="winx-weight">${toggle}${this.logView(d)}</div>` : html`<div class="winx-weight">${toggle}${this.weightView(d)}</div>`;
+    return html`<div class="winx-weight">${toggle}${this.mode === "log" && d.log ? this.logView(d) : this.weightView(d)}</div>`;
   }
   weightView({ missing, last, delta }) {
     if (missing) return new Missing({ path: PATH });

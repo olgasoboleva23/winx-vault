@@ -28,8 +28,6 @@
   }
 
   .winx-pomodoro__ring {
-    --p: 0;
-
     width: 180px;
     height: 180px;
     border-radius: $round;
@@ -96,7 +94,7 @@
       bottom: -20px;
       @include center;
       gap: $space-xl;
-      margin-top: -10px;
+      margin-top: -10px;   /* with bottom: -20px it still lifts the row: keep */
 
       .winx-pomodoro__btn {
         border-radius: $round;
@@ -106,10 +104,10 @@
         place-items: center;
         cursor: pointer;
         padding: 0;
+        transition: transform 0.15s ease;   /* both ways: grows on hover, shrinks back */
 
         &:hover {
           transform: scale(1.05);
-          transition: 0.15s ease;
         }
 
         svg {
@@ -259,7 +257,6 @@
     width: 22px;
     min-width: 22px;
     height: 22px;
-    aspect-ratio: 1 / 1;
     border-radius: $round;
     border: 1px solid var(--winx-border);
     background: transparent;
@@ -269,7 +266,6 @@
     opacity: 0.5;
     padding: 0;
     transition: opacity 0.15s ease;
-    box-sizing: border-box;
 
     svg {
       width: 12px;

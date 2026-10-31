@@ -8,13 +8,10 @@
 }
 .winx-dash__quests { display: contents; }   /* the Tasks query sits in the card as it did in the note */
 /* the date row and the ✦ Open button of the daily note side by side in their column */
-:is(.dashboard, .kanban-board) {
-  .callout[data-callout="col"]:has(> .callout-content > :is(.block-language-dataviewjs, .block-language-winx) > .winx-btn.winx-btn--pill) > .callout-content {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    flex-direction: row !important;
-    gap: $space-m;
-  }
-
+.dashboard .callout[data-callout="col"]:has(> .callout-content > .block-language-winx > .winx-btn--pill) > .callout-content {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row !important;
+  gap: $space-m;
 }
