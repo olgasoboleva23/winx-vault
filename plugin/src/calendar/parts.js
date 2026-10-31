@@ -54,7 +54,7 @@ export class Header extends Part {
   balance() {
     const { areas } = this.ctx.config, b = (this.ctx.everything ?? this.ctx.model).balance(areas.map(a => a.tag)), picked = this.view.area;
     const name = tag => areas.find(a => a.tag === tag).label, has = b.filter(x => x.planned), none = b.filter(x => !x.planned);
-    return html`<div class="winx-cal-balance"${PART("header")}><div class="winx-balance-bar${picked ? " picked" : ""}">${has.map(x => html`<div class="${x.area === picked ? "on" : ""}" data-area="${x.area.slice(6)}" data-action="area" style="flex: ${x.planned}" title="${name(x.area)}: ${x.done} of ${x.planned} done"><span>${name(x.area).split(" ")[0]} ${x.done}/${x.planned}</span><b><i style="width: ${Math.round(x.done / x.planned * 100)}%"></i></b></div>`)}</div>${none.length ? html`<div class="winx-balance-none" title="nothing this week">${none.map(x => html`<span title="${name(x.area)}: nothing this week">${name(x.area).split(" ")[0]}</span>`)}</div>` : ""}</div>`;
+    return html`<div class="winx-cal__balance"${PART("header")}><div class="winx-cal__balance-bar${picked ? " winx-cal__balance-bar--picked" : ""}">${has.map(x => html`<div class="winx-cal__area${x.area === picked ? " winx-cal__area--on" : ""}" data-area="${x.area.slice(6)}" data-action="area" style="flex: ${x.planned}" title="${name(x.area)}: ${x.done} of ${x.planned} done"><span class="winx-cal__area-label">${name(x.area).split(" ")[0]} ${x.done}/${x.planned}</span><b class="winx-cal__area-track"><i class="winx-cal__area-fill" style="width: ${Math.round(x.done / x.planned * 100)}%"></i></b></div>`)}</div>${none.length ? html`<div class="winx-cal__balance-none" title="nothing this week">${none.map(x => html`<span title="${name(x.area)}: nothing this week">${name(x.area).split(" ")[0]}</span>`)}</div>` : ""}</div>`;
   }
   routineDays() { return this.ctx.days.filter(d => this.ctx.model.byDay[d].some(e => T(e.t).isRecurring)); }
   render() {
@@ -62,7 +62,7 @@ export class Header extends Part {
     // while dragging, a bar of 7 days sticks to the top: the shown week, or in the month view the next 7 days
     const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
     const other = view === "week" ? "month" : "week";
-    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button>${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}${new Button({ text: "✦", title: "dashboard", kind: "chip", cls: "winx-cal-to-dash winx-phone-only", action: "dashboard" })}</div><div class="winx-cal-nav"${PART("header")}>${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}<span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span>${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${days.includes(today) ? "" : new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" })}${new Button({ text: view, kind: "chip", title: `switch to the ${other} view`, action: "switchView" })}${new Button({ text: "✓ done", kind: "toggle", on: state.showDone, action: "showDone" })}${new Button({ text: "🔁 repeats", kind: "toggle", title: "unfold / fold every day's 🔁 box", action: "repeats" })}</div>${view === "week" ? this.balance() : ""}`;
+    return html`<div class="winx-cal__dropbar"${PART("header")}><div class="winx-cal__dropbar-in">${chips.map(d => html`<div class="winx-cal__chip${d === today ? " winx-cal__chip--today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal__top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal__mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button>${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}${new Button({ text: "✦", title: "dashboard", kind: "chip", cls: "winx-cal__to-dash winx-phone-only", action: "dashboard" })}</div><div class="winx-nav"${PART("header")}>${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}<span class="winx-nav__title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span>${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${days.includes(today) ? "" : new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" })}${new Button({ text: view, kind: "chip", title: `switch to the ${other} view`, action: "switchView" })}${new Button({ text: "✓ done", kind: "toggle", on: state.showDone, action: "showDone" })}${new Button({ text: "🔁 repeats", kind: "toggle", title: "unfold / fold every day's 🔁 box", action: "repeats" })}</div>${view === "week" ? this.balance() : ""}`;
   }
   // after the grid: the repeats button lit while every routine day is unfolded
   mount(root) {
@@ -79,18 +79,18 @@ export class Missed extends Part {
     missedToday: (e, el) => this.act(el, this.sounds.today, t => this.view.actions.toToday(t)),
   };
   async act(el, sound, write) {
-    const row = el.closest(".winx-yesterday-row"), box = row.parentElement, t = this.view.taskOf(row);
+    const row = el.closest(".winx-missed__row"), box = row.parentElement, t = this.view.taskOf(row);
     if (!t) return;
     row.remove();
-    if (!box.querySelector(".winx-yesterday-row")) box.remove();
+    if (!box.querySelector(".winx-missed__row")) box.remove();
     sound.play({ gain: 0.25 });
     await write(t);
   }
   render() {
     const { days, today, model: { missed } } = this.ctx;
     if (!days.includes(today) || !missed.length) return html``;
-    const row = t => { const task = this.view.info(t); return html`<div class="winx-yesterday-row"${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"><span>${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span><div class="winx-board-btns">${new TaskButtons({ task })}</div><em>${dm(T(t).date)}</em>${this.ctx.TASKS ? new Button({ icon: "✓", title: `done on ${T(t).date}`, action: "missedDone" }) : ""}${new Button({ icon: "☀️", title: "move to today", action: "missedToday" })}</div>`; };
-    return html`<div class="winx-yesterday"${PART("missed")}><div class="winx-yesterday-head">Missed?</div>${missed.map(row)}</div>`;
+    const row = t => { const task = this.view.info(t); return html`<div class="winx-missed__row"${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"><span class="winx-missed__text">${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span><div class="winx-task-btns">${new TaskButtons({ task })}</div><em class="winx-missed__date">${dm(T(t).date)}</em>${this.ctx.TASKS ? new Button({ icon: "✓", title: `done on ${T(t).date}`, action: "missedDone" }) : ""}${new Button({ icon: "☀️", title: "move to today", action: "missedToday" })}</div>`; };
+    return html`<div class="winx-missed"${PART("missed")}><div class="winx-missed__head">Missed?</div>${missed.map(row)}</div>`;
   }
 }
 
@@ -100,23 +100,23 @@ export class Grid extends Part {
   on = {
     // a click on the box's edge, its pill or a group heading folds / unfolds the day (not a task in it)
     fold: (e, box) => {
-      if (!e.target.matches(".winx-cal-routine, .winx-cal-routine-pill, .winx-cal-routine-pill *, .winx-cal-routine-time")) return;
+      if (!e.target.matches(".winx-cal__routine, .winx-cal__routine-pill, .winx-cal__routine-pill *, .winx-cal__routine-time")) return;
       const d = box.dataset.day, u = this.ctx.unfolded;
       u.has(d) ? u.delete(d) : u.add(d);
       this.ctx.saveUnfolded(); this.show(box); this.ctx.syncRepeats();
     },
     // month: a click on the day's number or empty space opens its week; on the phone it picks the day shown under the grid
     day: (e, cell) => {
-      if (!(e.target === cell || e.target.matches(".winx-cal-num, .winx-cal-marks, .winx-cal-marks *, .winx-cal-dots, .winx-cal-dots *"))) return;
+      if (!(e.target === cell || e.target.matches(".winx-cal__num, .winx-cal__marks, .winx-cal__marks *, .winx-cal__dots, .winx-cal__dots *"))) return;
       if (Platform.isMobile) { this.view.picked = cell.dataset.day; return this.ctx.set({}, ["grid"]); }
       this.ctx.set({ date: dateFor(cell.dataset.day, "week", this.ctx.today), view: "week" }, ["header", "missed", "grid"]);
     },
   };
   show(box) {
     const open = this.ctx.unfolded.has(box.dataset.day);
-    box.classList.toggle("open", open);
-    box.querySelector(".winx-cal-routine-list").toggle(open);
-    box.querySelector(".winx-cal-routine-pill").toggle(!open);
+    box.classList.toggle("winx-cal__routine--open", open);
+    box.querySelector(".winx-cal__routine-list").toggle(open);
+    box.querySelector(".winx-cal__routine-pill").toggle(!open);
   }
   fill(d, compact) {
     const { model, shown, TASKS } = this.ctx;
@@ -124,32 +124,32 @@ export class Grid extends Part {
     const row = e => new TaskRow({ task: this.view.info(e.t), kind: e.kind, compact, tick: !!TASKS });
     const groups = TIMES.map(([tag, name]) => [name, routine.filter(e => T(e.t).time === tag || (!tag && !TIMES.some(([g]) => g && T(e.t).time === g)))]).filter(([, es]) => es.length);
     const hidden = all.filter(e => e.kind === "done" && !shown.done && !routine.includes(e));
-    return html`${all.filter(e => shown[e.kind] && !routine.includes(e)).map(row)}${routine.length ? html`<div class="winx-cal-routine" data-action="fold" data-day="${d}"><div class="winx-cal-routine-pill" title="${routine.map(e => this.view.info(e.t).label).join("\n")}"><span>🔁 ${routine.filter(e => e.kind === "done").length}/${routine.length}</span></div><div class="winx-cal-routine-list">${groups.map(([name, es]) => html`<div class="winx-cal-routine-time">${name}</div>${es.map(row)}`)}</div></div>` : ""}${hidden.length ? html`<div class="winx-cal-marks"><span title="${hidden.map(e => this.view.info(e.t).label).join("\n")}">✓${hidden.length}</span></div>` : ""}`;
+    return html`${all.filter(e => shown[e.kind] && !routine.includes(e)).map(row)}${routine.length ? html`<div class="winx-cal__routine" data-action="fold" data-day="${d}"><div class="winx-cal__routine-pill" title="${routine.map(e => this.view.info(e.t).label).join("\n")}"><span>🔁 ${routine.filter(e => e.kind === "done").length}/${routine.length}</span></div><div class="winx-cal__routine-list">${groups.map(([name, es]) => html`<div class="winx-cal__routine-time">${name}</div>${es.map(row)}`)}</div></div>` : ""}${hidden.length ? html`<div class="winx-cal__marks"><span title="${hidden.map(e => this.view.info(e.t).label).join("\n")}">✓${hidden.length}</span></div>` : ""}`;
   }
   zones(d) {
-    return html`<div class="winx-cal-zones">${d <= this.ctx.today ? html`<div class="winx-cal-zone done" data-drop="${d}" data-done="1">✓</div>` : ""}<div class="winx-cal-zone plan" data-drop="${d}">📅 ${M(d).format("D MMM")}</div></div>`;
+    return html`<div class="winx-cal__zones">${d <= this.ctx.today ? html`<div class="winx-cal__zone winx-cal__zone--done" data-drop="${d}" data-done="1">✓</div>` : ""}<div class="winx-cal__zone winx-cal__zone--plan" data-drop="${d}">📅 ${M(d).format("D MMM")}</div></div>`;
   }
   // the phone's month cell: a dot per task (open pink, done gold), 3 at most and "+N"
   dots(d) {
     const es = this.ctx.model.byDay[d].filter(e => e.kind !== "ghost" && this.ctx.shown[e.kind]);
-    return html`<div class="winx-cal-dots">${es.slice(0, 3).map(e => html`<i class="${e.kind}"></i>`)}${es.length > 3 ? html`<span>+${es.length - 3}</span>` : ""}</div>`;
+    return html`<div class="winx-cal__dots">${es.slice(0, 3).map(e => html`<i class="winx-cal__dot winx-cal__dot--${e.kind}"></i>`)}${es.length > 3 ? html`<span class="winx-cal__dots-more">+${es.length - 3}</span>` : ""}</div>`;
   }
   // the phone's month: the grid with dots, the picked day (today, or the month's first) as a day card under it
   phoneMonth() {
     const { days, today, base } = this.ctx;
     const picked = days.includes(this.view.picked) ? this.view.picked : days.includes(today) && today.slice(0, 7) === base.slice(0, 7) ? today : base.slice(0, 8) + "01";
-    return html`<div class="winx-cal-phone-month"${PART("grid")}><div class="winx-cal-month">${days.slice(0, 7).map(d => html`<div class="winx-cal-wd">${M(d).format("dd")}</div>`)}${days.map(d => html`<div class="winx-cal-cell${d === today ? " today" : ""}${d === picked ? " picked" : ""}${d.slice(0, 7) !== base.slice(0, 7) ? " outside" : ""}" data-action="day" data-day="${d}"><div class="winx-cal-num">${String(+d.slice(8))}</div>${this.dots(d)}${this.zones(d)}</div>`)}</div>
-      <div class="winx-cal-day${picked === today ? " today" : ""}"><div class="winx-cal-head">${M(picked).format("dddd D MMMM")}</div>${this.fill(picked, false)}${this.zones(picked)}</div></div>`;
+    return html`<div class="winx-cal__phone-month"${PART("grid")}><div class="winx-cal__month">${days.slice(0, 7).map(d => html`<div class="winx-cal__weekday">${M(d).format("dd")}</div>`)}${days.map(d => html`<div class="winx-cal__cell${d === today ? " winx-cal__cell--today" : ""}${d === picked ? " winx-cal__cell--picked" : ""}${d.slice(0, 7) !== base.slice(0, 7) ? " winx-cal__cell--outside" : ""}" data-action="day" data-day="${d}"><div class="winx-cal__num">${String(+d.slice(8))}</div>${this.dots(d)}${this.zones(d)}</div>`)}</div>
+      <div class="winx-cal__day${picked === today ? " winx-cal__day--today" : ""}"><div class="winx-cal__head">${M(picked).format("dddd D MMMM")}</div>${this.fill(picked, false)}${this.zones(picked)}</div></div>`;
   }
   render() {
     const { days, today, base, view } = this.ctx;
     if (view === "month" && Platform.isMobile) return this.phoneMonth();
-    if (view === "week") return html`<div class="winx-cal-week"${PART("grid")}>${days.map(d => html`<div class="winx-cal-day${d === today ? " today" : ""}"><div class="winx-cal-head">${M(d).format("ddd D")}</div>${this.fill(d, false)}${this.zones(d)}</div>`)}</div>`;
-    return html`<div class="winx-cal-month"${PART("grid")}>${days.slice(0, 7).map(d => html`<div class="winx-cal-wd">${M(d).format("ddd")}</div>`)}${days.map(d => html`<div class="winx-cal-cell${d === today ? " today" : ""}${d.slice(0, 7) !== base.slice(0, 7) ? " outside" : ""}" data-action="day" data-day="${d}"><div class="winx-cal-num">${String(+d.slice(8))}</div>${this.fill(d, true)}${this.zones(d)}</div>`)}</div>`;
+    if (view === "week") return html`<div class="winx-cal__week"${PART("grid")}>${days.map(d => html`<div class="winx-cal__day${d === today ? " winx-cal__day--today" : ""}"><div class="winx-cal__head">${M(d).format("ddd D")}</div>${this.fill(d, false)}${this.zones(d)}</div>`)}</div>`;
+    return html`<div class="winx-cal__month"${PART("grid")}>${days.slice(0, 7).map(d => html`<div class="winx-cal__weekday">${M(d).format("ddd")}</div>`)}${days.map(d => html`<div class="winx-cal__cell${d === today ? " winx-cal__cell--today" : ""}${d.slice(0, 7) !== base.slice(0, 7) ? " winx-cal__cell--outside" : ""}" data-action="day" data-day="${d}"><div class="winx-cal__num">${String(+d.slice(8))}</div>${this.fill(d, true)}${this.zones(d)}</div>`)}</div>`;
   }
   // the folds as the state has them; every box's refresh for the 🔁 repeats button
   mount(root) {
-    const boxes = [...root.querySelectorAll(".winx-cal-routine")];
+    const boxes = [...root.querySelectorAll(".winx-cal__routine")];
     this.ctx.shows = boxes.map(box => () => this.show(box));
     this.ctx.shows.forEach(f => f());
     this.ctx.syncRepeats();
@@ -168,7 +168,7 @@ export class Panel extends Part {
     pause: (e, el) => {
       const t = this.view.taskOf(el);
       if (!t) return;
-      el.closest(".winx-board-card")?.toggleClass("paused", !T(t).isPaused); el.disabled = true;
+      el.closest(".winx-task-card")?.toggleClass("winx-task-card--paused", !T(t).isPaused); el.disabled = true;
       this.view.actions.pauseOrResume(t);
     },
   };
@@ -179,7 +179,7 @@ export class Panel extends Part {
     const info = t => this.view.info(t);
     // as on the Life Areas chart
     const areaTitle = g => { const name = areaMap[g] ?? (g ? g.slice(6) : "other"); return `${areaIcons[g] ?? "✦"} ${name[0].toUpperCase()}${name.slice(1)}`; };
-    const group = (title, cards, extra = "", cls = "") => html`<div class="winx-cal-groupcard${cls}"><div class="winx-cal-group">${title}</div>${cards}${extra}</div>`;
+    const group = (title, cards, extra = "", cls = "") => html`<div class="winx-cal__group-card${cls}"><div class="winx-cal__group">${title}</div>${cards}${extra}</div>`;
     // the cards of `items`, one group card per run of the same area
     const byArea = (items, card) => {
       const runs = [];
@@ -191,28 +191,28 @@ export class Panel extends Part {
       // longest-waiting first (➕ created)
       const cut = backlog.length > SHOWN && !state.backlogOpen;
       list = byArea(cut ? backlog.slice(0, SHOWN) : backlog, t => new TaskCard({ task: info(t), meta: model.backlogMeta(t) }));
-      if (backlog.length > SHOWN) after = html`<button class="winx-cal-more" data-action="more">${cut ? `show all ${backlog.length}` : "show less"}</button>`;
+      if (backlog.length > SHOWN) after = html`<button class="winx-cal__more" data-action="more">${cut ? `show all ${backlog.length}` : "show less"}</button>`;
     } else if (state.tab === "pool") {
       // by area, the longest since last done first (never done at the top)
       const plus = t => new Button({ icon: "+📅", title: "add to today", action: "toToday" });
       list = pool.length ? byArea(pool, t => new TaskCard({ task: info(t), meta: model.poolMeta(t), extra: plus(t) }))
-        : html`<div class="winx-board-meta">Empty: ✦ New task with «To pool» adds one here</div>`;
+        : html`<div class="winx-cal__empty">Empty: ✦ New task with «To pool» adds one here</div>`;
     } else {
       // birthdays (a fixed yearly rule) fold into one card; the rest by area, the most neglected first; paused last
       const { rest, bdays } = regulars;
       const next = t => T(t).date;
-      const meta = t => html`${ruleText(T(t).rule)}  ·  ${next(t) ? html`<span${next(t) < today ? html` class="winx-cal-late"` : ""}>next ${dm(next(t))}</span>` : html`<span>⏸ paused</span>`}  ·  ${model.regularHistory(t)}`;
+      const meta = t => html`${ruleText(T(t).rule)}  ·  ${next(t) ? html`<span${next(t) < today ? html` class="winx-cal__late"` : ""}>next ${dm(next(t))}</span>` : html`<span>⏸ paused</span>`}  ·  ${model.regularHistory(t)}`;
       const pause = t => next(t)
         ? new Button({ icon: "⏸", title: "pause: drop its dates", action: "pause" })
         : new Button({ icon: "▶", title: "resume: from today, on the first day its rule allows", action: "pause" });
-      list = byArea(rest, t => new TaskCard({ task: info(t), meta: meta(t), extra: pause(t), cls: next(t) ? "" : "paused" }));
+      list = byArea(rest, t => new TaskCard({ task: info(t), meta: meta(t), extra: pause(t), cls: next(t) ? "" : "winx-task-card--paused" }));
       if (bdays.length) {
         const open = state.bdaysOpen;
-        const more = !open && bdays.length > 3 ? html`<button class="winx-cal-more" data-action="bdays">+${bdays.length - 3} more</button>` : open ? html`<button class="winx-cal-more" data-action="bdays">show less</button>` : "";
-        list = html`${list}<div class="winx-cal-groupcard dashed"><div class="winx-cal-group winx-cal-fold" title="${open ? "fold" : "show all"}" data-action="bdays">🎂 Birthdays · ${bdays.length}</div>${(open ? bdays : bdays.slice(0, 3)).map(t => new TaskCard({ task: info(t), meta: `yearly · ${dm(next(t))}` }))}${more}</div>`;
+        const more = !open && bdays.length > 3 ? html`<button class="winx-cal__more" data-action="bdays">+${bdays.length - 3} more</button>` : open ? html`<button class="winx-cal__more" data-action="bdays">show less</button>` : "";
+        list = html`${list}<div class="winx-cal__group-card winx-cal__group-card--dashed"><div class="winx-cal__group winx-cal__fold" title="${open ? "fold" : "show all"}" data-action="bdays">🎂 Birthdays · ${bdays.length}</div>${(open ? bdays : bdays.slice(0, 3)).map(t => new TaskCard({ task: info(t), meta: `yearly · ${dm(next(t))}` }))}${more}</div>`;
       }
     }
     const tabs = [["nodate", `No date · ${backlog.length}`], ["regulars", `Regulars · ${regulars.rest.length + regulars.bdays.length}`], ["pool", `Pool · ${pool.length}`]];
-    return html`<div class="winx-cal-backlog winx-board-backlog" data-drop=""${PART("panel")}><div class="winx-cal-tabs">${tabs.map(([key, text]) => html`<button class="winx-cal-head${key === state.tab ? " on" : ""}" data-action="tab" data-tab="${key}">${text}</button>`)}</div><div class="winx-cal-backlog-grid">${list}</div>${after}</div>`;
+    return html`<div class="winx-cal__backlog winx-board-backlog" data-drop=""${PART("panel")}><div class="winx-cal__tabs">${tabs.map(([key, text]) => html`<button class="winx-cal__tab${key === state.tab ? " winx-cal__tab--on" : ""}" data-action="tab" data-tab="${key}">${text}</button>`)}</div><div class="winx-cal__backlog-grid">${list}</div>${after}</div>`;
   }
 }

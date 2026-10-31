@@ -1,9 +1,9 @@
 @use "../mixins" as *;
 /* the dashboard tab: its date (where the note had the Meta Bind field) and the calendar's ✦ pill after a write */
-.winx-dash-date { margin-bottom: 0; }   /* a .winx-cal-nav row, alone in its card */
+.winx-dash-date { margin-bottom: 0; }   /* a .winx-nav row, alone in its card */
 .winx-dash .markdown-preview-section > :first-child { margin-top: 0; }   /* as the note's first block */
-.winx-dash.busy {
-  .winx-cal-busy-pill { display: flex; }
+.winx-dash--busy {
+  .winx-busy__pill { display: flex; }
   .markdown-preview-section { opacity: 0.55; transition: opacity 0.2s; pointer-events: none; }
 }
 .winx-dash-quests { display: contents; }   /* the Tasks query sits in the card as it did in the note */

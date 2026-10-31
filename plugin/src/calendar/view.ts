@@ -62,7 +62,7 @@ export class CalendarView extends ItemView {
       timer = window.setTimeout(() => this.contentEl.isShown() ? this.draw() : (this.stale = true), 100);
     }));
     // a write to a task file: the calendar dims with a spinning ✦ until the redraw
-    dimOnWrite(this, (path: string) => path.startsWith(TASKS_DIR), () => this.ctx?.root);
+    dimOnWrite(this, (path: string) => path.startsWith(TASKS_DIR), () => this.ctx?.root, "winx-cal--busy");
     this.registerEvent(this.app.workspace.on("active-leaf-change", () => this.catchUp()));
     this.registerEvent(this.app.workspace.on("layout-change", () => this.catchUp()));   // a sidebar or split shown
     // a new day: following today, the days move on; and "today" in every action is the new one
@@ -117,7 +117,7 @@ export class CalendarView extends ItemView {
       days, today, areaOrder: Object.keys(config.areaIcons),
     });
     const old = this.ctx?.root;
-    const root = createDiv({ cls: `winx-cal ${this.state.view}` });
+    const root = createDiv({ cls: `winx-cal winx-cal--${this.state.view}` });
     const ctx: any = this.ctx = {
       root, state: this.state, today, days, base: baseDate(this.state, today), view: this.state.view,
       shown: { open: true, ghost: true, done: this.state.showDone },
@@ -164,9 +164,9 @@ export class CalendarView extends ItemView {
     skip: (e, el) => { const t = this.taskOf(el); if (!t) return; el.closest("[data-task]")?.remove(); this.actions.skip(t); },
     // 🗑: the first click arms it for 3 s, the second removes the task's line (with undo)
     remove: async (e, el) => {
-      if (!el.classList.contains("armed")) {
-        el.classList.add("armed"); el.textContent = "✓?"; el.title = "click again to delete";
-        window.setTimeout(() => { el.classList.remove("armed"); el.textContent = "🗑"; el.title = "delete task"; }, 3000);
+      if (!el.classList.contains("winx-task-btns__del--armed")) {
+        el.classList.add("winx-task-btns__del--armed"); el.textContent = "✓?"; el.title = "click again to delete";
+        window.setTimeout(() => { el.classList.remove("winx-task-btns__del--armed"); el.textContent = "🗑"; el.title = "delete task"; }, 3000);
         return;
       }
       const t = this.taskOf(el);
@@ -178,11 +178,11 @@ export class CalendarView extends ItemView {
     // The sound comes from installSounds (it listens to every .task-list-item-checkbox)
     tick: (e, box) => {
       // the task as it is now: written 2 s later even if the calendar redraws meanwhile
-      const row = box.closest(".winx-cal-task") as HTMLElement, cb = box as HTMLInputElement, t = this.taskOf(row);
-      row.classList.toggle("ticking", cb.checked);
+      const row = box.closest(".winx-cal__task") as HTMLElement, cb = box as HTMLInputElement, t = this.taskOf(row);
+      row.classList.toggle("winx-cal__task--ticking", cb.checked);
       window.clearTimeout(this.ticks.get(row));
       if (cb.checked && t) this.ticks.set(row, window.setTimeout(() => {
-        cb.disabled = true; row.classList.add("done"); row.querySelector(".winx-board-btns")?.remove();
+        cb.disabled = true; row.classList.add("winx-cal__task--done"); row.querySelector(".winx-task-btns")?.remove();
         this.actions.tick(t);
       }, 2000));
     },
@@ -210,16 +210,16 @@ export class CalendarView extends ItemView {
       this.dragged = this.taskOf(src);
       dragging = true;   // a drag, not a swipe: its finger moves don't tick or skip anything
       e.dataTransfer?.setData("text/plain", "");
-      window.setTimeout(() => this.ctx?.root.classList.add("dragging"));   // later: zones covering the card at dragstart cancel the drag
+      window.setTimeout(() => this.ctx?.root.classList.add("winx-cal--dragging"));   // later: zones covering the card at dragstart cancel the drag
     });
-    this.registerDomEvent(el, "dragend", () => this.ctx?.root.classList.remove("dragging"));
-    this.registerDomEvent(el, "dragover", e => { const z = zone(e); if (z) { e.preventDefault(); z.classList.add("over"); } });
-    this.registerDomEvent(el, "dragleave", e => zone(e)?.classList.remove("over"));
+    this.registerDomEvent(el, "dragend", () => this.ctx?.root.classList.remove("winx-cal--dragging"));
+    this.registerDomEvent(el, "dragover", e => { const z = zone(e); if (z) { e.preventDefault(); z.classList.add(`${z.classList[0]}--over`); } });
+    this.registerDomEvent(el, "dragleave", e => { const z = zone(e); z?.classList.remove(`${z.classList[0]}--over`); });
     this.registerDomEvent(el, "drop", async e => {
       const z = zone(e);
       if (!z) return;
       e.preventDefault(); e.stopPropagation();
-      z.classList.remove("over");
+      z.classList.remove(`${z.classList[0]}--over`);
       if (!this.dragged) return;
       const t = this.dragged, done = z.dataset.done === "1";
       this.dragged = null;
@@ -260,8 +260,8 @@ export class CalendarView extends ItemView {
   }
   private left(t: any) { return this.actions.canSkip(t) ? () => this.actions.skip(t) : T(t).date ? () => this.actions.unplan(t) : null; }
   private right(r: HTMLElement, t: any) {
-    if (r.matches(".winx-yesterday-row")) return (r.querySelector('[data-action="missedDone"]') as HTMLElement)?.click();
-    if (r.matches(".winx-cal-task")) { const box = r.querySelector('input[data-action="tick"]') as HTMLInputElement; if (box && !box.checked) box.click(); return; }
+    if (r.matches(".winx-missed__row")) return (r.querySelector('[data-action="missedDone"]') as HTMLElement)?.click();
+    if (r.matches(".winx-cal__task")) { const box = r.querySelector('input[data-action="tick"]') as HTMLInputElement; if (box && !box.checked) box.click(); return; }
     if (t.pool) return this.actions.fromPool(t, this.ctx.today, false);
     if (this.ctx.TASKS) { r.remove(); this.actions.tick(t); }
   }

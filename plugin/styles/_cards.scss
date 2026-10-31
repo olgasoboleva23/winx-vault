@@ -213,3 +213,6 @@
     }
   }
 } /* end :is(.dashboard, .kanban-board) */
+
+/* a hero card: no title */
+.callout[data-callout="card"][data-callout-metadata~="hero"] > .callout-title { display: none; }

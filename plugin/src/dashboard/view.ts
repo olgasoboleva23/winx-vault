@@ -57,7 +57,7 @@ export class DashboardView extends ItemView {
     if (this.page) this.removeChild(this.page);
     this.page = this.addChild(new Component());
     this.contentEl.empty();
-    this.contentEl.removeClass("busy");
+    this.contentEl.removeClass("winx-dash--busy");
     this.contentEl.append(sanitizeHTMLToDom(busyPill().html));
     // the widgets' page date (Widget's dv.current())
     const body = this.body = this.contentEl.createDiv({ cls: "markdown-preview-sizer markdown-preview-section", attr: { "data-date": date } });
@@ -72,7 +72,7 @@ export class DashboardView extends ItemView {
   private dateRow() {
     const slot = this.body?.querySelector(".winx-dash-date");
     if (!slot) return;
-    slot.className = "winx-dash-date winx-cal-nav";
+    slot.className = "winx-dash-date winx-nav";
     slot.empty();
     slot.createDiv({ cls: "mb-input-type-date" }).createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
     const today = this.shownDate !== todayYmd() ? new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" }) : "";
@@ -108,8 +108,8 @@ export class DashboardView extends ItemView {
       if (link) { e.preventDefault(); this.app.workspace.openLinkText(link.dataset.href!, "", Keymap.isModEvent(e)); }
     });
     // a write to the tasks or the data: dim with the ✦ pill until a widget draws again
-    dimOnWrite(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el);
-    this.registerDomEvent(el, "winx-drawn" as any, () => window.setTimeout(() => el.removeClass("busy"), 200));
+    dimOnWrite(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el, "winx-dash--busy");
+    this.registerDomEvent(el, "winx-drawn" as any, () => window.setTimeout(() => el.removeClass("winx-dash--busy"), 200));
     // following today: a new day moves the dashboard on
     this.registerInterval(window.setInterval(() => { if (!this.date && this.shownDate !== todayYmd()) this.go(null); }, 60_000));
   }
