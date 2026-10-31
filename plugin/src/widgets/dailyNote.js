@@ -2,7 +2,7 @@
 import { Notice } from "obsidian";
 import { Button } from "../ui/component.js";
 import { Widget } from "./widget.js";
-import { ymd } from "../lib/dates.js";
+import { ymd } from "../core/dates.js";
 
 const NOTES_FOLDER  = "02 Areas/Personal/Daily Notes";
 const TEMPLATE_PATH = "00 System/Templates/Daily Note.md";

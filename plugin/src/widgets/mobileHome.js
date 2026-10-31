@@ -1,10 +1,10 @@
 // Mobile home: big tiles with live counts, each opens a mobile page.
-import { Task } from "../lib/task.js";
+import { Task } from "../tasks/task.js";
 import { html } from "../ui/html.js";
 import { Widget } from "./widget.js";
-import { todayYmd, ymd } from "../lib/dates.js";
-import { todayCount } from "../lib/task.js";
-import { parseWeights } from "../lib/weight.js";
+import { todayYmd, ymd } from "../core/dates.js";
+import { todayCount } from "../tasks/task.js";
+import { parseWeights } from "./body/weightLog.js";
 
 export class MobileHome extends Widget {
   on = { open: (e, el) => this.app.workspace.openLinkText(el.dataset.path, "", false) };

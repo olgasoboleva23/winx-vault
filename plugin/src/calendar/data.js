@@ -1,8 +1,8 @@
 // The calendar's model, no DOM (CalendarData), and the keys that name a task in its markup.
 // Tasks are Dataview tasks ({ status, text, path, line }), each with its Task.
-import { Task } from "../lib/task.js";
-import { diffDays, dm } from "../lib/dates.js";
-import { projectRepeats } from "../lib/repeats.js";
+import { Task } from "../tasks/task.js";
+import { diffDays, dm } from "../core/dates.js";
+import { projectRepeats } from "../tasks/repeats.js";
 
 export const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
 

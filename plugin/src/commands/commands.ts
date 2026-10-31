@@ -1,13 +1,13 @@
 import { Notice, Plugin } from "obsidian";
-import { Task } from "./lib/task.js";
-import { KINDS, itemForm, itemNote, itemPath } from "./lib/items.js";
-import { Form } from "./ui/form.ts";
-import config from "./lib/config.js";
-import { todayYmd } from "./lib/dates.js";
-import { taskWindow } from "./lib/taskEdit.js";
-import { addToMarket } from "./lib/market.js";
-import { logPurchase } from "./lib/rewards.js";
-import { appendLine, edit } from "./lib/files.js";
+import { Task } from "../tasks/task.js";
+import { KINDS, itemForm, itemNote, itemPath } from "./items.js";
+import { Form } from "../ui/form.ts";
+import config from "../core/config.js";
+import { todayYmd } from "../core/dates.js";
+import { taskWindow } from "../tasks/taskEdit.js";
+import { addToMarket } from "../widgets/market/market.js";
+import { logPurchase } from "../widgets/shop/wallet.js";
+import { appendLine, edit } from "../core/files.js";
 
 const MASTER = "02 Areas/Personal/Tasks/Master.md";
 const POOL   = "02 Areas/Personal/Tasks/Pool.md";

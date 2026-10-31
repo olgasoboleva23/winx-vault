@@ -1,12 +1,12 @@
 // Weight: line chart of the last 30 days, the last value, change vs a week ago, a field to log today's weight,
 // a button to the list. The same widget on the dashboard and the phone's Weight page.
-import { html } from "../ui/html.js";
-import { Button } from "../ui/component.js";
-import { Widget } from "./widget.js";
-import { addDays, dm, todayYmd } from "../lib/dates.js";
-import { edit } from "../lib/files.js";
-import { parseWeights, upsertWeight } from "../lib/weight.js";
-import { chartColor } from "../ui/chart.js";
+import { html } from "../../ui/html.js";
+import { Button } from "../../ui/component.js";
+import { Widget } from "../widget.js";
+import { addDays, dm, todayYmd } from "../../core/dates.js";
+import { edit } from "../../core/files.js";
+import { parseWeights, upsertWeight } from "./weightLog.js";
+import { chartColor } from "../../ui/chart.js";
 
 const PATH = "02 Areas/Appearance/Weight.md";
 const DAYS = 30;

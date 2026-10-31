@@ -6,7 +6,7 @@
 // Wrap a Dataview task with Task.of(t) (t is kept as .src, for its path and line) or a raw line with new Task(line).
 // A pool line (Pool.md: a task to pick when it's time, "- #⭐easy #area/base take out trash") is the same without
 // checkbox, rule or dates; its copies on the days are ordinary tasks with the same text.
-import { addDays, diffDays } from "./dates.js";
+import { addDays, diffDays } from "../core/dates.js";
 import { projectRepeats } from "./repeats.js";
 
 const DATE   = "\\d{4}-\\d{2}-\\d{2}";
