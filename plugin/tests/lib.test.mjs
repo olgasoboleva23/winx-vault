@@ -1,13 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cycleInfo } from "../src/lib/cycle.js";
-import { monthGrid, weekOf } from "../src/lib/dates.js";
-import { countDone, dayStatus, parseGoal, reminders, weeklyTarget } from "../src/lib/goals.js";
-import { markBought, supplyStats, unmarkBought } from "../src/lib/market.js";
-import { projectRepeats, ruleText } from "../src/lib/repeats.js";
-import { todayCount } from "../src/lib/task.js";
-import { parseWeights, upsertWeight } from "../src/lib/weight.js";
-import { levelInfo } from "../src/lib/xp.js";
+import { cycleInfo } from "../src/widgets/body/cycleLog.js";
+import { monthGrid, weekOf } from "../src/core/dates.js";
+import { countDone, dayStatus, parseGoal, reminders, weeklyTarget } from "../src/widgets/goals/goal.js";
+import { markBought, supplyStats, unmarkBought } from "../src/widgets/market/market.js";
+import { projectRepeats, ruleText } from "../src/tasks/repeats.js";
+import { todayCount } from "../src/tasks/task.js";
+import { parseWeights, upsertWeight } from "../src/widgets/body/weightLog.js";
+import { levelInfo } from "../src/widgets/xp/xp.js";
 
 // 2026-10-19 is a Monday
 test("weeks", () => {

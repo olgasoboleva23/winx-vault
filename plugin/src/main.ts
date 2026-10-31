@@ -1,10 +1,10 @@
 import { Plugin } from "obsidian";
 import { CalendarView, VIEW_TYPE } from "./calendar/view.ts";
 import { DashboardView, DASHBOARD_VIEW } from "./dashboard/view.ts";
-import { registerCommands } from "./commands.ts";
+import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./widgets/blocks.js";
-import { parseGoal, reminders } from "./lib/goals.js";
-import { installSounds } from "./lib/sounds.js";
+import { parseGoal, reminders } from "./widgets/goals/goal.js";
+import { installSounds } from "./core/sounds.js";
 
 // The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the commands, and the
 // styles (styles.css, built from styles/*.scss).

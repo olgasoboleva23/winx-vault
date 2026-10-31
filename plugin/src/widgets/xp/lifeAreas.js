@@ -1,10 +1,10 @@
 // Life Areas: a radar of XP per area over the last 4 weeks up to the page's day, plus the habit bonus this month.
-import { html } from "../ui/html.js";
-import { Widget } from "./widget.js";
-import config from "../lib/config.js";
-import { pageDay } from "../lib/dates.js";
-import { collectHabitDays, taskXp } from "../lib/xp.js";
-import { chartColor } from "../ui/chart.js";
+import { html } from "../../ui/html.js";
+import { Widget } from "../widget.js";
+import config from "../../core/config.js";
+import { pageDay } from "../../core/dates.js";
+import { collectHabitDays, taskXp } from "./xp.js";
+import { chartColor } from "../../ui/chart.js";
 
 export class LifeAreas extends Widget {
   async data() {
@@ -16,7 +16,7 @@ export class LifeAreas extends Widget {
       const area = Object.entries(areaMap).find(([tag]) => t.tags.includes(tag))?.[1];
       if (area) scores[area] += taskXp(t, xpMap);
     }
-    // habit bonus per area — shared scan from lib/xp.js
+    // habit bonus per area — shared scan from xp.js
     for (const { area, days } of Object.values(collectHabitDays(this.dv, sel.startOf("month"), sel.endOf("month"))))
       if (days.size >= HABIT_BONUS_THRESHOLD && areaMap[area]) scores[areaMap[area]] += HABIT_BONUS_XP;
     return { scores };

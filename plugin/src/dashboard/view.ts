@@ -1,6 +1,6 @@
 import { Component, ItemView, Keymap, MarkdownRenderer, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import layout from "./layout.md";
-import { addDays, todayYmd } from "../lib/dates.js";
+import { addDays, todayYmd } from "../core/dates.js";
 import { busyPill, dimOnWrite } from "../ui/busy.js";
 import { Button } from "../ui/component.js";
 import { html } from "../ui/html.js";

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { KINDS, itemNote, itemPath } from "../src/lib/items.js";
+import { KINDS, itemNote, itemPath } from "../src/commands/items.js";
 
 test("a watch item's note", () => {
   const note = itemNote("watch", { title: 'The "Tea" Shop', media_type: "anime", status: "to_watch" }, "2026-10-29");

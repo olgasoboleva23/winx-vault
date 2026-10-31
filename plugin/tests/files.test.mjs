@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { appendLine, edit, editLine } from "../src/lib/files.js";
+import { appendLine, edit, editLine } from "../src/core/files.js";
 
 // a vault in memory: path → text, folders as a set
 const vault = (files = {}, folders = []) => {

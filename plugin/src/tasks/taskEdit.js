@@ -1,8 +1,8 @@
 // Task lines: rewrite one where it is (found again by its words), with an undo notice; the task window
 // (difficulty, area, time, sticker) and the Tasks plugin's edit dialog.
 import { Notice } from "obsidian";
-import config from "./config.js";
-import { edit, editLine } from "./files.js";
+import config from "../core/config.js";
+import { edit, editLine } from "../core/files.js";
 import { Task } from "./task.js";
 import { Form } from "../ui/form.ts";
 

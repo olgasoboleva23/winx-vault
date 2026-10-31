@@ -3,8 +3,8 @@
 // the ticking stops when the block goes.
 import { html, raw } from "../ui/html.js";
 import { Widget } from "./widget.js";
-import { todayYmd } from "../lib/dates.js";
-import { AudioEngine } from "../lib/sounds.js";
+import { todayYmd } from "../core/dates.js";
+import { AudioEngine } from "../core/sounds.js";
 
 const PATH = "00 System/Data/pomodoro.json";
 const DEFAULTS = { focusMin: 25, breakMin: 5 };

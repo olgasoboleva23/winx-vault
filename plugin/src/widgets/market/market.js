@@ -1,8 +1,8 @@
 // The Celestial Market (the shopping list, 00 System/Data/Celestial Market.md) and the supplies bought from it.
 // supplyStats / markBought / unmarkBought are pure (tested by tests/lib.test.mjs); the rest reads Dataview's pages.
-import config from "./config.js";
-import { diffDays, ymd } from "./dates.js";
-import { appendLine } from "./files.js";
+import config from "../../core/config.js";
+import { diffDays, ymd } from "../../core/dates.js";
+import { appendLine } from "../../core/files.js";
 
 export const MARKET = "00 System/Data/Celestial Market.md";
 // the categories, and "✦ Other" for an item without one

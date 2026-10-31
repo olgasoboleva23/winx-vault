@@ -1,10 +1,10 @@
 // Mobile shopping list: tap a row = bought (moves down, struck out); tap a bought row = back on the list.
 // An add field on top.
-import { html } from "../ui/html.js";
-import { Widget } from "./widget.js";
-import { todayYmd, ymd } from "../lib/dates.js";
-import { editLine } from "../lib/files.js";
-import { MARKET, addToMarket, catOf, marketCats, markBought, marketName, unmarkBought } from "../lib/market.js";
+import { html } from "../../ui/html.js";
+import { Widget } from "../widget.js";
+import { todayYmd, ymd } from "../../core/dates.js";
+import { editLine } from "../../core/files.js";
+import { MARKET, addToMarket, catOf, marketCats, markBought, marketName, unmarkBought } from "./market.js";
 
 export class MobileShopping extends Widget {
   on = {

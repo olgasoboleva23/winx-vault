@@ -5,9 +5,9 @@ import { baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
 import { dimOnWrite } from "../ui/busy.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
-import config from "../lib/config.js";
-import { todayYmd } from "../lib/dates.js";
-import { AudioEngine, isMuted } from "../lib/sounds.js";
+import config from "../core/config.js";
+import { todayYmd } from "../core/dates.js";
+import { AudioEngine, isMuted } from "../core/sounds.js";
 
 // The calendar tab: the week (7 day columns) or the month around a date, the tasks of 02 Areas/Personal/Tasks on
 // their days, "Missed?" above, and the No date | Regulars | Pool panel below. Its state (date, view, tab, folds)

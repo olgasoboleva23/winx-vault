@@ -1,4 +1,4 @@
-import { monthGrid, weekOf } from "../lib/dates.js";
+import { monthGrid, weekOf } from "../core/dates.js";
 // The calendar tab's state: what Obsidian saves with the workspace layout and gives back after a restart.
 // `date` null = follow today (the week or month of today, moving on by itself); a date = the one picked.
 

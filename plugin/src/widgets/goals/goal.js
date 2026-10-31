@@ -1,5 +1,5 @@
 // Goals.md items and how a week of them went; today's reminders (tested by tests/lib.test.mjs).
-import { weekday } from "./dates.js";
+import { weekday } from "../../core/dates.js";
 
 const DAY_NAMES = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 const DAY_NAMES_EN = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];

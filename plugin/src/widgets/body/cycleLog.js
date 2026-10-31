@@ -1,5 +1,5 @@
 // The cycle: its day on a date, the next start forecast, whether it's a period day (tested by tests/lib.test.mjs).
-import { addDays, diffDays } from "./dates.js";
+import { addDays, diffDays } from "../../core/dates.js";
 
 // ends: recorded last days of a period. The end of a cycle is the first end
 // between its start and the next start. Without one, the period lasts the

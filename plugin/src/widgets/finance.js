@@ -3,7 +3,7 @@
 // The data (02 Areas/Finance) stays in the vault; styles in styles/_finance.scss.
 import { html } from "../ui/html.js";
 import { Widget } from "./widget.js";
-import { dm } from "../lib/dates.js";
+import { dm } from "../core/dates.js";
 
 const LEDGER = "02 Areas/Finance/Ledger";
 const RULES = "02 Areas/Finance/rules.json";

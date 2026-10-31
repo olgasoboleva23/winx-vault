@@ -1,10 +1,10 @@
 // Cycle: the day of the cycle on the page's date, the next start forecast, "started / ended today" and the dates.
-import { html } from "../ui/html.js";
-import { Button } from "../ui/component.js";
-import { Widget } from "./widget.js";
-import { cycleInfo } from "../lib/cycle.js";
-import { dm, pageDay, ymd } from "../lib/dates.js";
-import { appendLine } from "../lib/files.js";
+import { html } from "../../ui/html.js";
+import { Button } from "../../ui/component.js";
+import { Widget } from "../widget.js";
+import { cycleInfo } from "./cycleLog.js";
+import { dm, pageDay, ymd } from "../../core/dates.js";
+import { appendLine } from "../../core/files.js";
 
 const CYCLE_PATH = "02 Areas/Health & Body/Cycle.md";
 

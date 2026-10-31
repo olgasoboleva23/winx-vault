@@ -1,11 +1,11 @@
 // Supplies: what is bought again and again (from the Celestial Market's done items), how long since the last
 // time against the usual gap, and "running low" to put one back on the shopping list.
 import { Notice } from "obsidian";
-import { html } from "../ui/html.js";
-import { Button } from "../ui/component.js";
-import { Widget } from "./widget.js";
-import { todayYmd } from "../lib/dates.js";
-import { addToMarket, marketCats, marketState, supplyStats } from "../lib/market.js";
+import { html } from "../../ui/html.js";
+import { Button } from "../../ui/component.js";
+import { Widget } from "../widget.js";
+import { todayYmd } from "../../core/dates.js";
+import { addToMarket, marketCats, marketState, supplyStats } from "./market.js";
 
 export class Supplies extends Widget {
   on = {

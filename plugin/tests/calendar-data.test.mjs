@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { weekOf } from "../src/lib/dates.js";
+import { weekOf } from "../src/core/dates.js";
 import { T, CalendarData } from "../src/calendar/data.js";
 
 // Dataview-like tasks: { status, text, path, line }

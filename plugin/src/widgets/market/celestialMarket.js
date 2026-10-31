@@ -1,10 +1,10 @@
 // Celestial Market: the shopping list by category, a round ✓ per item (a sparkle, then it's written as bought),
 // what is running low soon, and links to the market and the supplies.
-import { html } from "../ui/html.js";
-import { Widget } from "./widget.js";
-import { todayYmd } from "../lib/dates.js";
-import { editLine } from "../lib/files.js";
-import { MARKET, catOf, marketCats, markBought, marketState, supplyStats } from "../lib/market.js";
+import { html } from "../../ui/html.js";
+import { Widget } from "../widget.js";
+import { todayYmd } from "../../core/dates.js";
+import { editLine } from "../../core/files.js";
+import { MARKET, catOf, marketCats, markBought, marketState, supplyStats } from "./market.js";
 
 export class CelestialMarket extends Widget {
   on = {

@@ -1,7 +1,7 @@
 // The shop's gold: earned by done tasks (by difficulty), spent in 00 System/Data/Purchases.md ("- date | name | cost").
-import config from "./config.js";
-import { todayYmd } from "./dates.js";
-import { appendLine } from "./files.js";
+import config from "../../core/config.js";
+import { todayYmd } from "../../core/dates.js";
+import { appendLine } from "../../core/files.js";
 
 const PURCHASES = "00 System/Data/Purchases.md";
 

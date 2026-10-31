@@ -8,9 +8,9 @@ import { Button } from "../ui/component.js";
 import { TaskButtons, TaskCard, TaskRow, TaskText } from "./components.js";
 import { T } from "./data.js";
 import { dateFor } from "./state.js";
-import { addDays, addMonths, dm } from "../lib/dates.js";
-import { ruleText } from "../lib/repeats.js";
-import { AudioEngine, isMuted } from "../lib/sounds.js";
+import { addDays, addMonths, dm } from "../core/dates.js";
+import { ruleText } from "../tasks/repeats.js";
+import { AudioEngine, isMuted } from "../core/sounds.js";
 
 const M = d => window.moment(d);
 const PART = name => html` data-part="${name}"`;

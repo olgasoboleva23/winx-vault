@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Task } from "../src/lib/task.js";
+import { Task } from "../src/tasks/task.js";
 
 const T = line => new Task(line);
 

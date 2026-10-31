@@ -1,10 +1,10 @@
 // Shop: the gold balance and the rewards of Shop.md (name:: … cost:: …); an affordable one is bought with a click
 // (logged to Purchases.md), the rest are greyed out.
 import { Notice } from "obsidian";
-import { html } from "../ui/html.js";
-import { Widget } from "./widget.js";
-import { AudioEngine } from "../lib/sounds.js";
-import { balance, logPurchase } from "../lib/rewards.js";
+import { html } from "../../ui/html.js";
+import { Widget } from "../widget.js";
+import { AudioEngine } from "../../core/sounds.js";
+import { balance, logPurchase } from "./wallet.js";
 
 export class Shop extends Widget {
   sound = new AudioEngine("00 System/Assets/star.wav");

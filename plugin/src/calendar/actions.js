@@ -1,9 +1,9 @@
 // What the calendar writes. Every edit goes through editTaskLine* (the line found again by its text);
 // most come with an undo notice. A 🔁 task ticked goes through the Tasks plugin, so it gets its next copy.
-import { Task } from "../lib/task.js";
+import { Task } from "../tasks/task.js";
 import { T } from "./data.js";
-import { edit as editFile } from "../lib/files.js";
-import { deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal } from "../lib/taskEdit.js";
+import { edit as editFile } from "../core/files.js";
+import { deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal } from "../tasks/taskEdit.js";
 
 const MASTER = "02 Areas/Personal/Tasks/Master.md";
 

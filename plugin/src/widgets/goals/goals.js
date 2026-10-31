@@ -1,9 +1,9 @@
 // Goals: per goal "X of Y this week", Mon–Sun dots, the minimum version, and how often it was done.
 // A missed goal task stays on its day (the calendar's Missed? lists it).
-import { html } from "../ui/html.js";
-import { Widget } from "./widget.js";
-import { dm, pageDay, todayYmd, weekOf, ymd } from "../lib/dates.js";
-import { countDone, dayStatus, parseGoal, weeklyTarget } from "../lib/goals.js";
+import { html } from "../../ui/html.js";
+import { Widget } from "../widget.js";
+import { dm, pageDay, todayYmd, weekOf, ymd } from "../../core/dates.js";
+import { countDone, dayStatus, parseGoal, weeklyTarget } from "./goal.js";
 
 const GOALS_PATH = "02 Areas/Personal/Goals.md";
 

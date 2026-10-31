@@ -1,9 +1,9 @@
 // Level and XP: total XP of the tasks done up to the page's day, the level it makes, progress to the next one.
-import { html } from "../ui/html.js";
-import { Widget } from "./widget.js";
-import config from "../lib/config.js";
-import { pageDay, ymd } from "../lib/dates.js";
-import { levelInfo, taskXp } from "../lib/xp.js";
+import { html } from "../../ui/html.js";
+import { Widget } from "../widget.js";
+import config from "../../core/config.js";
+import { pageDay, ymd } from "../../core/dates.js";
+import { levelInfo, taskXp } from "./xp.js";
 
 export class LevelToday extends Widget {
   async data() {
