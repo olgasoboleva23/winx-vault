@@ -26,9 +26,9 @@ export class Goals extends Widget {
       // "I've done this before": total and last time, from the ✅ dates already in the tasks
       const bits = [goal.min && `min: ${goal.min}`, done.length && `done ${done.length}× · last ${dm(last)}`].filter(Boolean);
       return html`<div class="winx-goal"${goal.plan ? html` title="${goal.plan}"` : ""}>
-        <div class="winx-goal-head"><span class="winx-goal-name">${goal.name}</span><span class="winx-goal-count">${goal.doneIn(done, week)} of ${goal.weeklyTarget} this week</span></div>
-        <div class="winx-goal-dots">${week.map(d => html`<span class="winx-dot ${goal.statusOn(d, doneSet, today)}${d === selected ? " sel" : ""}" title="${d}"></span>`)}</div>
-        ${bits.length ? html`<div class="winx-goal-min">${bits.join("  ·  ")}</div>` : ""}
+        <div class="winx-goal__head"><span class="winx-goal__name">${goal.name}</span><span class="winx-goal__count">${goal.doneIn(done, week)} of ${goal.weeklyTarget} this week</span></div>
+        <div class="winx-goal__dots">${week.map(d => html`<span class="winx-goal__dot winx-goal__dot--${goal.statusOn(d, doneSet, today)}${d === selected ? " winx-goal__dot--sel" : ""}" title="${d}"></span>`)}</div>
+        ${bits.length ? html`<div class="winx-goal__min">${bits.join("  ·  ")}</div>` : ""}
       </div>`;
     })}</div>`;
   }

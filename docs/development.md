@@ -63,7 +63,7 @@ export class Weight extends Widget {
   async data() { … }                                             // what it shows (this.dv: Dataview, this.args: the block's lines)
   view(d) {                                                      // its markup, in backticks
     return html`<div class="winx-weight">
-      <span class="winx-weight-now">${d.last.kg} kg</span>
+      <span class="winx-weight__now">${d.last.kg} kg</span>
       ${new Button({ text: "✦ list", action: "list", kind: "pill" })}
     </div>`;
   }
@@ -72,7 +72,8 @@ export class Weight extends Widget {
 ```
 
 - `html` escapes every value put in (a task with `<` or `&` can't break the markup); a nested `html` or a `Component` goes in as it is.
-- `Button` and `Card` (`plugin/src/ui/component.js`) are the reusable parts: a button with a kind (`round`, `pill`, `cta`), an action and `data-*` values; a dashboard card with a title and the widget inside.
+- `Button`, `Card` and the other parts in `plugin/src/uikit/` are reusable: a button with a kind (`round`, `nav`, `pill`, `chip`, `toggle`, `text`), an action and `data-*` values; a dashboard card with a title and the widget inside.
+- Class names are BEM: `winx-block__element--modifier` (`winx-weight__now`, `winx-cal__day--today`, `winx-btn--on`), one block per file in `plugin/styles/widgets/` or `plugin/styles/uikit/`; states the code sets are modifiers; global helpers are `.winx-is-*` in `plugin/styles/_helpers.scss`.
 - A click on an element with `data-action="name"` (a change for an input, a submit for a form) calls `on.name`.
 - The base draws the widget, and again a second after Dataview's index or its own note changes; a hidden widget when it shows; one someone is typing in after they leave the field (typed text stays). `static followsChanges = false` draws it once (the pomodoro).
 - Add a new one to `blocks` in `plugin/src/widgets/blocks.js`; a note shows it with a `winx` block (see [Dashboard](dashboard.md)).

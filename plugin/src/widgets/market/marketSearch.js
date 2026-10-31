@@ -14,10 +14,10 @@ export async function addMarketItem() {
   // a category header over the first row of each category
   const find = q => findChoices(choices, q).map((c, i, all) => ({ ...c, header: !c.isNew && c.tag !== all[i - 1]?.tag }));
   const pick = await Search.pick(app, "Find or add an item…", find, (c, el) => {
-    if (c.header) el.createDiv({ cls: "winx-search-group", text: catLabel(c.tag) });
-    const row = el.createDiv({ cls: "winx-search-row" });
+    if (c.header) el.createDiv({ cls: "winx-search__group", text: catLabel(c.tag) });
+    const row = el.createDiv({ cls: "winx-search__row" });
     row.createSpan({ text: c.isNew ? `+ new: ${c.name}` : c.name });
-    row.createSpan({ cls: "winx-search-note", text: c.isNew ? "" : c.onList ? "on the list" : `×${c.buys} · ${dm(c.last)}` });
+    row.createSpan({ cls: "winx-search__note", text: c.isNew ? "" : c.onList ? "on the list" : `×${c.buys} · ${dm(c.last)}` });
   });
   if (!pick) return;
   if (pick.onList) return void new Notice(`✦ ${pick.name} is on the list already`);

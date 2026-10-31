@@ -48,5 +48,5 @@ test("NoteLink, Empty / Missing, GroupHeader, AddForm", async () => {
   assert.equal(new GroupHeader({ label: "🌿 Harvest", count: 3 }).html, '<div class="winx-group-header"><span>🌿 Harvest</span><span class="winx-group-header__count">3</span></div>');
   assert.equal(new GroupHeader({ label: "🌿 Harvest" }).html, '<div class="winx-group-header"><span>🌿 Harvest</span></div>');
   assert.equal(new AddForm({ action: "save", input: { name: "kg", type: "number" }, submit: "Save" }).html,
-    '<form class="winx-add-form" data-action="save"><input name="kg" type="number"><button type="submit">Save</button></form>');
+    '<form class="winx-add-form" data-action="save"><input class="winx-add-form__input" name="kg" type="number"><button class="winx-add-form__submit" type="submit">Save</button></form>');
 });

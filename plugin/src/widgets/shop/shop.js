@@ -26,8 +26,8 @@ export class Shop extends Widget {
     return { items, balance: balance(this.dv) };
   }
   view({ items, balance }) {
-    return html`<div class="winx-shop-balance"><span class="winx-shop-balance-icon">✨</span><span>Gold</span><span class="winx-shop-balance-amount">${balance}</span></div>
-      <div class="winx-shop-items">${items.map(({ name, cost }) => html`<button class="winx-shop-item"${balance >= cost ? html` data-action="buy" data-name="${name}" data-cost="${cost}"` : html` disabled`}><span class="winx-shop-item-name">${name}</span><span class="winx-shop-item-cost">${cost} ✨</span></button>`)}</div>`;
+    return html`<div class="winx-shop__balance"><span class="winx-shop__balance-icon">✨</span><span>Gold</span><span class="winx-shop__balance-amount">${balance}</span></div>
+      <div class="winx-shop__items">${items.map(({ name, cost }) => html`<button class="winx-shop__item"${balance >= cost ? html` data-action="buy" data-name="${name}" data-cost="${cost}"` : html` disabled`}><span class="winx-shop__item-name">${name}</span><span class="winx-shop__item-cost">${cost} ✨</span></button>`)}</div>`;
   }
   after(root) { root.addClass("winx-shop"); }
 }

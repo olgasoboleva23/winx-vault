@@ -1,9 +1,9 @@
 @use "../mixins" as *;
-/* ===== SHOP ===== */
+/* ===== SHOP (block winx-shop; the nesting outweighs Obsidian's button styles) ===== */
 .winx-shop {
   padding: $space-m 0;
 
-  & .winx-shop-balance {
+  & .winx-shop__balance {
     @include center;
     gap: $space-l;
     padding: $space-4xl;
@@ -17,24 +17,24 @@
     box-shadow: 0 4px 16px alpha(--winx-purple-deep, 25%);
     text-shadow: 0 1px 2px alpha(--winx-text-dark, 30%);
 
-    & .winx-shop-balance-icon {
+    & .winx-shop__balance-icon {
       font-size: 1.3em;
     }
 
-    & .winx-shop-balance-amount {
+    & .winx-shop__balance-amount {
       color: var(--winx-gold-bright);
       font-weight: 700;
       font-size: 1.2em;
     }
   }
 
-  & .winx-shop-items {
+  & .winx-shop__items {
     display: flex;
     flex-direction: column;
     gap: $space-xl;
   }
 
-  & .winx-shop-item {
+  & .winx-shop__item {
     @include row;
     justify-content: space-between;
     width: 100%;
@@ -51,11 +51,11 @@
       box-shadow 0.15s ease,
       background 0.15s ease;
 
-    & .winx-shop-item-name {
+    & .winx-shop__item-name {
       text-align: left;
     }
 
-    & .winx-shop-item-cost {
+    & .winx-shop__item-cost {
       display: inline-flex;
       align-items: center;
       gap: $space-xs;
@@ -83,7 +83,7 @@
       cursor: not-allowed;
       background: var(--winx-purple-light);
 
-      & .winx-shop-item-cost {
+      & .winx-shop__item-cost {
         background: var(--winx-border);
         color: var(--winx-purple-deep);
         filter: grayscale(0.5);

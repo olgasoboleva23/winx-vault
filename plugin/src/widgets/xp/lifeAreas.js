@@ -21,9 +21,9 @@ export class LifeAreas extends Widget {
       if (days.size >= HABIT_BONUS_THRESHOLD && areaMap[area]) scores[areaMap[area]] += HABIT_BONUS_XP;
     return { scores };
   }
-  view() { return html`<div class="winx-goal-min" style="text-align: center;">last 4 weeks</div>`; }
+  view() { return html`<div class="winx-areas__caption">last 4 weeks</div>`; }
   async after(root, { scores }) {
-    const caption = root.querySelector(".winx-goal-min");
+    const caption = root.querySelector(".winx-areas__caption");
     this.keep(await window.renderChart({
       type: "radar",
       data: { labels: Object.keys(scores), datasets: [{ label: "Areas", data: Object.values(scores), backgroundColor: chartColor("--winx-pink-deep", 0.3), borderColor: chartColor("--winx-pink-deep"), borderWidth: 2 }] },
