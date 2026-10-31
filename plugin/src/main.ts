@@ -36,7 +36,7 @@ export default class WinxPlugin extends Plugin {
     // the phone has no status bar: "✦ syncing" (the star spinning) at the top while Remotely Save syncs
     if (Platform.isMobile) {
       const badge = document.body.createDiv({ cls: "winx-syncing", attr: { style: "display: none" } });   // hidden even before the styles load
-      badge.createSpan({ text: "✦" });
+      badge.createSpan({ cls: "winx-syncing__star", text: "✦" });
       badge.appendText("syncing");
       this.register(() => badge.remove());
       this.registerInterval(window.setInterval(() => badge.style.display = (this.app as any).plugins.plugins["remotely-save"]?.isSyncing ? "flex" : "none", 500));

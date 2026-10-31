@@ -22,16 +22,16 @@ export class LevelToday extends Widget {
     return { total, ...levelInfo(total), v };
   }
   view({ total, level, progress, cost, v }) {
-    const bar = (name, value, max, title) => html`<div class="winx-vital ${name.toLowerCase()}" title="${title}"><b>${name}</b><div class="winx-vital-bar"><i style="width: ${value / max * 100}%"></i></div><span>${value}/${max}</span></div>`;
-    return html`<div class="winx-stat-card">
-      <div class="winx-icon-circle"></div>
-      <div class="winx-stat-body">
-        <div class="winx-stat-text">Level: ${level} | Total XP: ${total}</div>
-        <div class="winx-stat-text">Progress: ${progress}/${cost}</div>
-        <div class="winx-progress-bar">
-          <div class="winx-progress-fill" style="width:${(progress / cost * 100).toFixed(1)}%"></div>
+    const bar = (name, value, max, title) => html`<div class="winx-level__vital winx-level__vital--${name.toLowerCase()}" title="${title}"><b class="winx-level__vital-name">${name}</b><div class="winx-level__vital-bar"><i class="winx-level__vital-fill" style="width: ${value / max * 100}%"></i></div><span class="winx-level__vital-value">${value}/${max}</span></div>`;
+    return html`<div class="winx-level">
+      <div class="winx-level__icon"></div>
+      <div class="winx-level__body">
+        <div class="winx-level__text">Level: ${level} | Total XP: ${total}</div>
+        <div class="winx-level__text">Progress: ${progress}/${cost}</div>
+        <div class="winx-level__progress">
+          <div class="winx-level__progress-fill" style="width:${(progress / cost * 100).toFixed(1)}%"></div>
         </div>
-        <div class="winx-vitals">
+        <div class="winx-level__vitals">
           ${bar("HP", v.hp, v.hpMax, `missed tasks −${v.damage}, done today +${v.heal}`)}
           ${bar("MP", v.mp, v.mpMax, `focus sessions today: ${v.mp} of ${v.mpMax}`)}
         </div>

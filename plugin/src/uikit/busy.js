@@ -2,7 +2,7 @@
 // it's drawn again; 5 s at most.
 import { html } from "../core/html.js";
 
-export const busyPill = (attrs = "") => html`<div class="winx-busy"${attrs}><div class="winx-busy__pill" title="saving…"><span>✦</span></div></div>`;
+export const busyPill = (attrs = "") => html`<div class="winx-busy"${attrs}><div class="winx-busy__pill" title="saving…"><span class="winx-busy__star">✦</span></div></div>`;
 
 export function dimOnWrite(view, watched, el, cls) {
   let timer = 0;

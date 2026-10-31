@@ -1,7 +1,8 @@
-/* ── "Yesterday?" strip above Today ── */
+/* ── Missed: open tasks whose day has passed, a strip at the top of the calendar ── */
 
 @use "../mixins" as *;
 .winx-missed {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   column-gap: 18px;
@@ -12,38 +13,28 @@
   border: 1px solid rgb(168 200 240);
   background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240), rgb(232 213 245));
   box-shadow: 0 0 16px rgb(168 200 240 / 60%);
+  /* the card's fairy wings in two corners */
+  @include wings(40px, 3px);
+  > * { position: relative; z-index: 1; }
 
-  .winx-missed__head { grid-column: 1 / -1; font-family: "Cinzel", serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
+  .winx-missed__head { grid-column: 1 / -1; padding-left: 34px; font-family: "Cinzel", serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
+  /* rounded coloured rows like the day entries; ✏️ 🗑 sit in the row, before the date */
   .winx-missed__row {
     @include row;
+    position: relative;
     gap: $space-s;
-    padding: 3px 0;
+    margin: $space-2xs $space-xs $space-2xs 0;
+    padding: 3px $space-s;
+    border-radius: $radius-m;
     font-size: $text-l;
     color: var(--winx-text-dark);
-
-    &[draggable="true"] { cursor: grab; }
-    border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
+    cursor: grab;
   }
   .winx-missed__text { flex: 1; }
   .winx-missed__date { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }
 }
-/* Missed inside the calendar: rounded colored rows like the day entries */
-.winx-cal {
-  .winx-missed .winx-missed__row { margin: $space-2xs $space-xs $space-2xs 0; padding: 3px $space-s; border-bottom: none; border-radius: $radius-m; }
-  .winx-missed .winx-missed__row[data-area] { border-radius: $radius-m; }
-}
-/* Missed rows: ✏️ 🗑 sit in the row, before the date */
-.winx-cal .winx-missed__row { position: relative; }
-/* desktop: they float over the end of the text on hover (opacity only, so the row height stays) */
-body:not(.is-mobile) .winx-cal .winx-missed__row .winx-task-btns { right: 104px; }
-body.is-mobile .winx-cal .winx-missed__row .winx-task-btns { margin: 0; }
+/* desktop: the buttons float over the end of the text on hover (opacity only, so the row height stays) */
+body:not(.is-mobile) .winx-missed__row .winx-task-btns { right: 104px; }
+body.is-mobile .winx-missed__row .winx-task-btns { margin: 0; }
 /* the phone: the task's text on its own line, the buttons and the date under it */
-body.is-mobile .winx-cal .winx-missed__row { flex-wrap: wrap; .winx-missed__text { flex-basis: 100%; } }
-
-/* Missed in the calendar: the card's fairy wings in two corners */
-.winx-cal .winx-missed {
-  position: relative;
-  @include wings(40px, 3px);
-  .winx-missed__head { padding-left: 34px; }
-  > * { position: relative; z-index: 1; }
-}
+body.is-mobile .winx-missed__row { flex-wrap: wrap; .winx-missed__text { flex-basis: 100%; } }

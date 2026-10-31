@@ -13,5 +13,5 @@
   box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
   color: #fff;
   font-size: $text-3xl;
-  span { animation: winx-spin 0.9s linear infinite; }
 }
+.winx-busy__star { animation: winx-spin 0.9s linear infinite; }

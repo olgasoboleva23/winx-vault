@@ -34,7 +34,7 @@ export class CelestialMarket extends Widget {
       soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.name)).map(s => s.name),
     };
   }
-  cardButton() { return new Button({ icon: "+", title: "add item", action: "add", kind: "text", cls: "winx-card-add" }); }
+  cardButton() { return new Button({ icon: "+", title: "add item", action: "add", kind: "text", cls: "winx-widget__add" }); }
   view({ missing, items, groups, soon }) {
     if (missing) return new Missing({ path: MARKET });
     const link = (text, path) => new NoteLink({ text, path, kind: "text", cls: "market-open" });

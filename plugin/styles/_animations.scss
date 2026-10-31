@@ -20,7 +20,7 @@
   }
 }
 
-/* Progress bar shimmer — used by .winx-progress-fill in widgets.css */
+/* Progress bar shimmer — used by .winx-level__progress-fill (widgets/_level.scss) */
 @keyframes winx-shimmer {
   0% {
     background-position: 200% 0;
@@ -30,7 +30,7 @@
   }
 }
 
-/* Icon glow pulse — used by .winx-icon-circle in widgets.css */
+/* Icon glow pulse — used by .winx-level__icon (widgets/_level.scss) */
 @keyframes pulse-glow {
   0%,
   100% {
@@ -48,8 +48,8 @@
 /* ── Accessibility — stop decorative motion ── */
 @media (prefers-reduced-motion: reduce) {
   :is(.dashboard, .kanban-board, .winx-pomodoro) :is(*, *::before, *::after),
-  .winx-icon-circle,
-  .winx-progress-fill {
+  .winx-level__icon,
+  .winx-level__progress-fill {
     animation: none !important;
   }
 }

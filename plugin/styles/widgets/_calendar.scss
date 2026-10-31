@@ -45,7 +45,7 @@
   border: 1px solid var(--winx-border);
   background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
-
+  position: relative;
 }
 /* the Missed strip's blue */
 .winx-cal__day--today, .winx-cal__cell--today { border-color: rgb(168 200 240); background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240) 60%, rgb(232 213 245)); }
@@ -53,7 +53,6 @@
 /* the phone: the week's days one under another, each as tall as its tasks */
 body.is-mobile .winx-cal__week { grid-template-columns: minmax(0, 1fr); }
 body.is-mobile .winx-cal__day { min-height: 0; }
-.winx-cal__day, .winx-cal__cell { position: relative; }
 /* while dragging, today and past days split into ✓ done / ⏳ plan halves */
 .winx-cal__zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
 .winx-cal--dragging .winx-cal__zones { display: flex; flex-direction: column; }

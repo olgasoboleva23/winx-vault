@@ -43,11 +43,6 @@
 }
 
 /* ── Dashboard: flex columns ── */
-/* a ```winx block that draws its own card: the block's wrapper steps out of the layout, so the card sits in the
-   column like a "> [!card]" callout does */
-.block-language-winx:has(> .callout[data-callout="card"]) {
-  display: contents;
-}
 
 .dashboard {
   /* overflow fix for card content (merged from theme.css) */
@@ -119,4 +114,87 @@
 
   .callout[data-callout="grid"] { padding: $space-xs !important; }
   .callout[data-callout="card"] { padding: $space-l !important; }
+}
+
+/* ── Column sparkles ── */
+:is(.dashboard, .kanban-board) {
+  /*
+     * Each col gets a ::before and ::after star.
+     * Position & delay are driven by scoped custom
+     * properties set per nth-child — one place to
+     * edit instead of 6 separate selector blocks.
+     */
+  .callout[data-callout="col"] {
+    position: relative;
+
+    /* Fallback values (star hidden off-screen if unset) */
+    --star-before-top: auto;
+    --star-before-bottom: auto;
+    --star-before-left: auto;
+    --star-before-right: auto;
+    --star-before-delay: 0s;
+    --star-after-top: auto;
+    --star-after-bottom: auto;
+    --star-after-left: auto;
+    --star-after-right: auto;
+    --star-after-delay: 0s;
+
+    &:nth-child(1) {
+      --star-before-top: 30%;
+      --star-before-right: -12px;
+      --star-before-delay: 0s;
+      --star-after-bottom: 12%;
+      --star-after-left: -10px;
+      --star-after-delay: 1.4s;
+    }
+    &:nth-child(2) {
+      --star-before-top: 8%;
+      --star-before-left: -12px;
+      --star-before-delay: 0.7s;
+      --star-after-bottom: 30%;
+      --star-after-right: -10px;
+      --star-after-delay: 2.1s;
+    }
+    &:nth-child(3) {
+      --star-before-top: 45%;
+      --star-before-left: -12px;
+      --star-before-delay: 0.4s;
+      --star-after-top: 5%;
+      --star-after-right: -10px;
+      --star-after-delay: 1.8s;
+    }
+
+    > .callout-content {
+      /* Shared star styles */
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        z-index: 2 !important;
+        width: $deco;
+        height: $deco;
+        translate: -16px -16px;          /* wider canvas for sparkles, star stays put */
+        background: var(--winx-star-sparkle-svg) 0 0 / contain no-repeat;
+        pointer-events: none;
+        animation: winx-twinkle 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 3px alpha(--winx-gold, 60%));
+      }
+
+      /* Position wired to scoped custom props above */
+      &::before {
+        top: var(--star-before-top);
+        bottom: var(--star-before-bottom);
+        left: var(--star-before-left);
+        right: var(--star-before-right);
+        animation-delay: var(--star-before-delay);
+      }
+      &::after {
+        top: var(--star-after-top);
+        bottom: var(--star-after-bottom);
+        left: var(--star-after-left);
+        right: var(--star-after-right);
+        animation-delay: var(--star-after-delay);
+      }
+    }
+  }
 }

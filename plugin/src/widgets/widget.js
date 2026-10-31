@@ -94,7 +94,7 @@ export class Widget extends MarkdownRenderChild {
 
   // a card widget before its first draw: its card with a shimmering placeholder
   skeleton() {
-    if (this.args.card) this.containerEl.replaceChildren(sanitizeHTMLToDom(new Card({ title: String(this.args.card), body: html`<div class="winx-skeleton"></div>` }).html));
+    if (this.args.card) this.containerEl.replaceChildren(sanitizeHTMLToDom(new Card({ title: String(this.args.card), body: html`<div class="winx-widget__skeleton"></div>` }).html));
   }
   // what someone typed and hasn't saved: () => the fields (by their name) get their text back after a draw
   keepTyped() {
@@ -114,7 +114,7 @@ export class Widget extends MarkdownRenderChild {
     this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
     restore();
     // the widget's own place: inside the card when there is one
-    const root = card ? this.containerEl.querySelector(":scope > .callout > .callout-content") : this.containerEl;
+    const root = card ? this.containerEl.querySelector(":scope > .winx-widget > .winx-widget__body") : this.containerEl;
     await this.after(root, data);
     this.containerEl.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));   // the dashboard tab's ✦ pill goes
   }

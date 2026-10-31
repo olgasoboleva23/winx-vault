@@ -14,7 +14,7 @@
   const leaf = app.workspace.getLeaf(false), was = leaf.getViewState();
   for (const page of PAGES) {
     if (page.startsWith("view:")) { const [type, state] = page.slice(5).split("|"); await leaf.setViewState({ type, state: state ? JSON.parse(state) : {} }); }
-    else await leaf.setViewState({ type: "markdown", state: { file: app.metadataCache.getFirstLinkpathDest(page, "").path, mode: "source" } });
+    else await leaf.setViewState({ type: "markdown", state: { file: (app.vault.getFileByPath(`${page}.md`) ?? app.metadataCache.getFirstLinkpathDest(page, "")).path, mode: "source" } });
     await wait(5000);
     const root = leaf.view.containerEl.querySelector(ROOT ?? ".markdown-source-view");
     if (!root) throw new Error(`${page}: no ${ROOT}`);

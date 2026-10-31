@@ -30,9 +30,9 @@ test("Button: a toggle is lit by on; a nav arrow keeps its sign for screen reade
 
 test("Card: the markup Obsidian draws for a > [!card] callout, the body as it is", () => {
   assert.equal(new Card({ title: "Weight", body: html`<b>40 kg</b>` }).html,
-    '<div class="callout" data-callout="card" data-callout-metadata="" data-callout-fold="">' +
-    '<div class="callout-title" dir="auto"><div class="callout-icon"></div><div class="callout-title-inner">Weight</div></div>' +
-    '<div class="callout-content"><b>40 kg</b></div></div>');
+    '<div class="callout winx-widget" data-callout="card" data-callout-metadata="" data-callout-fold="">' +
+    '<div class="callout-title winx-widget__title" dir="auto"><div class="callout-icon"></div><div class="callout-title-inner">Weight</div></div>' +
+    '<div class="callout-content winx-widget__body"><b>40 kg</b></div></div>');
   assert.match(new Card({ title: "Quests", meta: ["scroll"], body: "" }).html, /data-callout-metadata="scroll"/);
 });
 
