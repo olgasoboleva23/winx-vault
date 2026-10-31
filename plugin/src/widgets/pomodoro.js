@@ -51,14 +51,14 @@ export class Pomodoro extends Widget {
     skip:  () => this.act(t => t.reset(t.other)),   // to the next session, this one not counted
     play:  () => this.act(t => t.running ? t.pause() : t.play()),
     gear:  () => {
-      const panel = this.q(".settings-panel"), open = !panel.classList.contains("hidden");
-      if (!open) { this.q(".s-focus").value = this.timer.settings.focusMin; this.q(".s-break").value = this.timer.settings.breakMin; }
-      panel.classList.toggle("hidden", open);
+      const panel = this.q(".winx-pomodoro__settings"), open = !panel.classList.contains("winx-is-hidden");
+      if (!open) { this.q(".winx-pomodoro__input--focus").value = this.timer.settings.focusMin; this.q(".winx-pomodoro__input--break").value = this.timer.settings.breakMin; }
+      panel.classList.toggle("winx-is-hidden", open);
     },
     saveSettings: () => {
-      const focusMin = parseInt(this.q(".s-focus").value), breakMin = parseInt(this.q(".s-break").value);
+      const focusMin = parseInt(this.q(".winx-pomodoro__input--focus").value), breakMin = parseInt(this.q(".winx-pomodoro__input--break").value);
       if (![focusMin, breakMin].every(n => n > 0)) return;
-      this.q(".settings-panel").classList.add("hidden");
+      this.q(".winx-pomodoro__settings").classList.add("winx-is-hidden");
       this.act(t => { t.settings = { focusMin, breakMin }; t.reset(); });
     },
   };
@@ -69,38 +69,38 @@ export class Pomodoro extends Widget {
   }
   view() {
     return html`<div class="winx-pomodoro">
-    <div class="pomodoro">
-      <div class="ring">
-        <div class="wing left"></div>
-        <div class="wing right"></div>
-        <div class="top-star">${raw(ICON.star)}</div>
-        <div class="time">--:--</div>
-        <div class="controls">
-          <button class="btn reset-btn" data-action="reset">${raw(ICON.reset)}</button>
-          <button class="btn play" data-action="play">${raw(ICON.play)}</button>
-          <button class="btn skip-btn" data-action="skip">${raw(ICON.skip)}</button>
+    <div class="winx-pomodoro__body">
+      <div class="winx-pomodoro__ring">
+        <div class="winx-pomodoro__wing winx-pomodoro__wing--left"></div>
+        <div class="winx-pomodoro__wing winx-pomodoro__wing--right"></div>
+        <div class="winx-pomodoro__top-star">${raw(ICON.star)}</div>
+        <div class="winx-pomodoro__time">--:--</div>
+        <div class="winx-pomodoro__controls">
+          <button class="winx-pomodoro__btn winx-pomodoro__btn--reset" data-action="reset">${raw(ICON.reset)}</button>
+          <button class="winx-pomodoro__btn winx-pomodoro__btn--play" data-action="play">${raw(ICON.play)}</button>
+          <button class="winx-pomodoro__btn winx-pomodoro__btn--skip" data-action="skip">${raw(ICON.skip)}</button>
         </div>
       </div>
     
-      <div class="mode-label">
-        <span class="mode-text"></span>
-        <span class="session-count"></span>
+      <div class="winx-pomodoro__mode">
+        <span class="winx-pomodoro__mode-text"></span>
+        <span class="winx-pomodoro__session"></span>
       </div>
     
-      <div class="stars">
-        ${[0, 1, 2, 3].map(() => html`<div class="s">${raw(ICON.star)}</div>`)}
-        <span class="multiplier"></span>
+      <div class="winx-pomodoro__stars">
+        ${[0, 1, 2, 3].map(() => html`<div class="winx-pomodoro__star">${raw(ICON.star)}</div>`)}
+        <span class="winx-pomodoro__multiplier"></span>
       </div>
     
-      <div class="bottom-bar">
-          <span class="settings-info"></span>
-          <button class="gear-btn" data-action="gear">${raw(ICON.gear)}</button>
+      <div class="winx-pomodoro__bottom">
+          <span class="winx-pomodoro__settings-info"></span>
+          <button class="winx-pomodoro__gear" data-action="gear">${raw(ICON.gear)}</button>
         </div>
     
-      <div class="settings-panel hidden">
-        <label>Focus <input class="s-focus" type="number" min="1" max="120"/><span>min</span></label>
-        <label>Break <input class="s-break" type="number" min="1" max="60"/><span>min</span></label>
-        <button class="s-save" data-action="saveSettings">Save</button>
+      <div class="winx-pomodoro__settings winx-is-hidden">
+        <label class="winx-pomodoro__field">Focus <input class="winx-pomodoro__input winx-pomodoro__input--focus" type="number" min="1" max="120"/><span class="winx-pomodoro__unit">min</span></label>
+        <label class="winx-pomodoro__field">Break <input class="winx-pomodoro__input winx-pomodoro__input--break" type="number" min="1" max="60"/><span class="winx-pomodoro__unit">min</span></label>
+        <button class="winx-pomodoro__save" data-action="saveSettings">Save</button>
       </div>
     </div></div>`;
   }
@@ -145,15 +145,15 @@ export class Pomodoro extends Widget {
 
   tick() {
     const t = this.timer, rem = t.remaining;
-    this.q(".time").textContent = `${Math.floor(rem / 60_000)}:${String(Math.floor(rem % 60_000 / 1000)).padStart(2, "0")}`;
-    this.q(".ring").style.setProperty("--p", 1 - rem / t.duration);
-    this.q(".mode-text").textContent = t.type === "focus" ? "Focus" : "Break";
-    this.q(".session-count").textContent = `Session ${t.sessions + 1}`;
-    this.q(".settings-info").textContent = `${t.settings.focusMin}m · ${t.settings.breakMin}m`;
-    if (this.box.dataset.running !== String(t.running)) { this.box.dataset.running = t.running; this.q(".btn.play").innerHTML = t.running ? ICON.pause : ICON.play; }
+    this.q(".winx-pomodoro__time").textContent = `${Math.floor(rem / 60_000)}:${String(Math.floor(rem % 60_000 / 1000)).padStart(2, "0")}`;
+    this.q(".winx-pomodoro__ring").style.setProperty("--p", 1 - rem / t.duration);
+    this.q(".winx-pomodoro__mode-text").textContent = t.type === "focus" ? "Focus" : "Break";
+    this.q(".winx-pomodoro__session").textContent = `Session ${t.sessions + 1}`;
+    this.q(".winx-pomodoro__settings-info").textContent = `${t.settings.focusMin}m · ${t.settings.breakMin}m`;
+    if (this.box.dataset.running !== String(t.running)) { this.box.dataset.running = t.running; this.q(".winx-pomodoro__btn--play").innerHTML = t.running ? ICON.pause : ICON.play; }
     // stars cycle every 4 sessions, ×N counts the full sets: 4 → 4 stars; 5 → 1 star ×1; 13 → 1 star ×3
     const sets = t.sessions === 0 ? 0 : Math.floor((t.sessions - 1) / 4), filled = t.sessions - sets * 4;
-    this.box.querySelectorAll(".s").forEach((el, i) => el.classList.toggle("on", i < filled));
-    this.q(".multiplier").textContent = sets > 0 ? `×${sets}` : "";
+    this.box.querySelectorAll(".winx-pomodoro__star").forEach((el, i) => el.classList.toggle("winx-pomodoro__star--on", i < filled));
+    this.q(".winx-pomodoro__multiplier").textContent = sets > 0 ? `×${sets}` : "";
   }
 }

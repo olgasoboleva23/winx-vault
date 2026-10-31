@@ -1,6 +1,6 @@
 @use "../mixins" as *;
 /* ============================================
- * WINX THEME — Pomodoro Widget
+ * WINX THEME — Pomodoro Widget (block winx-pomodoro)
  * File: pomodoro.css
  *
  * Wing decoration references var(--winx-wing-svg)
@@ -20,14 +20,14 @@
   overflow-x: visible !important;
   padding-top: $space-l;
 
-  .pomodoro {
+  .winx-pomodoro__body {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: $space-2xl;
   }
 
-  .ring {
+  .winx-pomodoro__ring {
     --p: 0;
 
     width: 180px;
@@ -44,19 +44,19 @@
     );
 
     /* Wing decoration — SVG lives in winx-assets.css */
-    .wing {
+    .winx-pomodoro__wing {
       position: absolute;
       width: $deco;
       height: $deco;
       background: var(--winx-wing-svg) 0 0 / contain no-repeat;
       pointer-events: none;
 
-      &.left {
+      &--left {
         left: -42px;
         top: 50%;
         transform: translateY(-50%) scaleX(-1);
       }
-      &.right {
+      &--right {
         right: -42px;
         top: 50%;
         transform: translateY(-50%) rotate(180deg) scaleX(-1) scaleY(-1);
@@ -72,7 +72,7 @@
       border: 2px solid var(--winx-border);
     }
 
-    .top-star {
+    .winx-pomodoro__top-star {
       position: absolute;
       top: -10px;
       width: 20px;
@@ -84,21 +84,21 @@
       }
     }
 
-    .time {
+    .winx-pomodoro__time {
       position: relative;
       font-size: 30px;
       color: var(--winx-text-dark);
       z-index: 2;
     }
 
-    .controls {
+    .winx-pomodoro__controls {
       position: absolute;
       bottom: -20px;
       @include center;
       gap: $space-xl;
       margin-top: -10px;
 
-      .btn {
+      .winx-pomodoro__btn {
         border-radius: $round;
         border: 2px solid var(--winx-border);
         background: var(--winx-pink);
@@ -116,7 +116,7 @@
           fill: var(--winx-text-dark);
         }
 
-        &.play {
+        &.winx-pomodoro__btn--play {
           width: 48px;
           height: 48px;
           svg {
@@ -125,8 +125,8 @@
           }
         }
 
-        &.reset-btn,
-        &.skip-btn {
+        &.winx-pomodoro__btn--reset,
+        &.winx-pomodoro__btn--skip {
           width: 36px;
           height: 36px;
           svg {
@@ -138,17 +138,17 @@
     }
   }
 
-  .stars {
+  .winx-pomodoro__stars {
     display: flex;
     gap: $space-m;
 
-    .multiplier {
+    .winx-pomodoro__multiplier {
       font-size: $text-xl;
       font-weight: 500;
       margin-left: $space-xs;
     }
 
-    .s {
+    .winx-pomodoro__star {
       width: 18px;
       height: 18px;
       opacity: 0.3;
@@ -156,7 +156,7 @@
         fill: var(--winx-purple);
       }
 
-      &.on {
+      &.winx-pomodoro__star--on {
         opacity: 1;
         svg {
           fill: var(--winx-gold);
@@ -165,21 +165,21 @@
     }
   }
 
-  .mode-label {
+  .winx-pomodoro__mode {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: $space-2xs;
     margin-top: $space-2xl;
 
-    .mode-text {
+    .winx-pomodoro__mode-text {
       font-size: $text-l;
       font-weight: 600;
       color: var(--winx-text-dark);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
-    .session-count {
+    .winx-pomodoro__session {
       font-size: $text-xs;
       color: var(--winx-purple);
       opacity: 0.7;
@@ -187,7 +187,7 @@
   }
 
   /* ── Settings panel ── */
-  .settings-panel {
+  .winx-pomodoro__settings {
     display: flex;
     flex-direction: column;
     gap: $space-s;
@@ -197,17 +197,13 @@
     padding: $space-l $space-2xl;
     width: 140px;
 
-    &.hidden {
-      display: none;
-    }
-
-    label {
+    .winx-pomodoro__field {
       @include row;
       gap: $space-s;
       font-size: $text-s;
     }
 
-    input {
+    .winx-pomodoro__input {
       width: 40px;
       border: 1px solid var(--winx-border);
       border-radius: 4px;
@@ -224,11 +220,11 @@
       }
     }
 
-    span {
+    .winx-pomodoro__unit {
       opacity: 0.6;
     }
 
-    .s-save {
+    .winx-pomodoro__save {
       align-self: flex-end;
       font-size: $text-xs;
       padding: 3px $space-l;
@@ -242,24 +238,24 @@
       }
     }
 
-    :is(.s-save, label, input) {
+    :is(.winx-pomodoro__save, .winx-pomodoro__field, .winx-pomodoro__input) {
       color: var(--winx-text-dark);
     }
   }
 
   /* ── Bottom bar ── */
-  .bottom-bar {
+  .winx-pomodoro__bottom {
     @include center;
     gap: $space-m;
 
-    .settings-info {
+    .winx-pomodoro__settings-info {
       font-size: $text-xs;
       color: var(--winx-purple);
       opacity: 0.6;
     }
   }
 
-  .gear-btn {
+  .winx-pomodoro__gear {
     width: 22px;
     min-width: 22px;
     height: 22px;
