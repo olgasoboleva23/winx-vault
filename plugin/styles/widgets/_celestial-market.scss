@@ -1,5 +1,5 @@
 /* ─────────────────────────────
-   CELESTIAL MARKET — compact shopping list
+   CELESTIAL MARKET (block winx-market) — compact shopping list
    Category header with a count, slim rows split by a dotted gold line,
    a round "bought" button per item. Clicking it strikes the row out,
    flashes the sparkle star and slides the row away before it is saved.
@@ -7,14 +7,13 @@
 
 @use "../mixins" as *;
 
-.winx-celestial-market {
+.winx-market {
   display: grid;
   gap: $space-l;
 
-  .market-list { display: grid; }
+  .winx-market__list { display: grid; }
 
-
-  .market-item {
+  .winx-market__item {
     position: relative;
     @include row;
     gap: $space-l;
@@ -26,7 +25,7 @@
     &:hover { background: fade(white, 30%); border-radius: $radius-m; }
   }
 
-  .market-text {
+  .winx-market__text {
     flex: 1;
     color: var(--winx-text-dark);
     font-size: $text-xl;
@@ -34,7 +33,7 @@
 
   /* round "bought" button: pink circle, white tick */
   /* same look as the scroll arrows, but round: pink, glowing white mark, sparkles on hover */
-  .market-buy {
+  .winx-market__buy {
     flex: none;
     width: $btn-m;
     height: $btn-m;
@@ -55,11 +54,11 @@
   }
 
   /* bought: strike, sparkle burst over the button, slide away */
-  .market-item.bought {
+  .winx-market__item--bought {
     animation: winx-bought 0.65s ease-in forwards;
     pointer-events: none;
 
-    .market-text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
+    .winx-market__text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
 
     &::after {
       content: "";
@@ -74,9 +73,9 @@
     }
   }
 
-  .market-soon { font-size: $text-m; color: var(--winx-pink-deep); }
+  .winx-market__soon { margin: $space-s 0 $space-2xs; font-size: $text-m; color: var(--winx-pink-deep); }
 
-  .market-footer {
+  .winx-market__footer {
     text-align: center;
     color: var(--winx-purple);
     font-size: $text-m;
@@ -84,7 +83,7 @@
     letter-spacing: 0.12em;
   }
 
-  .market-open {
+  .winx-market__link {
     cursor: pointer;
     color: var(--winx-purple-deep);
     margin-inline-start: $space-xl;
@@ -107,8 +106,8 @@
   100% { opacity: 0; scale: 1.4; }
 }
 
-/* Category pill, shared by the market widget and the Supplies page */
-:is(.winx-celestial-market, .winx-supplies) .market-group-header {
+/* Category pill (src/uikit/groupHeader.js, block winx-group-header): the market widget and the Supplies page */
+.winx-group-header {
   @include row;
   gap: $space-m;
   width: fit-content;
@@ -124,7 +123,7 @@
   &:first-child { margin-top: 0; }
 }
 
-.winx-celestial-market .market-count {
+.winx-group-header__count {
   min-width: 20px;
   padding: 0 $space-s;
   border-radius: $pill;
