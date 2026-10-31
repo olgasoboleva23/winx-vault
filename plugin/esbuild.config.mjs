@@ -12,7 +12,8 @@ const watch = process.argv.includes("--watch");
 const out   = watch && process.env.WINX_VAULT ? resolve(process.env.WINX_VAULT, ".obsidian/plugins/winx") : resolve(here, "dist");
 mkdirSync(out, { recursive: true });
 
-const styles = () => writeFileSync(resolve(out, "styles.css"), sass.compile(resolve(here, "styles/main.scss")).css);
+// a release build is minified (the vault syncs it to the phone); the dev one stays readable, with a source map
+const styles = () => writeFileSync(resolve(out, "styles.css"), sass.compile(resolve(here, "styles/main.scss"), { style: watch ? "expanded" : "compressed" }).css);
 const extras = {
   name: "winx-extras",   // styles and manifest go with every JS build
   setup(build) {
@@ -34,6 +35,7 @@ const ctx = await esbuild.context({
   target: "es2022",
   external: ["obsidian", "electron", "@codemirror/*", "@lezer/*"],
   sourcemap: watch ? "inline" : false,
+  minify: !watch,
   logLevel: "warning",
   loader: { ".md": "text" },   // dashboard/layout.md: the dashboard's layout as text
   plugins: [extras],
