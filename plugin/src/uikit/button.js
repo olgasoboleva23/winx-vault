@@ -1,7 +1,8 @@
 import { html } from "../core/html.js";
 import { Component } from "./component.js";
 
-// A button's look is its kind, one block of styles each (styles/widgets/_buttons.scss):
+// A button (block winx-btn): its look is its kind, a modifier (winx-btn--round…), one block of styles each
+// (styles/uikit/_buttons.scss); on: winx-btn--on
 //   round   an icon in a white circle (a task's ⭐ ⏭ ✏️ 🗑, Missed's ✓ ☀️, the panel's +📅 ⏸ ▶); bigger on the phone
 //   nav     ‹ › in a circle: a chevron, mirrored for "next"
 //   pill    a word on the pink Cinzel ticket (✦ Open, running low, dates)
@@ -13,6 +14,6 @@ export class Button extends Component {
   view({ icon, text, title, action, kind = "round", on = false, cls, data = {} }) {
     const label = title ? html` title="${title}" aria-label="${title}"` : "";
     const extra = Object.entries(data).map(([k, v]) => html` data-${k}="${v}"`);
-    return html`<button class="winx-btn ${kind}${on ? " on" : ""}${cls ? " " + cls : ""}"${action ? html` data-action="${action}"` : ""}${extra}${label}>${icon ?? text}</button>`;
+    return html`<button class="winx-btn winx-btn--${kind}${on ? " winx-btn--on" : ""}${cls ? " " + cls : ""}"${action ? html` data-action="${action}"` : ""}${extra}${label}>${icon ?? text}</button>`;
   }
 }
