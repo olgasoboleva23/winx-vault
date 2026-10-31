@@ -1,4 +1,4 @@
-import { Component, ItemView, Keymap, MarkdownRenderer, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
+import { Component, ItemView, Keymap, MarkdownRenderer, Platform, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import layout from "./layout.md";
 import { addDays, todayYmd } from "../core/dates.js";
 import { busyPill, dimOnWrite } from "../uikit/busy.js";
@@ -67,15 +67,16 @@ export class DashboardView extends ItemView {
     });
   }
 
-  // the day it shows, where the note had the Meta Bind field: the calendar's date field, round ‹ ›, "today" pill
+  // the day it shows, where the note had the Meta Bind field: the calendar's date field, round ‹ ›, "today" pill;
+  // and 📅 to the calendar, on the phone only (its tabs are out of sight)
   private dateRow() {
     const slot = this.body?.querySelector(".winx-dash-date");
     if (!slot) return;
     slot.className = "winx-dash-date winx-cal-nav";
     slot.empty();
     slot.createDiv({ cls: "mb-input-type-date" }).createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
-    const today = this.shownDate !== todayYmd() ? new Button({ text: "today", kind: "chip", action: "today" }) : "";
-    slot.append(sanitizeHTMLToDom(html`${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${today}`.html));
+    const today = this.shownDate !== todayYmd() ? new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" }) : "";
+    slot.append(sanitizeHTMLToDom(html`${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${today}${new Button({ text: "📅", title: "calendar", kind: "chip", action: "calendar", cls: "winx-phone-only" })}`.html));
   }
 
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)
@@ -93,7 +94,7 @@ export class DashboardView extends ItemView {
     const el = this.contentEl;
     this.registerDomEvent(el, "change", e => {
       const t = e.target as HTMLInputElement;
-      if (t.dataset.action === "date" && t.value) this.go(t.value);
+      if (t.dataset.action === "date") this.go(t.value || null);   // emptied (the phone's "Reset"): today
     });
     this.registerDomEvent(el, "click", e => {
       const t = e.target as HTMLElement;
@@ -101,6 +102,7 @@ export class DashboardView extends ItemView {
       if (act?.dataset.action === "prev") return this.go(addDays(this.shownDate, -1));
       if (act?.dataset.action === "next") return this.go(addDays(this.shownDate, 1));
       if (act?.dataset.action === "today") return this.go(null);
+      if (act?.dataset.action === "calendar") return (this.app as any).commands.executeCommandById("winx:open-calendar");
       // [[links]] in the layout open their note, as in a note (Cmd/Ctrl: a new tab)
       const link = t.closest?.("a.internal-link[data-href]") as HTMLAnchorElement | null;
       if (link) { e.preventDefault(); this.app.workspace.openLinkText(link.dataset.href!, "", Keymap.isModEvent(e)); }

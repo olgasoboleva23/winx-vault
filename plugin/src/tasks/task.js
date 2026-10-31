@@ -134,3 +134,17 @@ export const todayCount = (tasks, date) => tasks.filter(t => !t.done && (
   t.recurring ? (t.due ?? t.scheduled) !== undefined && (t.due ?? t.scheduled) <= date
               : t.scheduled === date || (t.due !== undefined && t.due <= date)
 )).length;
+
+// Every task and pool line once, for the "New task" search: its latest spelling and picks, how many times it was
+// done and when last; by `areaOrder` (["#area/…"], the rest after), then the most done and the most recent first.
+export function taskChoices(lines, areaOrder) {
+  const by = {};
+  for (const t of lines.map(l => new Task(l)).filter(t => t.text)) {
+    const when = t.doneOn ?? t.date ?? t.created ?? "", c = by[t.key] ??= { done: 0, last: null, when: "" };
+    if (t.isDone) { c.done++; if (!c.last || t.doneOn > c.last) c.last = t.doneOn; }
+    if (when >= c.when) Object.assign(c, { when, name: t.text, area: t.area, picks: t.picks });
+  }
+  const rank = area => areaOrder.indexOf(area) >>> 0;
+  return Object.values(by).map(({ when, ...c }) => c)
+    .sort((a, b) => rank(a.area) - rank(b.area) || b.done - a.done || (b.last ?? "").localeCompare(a.last ?? ""));
+}

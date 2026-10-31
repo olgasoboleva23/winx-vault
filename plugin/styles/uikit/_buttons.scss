@@ -73,3 +73,6 @@ button.winx-btn.text {
   letter-spacing: inherit;
   cursor: pointer;
 }
+
+/* the phone only: the way between the dashboard and the calendar (📅, ✦); the computer has its tabs */
+body:not(.is-mobile) .winx-btn.winx-phone-only { display: none; }

@@ -1,5 +1,5 @@
 // Celestial Market: the shopping list by category, a round ✓ per item (a sparkle, then it's written as bought),
-// what is running low soon, and links to the market and the supplies.
+// what is running low soon and links to the market and the supplies; ＋ by the card's title opens the search.
 import { html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import { todayYmd } from "../../core/dates.js";
@@ -9,9 +9,12 @@ import { MarketItem } from "./marketItem.js";
 import { Empty, Missing } from "../../uikit/empty.js";
 import { GroupHeader } from "../../uikit/groupHeader.js";
 import { NoteLink } from "../../uikit/noteLink.js";
+import { Button } from "../../uikit/button.js";
+import { addMarketItem } from "./marketSearch.js";
 
 export class CelestialMarket extends Widget {
   on = {
+    add: () => addMarketItem(),
     // let the sparkle play first, then write (the write redraws the widget)
     buy: async (e, el) => {
       const row = el.closest(".market-item");
@@ -31,6 +34,7 @@ export class CelestialMarket extends Widget {
       soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.name)).map(s => s.name),
     };
   }
+  cardButton() { return new Button({ icon: "+", title: "add item", action: "add", kind: "text", cls: "winx-card-add" }); }
   view({ missing, items, groups, soon }) {
     if (missing) return new Missing({ path: MARKET });
     const link = (text, path) => new NoteLink({ text, path, kind: "text", cls: "market-open" });

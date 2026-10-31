@@ -5,6 +5,7 @@ import { Goal, reminders } from "../src/widgets/goals/goal.js";
 import { CycleLog } from "../src/widgets/body/cycleLog.js";
 import { WeightLog } from "../src/widgets/body/weightLog.js";
 import { MarketItem } from "../src/widgets/market/marketItem.js";
+import { paydays, SavingsJar } from "../src/widgets/savings/savingsJar.js";
 
 // 2026-10-19 is a Monday
 const w = Goal.parse("name:: Stretching\n  tag:: #goal/stretch\n  days:: пн, ср, пт\n  min:: 10 minutes\n  plan:: if...");
@@ -105,4 +106,27 @@ test("MarketItem: its name, its category tag, bought or not", () => {
   assert.equal(i.isBought, true);
   assert.equal(new MarketItem("- [ ] soap").tag, "#other");
   assert.equal(new MarketItem("- [ ] soap").isBought, false);
+});
+
+test("paydays: the 16th and the 30th (a short month's last day), a weekend one on the Friday before", () => {
+  assert.deepEqual(paydays("2026-10-01", "2026-11-30"), ["2026-10-16", "2026-10-30", "2026-11-16", "2026-11-30"]);
+  assert.deepEqual(paydays("2027-01-01", "2027-02-28"), ["2027-01-15", "2027-01-29", "2027-02-16", "2027-02-26"]);
+  assert.deepEqual(paydays("2026-10-17", "2026-10-29"), []);
+});
+
+test("SavingsJar: saved, deposits, the payday's deposit until it's in, the halfway words", () => {
+  const note = "---\nper_payday: 12000\n---\n- 2026-10-16 12000\n- 2026-10-31 20 000\nnot a deposit\n";
+  const jar = new SavingsJar(note, { per_payday: 12000 });
+  assert.equal(jar.saved, 32000);
+  assert.equal(jar.deposits.length, 2);
+  assert.equal(jar.pct, null);                                          // no price: no percent
+  assert.equal(jar.due("2026-10-31"), null);                            // the 30th's deposit is in (on the 31st)
+  assert.deepEqual(jar.due("2026-11-17"), { payday: "2026-11-16", sum: 12000 });
+  assert.deepEqual(jar.next("2026-11-17", 2), ["2026-11-30", "2026-12-16"]);
+  assert.equal(jar.deposit("2026-11-17").trim().split("\n").at(-1), "- 2026-11-17 12000");
+
+  const priced = new SavingsJar(note, { per_payday: 12000, price: 60000 });
+  assert.equal(priced.pct, 53);
+  assert.equal(priced.left, 28000);
+  assert.equal(new SavingsJar("- 2026-10-16 10000", { price: 60000 }).pct, 17);
 });

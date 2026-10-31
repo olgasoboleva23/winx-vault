@@ -42,6 +42,11 @@
 > >
 > > > [!card] Finance
 > > > 💰 [[Finance|Open finance]]
+> >
+> > ```winx
+> > savings
+> > card: Savings
+> > ```
 >
 > > [!col]
 > > ```winx
@@ -54,7 +59,7 @@
 > >
 > > ```winx
 > > celestialMarket
-> > card: Celestial Market
+> > card: Celestial
 > > meta: scroll
 > > ```
 
@@ -63,7 +68,6 @@
 ```tasks
 due on {{date}}
 path includes Tasks
-group by function const i = {body: "🏃 Body", mind: "🧠 Mind", wealth: "💰 Wealth", base: "🏡 Base", occasions: "🌄 Occasions", rest: "🌙 Rest", learning: "📚 Learning", work: "💼 Work", personal: "🌸 Personal", health: "💊 Health"}; return task.tags.filter(t => t.startsWith("#area/")).map(t => i[t.slice(6)] ?? t)
 short mode
 sort by tags
 ```

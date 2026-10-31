@@ -9,6 +9,7 @@ import { LifeAreas } from "./xp/lifeAreas.js";
 import { LevelToday } from "./xp/levelToday.js";
 import { MobileHome } from "./mobileHome.js";
 import { MobileShopping } from "./market/mobileShopping.js";
+import { Savings } from "./savings/savings.js";
 import { Pomodoro } from "./pomodoro.js";
 import { Shop } from "./shop/shop.js";
 import { Supplies } from "./market/supplies.js";
@@ -16,7 +17,7 @@ import { Weight } from "./body/weight.js";
 import { XpToday } from "./xp/xpToday.js";
 
 // name → class
-export const blocks = { celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, goals: Goals, levelToday: LevelToday, lifeAreas: LifeAreas, mobileHome: MobileHome, mobileShopping: MobileShopping, pomodoro: Pomodoro, shop: Shop, supplies: Supplies, weight: Weight, xpToday: XpToday };
+export const blocks = { celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, goals: Goals, levelToday: LevelToday, lifeAreas: LifeAreas, mobileHome: MobileHome, mobileShopping: MobileShopping, pomodoro: Pomodoro, savings: Savings, shop: Shop, supplies: Supplies, weight: Weight, xpToday: XpToday };
 
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);

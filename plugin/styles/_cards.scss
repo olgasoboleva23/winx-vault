@@ -75,6 +75,25 @@
       font-size: $text-2xl !important;
       padding-inline: 64px !important; /* room for wings */
     }
+    /* a widget's button next to the title (the market's +): the pink glowing circle of the market's ✓ */
+    > .callout-title .winx-btn.winx-card-add {
+      @include center;
+      flex-shrink: 0;
+      width: $btn-m;
+      height: $btn-m;
+      align-self: center;
+      margin: -$space-xs 0 -$space-xs $space-s;   /* centred on the title's line without making it taller */
+      padding: 0;
+      border: none;
+      border-radius: $round;
+      background: alpha(--winx-pink-deep, 85%);
+      box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
+      color: #fff;
+      font-family: var(--font-text);
+      font-size: $text-3xl;
+      line-height: 1;
+      letter-spacing: 0;
+    }
 
     /* Hover glow */
     &:hover {

@@ -116,3 +116,21 @@
 :is(.dashboard, .kanban-board, .winx-pomodoro, .winx-shop) :is(button, input) {
   corner-shape: round;
 }
+
+/* the phone: "✦ syncing" at the top while Remotely Save syncs, the star spinning (src/main.ts) */
+.winx-syncing {
+  position: fixed;
+  z-index: var(--layer-notice);
+  top: calc(env(safe-area-inset-top) + #{$space-xs});
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  gap: $space-xs;
+  padding: $space-2xs $space-l;
+  border-radius: $pill;
+  background: alpha(--winx-pink-deep, 85%);
+  box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%);
+  color: #fff;
+  font-size: $text-m;
+  span { animation: winx-spin 1.2s linear infinite; }
+}

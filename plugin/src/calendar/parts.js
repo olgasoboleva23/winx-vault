@@ -2,6 +2,7 @@
 // with data-action inside it. The view puts data-part on a part's top elements, finds the part an event came
 // from and calls its handler (task buttons — ✏️ 🗑 ⏭ ⭐ ✓ — are the view's own, the same everywhere).
 // No whitespace between tags: inline elements must lay out as the old createEl calls did.
+import { Platform } from "obsidian";
 import { html } from "../core/html.js";
 import { busyPill } from "../uikit/busy.js";
 import { Button } from "../uikit/button.js";
@@ -22,12 +23,13 @@ export class Part {
   render() { return html``; }
 }
 
-// ── the top: the drop bar (while dragging), the busy pill, date / sounds / ＋ task / legend, the navigation ──
+// ── the top: the drop bar (while dragging), the busy pill, date / sounds / ＋ task / ✦ to the dashboard (the phone), the navigation ──
 export class Header extends Part {
   on = {
-    date: (e, el) => el.value && this.ctx.set({ date: dateFor(el.value, this.ctx.view, this.ctx.today) }, ["header", "missed", "grid"]),
+    date: (e, el) => this.go(el.value || null),   // emptied (the phone's "Reset"): today
     mute: (e, el) => { toggleMute(); el.textContent = isMuted() ? "🔇" : "🔊"; },
     newTask: () => app.commands.executeCommandById("winx:new-task"),
+    dashboard: () => app.commands.executeCommandById("winx:open-dashboard"),
     prev: () => this.step(-1),
     next: () => this.step(1),
     today: () => this.go(null),   // null: follow today again
@@ -46,12 +48,10 @@ export class Header extends Part {
   routineDays() { return this.ctx.days.filter(d => this.ctx.model.byDay[d].some(e => T(e.t).isRecurring)); }
   render() {
     const { state, days, today, base, view, model, shown } = this.ctx;
-    const { areaIcons, areaMap } = this.ctx.config;
     // while dragging, a bar of 7 days sticks to the top: the shown week, or in the month view the next 7 days
     const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
-    const legend = Object.keys(areaIcons).filter(g => days.some(d => model.byDay[d].some(e => shown[e.kind] && T(e.t).area === g)));
     const other = view === "week" ? "month" : "week";
-    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button>${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}<div class="winx-cal-legend">${legend.map(g => html`<span data-area="${g.slice(6)}">${areaMap[g] ?? g.slice(6)}</span>`)}</div></div><div class="winx-cal-nav"${PART("header")}>${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}<span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span>${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${days.includes(today) ? "" : new Button({ text: "today", kind: "chip", action: "today" })}${new Button({ text: view, kind: "chip", title: `switch to the ${other} view`, action: "switchView" })}${new Button({ text: "✓ done", kind: "toggle", on: state.showDone, action: "showDone" })}${new Button({ text: "🔁 repeats", kind: "toggle", title: "unfold / fold every day's 🔁 box", action: "repeats" })}</div>`;
+    return html`<div class="winx-cal-dropbar"${PART("header")}><div class="winx-cal-dropbar-in">${chips.map(d => html`<div class="winx-cal-chip${d === today ? " today" : ""}" data-drop="${d}">${M(d).format("ddd D")}</div>`)}</div></div>${busyPill(PART("header"))}<div class="winx-cal-top"${PART("header")}><div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div><button class="winx-cal-mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">${isMuted() ? "🔇" : "🔊"}</button>${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}${new Button({ text: "✦", title: "dashboard", kind: "chip", cls: "winx-cal-to-dash winx-phone-only", action: "dashboard" })}</div><div class="winx-cal-nav"${PART("header")}>${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}<span class="winx-cal-title">${view === "week" ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}` : M(base).format("MMMM YYYY")}</span>${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${days.includes(today) ? "" : new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" })}${new Button({ text: view, kind: "chip", title: `switch to the ${other} view`, action: "switchView" })}${new Button({ text: "✓ done", kind: "toggle", on: state.showDone, action: "showDone" })}${new Button({ text: "🔁 repeats", kind: "toggle", title: "unfold / fold every day's 🔁 box", action: "repeats" })}</div>`;
   }
   // after the grid: the repeats button lit while every routine day is unfolded
   mount(root) {

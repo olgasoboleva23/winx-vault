@@ -82,6 +82,7 @@
 
   .market-group-header { margin-top: $space-l; }
 }
+.winx-mshop .winx-mshop-add { justify-self: start; }
 .winx-mshop-list { display: grid; }
 .winx-mshop .winx-mshop-row {
   @include row;

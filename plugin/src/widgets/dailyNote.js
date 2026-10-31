@@ -1,5 +1,5 @@
 // "✦ Open": the daily note of the page's date; made from the daily template (through Templater) if it's missing.
-import { Notice } from "obsidian";
+import { Notice, Platform } from "obsidian";
 import { Button } from "../uikit/button.js";
 import { Widget } from "./widget.js";
 import { ymd } from "../core/dates.js";
@@ -21,5 +21,6 @@ export class DailyNote extends Widget {
     },
   };
   async data() { return { date: ymd(this.dv.current()?.date) }; }
-  view({ date }) { return date ? new Button({ text: "✦ Open", action: "open", kind: "pill" }) : { html: "" }; }
+  // on the phone only the ✦ (the word didn't fit next to the date row)
+  view({ date }) { return date ? new Button({ text: Platform.isMobile ? "✦" : "✦ Open", title: "open the day's note", action: "open", kind: "pill" }) : { html: "" }; }
 }

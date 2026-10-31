@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Task } from "../src/tasks/task.js";
+import { Task, taskChoices } from "../src/tasks/task.js";
 
 const T = line => new Task(line);
 
@@ -135,4 +135,20 @@ test("pause state, skipping and overdue are the task's own", () => {
   assert.equal(open.isOverdue("2026-10-20"), false);
   assert.equal(new Task("- [x] call 📅 2026-10-20 ✅ 2026-10-21").isOverdue("2026-10-28"), false);
   assert.equal(paused.isOverdue("2026-10-28"), false);
+});
+
+test("taskChoices: one per task, by area, the most done first; the picks of its latest line", () => {
+  const c = taskChoices([
+    "- [x] #⭐easy #area/base wash dishes ✅ 2026-10-01",
+    "- [x] #⭐⭐medium #area/base #time/evening Wash dishes ![[cat.png|28]] ✅ 2026-10-20",
+    "- [ ] #⭐easy #area/body stretch 📅 2026-11-01",
+    "- #⭐⭐medium #area/base take out trash",
+    "- [x] #⭐easy #area/body stretch ✅ 2026-09-01",
+  ], ["#area/body", "#area/base"]);
+  assert.deepEqual(c.map(x => [x.name, x.area, x.done, x.last]), [
+    ["stretch", "#area/body", 1, "2026-09-01"],
+    ["Wash dishes", "#area/base", 2, "2026-10-20"],
+    ["take out trash", "#area/base", 0, null],
+  ]);
+  assert.deepEqual(c[1].picks, { difficulty: "#⭐⭐medium", area: "#area/base", time: "#time/evening", sticker: "cat.png" });
 });

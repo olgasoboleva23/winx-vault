@@ -28,6 +28,17 @@ export const supplyStats = function (history, today) {
   });
 };
 
+// Everything bought before, for the search: one per name (its last spelling and category), by category,
+// then the most bought and the most recent first; onList when it's on the list now (`open`: lowercased names).
+export function marketChoices(history, open) {
+  const by = {};
+  for (const h of [...history].sort((a, b) => a.date.localeCompare(b.date))) {
+    const key = h.name.trim().toLowerCase();
+    by[key] = { name: h.name.trim(), tag: h.tag, buys: (by[key]?.buys ?? 0) + 1, last: h.date, onList: open.has(key) };
+  }
+  const rank = tag => marketCats.findIndex(c => c.tag === tag) >>> 0;   // unknown tags last
+  return Object.values(by).sort((a, b) => rank(a.tag) - rank(b.tag) || b.buys - a.buys || b.last.localeCompare(a.last));
+}
 
 // { history: [{name, tag, date}] of bought items, open: Set of lowercased names still on the list }
 export function marketState(dv) {

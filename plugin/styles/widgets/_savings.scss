@@ -1,0 +1,60 @@
+@use "../mixins" as *;
+/* ── Savings (src/widgets/savings/savings.js): a jar per goal ── */
+.winx-savings { display: grid; gap: $space-4xl; }
+.winx-jar { display: grid; gap: $space-m; color: var(--winx-purple-deep); }
+.winx-jar-goal { @include row; gap: $space-xl; }
+/* the goal's picture: grey above the saved share, so the colour rises as the jar fills */
+.winx-jar-pic {
+  position: relative;
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  border: 2px solid var(--winx-gold);
+  border-radius: $radius-xl;
+  background: #fff;
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+}
+.winx-jar-pic img.winx-jar-grey { position: absolute; inset: 0; filter: grayscale(1) brightness(1.08); }
+.winx-jar-name { font-size: $text-xl; font-weight: 600; }
+.winx-jar-big { font-size: 22px; font-weight: 700; }
+.winx-jar-note, .winx-jar-next { font-size: $text-s; color: alpha(--winx-purple-deep, 65%); }
+.winx-jar-next { text-align: center; }
+.winx-jar-bar {
+  height: $space-l;
+  overflow: hidden;
+  border-radius: $pill;
+  background: alpha(--winx-pink-deep, 15%);
+  i { display: block; height: 100%; background: linear-gradient(90deg, var(--winx-pink-deep), var(--winx-gold)); }
+}
+/* a ✦ stamp per deposit, dashed ones for the next */
+.winx-jar-stamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-s;
+  span {
+    @include center;
+    width: $btn-m;
+    height: $btn-m;
+    border: 2px dashed alpha(--winx-pink-deep, 50%);
+    border-radius: $round;
+    color: alpha(--winx-pink-deep, 50%);
+    font-size: $text-l;
+  }
+  span.on {
+    border: 2px solid var(--winx-gold-deep);
+    background: radial-gradient(var(--winx-gold-bright), var(--winx-gold));
+    color: #8a5a1a;
+    box-shadow: 0 0 6px alpha(--winx-gold, 80%);
+  }
+}
+.winx-jar-due {
+  @include row;
+  justify-content: space-between;
+  gap: $space-m;
+  padding: $space-m $space-xl;
+  border: 2px solid var(--winx-pink-deep);
+  border-radius: $radius-xl;
+  background: rgb(255 255 255 / 60%);
+  b { color: var(--winx-pink-deep); white-space: nowrap; }
+}
