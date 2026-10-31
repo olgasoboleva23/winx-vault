@@ -4,7 +4,8 @@ import { html } from "../../ui/html.js";
 import { Widget } from "../widget.js";
 import { todayYmd } from "../../core/dates.js";
 import { editLine } from "../../core/files.js";
-import { MARKET, catOf, marketCats, markBought, marketState, supplyStats } from "./market.js";
+import { MARKET, catOf, marketCats, marketState, supplyStats } from "./market.js";
+import { MarketItem } from "./marketItem.js";
 
 export class CelestialMarket extends Widget {
   on = {
@@ -14,7 +15,7 @@ export class CelestialMarket extends Widget {
       if (row.classList.contains("bought")) return;
       row.classList.add("bought");
       await new Promise(r => setTimeout(r, 650));
-      await editLine(MARKET, Number(el.dataset.line), line => markBought(line, todayYmd()));
+      await editLine(MARKET, Number(el.dataset.line), line => new MarketItem(line).bought(todayYmd()));
     },
     open: (e, el) => this.app.workspace.openLinkText(el.dataset.path, "", false),
   };

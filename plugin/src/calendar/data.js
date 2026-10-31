@@ -39,7 +39,7 @@ export class CalendarData {
     for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
     this.done = tasks.map(T).filter(t => t.isDone && t.doneOn);
     this.skips = tasks.map(T).filter(t => t.isSkipped);
-    this.missed = tasks.filter(t => T(t).isOpen && T(t).date && T(t).date < today).sort((a, b) => T(b).date.localeCompare(T(a).date));
+    this.missed = tasks.filter(t => T(t).isOverdue(today)).sort((a, b) => T(b).date.localeCompare(T(a).date));
     const pool = poolLines.map(l => { const p = { text: l.text, path: l.path, line: l.line, pool: true }; p.winxTask = new Task(`- ${l.text}`, p); return p; });
     this.all = [...tasks, ...pool];
     this.backlog = backlog.sort((a, b) => this.rank(a) - this.rank(b) || (T(a).created ?? "9").localeCompare(T(b).created ?? "9"));

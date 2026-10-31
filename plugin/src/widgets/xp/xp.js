@@ -1,4 +1,4 @@
-// XP: a task's by its difficulty tag, levels from total XP (pure, tested by tests/lib.test.mjs), habit days.
+// XP: a task's by its difficulty tag, levels from total XP (pure, tested by tests/logic.test.mjs), habit days.
 import { ymd } from "../../core/dates.js";
 
 // XP value of a task, based on its difficulty tag (0 if untagged).

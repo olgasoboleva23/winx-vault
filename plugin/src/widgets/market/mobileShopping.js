@@ -4,7 +4,8 @@ import { html } from "../../ui/html.js";
 import { Widget } from "../widget.js";
 import { todayYmd, ymd } from "../../core/dates.js";
 import { editLine } from "../../core/files.js";
-import { MARKET, addToMarket, catOf, marketCats, markBought, marketName, unmarkBought } from "./market.js";
+import { MARKET, addToMarket, catOf, marketCats } from "./market.js";
+import { MarketItem } from "./marketItem.js";
 
 export class MobileShopping extends Widget {
   on = {
@@ -18,7 +19,7 @@ export class MobileShopping extends Widget {
     toggle: async (e, row) => {
       const bought = row.classList.contains("bought"), name = row.dataset.name;
       row.classList.toggle("bought");
-      await editLine(MARKET, Number(row.dataset.line), line => !line.includes(name) ? line : bought ? unmarkBought(line) : markBought(line, todayYmd()));
+      await editLine(MARKET, Number(row.dataset.line), line => !line.includes(name) ? line : bought ? new MarketItem(line).unbought() : new MarketItem(line).bought(todayYmd()));
     },
   };
   async data() {
@@ -33,7 +34,7 @@ export class MobileShopping extends Widget {
   }
   view({ missing, cats, open, groups, bought }) {
     if (missing) return html`<p>Market file not found.</p>`;
-    const row = (t, isBought) => html`<button class="winx-mshop-row${isBought ? " bought" : ""}" data-action="toggle" data-line="${t.line}" data-name="${marketName(t)}"><span class="winx-mshop-name">${marketName(t)}</span><span class="winx-mshop-mark"></span></button>`;
+    const row = (t, isBought) => html`<button class="winx-mshop-row${isBought ? " bought" : ""}" data-action="toggle" data-line="${t.line}" data-name="${MarketItem.of(t).name}"><span class="winx-mshop-name">${MarketItem.of(t).name}</span><span class="winx-mshop-mark"></span></button>`;
     return html`<div class="winx-mshop">
       <form class="winx-mshop-add" data-action="add"><input name="item" type="text" placeholder="+ add item" enterkeyhint="done"><select name="cat">${cats.map(c => html`<option value="${c.tag}">${c.label}</option>`)}</select><button type="submit">Add</button></form>
       ${open.length ? "" : html`<div class="winx-mshop-empty">✨ All bought</div>`}

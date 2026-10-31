@@ -7,7 +7,7 @@ import { dimOnWrite } from "../ui/busy.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
 import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
-import { AudioEngine, isMuted } from "../core/sounds.js";
+import { AudioEngine } from "../core/sounds.js";
 
 // The calendar tab: the week (7 day columns) or the month around a date, the tasks of 02 Areas/Personal/Tasks on
 // their days, "Missed?" above, and the No date | Regulars | Pool panel below. Its state (date, view, tab, folds)
@@ -151,7 +151,6 @@ export class CalendarView extends ItemView {
   // ── the task's own buttons, the same in every part ──
   private ticks = new WeakMap<Element, number>();
   private taskOn: Record<string, (e: Event, el: HTMLElement) => any> = {
-    difficulty: (e, el) => { e.stopPropagation(); const t = this.taskOf(el); if (t) this.difficultyPicker(el, t); },
     edit: (e, el) => { const t = this.taskOf(el); if (t) this.actions.edit(t); },
     skip: (e, el) => { const t = this.taskOf(el); if (!t) return; el.closest("[data-task]")?.remove(); this.actions.skip(t); },
     // 🗑: the first click arms it for 3 s, the second removes the task's line (with undo)
@@ -179,18 +178,6 @@ export class CalendarView extends ItemView {
       }, 2000));
     },
   };
-
-  // small panel under the stars: one row per difficulty and "none"; the choice rewrites the tag (with undo)
-  private difficultyPicker(anchor: HTMLElement, t: any) {
-    document.querySelector(".winx-cal-picker")?.remove();
-    const box = document.body.createEl("div", { cls: "winx-cal-picker" });
-    const r = anchor.getBoundingClientRect();
-    Object.assign(box.style, { left: `${Math.min(r.left, innerWidth - 170)}px`, top: `${r.bottom + 4}px` });
-    for (const { label, tag } of [...this.ctx.config.difficulties, { label: "☆ none", tag: null }])
-      box.createEl("button", { text: label }).onclick = async () => { box.remove(); await this.actions.setDifficulty(t, tag); };
-    const close = (e: Event) => { if (!box.contains(e.target as Node)) { box.remove(); document.removeEventListener("pointerdown", close, true); } };
-    window.setTimeout(() => document.addEventListener("pointerdown", close, true));
-  }
 
   // one set of listeners for the whole tab: actions, ticks, drags, swipes
   private listen() {
@@ -226,7 +213,7 @@ export class CalendarView extends ItemView {
       if (!this.dragged) return;
       const t = this.dragged, done = z.dataset.done === "1";
       this.dragged = null;
-      if (!isMuted()) (done ? this.sounds.gem : this.sounds.move).play({ gain: 0.25 });
+      (done ? this.sounds.gem : this.sounds.move).play({ gain: 0.25 });
       await this.actions.place(t, z.dataset.drop || null, done);
     });
 

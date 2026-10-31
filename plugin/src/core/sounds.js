@@ -1,4 +1,5 @@
-// Sounds: an AudioEngine per file (one shared AudioContext, each file decoded once), and the tick sounds.
+// Sounds: an AudioEngine per file (one shared AudioContext, each file decoded once), the 🔇 switch, the tick sounds.
+// Every sound keeps quiet while muted (the calendar's 🔊 button), the timer's and the shop's too.
 const _audio = { ctx: null, buffers: new Map() };
 const _ctx   = () => _audio.ctx ??= new (window.AudioContext || window.webkitAudioContext)();
 
@@ -19,6 +20,7 @@ export class AudioEngine {
   }
 
   async play({ rate = 1.0, gain = 0.3, duration = 1.2 } = {}) {
+    if (isMuted()) return;
     const buffer = await _audio.buffers.get(this.path);
     if (!buffer) return;
 
@@ -38,8 +40,10 @@ export class AudioEngine {
 }
 
 
-// ticking a task anywhere; muted with the calendar's 🔊 button
 export const isMuted = () => app.loadLocalStorage("winx-mute") === "1";
+export const toggleMute = () => app.saveLocalStorage("winx-mute", isMuted() ? null : "1");
+
+// ticking a task anywhere
 // installed by the plugin on load; its registerDomEvent removes the listener on unload
 export function installSounds(plugin) {
   const gems   = [1, 2, 3, 4, 5, 6].map(n => new AudioEngine(`00 System/Assets/winx music/snd_pickup_gem0${n}.wav`));
@@ -47,7 +51,7 @@ export function installSounds(plugin) {
   // capture phase: the checkbox already shows its new state, before Tasks re-renders it
   plugin.registerDomEvent(document, "click", e => {
     const box = e.target.closest?.("input.task-list-item-checkbox");
-    if (!box || isMuted()) return;
+    if (!box) return;
     if (!box.checked) return gems[0].play({ rate: 0.6, gain: 0.2 });   // unticked: the same gem, slowed down
     const goal = (box.closest("li")?.textContent ?? "").includes("#goal/");
     (goal ? flower : gems[Math.floor(Math.random() * gems.length)]).play({ gain: 0.25 });

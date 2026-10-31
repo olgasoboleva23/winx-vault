@@ -1,10 +1,14 @@
-// The cycle: its day on a date, the next start forecast, whether it's a period day (tested by tests/lib.test.mjs).
+// The cycle: its day on a date, the next start forecast, whether it's a period day (tested by tests/entities.test.mjs).
 import { addDays, diffDays } from "../../core/dates.js";
 
-// ends: recorded last days of a period. The end of a cycle is the first end
-// between its start and the next start. Without one, the period lasts the
-// average of the last 6 recorded lengths, or `period` days if none.
-export const cycleInfo = function (starts, date, period = 8, ends = []) {
+// The log of Cycle.md: the start dates, the recorded last days of a period (ends) and the usual period length.
+// on(date): the day of the cycle, its usual length, the next start and how far, a period day or not, ended or not
+// (null before the first start). The end of a cycle is the first end between its start and the next start;
+// without one, the period lasts the average of the last 6 recorded lengths, or `period` days if none.
+export class CycleLog {
+  constructor(starts, ends = [], period = 8) { this.starts = starts; this.ends = ends; this.period = period; }
+  on(date) {
+    const { starts, ends, period } = this;
   const all  = [...starts].sort();
   const past = all.filter(s => s <= date);
   if (!past.length) return null;
@@ -24,4 +28,5 @@ export const cycleInfo = function (starts, date, period = 8, ends = []) {
     isPeriod: end ? date <= end : day <= usual,
     ended: !!end && end <= date,
   };
-};
+  }
+}

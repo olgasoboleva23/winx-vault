@@ -6,20 +6,18 @@
 import { html } from "../ui/html.js";
 import { Button, Component } from "../ui/component.js";
 
-// gold difficulty stars (a pale ☆ when there are none; a click opens the picker), the text, its stickers
+// the difficulty stars (in the area's colour), the text, its stickers; the difficulty is changed in the task window (✏️)
 export class TaskText extends Component {
   view({ task, withIcon = false }) {
-    const stars = task.difficulty
-      ? html`<span class="tag" data-tag-name="${task.difficulty}" title="difficulty" data-action="difficulty"></span>`
-      : html`<span class="winx-cal-nostar" title="difficulty" data-action="difficulty">☆</span>`;
+    const stars = task.difficulty ? html`<span class="tag" data-tag-name="${task.difficulty}" title="difficulty"></span>` : "";
     return html`${stars} ${withIcon ? task.label : task.text} ${task.stickers.map(src => html`<img class="winx-cal-sticker" src="${src}" alt="">`)}`;
   }
 }
 
-// ⭐ (phone only, CSS), ⏭ (a dated 🔁 one), ✏️ (the task window, then the Tasks dialog), 🗑 (click twice)
+// ⏭ (a dated 🔁 one), ✏️ (the task window, then the Tasks dialog), 🗑 (click twice)
 export class TaskButtons extends Component {
-  view({ task, star = true, editTitle = "edit: difficulty, area, time, sticker, then text and dates" }) {
-    return html`${star ? new Button({ icon: "⭐", title: "difficulty", action: "difficulty", cls: "winx-cal-diffbtn" }) : ""}${task.canSkip ? new Button({ icon: "⏭", title: "skip this time", action: "skip" }) : ""}${new Button({ icon: "✏️", title: editTitle, action: "edit" })}${new Button({ icon: "🗑", title: "delete task", action: "remove", cls: "winx-board-del" })}`;
+  view({ task, editTitle = "edit: difficulty, area, time, sticker, then text and dates" }) {
+    return html`${task.canSkip ? new Button({ icon: "⏭", title: "skip this time", action: "skip" }) : ""}${new Button({ icon: "✏️", title: editTitle, action: "edit" })}${new Button({ icon: "🗑", title: "delete task", action: "remove", cls: "winx-board-del" })}`;
   }
 }
 
