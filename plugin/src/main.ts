@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Platform, Plugin } from "obsidian";
 import { CalendarView, VIEW_TYPE } from "./calendar/view.ts";
 import { DashboardView, DASHBOARD_VIEW } from "./dashboard/view.ts";
 import { registerCommands } from "./commands/commands.ts";
@@ -33,6 +33,14 @@ export default class WinxPlugin extends Plugin {
         await plugins.enablePlugin(this.manifest.id);
       },
     });
+    // the phone has no status bar: "✦ syncing" (the star spinning) at the top while Remotely Save syncs
+    if (Platform.isMobile) {
+      const badge = document.body.createDiv({ cls: "winx-syncing", attr: { style: "display: none" } });   // hidden even before the styles load
+      badge.createSpan({ text: "✦" });
+      badge.appendText("syncing");
+      this.register(() => badge.remove());
+      this.registerInterval(window.setInterval(() => badge.style.display = (this.app as any).plugins.plugins["remotely-save"]?.isSyncing ? "flex" : "none", 500));
+    }
     console.log("winx loaded");
   }
   // a Winx tab, pinned: the one already open, or a new one

@@ -16,13 +16,13 @@
 │   │   ├── 📁 core               — dates, files (edit / editLine / appendLine a note), config, sounds (and 🔇),
 │   │   │                           html.js (markup in backticks), chart.js
 │   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
-│   │   │                           taskEdit.js (rewrite a line with undo, the task window)
+│   │   │                           taskEdit.js (rewrite a line with undo, the task window), taskSearch.js (New task: a past task)
 │   │   ├── 📁 uikit              — the interface parts, props in, markup out: Button (round, nav, pill, chip, toggle,
 │   │   │                           text), Card, NoteLink, Empty / Missing, GroupHeader, AddForm; Form (one window of
-│   │   │                           fields), busy.js (the ✦ pill)
+│   │   │                           fields), Search (a search window over a list), busy.js (the ✦ pill)
 │   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget;
-│   │                               a topic's own logic next to its widgets, as classes: market/ (MarketItem),
-│   │                               goals/ (Goal), body/ (CycleLog, WeightLog), xp/, shop/ (gold)
+│   │                               a topic's own logic next to its widgets, as classes: market/ (MarketItem, the search),
+│   │                               goals/ (Goal), body/ (CycleLog, WeightLog), savings/ (SavingsJar, paydays), xp/, shop/ (gold)
 │   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; uikit/ the parts' looks;
 │   │                               _mixins.scss has the shared sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian

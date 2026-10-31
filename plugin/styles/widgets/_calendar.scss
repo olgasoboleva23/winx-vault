@@ -26,6 +26,9 @@
   &.over  { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
 }
 .winx-cal-day { min-height: 220px; padding: $space-m $space-s; }
+/* the phone: the week's days one under another, each as tall as its tasks */
+body.is-mobile .winx-cal-week { grid-template-columns: minmax(0, 1fr); }
+body.is-mobile .winx-cal-day { min-height: 0; }
 .winx-cal-day, .winx-cal-cell { position: relative; }
 /* while dragging, today and past days split into ✓ done / ⏳ plan halves */
 .winx-cal-zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
@@ -113,36 +116,8 @@
   &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
   > input.task-list-item-checkbox { position: absolute; left: $space-xs; top: 5px; margin: 0; }
 }
-/* area colors: a stripe on the left of each task, dots in the legend */
-.winx-cal [data-area] {
-  --area: #b9a3c9;
-  &[data-area="body"]      { --area: #e8609a; }
-  &[data-area="mind"]      { --area: #9b6bd6; }
-  &[data-area="wealth"]    { --area: #e0a12e; }
-  &[data-area="base"]      { --area: #4fb59a; }
-  &[data-area="occasions"] { --area: #f08a5d; }
-  &[data-area="rest"]      { --area: #6aa6e0; }
-  &[data-area="learning"]  { --area: #7b8be0; }
-  &[data-area="work"]      { --area: #8a7f9e; }
-  &[data-area="personal"]  { --area: #e88fc0; }
-  &[data-area="health"]    { --area: #5ec4c4; }
-}
-/* the area is the colour of the difficulty stars (no tint on the row) */
-.winx-cal :is(.winx-cal-task, .winx-yesterday-row)[data-area] .tag[data-tag-name^="#⭐"]::before {
-  background: var(--area);
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='11' viewBox='0 0 14 11'%3E%3Cpath d='M5.50 0.60L7.20 3.55L10.54 4.26L8.26 6.80L8.62 10.19L5.50 8.80L2.38 10.19L2.74 6.80L0.46 4.26L3.80 3.55Z'/%3E%3C/svg%3E") 0 0 / 14px 11px repeat-x;
-  filter: drop-shadow(0 0 0.6px rgb(0 0 0 / 45%));
-}
-.winx-cal-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-l;
-  margin-left: auto;
-  font-size: $text-m;
-  color: var(--winx-lavender);
-  span { text-transform: capitalize; }
-  span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: $space-xs; border-radius: $round; background: var(--area); }
-}
+/* ✦ dashboard on the right of the top row */
+.winx-cal-top .winx-cal-to-dash { margin-left: auto; }
 /* stickers from ![[...]] in the task text */
 .winx-cal-sticker { height: 24px; width: auto; vertical-align: middle; }
 .winx-cal-month .winx-cal-sticker { height: 14px; }

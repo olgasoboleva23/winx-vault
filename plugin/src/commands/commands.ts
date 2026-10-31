@@ -2,10 +2,10 @@ import { Notice, Plugin } from "obsidian";
 import { Task } from "../tasks/task.js";
 import { KINDS, itemForm, itemNote, itemPath } from "./items.js";
 import { Form } from "../uikit/form.ts";
-import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
 import { taskWindow } from "../tasks/taskEdit.js";
-import { addToMarket } from "../widgets/market/market.js";
+import { pickTask } from "../tasks/taskSearch.js";
+import { addMarketItem } from "../widgets/market/marketSearch.js";
 import { logPurchase } from "../widgets/shop/wallet.js";
 import { appendLine, edit } from "../core/files.js";
 
@@ -17,14 +17,18 @@ export function registerCommands(plugin: Plugin) {
   const { app } = plugin;
   const add = (id: string, name: string, run: () => Promise<void>) => plugin.addCommand({ id, name, callback: run });
 
-  // difficulty, area, time of day, sticker (or "to pool") in one window; then the Tasks modal for the text and dates
+  // a past task (its difficulty, area, time and sticker come along) or a new one: then difficulty, area, time of day,
+  // sticker (or "to pool") in one window; then the Tasks modal for the text and dates
   add("new-task", "New task", async () => {
-    const pick = await taskWindow({}, true);
+    const found = await pickTask();
+    if (!found) return;
+    const ready = !found.isNew && found.picks.difficulty && found.picks.area;
+    const pick = ready ? found.picks : await taskWindow(found.picks ?? {}, true);
     if (!pick) return;
     const tasksApi = (app as any).plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
     if (!tasksApi) return void new Notice("✦ the Tasks plugin is off — task not saved");
     // ➕ shows how long it waits on the board
-    const result = await tasksApi.editTaskLineModal(`- [ ] ${pick.difficulty} ${pick.area}${pick.time ? " " + pick.time : ""}  ➕ ${todayYmd()}`);
+    const result = await tasksApi.editTaskLineModal(`- [ ] ${[pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ")}  ➕ ${todayYmd()}`);
     if (!result) return;
     const line = new Task(result).setSticker(pick.sticker);   // after the text typed in the Tasks modal
     // a pool line (no checkbox, no dates) goes to the end of Pool.md, made on first use; a task to the top of Master.md
@@ -57,14 +61,6 @@ export function registerCommands(plugin: Plugin) {
     if (v) await logPurchase(v.name, v.cost);
   });
 
-  // a shopping item in the Celestial Market, by category
-  add("new-market-item", "New market item", async () => {
-    const { marketCategories } = config;
-    const v = await Form.ask(app, "✦ New market item", [
-      { name: "Category", key: "category", options: marketCategories.map((c: any) => ({ label: c.label, value: c.tag })) },
-      { name: "Name", key: "name", text: "item name" },
-    ], { required: ["category", "name"], submit: "Add" });
-    if (!v) return;
-    await addToMarket(v.name, v.category);
-  });
+  // a shopping item in the Celestial Market: one bought before, or a new one with its category
+  add("new-market-item", "New market item", addMarketItem);
 }

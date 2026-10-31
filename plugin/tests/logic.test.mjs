@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { monthGrid, weekOf } from "../src/core/dates.js";
-import { supplyStats } from "../src/widgets/market/market.js";
+import { supplyStats, marketChoices } from "../src/widgets/market/market.js";
+import { findChoices } from "../src/core/find.js";
 import { projectRepeats, ruleText } from "../src/tasks/repeats.js";
 import { todayCount } from "../src/tasks/task.js";
 import { levelInfo } from "../src/widgets/xp/xp.js";
@@ -10,6 +11,30 @@ import { levelInfo } from "../src/widgets/xp/xp.js";
 test("weeks", () => {
   assert.deepEqual(weekOf("2026-10-22"), ["2026-10-19","2026-10-20","2026-10-21","2026-10-22","2026-10-23","2026-10-24","2026-10-25"]);
   assert.deepEqual(weekOf("2026-10-25")[0], "2026-10-19");
+});
+
+test("marketChoices: every item bought before, by category, most bought first", () => {
+  const h = [
+    { name: "rice", tag: "#home", date: "2026-06-01" },
+    { name: "Apples", tag: "#food", date: "2026-09-01" },
+    { name: "kiwi", tag: "#food", date: "2026-06-12" },
+    { name: "apples", tag: "#food", date: "2026-09-11" },
+    { name: "Rice", tag: "#food", date: "2026-09-03" },
+  ];
+  const c = marketChoices(h, new Set(["kiwi"]));
+  assert.deepEqual(c.map(x => [x.name, x.tag, x.buys, x.last, x.onList]), [
+    ["apples", "#food", 2, "2026-09-11", false],
+    ["Rice", "#food", 2, "2026-09-03", false],     // the last spelling and category win
+    ["kiwi", "#food", 1, "2026-06-12", true],
+  ]);
+});
+
+test("findChoices: words in any order, a new item when nothing has that name", () => {
+  const c = marketChoices([{ name: "green tea", tag: "#food", date: "2026-09-01" }, { name: "tea cups", tag: "#home", date: "2026-09-02" }], new Set());
+  assert.deepEqual(findChoices(c, "").map(x => x.name), ["green tea", "tea cups"]);
+  assert.deepEqual(findChoices(c, "Tea gr").map(x => x.name), ["green tea", "Tea gr"]);
+  assert.equal(findChoices(c, "Tea gr").at(-1).isNew, true);
+  assert.deepEqual(findChoices(c, " green TEA ").map(x => x.name), ["green tea"]);
 });
 
 test("supplyStats", () => {

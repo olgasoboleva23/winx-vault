@@ -110,7 +110,7 @@ export class Widget extends MarkdownRenderChild {
     this.drop();
     const restore = this.keepTyped();
     const body = this.view(data), { card, meta } = this.args;
-    const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body }) : body;
+    const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body, button: this.cardButton?.() ?? "" }) : body;
     this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
     restore();
     // the widget's own place: inside the card when there is one
