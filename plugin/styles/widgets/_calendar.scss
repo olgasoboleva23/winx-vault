@@ -280,7 +280,5 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
   button.winx-cal__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
 }
 .winx-cal__late { color: #b0306a; font-weight: 600; }
-.winx-cal__fold { cursor: pointer; }
-.winx-cal__group-card--dashed { background: none; border: 1.5px dashed fade(var(--winx-purple-deep), 35%); }
 .winx-cal__zone--plan { font-family: "Cinzel", serif; font-size: $text-2xl; text-align: center; }
 .winx-cal__month .winx-cal__zone { font-size: $text-m; }

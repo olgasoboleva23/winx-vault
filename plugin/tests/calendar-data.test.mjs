@@ -27,7 +27,7 @@ test("days: open on their date, done on their ✅ date, 🔁 repeats faded in th
   assert.equal(m.byDay["2026-10-20"], undefined);
   assert.ok(!Object.values(m.byDay).flat().some(e => T(e.t).text === "call bank"));
   assert.deepEqual(texts(m.backlog), ["plan trip"]);
-  assert.deepEqual(texts(m.regulars.rest), ["stretch", "mask"]);
+  assert.deepEqual(texts(m.regulars), ["stretch", "mask"]);
   assert.deepEqual(m.done.map(t => t.text), ["read"]);
   assert.deepEqual(m.skips.map(t => t.text), ["stretch"]);
 });
@@ -76,8 +76,8 @@ test("Pool: by area, then the longest since last done (never done first)", () =>
   assert.deepEqual(texts(m.pool), ["run", "wash windows", "vacuum", "dust"]);
 });
 
-test("Regulars: by area, dated before paused, the most overdue first; birthdays apart by next date", () => {
-  const { rest, bdays } = data([
+test("Regulars: by area, dated before paused, the most overdue first; birthdays go to Ahead", () => {
+  const regulars = data([
     task("x", "floss ✅ 2026-10-27"),
     task(" ", "#area/body floss 🔁 every day 📅 2026-10-28"),
     task(" ", "#area/body mask 🔁 every week"),                    // paused
@@ -85,8 +85,7 @@ test("Regulars: by area, dated before paused, the most overdue first; birthdays 
     task(" ", "#area/occasions Ann 🔁 every year 📅 2027-03-02"),
     task(" ", "#area/occasions Bo 🔁 every year 📅 2026-12-01"),
   ]).regulars;
-  assert.deepEqual(texts(rest), ["stretch", "floss", "mask"]);
-  assert.deepEqual(texts(bdays), ["Bo", "Ann"]);
+  assert.deepEqual(texts(regulars), ["stretch", "floss", "mask"]);
 });
 
 test("meta lines", () => {
@@ -151,7 +150,7 @@ test("a day's parts: done hidden → the done ones counted as ✓N, the 🔁 one
   assert.deepEqual([...show.hidden, ...show.routineHidden], []);
 });
 
-test("Ahead: open dated tasks after this week, by month; in a month by date, then area; no 🔁", () => {
+test("Ahead: open dated tasks after this week, by month; in a month by date, then area; no 🔁 but birthdays", () => {
   const m = data([   // today Wed 28.10, the week ends Sun 01.11
     task(" ", "#area/body walk 📅 2026-11-01"),               // this week: the calendar shows it
     task(" ", "#area/mind book 📅 2026-12-03"),
@@ -159,7 +158,8 @@ test("Ahead: open dated tasks after this week, by month; in a month by date, the
     task(" ", "#area/body tea 📅 2026-12-01"),
     task(" ", "#area/body visa 📅 2027-02-01"),
     task(" ", "#area/body gym 🔁 every month 📅 2026-12-01"),  // a regular: in Regulars
+    task(" ", "#area/occasions Bo 🔁 every year 📅 2026-12-02"),
     task("x", "#area/body done ✅ 2026-10-27 📅 2026-12-05"),
   ]);
-  assert.deepEqual(m.ahead.map(g => [g.month, texts(g.items)]), [["2026-12", ["tea", "dentist", "book"]], ["2027-02", ["visa"]]]);
+  assert.deepEqual(m.ahead.map(g => [g.month, texts(g.items)]), [["2026-12", ["tea", "Bo", "dentist", "book"]], ["2027-02", ["visa"]]]);
 });

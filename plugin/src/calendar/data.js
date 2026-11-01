@@ -17,9 +17,9 @@ const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 //   backlog  No date: open one-offs with no date, by area, then the longest waiting (➕ created) first
 //   pool     Pool.md's lines (no checkbox), each { text, path, line, pool: true } with its Task: by area, then the
 //            longest since last done (never done first)
-//   regulars open 🔁 tasks (an undated one is paused): { rest, bdays } — birthdays (a yearly rule) apart, by the
-//            next date; the rest by area, dated before paused, the longest overdue, then the longest since last done
-//   ahead    open dated tasks (no 🔁) after today's week, by month: [{ month: "2026-12", items }]; in a month
+//   regulars open 🔁 tasks (an undated one is paused) but dated birthdays (a yearly rule, in Ahead): by area,
+//            dated before paused, the longest overdue, then the longest since last done
+//   ahead    open dated tasks (no 🔁, but birthdays) after today's week, by month: [{ month: "2026-12", items }]; in a month
 //            by date, then area (the old Kanban's month / year / future columns)
 //   all      every task and pool item: what a data-task key is looked up in
 // and the meta lines of the bottom panel's cards.
@@ -37,7 +37,7 @@ export class CalendarData {
       const d = task.date;
       if (!d) { if (!task.isRecurring) backlog.push(t); continue; }
       if (d >= today) this.byDay[d]?.push({ t, kind: "open" });
-      if (!task.isRecurring && d > sunday) ahead.push(t);
+      if ((!task.isRecurring || task.isBirthday) && d > sunday) ahead.push(t);
       if (task.rule) for (const g of projectRepeats(task.rule, d, last)) if (g > today) this.byDay[g]?.push({ t, kind: "ghost" });
     }
     ahead.sort((a, b) => T(a).date.localeCompare(T(b).date) || this.rank(a) - this.rank(b));
@@ -86,10 +86,8 @@ export class CalendarData {
   sortRegulars(list) {
     const next = t => T(t).date, today = this.today;
     const late = t => next(t) && next(t) < today ? diffDays(today, next(t)) : -1;
-    const bdays = list.filter(t => T(t).isBirthday).sort((a, b) => (next(a) ?? "9").localeCompare(next(b) ?? "9"));
-    const rest = list.filter(t => !T(t).isBirthday)
+    return list.filter(t => !(T(t).isBirthday && next(t)))
       .sort((a, b) => this.rank(a) - this.rank(b) || !next(a) - !next(b) || late(b) - late(a) || this.lastDone(a).localeCompare(this.lastDone(b)));
-    return { rest, bdays };
   }
 
   backlogMeta(t) {
