@@ -2,7 +2,7 @@ import { monthGrid, weekOf } from "../core/dates.js";
 // The calendar tab's state: what Obsidian saves with the workspace layout and gives back after a restart.
 // `date` null = follow today (the week or month of today, moving on by itself); a date = the one picked.
 
-export const DEFAULT = Object.freeze({ date: null, view: "week", showDone: false, tab: "nodate", unfolded: [], backlogOpen: false, bdaysOpen: false });
+export const DEFAULT = Object.freeze({ date: null, view: "week", showDone: false, tab: "nodate", ahead: "month", unfolded: [], backlogOpen: false, bdaysOpen: false });
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const pick = (v, ok, fallback) => (ok(v) ? v : fallback);
@@ -15,7 +15,8 @@ export function readState(saved) {
     date: pick(s.date, v => typeof v === "string" && DATE.test(v), null),
     view: pick(s.view, v => v === "week" || v === "month", "week"),
     showDone: pick(s.showDone, bool, false),
-    tab: pick(s.tab, v => ["nodate", "regulars", "pool"].includes(v), "nodate"),
+    tab: pick(s.tab, v => ["nodate", "ahead", "regulars", "pool"].includes(v), "nodate"),
+    ahead: pick(s.ahead, v => ["month", "year", "later"].includes(v), "month"),
     unfolded: Array.isArray(s.unfolded) ? [...new Set(s.unfolded.filter(d => typeof d === "string" && DATE.test(d)))] : [],
     backlogOpen: pick(s.backlogOpen, bool, false),
     bdaysOpen: pick(s.bdaysOpen, bool, false),

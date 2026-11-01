@@ -9,6 +9,7 @@ import { dm, pageDay, ymd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
 import { Empty, Missing } from "../../uikit/empty.js";
 import { NoteLink } from "../../uikit/noteLink.js";
+import { mana, mpLine, mpTable } from "../xp/vitals.js";
 
 const CYCLE_PATH = "00 System/Data/Cycle.md";
 
@@ -48,8 +49,8 @@ export class Cycle extends Widget {
     const when = info && (info.daysUntil >= 0 ? `in ${info.daysUntil} d` : `${-info.daysUntil} d late`);
     return html`<div class="winx-cycle">
       ${!page ? new Missing({ path: CYCLE_PATH })
-        : !info ? new Empty({ text: "no data yet" })
-        : html`<div class="winx-cycle__day${info.isPeriod ? " winx-cycle__day--period" : ""}">day ${info.day}</div><div class="winx-cycle__next">next ~${dm(info.nextStart)}, ${when}</div>`}
+        : !info ? new Empty({ text: "No data yet" })
+        : html`<div class="winx-cycle__head"><div class="winx-cycle__day${info.isPeriod ? " winx-cycle__day--period" : ""}" title="${mpLine(mana(info))}\n\n${mpTable(mana(info))}">day ${info.day}<span class="winx-cycle__phase"> · ${mana(info).phase}</span></div><div class="winx-cycle__next">next ~${dm(info.nextStart)}, ${when}</div></div>`}
       ${cycles.length ? html`<div class="winx-cycle__tabs">${new Button({ text: "days", kind: "toggle", on: this.tab === "days", action: "tab", data: { tab: "days" } })}${new Button({ text: "stats", kind: "toggle", on: this.tab === "stats", action: "tab", data: { tab: "stats" } })}</div>` : ""}
       ${!cycles.length ? "" : this.tab === "stats"
         ? html`${stats.length ? this.columns("cycle", stats.map(c => c.length), "len") : ""}${stats.some(c => c.period) ? this.columns("period", stats.filter(c => c.period).map(c => c.period), "per") : ""}`

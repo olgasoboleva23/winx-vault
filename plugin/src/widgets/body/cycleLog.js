@@ -24,7 +24,7 @@ export class CycleLog {
   const day  = diffDays(date, last) + 1;
   const nextStart = addDays(last, length);
   return {
-    day, length, nextStart, daysUntil: diffDays(nextStart, date),
+    day, length, period: usual, nextStart, daysUntil: diffDays(nextStart, date),
     isPeriod: end ? date <= end : day <= usual,
     ended: !!end && end <= date,
   };

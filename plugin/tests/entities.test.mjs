@@ -52,7 +52,7 @@ test("reminders", () => {
 
 test("CycleLog: the day of the cycle on a date", () => {
   assert.equal(new CycleLog(["2026-10-05"]).on("2026-10-01"), null);
-  assert.deepEqual(new CycleLog(["2026-10-05"]).on("2026-10-22"), { day: 18, length: 30, nextStart: "2026-11-04", daysUntil: 13, isPeriod: false, ended: false });
+  assert.deepEqual(new CycleLog(["2026-10-05"]).on("2026-10-22"), { day: 18, length: 30, period: 8, nextStart: "2026-11-04", daysUntil: 13, isPeriod: false, ended: false });
   const c = new CycleLog(["2026-08-01", "2026-08-29", "2026-09-28", "2026-10-27"]).on("2026-10-30");
   assert.equal(c.length, 29); assert.equal(c.day, 4); assert.equal(c.isPeriod, true);
 });

@@ -270,6 +270,35 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
   button.winx-cal__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: "Cinzel", serif; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
   button.winx-cal__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
 }
+/* Ahead's inner tabs as folder tabs on a line: the others a shade darker behind, the open one the panel's colour */
+.winx-cal__subtabs {
+  display: flex;
+  gap: $space-2xs;
+  margin-bottom: $space-m;
+  border-bottom: 1px solid var(--winx-border);
+  button.winx-cal__subtab {
+    height: auto;
+    margin: 0 0 -1px;
+    padding: $space-xs $space-xl;
+    border: 1px solid var(--winx-border);
+    border-bottom: none;
+    border-radius: $radius-m $radius-m 0 0;
+    background: fade(var(--winx-border), 35%);
+    box-shadow: none;
+    font-family: "Cinzel", serif;
+    font-size: inherit;
+    color: var(--winx-purple-deep);
+    opacity: 0.75;
+    cursor: pointer;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    &:hover { opacity: 1; background: fade(var(--winx-border), 55%); }
+  }
+  button.winx-cal__subtab--on, button.winx-cal__subtab--on:hover {
+    opacity: 1;
+    background: var(--winx-pink-light);
+    border-bottom: 1px solid var(--winx-pink-light);
+  }
+}
 .winx-cal__late { color: #b0306a; font-weight: 600; }
 .winx-cal__fold { cursor: pointer; }
 .winx-cal__group-card--dashed { background: none; border: 1.5px dashed fade(var(--winx-purple-deep), 35%); }

@@ -40,7 +40,7 @@ export class CelestialMarket extends Widget {
     const link = (text, path) => new NoteLink({ text, path, kind: "text", cls: "winx-market__link" });
     return html`<div class="winx-market">
       <div class="winx-market__list">
-        ${items.length ? "" : new Empty({ text: "✨ Merchant inventory cleared" })}
+        ${items.length ? "" : new Empty({ text: "Merchant inventory cleared" })}
         ${groups.map(({ cat, items }) => html`
           ${new GroupHeader({ label: cat.label, count: items.length })}
           ${items.map(t => html`<div class="winx-market__item"><span class="winx-market__text">${t.text.replace(/#[\w/]+/g, "").trim()}</span><button class="winx-market__buy" aria-label="bought" title="bought" data-action="buy" data-line="${t.line}"></button></div>`)}`)}

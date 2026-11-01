@@ -131,3 +131,40 @@ test("balance: each area's tasks on the shown days (open + done, no 🔁 ghosts)
     { area: "#area/base", planned: 0, done: 0 },
   ]);
 });
+
+test("a day's parts: done hidden → the done ones counted as ✓N, the 🔁 ones apart (shown inside the box)", () => {
+  const m = data([
+    task("x", "tea ✅ 2026-10-28"),
+    task("x", "yoga 🔁 every day 📅 2026-10-28 ✅ 2026-10-28"),
+    task(" ", "post letter 📅 2026-10-28"),
+  ], { days: ["2026-10-28"] });
+  const names = es => es.map(e => T(e.t).text);
+  const hide = m.dayParts("2026-10-28", { open: true, ghost: true, done: false });
+  assert.deepEqual(names(hide.rows), ["post letter"]);
+  assert.deepEqual(names(hide.hidden), ["tea"]);
+  assert.deepEqual(names(hide.routineHidden), ["yoga"]);
+  assert.deepEqual(names(hide.routine), ["yoga"]);                 // the 🔁 pill counts all of them: 1/1
+  assert.deepEqual(names(hide.routineRows), []);
+  const show = m.dayParts("2026-10-28", { open: true, ghost: true, done: true });
+  assert.deepEqual(names(show.rows), ["post letter", "tea"]);
+  assert.deepEqual(names(show.routineRows), ["yoga"]);
+  assert.deepEqual([...show.hidden, ...show.routineHidden], []);
+});
+
+test("Ahead: open dated tasks after this week — the rest of the month, of the year, later; by area, then date; no 🔁", () => {
+  const m = data([   // today Wed 28.10, the week ends Sun 01.11
+    task(" ", "#area/body walk 📅 2026-11-01"),               // this week: the calendar shows it
+    task(" ", "#area/mind book 📅 2026-12-10"),
+    task(" ", "#area/body dentist 📅 2026-12-03"),
+    task(" ", "#area/body visa 📅 2027-02-01"),
+    task(" ", "#area/body gym 🔁 every month 📅 2026-12-01"),  // a regular: in Regulars
+    task("x", "#area/body done ✅ 2026-10-27 📅 2026-12-05"),
+  ]);
+  assert.deepEqual(texts(m.ahead.month), []);                   // October ends inside the week
+  assert.deepEqual(texts(m.ahead.year), ["dentist", "book"]);
+  assert.deepEqual(texts(m.ahead.later), ["visa"]);
+  // today Tue 10.11, the week ends Sun 15.11: the rest of November, by area
+  const nov = new CalendarData({ tasks: [task(" ", "#area/mind talk 📅 2026-11-20"), task(" ", "#area/body run 📅 2026-11-25"), task(" ", "#area/body swim 📅 2026-11-14")],
+    poolLines: [], days: weekOf("2026-11-10"), today: "2026-11-10", areaOrder: AREAS });
+  assert.deepEqual(texts(nov.ahead.month), ["run", "talk"]);
+});

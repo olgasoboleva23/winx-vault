@@ -20,6 +20,67 @@
   overflow-x: visible !important;
   padding-top: $space-l;
 
+  /* ── Small row (the default); --mini hides the full ring ── */
+  .winx-pomodoro__mini {
+    display: none;
+    align-items: center;
+    gap: $space-xl;
+  }
+  &.winx-pomodoro--mini {
+    padding-top: 0;
+    .winx-pomodoro__mini { display: flex; }
+    .winx-pomodoro__body { display: none; }
+  }
+
+  .winx-pomodoro__mini-ring {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    border-radius: $round;
+    border: 2px solid var(--winx-border);
+    cursor: pointer;
+    transition: --p 1s linear;
+    background:
+      radial-gradient(circle, var(--winx-pink-light) 15px, var(--winx-border) 16px, transparent 17px),
+      conic-gradient(var(--winx-pink-deep) calc(var(--p) * 360deg), var(--winx-purple-light) 0);
+  }
+
+  .winx-pomodoro__mini-info {
+    .winx-pomodoro__stars { align-items: center; }
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .winx-pomodoro__mini-time {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--winx-text-dark);
+  }
+
+  .winx-pomodoro__mini-mode {
+    color: var(--winx-text-dark);
+    opacity: 0.75;
+    margin-right: $space-xs;
+  }
+
+  button.winx-pomodoro__mini-play {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    padding: 0;
+    border-radius: $round;
+    border: 2px solid var(--winx-border);
+    background: var(--winx-pink);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    &:hover { transform: scale(1.05); }
+    svg { width: 20px; height: 20px; fill: var(--winx-text-dark); }
+  }
+
   .winx-pomodoro__body {
     display: flex;
     flex-direction: column;
@@ -84,6 +145,7 @@
 
     .winx-pomodoro__time {
       position: relative;
+      cursor: pointer;
       font-size: 30px;
       color: var(--winx-text-dark);
       z-index: 2;

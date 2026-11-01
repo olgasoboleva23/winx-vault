@@ -1,9 +1,9 @@
 import { html } from "../core/html.js";
 import { Component } from "./component.js";
 
-// an empty list's line: "✨ All bought"
+// an empty list's line with a sparkle: "✦ All bought"; no text: "✦ Nothing here yet"
 export class Empty extends Component {
-  view({ text }) { return html`<div class="winx-empty">${text}</div>`; }
+  view({ text = "Nothing here yet" }) { return html`<div class="winx-empty">✦ ${text}</div>`; }
 }
 
 // a widget whose note isn't there: "Create 02 Areas/Personal/Goals.md"

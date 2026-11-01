@@ -35,7 +35,7 @@ export class Savings extends Widget {
     return { jars };
   }
   view({ jars }) {
-    if (!jars.length) return new Empty({ text: `✦ A goal: a note in ${FOLDER}` });
+    if (!jars.length) return new Empty({ text: `A goal: a note in ${FOLDER}` });
     return html`<div class="winx-savings">${jars.map(j => {
       const slots = Math.max(8, Math.ceil((j.count + 1) / 8) * 8);
       const grey = j.pct === null ? 100 : Math.max(0, 100 - j.pct);

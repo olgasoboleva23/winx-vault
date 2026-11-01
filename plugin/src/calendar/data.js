@@ -1,7 +1,7 @@
 // The calendar's model, no DOM (CalendarData), and the keys that name a task in its markup.
 // Tasks are Dataview tasks ({ status, text, path, line }), each with its Task.
 import { Task } from "../tasks/task.js";
-import { diffDays, dm } from "../core/dates.js";
+import { addDays, addMonths, diffDays, dm, weekday } from "../core/dates.js";
 import { projectRepeats } from "../tasks/repeats.js";
 
 export const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
@@ -19,6 +19,8 @@ const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 //            longest since last done (never done first)
 //   regulars open 🔁 tasks (an undated one is paused): { rest, bdays } — birthdays (a yearly rule) apart, by the
 //            next date; the rest by area, dated before paused, the longest overdue, then the longest since last done
+//   ahead    open dated tasks (no 🔁) after today's week: { month, year, later } — the rest of this month,
+//            of this year, later; by area, then date (the old Kanban's columns)
 //   all      every task and pool item: what a data-task key is looked up in
 // and the meta lines of the bottom panel's cards.
 export class CalendarData {
@@ -26,7 +28,8 @@ export class CalendarData {
     this.today = today;
     this.areaOrder = areaOrder;
     this.byDay = Object.fromEntries(days.map(d => [d, []]));
-    const backlog = [], last = days.at(-1);
+    const sunday = addDays(today, 7 - weekday(today));
+    const backlog = [], ahead = [], last = days.at(-1);
     for (const t of tasks) {
       const task = T(t);
       if (task.isDone) { if (task.doneOn) this.byDay[task.doneOn]?.push({ t, kind: "done" }); continue; }
@@ -34,8 +37,16 @@ export class CalendarData {
       const d = task.date;
       if (!d) { if (!task.isRecurring) backlog.push(t); continue; }
       if (d >= today) this.byDay[d]?.push({ t, kind: "open" });
+      if (!task.isRecurring && d > sunday) ahead.push(t);
       if (task.rule) for (const g of projectRepeats(task.rule, d, last)) if (g > today) this.byDay[g]?.push({ t, kind: "ghost" });
     }
+    ahead.sort((a, b) => this.rank(a) - this.rank(b) || T(a).date.localeCompare(T(b).date));
+    const nextMonth = addMonths(today.slice(0, 8) + "01", 1), nextYear = `${+today.slice(0, 4) + 1}-01-01`;
+    this.ahead = {
+      month:  ahead.filter(t => T(t).date < nextMonth),
+      year:   ahead.filter(t => T(t).date >= nextMonth && T(t).date < nextYear),
+      later:  ahead.filter(t => T(t).date >= nextYear),
+    };
     for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
     this.done = tasks.map(T).filter(t => t.isDone && t.doneOn);
     this.skips = tasks.map(T).filter(t => t.isSkipped);
@@ -55,6 +66,18 @@ export class CalendarData {
       const mine = entries.filter(e => T(e.t).area === area);
       return { area, planned: mine.length, done: mine.filter(e => e.kind === "done").length };
     });
+  }
+
+  // a day's entries by where they go: rows (not 🔁), the 🔁 box (all of them for its n/m pill; routineRows
+  // listed in it) and the done ones `shown` hides, counted as ✓N: under the day, and the 🔁 ones inside the box
+  dayParts(d, shown) {
+    const all = this.byDay[d], routine = all.filter(e => T(e.t).isRecurring);
+    return {
+      rows: all.filter(e => shown[e.kind] && !routine.includes(e)),
+      routine, routineRows: routine.filter(e => shown[e.kind]),
+      hidden: all.filter(e => !shown[e.kind] && e.kind === "done" && !routine.includes(e)),
+      routineHidden: routine.filter(e => !shown[e.kind] && e.kind === "done"),
+    };
   }
 
   // the place of a task's area in the areas' order, unknown areas last

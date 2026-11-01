@@ -6,7 +6,7 @@ import { findChoices } from "../src/core/find.js";
 import { projectRepeats, ruleText } from "../src/tasks/repeats.js";
 import { todayCount } from "../src/tasks/task.js";
 import { levelInfo } from "../src/widgets/xp/xp.js";
-import { vitals } from "../src/widgets/xp/vitals.js";
+import { vitals, mana, mpPhases, mpLine, mpTable } from "../src/widgets/xp/vitals.js";
 import { Task } from "../src/tasks/task.js";
 
 // 2026-10-19 is a Monday
@@ -111,14 +111,32 @@ test("ruleText", () => {
 });
 
 
-test("vitals: HP loses 2 a star for each missed task, gets 1 a star back for each done today; MP is today's focus", () => {
+test("vitals: HP loses 2 a star for each missed task, gets 1 a star back for each done today", () => {
   const T = l => new Task(l);
   const v = vitals({
     missed: [T("- [ ] #⭐⭐⭐hard #area/base clean 📅 2026-10-24"), T("- [ ] #⭐easy #area/body mask 📅 2026-10-22")],
     doneToday: [T("- [x] #⭐⭐medium #area/mind read ✅ 2026-10-31")],
-    focus: 1,
   });
-  assert.deepEqual(v, { hp: 44, hpMax: 50, damage: 8, heal: 2, mp: 1, mpMax: 4 });
-  assert.equal(vitals({ missed: Array(20).fill(T("- [ ] #⭐⭐⭐hard x 📅 2026-10-01")), doneToday: [], focus: 9 }).hp, 0);
-  assert.equal(vitals({ missed: [], doneToday: [T("- [x] #⭐⭐⭐hard x ✅ 2026-10-31")], focus: 9 }).mp, 4);
+  assert.deepEqual(v, { hp: 44, hpMax: 50, damage: 8, heal: 2 });
+  assert.equal(vitals({ missed: Array(20).fill(T("- [ ] #⭐⭐⭐hard x 📅 2026-10-01")), doneToday: [] }).hp, 0);
+});
+
+test("MP by the day of the cycle: period 1, after it 3, the fertile days and ovulation 4, then 3, the last 5 days 2", () => {
+  // a 30-day cycle, 6-day period: ovulation on day 16
+  assert.deepEqual(mpPhases(30, 6), [
+    { from: 1, to: 6, value: 1, phase: "period" }, { from: 7, to: 10, value: 3, phase: "follicular" },
+    { from: 11, to: 17, value: 4, phase: "ovulation" }, { from: 18, to: 25, value: 3, phase: "luteal" },
+    { from: 26, to: 30, value: 2, phase: "pre-period" },
+  ]);
+  const on = (day, isPeriod = day <= 6) => mana({ day, length: 30, period: 6, isPeriod });
+  assert.deepEqual(on(2), { value: 1, max: 4, phase: "period", day: 2, up: { value: 3, in: 5 }, phases: mpPhases(30, 6) });
+  assert.equal(on(5, false).phase, "follicular");                          // the period ended early
+  assert.equal(on(8, true).value, 1);                                      // or goes on longer
+  assert.deepEqual(on(7).up, { value: 4, in: 4 });
+  assert.equal(on(12).up, null);                                           // the top: nothing higher until the next cycle
+  assert.equal(on(33).phase, "pre-period");                                // late: still before the period
+  assert.equal(mana(null), null);                                          // no Cycle.md: no bar
+  assert.equal(mpLine(on(7)), "MP 3/4 · follicular · ↑4 in 4 d");
+  assert.equal(mpLine(on(12)), "MP 4/4 · ovulation");
+  assert.equal(mpTable(on(7)), "day 1–6 · period · MP 1\nday 7–10 · follicular · MP 3\nday 11–17 · ovulation · MP 4\nday 18–25 · luteal · MP 3\nday 26–30 · pre-period · MP 2");
 });
