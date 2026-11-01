@@ -14,22 +14,6 @@
 > > levelToday
 > > card: Level
 > > ```
-> > 
-> > ```winx
-> > pomodoro
-> > card: Pomodoro
-> > ```
-> > 
-> > > [!card] Goals
-> > > ```winx
-> > > goals
-> > > ```
-> 
-> > [!col]
-> > ```winx
-> > lifeAreas
-> > card: Life Areas
-> > ```
 > >
 > > ```winx
 > > cycle
@@ -37,18 +21,25 @@
 > > ```
 > >
 > > ```winx
+> > pomodoro
+> > card: Pomodoro
+> > ```
+> >
+> > > [!card] Goals
+> > > ```winx
+> > > goals
+> > > ```
+>
+> > [!col]
+> > ```winx
+> > lifeAreas
+> > card: Life Areas
+> > ```
+> >
+> > ```winx
 > > weight
 > > card: Weight
 > > ```
-> >
-> > > [!card] Finance
-> > > ```winx
-> > > financeMonth
-> > > ```
-> > >
-> > > ```winx
-> > > savings
-> > > ```
 >
 > > [!col]
 > > ```winx
@@ -64,6 +55,15 @@
 > > card: Celestial
 > > meta: scroll
 > > ```
+> >
+> > > [!card] Finance
+> > > ```winx
+> > > financeMonth
+> > > ```
+> > >
+> > > ```winx
+> > > savings
+> > > ```
 
 %% the Quests card's Tasks query, for the tab's day (the dashboard draws it into the card) %%
 

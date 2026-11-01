@@ -111,6 +111,9 @@
    too much on a ~390px screen. Desktop is untouched. */
 .is-phone :is(.dashboard, .kanban-board) {
   --file-margins: 12px 8px;
+  /* the floating navbar covers the page's end (the panel's "show less"): room for it below, as Obsidian
+     leaves for Bases (--view-bottom-spacing: navbar + safe area, 0 when the navbar doesn't float) */
+  padding-bottom: calc(var(--view-bottom-spacing, 0px) + #{$space-2xl}) !important;
 
   .callout[data-callout="grid"] { padding: $space-xs !important; }
   .callout[data-callout="card"] { padding: $space-l !important; }

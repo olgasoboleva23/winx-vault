@@ -1,6 +1,7 @@
 // Cycle: the day of the cycle on the page's date, the next start forecast, then one of two tabs: the current cycle and
 // the 3 before it as rows of day pills (the period, the fertile window and the ovulation marked), or the last 10
 // cycles' lengths and period lengths as columns with their average; "started / ended today", the dates.
+// Folded (the default; a click on the head toggles it, kept per device): only the head.
 import { html } from "../../core/html.js";
 import { Button } from "../../uikit/button.js";
 import { Widget } from "../widget.js";
@@ -26,7 +27,9 @@ const pill = (c, n) => n <= (c.period ?? 0) ? "period" : n === c.ovulation ? "ov
 
 export class Cycle extends Widget {
   tab = "days";   // or "stats"
+  folded = this.app.loadLocalStorage("winx-cycle-open") !== "1";
   on = {
+    fold: () => { this.folded = !this.folded; this.app.saveLocalStorage("winx-cycle-open", this.folded ? null : "1"); this.draw(); },
     tab: (e, el) => { this.tab = el.dataset.tab; this.draw(); },
     mark: (e, el) => appendLine(CYCLE_PATH, `- ${el.dataset.kind}:: ${el.dataset.day}`, { header: "period:: 8\n\n", unique: true }),
   };
@@ -50,8 +53,8 @@ export class Cycle extends Widget {
     return html`<div class="winx-cycle">
       ${!page ? new Missing({ path: CYCLE_PATH })
         : !info ? new Empty({ text: "No data yet" })
-        : html`<div class="winx-cycle__head"><div class="winx-cycle__day${info.isPeriod ? " winx-cycle__day--period" : ""}" title="${mpLine(mana(info))}\n\n${mpTable(mana(info))}">day ${info.day}<span class="winx-cycle__phase"> · ${mana(info).phase}</span></div><div class="winx-cycle__next">next ~${dm(info.nextStart)}, ${when}</div></div>`}
-      ${cycles.length ? html`<div class="winx-cycle__tabs">${new Button({ text: "days", kind: "toggle", on: this.tab === "days", action: "tab", data: { tab: "days" } })}${new Button({ text: "stats", kind: "toggle", on: this.tab === "stats", action: "tab", data: { tab: "stats" } })}</div>` : ""}
+        : html`<div class="winx-cycle__head" data-action="fold" title="${this.folded ? "show the cycles" : "fold"}"><div class="winx-cycle__day${info.isPeriod ? " winx-cycle__day--period" : ""}" title="${mpLine(mana(info))}\n\n${mpTable(mana(info))}">day ${info.day}<span class="winx-cycle__phase"> · ${mana(info).phase}</span></div><div class="winx-cycle__next">next ~${dm(info.nextStart)}, ${when}</div></div>`}
+      ${this.folded && info ? "" : html`${cycles.length ? html`<div class="winx-cycle__tabs">${new Button({ text: "days", kind: "toggle", on: this.tab === "days", action: "tab", data: { tab: "days" } })}${new Button({ text: "stats", kind: "toggle", on: this.tab === "stats", action: "tab", data: { tab: "stats" } })}</div>` : ""}
       ${!cycles.length ? "" : this.tab === "stats"
         ? html`${stats.length ? this.columns("cycle", stats.map(c => c.length), "len") : ""}${stats.some(c => c.period) ? this.columns("period", stats.filter(c => c.period).map(c => c.period), "per") : ""}`
         : html`<div class="winx-cycle__rows">${cycles.map(c => html`<div class="winx-cycle__row">
@@ -61,7 +64,7 @@ export class Cycle extends Widget {
       <div class="winx-cycle__btns">
         ${new Button({ text: ending ? "ended today" : "started today", action: "mark", kind: "pill", data: { kind: ending ? "end" : "start", day } })}
         ${new NoteLink({ text: "dates", path: CYCLE_PATH })}
-      </div>
+      </div>`}
     </div>`;
   }
 }

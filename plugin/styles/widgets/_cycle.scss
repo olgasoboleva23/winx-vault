@@ -18,7 +18,7 @@
 }
 
 /* the day and its phase on the left, the next start on the right */
-.winx-cycle__head { align-self: stretch; display: flex; justify-content: space-between; align-items: baseline; gap: $space-m; flex-wrap: wrap; }
+.winx-cycle__head { cursor: pointer; align-self: stretch; display: flex; justify-content: space-between; align-items: baseline; gap: $space-m; flex-wrap: wrap; }
 /* the phase by the day; the day's tooltip: the MP phases */
 .winx-cycle__phase { font-size: $text-l; opacity: 0.7; }
 .winx-cycle__next { font-size: $text-m; color: var(--winx-purple-deep); }
