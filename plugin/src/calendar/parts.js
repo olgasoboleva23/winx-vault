@@ -162,7 +162,6 @@ const SHOWN = 8;
 export class Panel extends Part {
   on = {
     tab: (e, el) => this.ctx.set({ tab: el.dataset.tab }, ["panel"]),
-    aheadTab: (e, el) => this.ctx.set({ ahead: el.dataset.tab }, ["panel"]),
     more: () => this.ctx.set({ backlogOpen: !this.ctx.state.backlogOpen }, ["panel"]),
     bdays: () => this.ctx.set({ bdaysOpen: !this.ctx.state.bdaysOpen }, ["panel"]),
     toToday: (e, el) => { const t = this.view.taskOf(el); if (t) this.view.actions.fromPool(t, this.ctx.today, false); },
@@ -195,11 +194,15 @@ export class Panel extends Part {
       list = byArea(cut ? backlog.slice(0, SHOWN) : backlog, t => new TaskCard({ task: info(t), meta: model.backlogMeta(t) }));
       if (backlog.length > SHOWN) after = html`<button class="winx-cal__more" data-action="more">${cut ? `show all ${backlog.length}` : "show less"}</button>`;
     } else if (state.tab === "ahead") {
-      // after this week, in folder tabs: the rest of the month, of the year, later (the old Kanban's columns)
-      const items = model.ahead[state.ahead];
-      const card = t => new TaskCard({ task: info(t), meta: `📅 ${M(T(t).date).format("D MMM, ddd")} · in ${diffDays(T(t).date, today)} d` });
-      before = html`<div class="winx-cal__subtabs">${[["month", "🌸 Month"], ["year", "✨ Year"], ["later", "🔮 Later"]].map(([key, text]) => html`<button class="winx-cal__subtab${key === state.ahead ? " winx-cal__subtab--on" : ""}" data-action="aheadTab" data-tab="${key}">${text} · ${model.ahead[key].length}</button>`)}</div>`;
-      list = items.length ? byArea(items, card) : new Empty();
+      // after this week: a card per month, the tasks under their dates (the old Kanban's month / year / future)
+      const year = today.slice(0, 4);
+      const meta = t => `${areaTitle(T(t).area)} · in ${diffDays(T(t).date, today)} d`;
+      const month = ({ month, items }) => {
+        const title = M(month + "-01").format(month.startsWith(year) ? "MMMM" : "MMMM YYYY");
+        const days = items.map((t, i) => html`${i && T(items[i - 1]).date === T(t).date ? "" : html`<div class="winx-cal__date">📅 ${M(T(t).date).format("D MMM · ddd")}</div>`}${new TaskCard({ task: info(t), meta: meta(t) })}`);
+        return group(`${title} · ${items.length}`, days);
+      };
+      list = model.ahead.length ? model.ahead.map(month) : new Empty();
     } else if (state.tab === "pool") {
       // by area, the longest since last done first (never done at the top)
       const plus = t => new Button({ icon: "+📅", title: "add to today", action: "toToday" });
@@ -220,7 +223,7 @@ export class Panel extends Part {
         list = html`${list}<div class="winx-cal__group-card winx-cal__group-card--dashed"><div class="winx-cal__group winx-cal__fold" title="${open ? "fold" : "show all"}" data-action="bdays">🎂 Birthdays · ${bdays.length}</div>${(open ? bdays : bdays.slice(0, 3)).map(t => new TaskCard({ task: info(t), meta: `yearly · ${dm(next(t))}` }))}${more}</div>`;
       }
     }
-    const tabs = [["nodate", `No date · ${backlog.length}`], ["ahead", `Ahead · ${Object.values(model.ahead).flat().length}`], ["regulars", `Regulars · ${regulars.rest.length + regulars.bdays.length}`], ["pool", `Pool · ${pool.length}`]];
+    const tabs = [["nodate", `No date · ${backlog.length}`], ["ahead", `Ahead · ${model.ahead.flatMap(g => g.items).length}`], ["regulars", `Regulars · ${regulars.rest.length + regulars.bdays.length}`], ["pool", `Pool · ${pool.length}`]];
     return html`<div class="winx-cal__backlog winx-board-backlog" data-drop=""${PART("panel")}><div class="winx-cal__tabs">${tabs.map(([key, text]) => html`<button class="winx-cal__tab${key === state.tab ? " winx-cal__tab--on" : ""}" data-action="tab" data-tab="${key}">${text}</button>`)}</div>${before}<div class="winx-cal__backlog-grid">${list}</div>${after}</div>`;
   }
 }

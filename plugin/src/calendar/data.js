@@ -1,7 +1,7 @@
 // The calendar's model, no DOM (CalendarData), and the keys that name a task in its markup.
 // Tasks are Dataview tasks ({ status, text, path, line }), each with its Task.
 import { Task } from "../tasks/task.js";
-import { addDays, addMonths, diffDays, dm, weekday } from "../core/dates.js";
+import { addDays, diffDays, dm, weekday } from "../core/dates.js";
 import { projectRepeats } from "../tasks/repeats.js";
 
 export const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
@@ -19,8 +19,8 @@ const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 //            longest since last done (never done first)
 //   regulars open 🔁 tasks (an undated one is paused): { rest, bdays } — birthdays (a yearly rule) apart, by the
 //            next date; the rest by area, dated before paused, the longest overdue, then the longest since last done
-//   ahead    open dated tasks (no 🔁) after today's week: { month, year, later } — the rest of this month,
-//            of this year, later; by area, then date (the old Kanban's columns)
+//   ahead    open dated tasks (no 🔁) after today's week, by month: [{ month: "2026-12", items }]; in a month
+//            by date, then area (the old Kanban's month / year / future columns)
 //   all      every task and pool item: what a data-task key is looked up in
 // and the meta lines of the bottom panel's cards.
 export class CalendarData {
@@ -40,13 +40,13 @@ export class CalendarData {
       if (!task.isRecurring && d > sunday) ahead.push(t);
       if (task.rule) for (const g of projectRepeats(task.rule, d, last)) if (g > today) this.byDay[g]?.push({ t, kind: "ghost" });
     }
-    ahead.sort((a, b) => this.rank(a) - this.rank(b) || T(a).date.localeCompare(T(b).date));
-    const nextMonth = addMonths(today.slice(0, 8) + "01", 1), nextYear = `${+today.slice(0, 4) + 1}-01-01`;
-    this.ahead = {
-      month:  ahead.filter(t => T(t).date < nextMonth),
-      year:   ahead.filter(t => T(t).date >= nextMonth && T(t).date < nextYear),
-      later:  ahead.filter(t => T(t).date >= nextYear),
-    };
+    ahead.sort((a, b) => T(a).date.localeCompare(T(b).date) || this.rank(a) - this.rank(b));
+    this.ahead = [];
+    for (const t of ahead) {
+      const month = T(t).date.slice(0, 7);
+      if (this.ahead.at(-1)?.month !== month) this.ahead.push({ month, items: [] });
+      this.ahead.at(-1).items.push(t);
+    }
     for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
     this.done = tasks.map(T).filter(t => t.isDone && t.doneOn);
     this.skips = tasks.map(T).filter(t => t.isSkipped);

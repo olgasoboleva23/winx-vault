@@ -151,20 +151,15 @@ test("a day's parts: done hidden → the done ones counted as ✓N, the 🔁 one
   assert.deepEqual([...show.hidden, ...show.routineHidden], []);
 });
 
-test("Ahead: open dated tasks after this week — the rest of the month, of the year, later; by area, then date; no 🔁", () => {
+test("Ahead: open dated tasks after this week, by month; in a month by date, then area; no 🔁", () => {
   const m = data([   // today Wed 28.10, the week ends Sun 01.11
     task(" ", "#area/body walk 📅 2026-11-01"),               // this week: the calendar shows it
-    task(" ", "#area/mind book 📅 2026-12-10"),
+    task(" ", "#area/mind book 📅 2026-12-03"),
     task(" ", "#area/body dentist 📅 2026-12-03"),
+    task(" ", "#area/body tea 📅 2026-12-01"),
     task(" ", "#area/body visa 📅 2027-02-01"),
     task(" ", "#area/body gym 🔁 every month 📅 2026-12-01"),  // a regular: in Regulars
     task("x", "#area/body done ✅ 2026-10-27 📅 2026-12-05"),
   ]);
-  assert.deepEqual(texts(m.ahead.month), []);                   // October ends inside the week
-  assert.deepEqual(texts(m.ahead.year), ["dentist", "book"]);
-  assert.deepEqual(texts(m.ahead.later), ["visa"]);
-  // today Tue 10.11, the week ends Sun 15.11: the rest of November, by area
-  const nov = new CalendarData({ tasks: [task(" ", "#area/mind talk 📅 2026-11-20"), task(" ", "#area/body run 📅 2026-11-25"), task(" ", "#area/body swim 📅 2026-11-14")],
-    poolLines: [], days: weekOf("2026-11-10"), today: "2026-11-10", areaOrder: AREAS });
-  assert.deepEqual(texts(nov.ahead.month), ["run", "talk"]);
+  assert.deepEqual(m.ahead.map(g => [g.month, texts(g.items)]), [["2026-12", ["tea", "dentist", "book"]], ["2027-02", ["visa"]]]);
 });
