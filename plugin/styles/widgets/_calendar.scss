@@ -30,8 +30,11 @@
 /* a piece of the balance bar: its icon and done / all, the bar with the done part brighter */
 .winx-cal__area { min-width: 2.6em; cursor: pointer; }
 .winx-cal__area-label { display: block; overflow: hidden; white-space: nowrap; text-overflow: clip; font-size: $text-xs; color: var(--winx-lavender); }
-.winx-cal__area--on .winx-cal__area-label { color: var(--winx-purple-deep); font-weight: 600; }
-.winx-cal__area-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); }
+.winx-cal__area--on .winx-cal__area-label { font-weight: 600; }
+/* hover: the piece glows in its area's colour (a click filters by the area) */
+.winx-cal__area:hover .winx-cal__area-label { text-shadow: 0 0 6px var(--area); }
+.winx-cal__area:hover .winx-cal__area-track { box-shadow: 0 0 10px var(--area), 0 0 4px var(--area); }
+.winx-cal__area-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); transition: box-shadow 0.15s ease; }
 .winx-cal__area-fill { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
 .winx-cal__balance-none { display: flex; gap: $space-2xs; filter: grayscale(1); opacity: 0.6; font-size: $text-l; }
 .winx-cal__week {
