@@ -15,3 +15,9 @@
   flex-direction: row !important;
   gap: $space-m;
 }
+/* two widgets in one card (Finance: the month, then the savings jars): a dashed line between them */
+.callout[data-callout="card"] > .callout-content > .block-language-winx + .block-language-winx {
+  margin-top: $space-l;
+  padding-top: $space-l;
+  border-top: 1px dashed fade(var(--winx-gold-deep), 35%);
+}

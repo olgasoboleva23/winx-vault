@@ -41,15 +41,14 @@
 > > card: Weight
 > > ```
 > >
-> > ```winx
-> > financeMonth
-> > card: Finance
-> > ```
-> >
-> > ```winx
-> > savings
-> > card: Savings
-> > ```
+> > > [!card] Finance
+> > > ```winx
+> > > financeMonth
+> > > ```
+> > >
+> > > ```winx
+> > > savings
+> > > ```
 >
 > > [!col]
 > > ```winx
