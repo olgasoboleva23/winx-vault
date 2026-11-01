@@ -9,7 +9,7 @@ export const KINDS = {
   },
   read: {
     folder: "03 Resources/Collections/Readlist", icon: "📖", title: "✦ New read item", steps: ["Start", "Read", "Finish"],
-    types: pairs([["Fanfiction", "fanfiction"], ["Fiction", "fiction"], ["Scientific pop", "scientific_pop"], ["IT", "it"]]),
+    types: pairs([["Fanfiction", "fanfiction"], ["Fiction", "fiction"], ["Manga", "manga"], ["Scientific pop", "scientific_pop"], ["IT", "it"]]),
     statuses: pairs([["to read", "to_read"], ["reading", "reading"], ["completed", "completed"], ["dropped", "dropped"]]),
   },
   game: {
