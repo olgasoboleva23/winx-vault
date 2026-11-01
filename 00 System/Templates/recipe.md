@@ -5,6 +5,7 @@ tags: []
 source:
 time: ~
 difficulty:
+rating:
 ---
 
 # {{title}}

@@ -1,7 +1,25 @@
 formulas:
   coverImageFormula: file.embeds[0]
+  stars: if(rating, "★".repeat(rating) + "☆".repeat(10 - rating), "")
+properties:
+  formula.stars:
+    displayName: rating
+  note.rating:
+    displayName: 1–10
 views:
   - type: cards
+    name: Cards
+    filters:
+      and:
+        - type == "game"
+    order:
+      - title
+      - formula.stars
+      - status
+      - genre
+      - tags
+    image: formula.coverImageFormula
+  - type: table
     name: Table
     filters:
       and:
@@ -10,5 +28,6 @@ views:
       - title
       - status
       - genre
-      - tags
-    image: formula.coverImageFormula
+      - hours
+      - rating
+      - formula.stars
