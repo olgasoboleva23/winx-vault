@@ -71,5 +71,6 @@
 due on {{date}}
 path includes Tasks
 short mode
+sort by status
 sort by tags
 ```
