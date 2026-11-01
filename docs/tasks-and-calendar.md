@@ -9,7 +9,7 @@
 Tasks live in `02 Areas/Personal/Tasks/Master.md` in the Tasks plugin's format, tagged with a difficulty and a life area:
 
 ```
-- [ ] #⭐⭐medium #area/mind #time/evening read a chapter ![[rings.gif|28]] 🔁 every week on Tuesday, Thursday 📅 2026-11-03
+- [ ] #⭐⭐medium #area/mind #time/evening read a chapter ![[rings.webp|28]] 🔁 every week on Tuesday, Thursday 📅 2026-11-03
 ```
 
 **Winx: New task** (Cmd+P, or **＋ task** in the calendar):
