@@ -184,63 +184,6 @@
     }
   }
 
-  /* ── Settings panel ── */
-  .winx-pomodoro__settings {
-    display: flex;
-    flex-direction: column;
-    gap: $space-s;
-    background: var(--winx-pink-light);
-    border: 1px solid var(--winx-border);
-    border-radius: $radius-m;
-    padding: $space-l $space-2xl;
-    width: 140px;
-
-    .winx-pomodoro__field {
-      @include row;
-      gap: $space-s;
-      font-size: $text-s;
-    }
-
-    .winx-pomodoro__input {
-      width: 40px;
-      border: 1px solid var(--winx-border);
-      border-radius: 4px;
-      background: var(--winx-pink);
-      text-align: center;
-      font-size: $text-s;
-      padding: $space-2xs $space-xs;
-
-      /* app.css input:not(:disabled):hover is (0,3,1) — tie it or it wins */
-      &:hover,
-      &:focus {
-        background: var(--winx-pink);
-        border-color: var(--winx-border);
-      }
-    }
-
-    .winx-pomodoro__unit {
-      opacity: 0.6;
-    }
-
-    .winx-pomodoro__save {
-      align-self: flex-end;
-      font-size: $text-xs;
-      padding: 3px $space-l;
-      border-radius: $radius-s;
-      border: 1px solid var(--winx-border);
-      background: var(--winx-pink);
-      cursor: pointer;
-
-      &:hover {
-        background: var(--winx-pink-deep);
-      }
-    }
-
-    :is(.winx-pomodoro__save, .winx-pomodoro__field, .winx-pomodoro__input) {
-      color: var(--winx-text-dark);
-    }
-  }
-
   /* ── Bottom bar ── */
   .winx-pomodoro__bottom {
     @include center;

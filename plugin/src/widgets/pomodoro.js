@@ -6,6 +6,7 @@ import { Widget } from "./widget.js";
 import { todayYmd } from "../core/dates.js";
 import { readJson } from "../core/files.js";
 import { AudioEngine } from "../core/sounds.js";
+import { Form } from "../uikit/form.ts";
 
 const PATH = "00 System/Data/pomodoro.json";
 const DEFAULTS = { focusMin: 25, breakMin: 5 };
@@ -51,16 +52,13 @@ export class Pomodoro extends Widget {
     reset: () => this.act(t => t.reset()),
     skip:  () => this.act(t => t.reset(t.other)),   // to the next session, this one not counted
     play:  () => this.act(t => t.running ? t.pause() : t.play()),
-    gear:  () => {
-      const panel = this.q(".winx-pomodoro__settings"), open = !panel.classList.contains("winx-is-hidden");
-      if (!open) { this.q(".winx-pomodoro__input--focus").value = this.timer.settings.focusMin; this.q(".winx-pomodoro__input--break").value = this.timer.settings.breakMin; }
-      panel.classList.toggle("winx-is-hidden", open);
-    },
-    saveSettings: () => {
-      const focusMin = parseInt(this.q(".winx-pomodoro__input--focus").value), breakMin = parseInt(this.q(".winx-pomodoro__input--break").value);
-      if (![focusMin, breakMin].every(n => n > 0)) return;
-      this.q(".winx-pomodoro__settings").classList.add("winx-is-hidden");
-      this.act(t => { t.settings = { focusMin, breakMin }; t.reset(); });
+    // ⚙: the session lengths in the shared window
+    gear:  async () => {
+      const v = await Form.ask(this.app, "✦ Pomodoro", [
+        { name: "Focus", key: "focusMin", text: "minutes", number: true },
+        { name: "Break", key: "breakMin", text: "minutes", number: true },
+      ], { values: this.timer.settings, required: ["focusMin", "breakMin"], submit: "Save" });
+      if (v?.focusMin > 0 && v.breakMin > 0) this.act(t => { t.settings = { focusMin: v.focusMin, breakMin: v.breakMin }; t.reset(); });
     },
   };
 
@@ -97,12 +95,6 @@ export class Pomodoro extends Widget {
           <span class="winx-pomodoro__settings-info"></span>
           <button class="winx-pomodoro__gear" data-action="gear">${raw(ICON.gear)}</button>
         </div>
-    
-      <div class="winx-pomodoro__settings winx-is-hidden">
-        <label class="winx-pomodoro__field">Focus <input class="winx-pomodoro__input winx-pomodoro__input--focus" type="number" min="1" max="120"/><span class="winx-pomodoro__unit">min</span></label>
-        <label class="winx-pomodoro__field">Break <input class="winx-pomodoro__input winx-pomodoro__input--break" type="number" min="1" max="60"/><span class="winx-pomodoro__unit">min</span></label>
-        <button class="winx-pomodoro__save" data-action="saveSettings">Save</button>
-      </div>
     </div></div>`;
   }
   after(root, { saved, current }) {
