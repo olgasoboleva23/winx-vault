@@ -44,7 +44,8 @@ test("a template gets the title and today's date", () => {
   assert.equal(fillTemplate(text, "Fix login", "2026-10-31"), "created: 2026-10-31\nname: Fix login\n# Fix login\n# Fix login\n");
 });
 
-test("a watch item can get a rating 1–10 in its window; it goes into the note", () => {
+test("a watch, read or game item can get a rating 1–10 in its window; it goes into the note", () => {
+  for (const kind of ["read", "game"]) assert.ok(itemForm(kind).rows.some(r => r.key === "rating"), kind);
   const { rows, required } = itemForm("watch");
   const rating = rows.find(r => r.key === "rating");
   assert.deepEqual(rating.options.map(o => o.value), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);

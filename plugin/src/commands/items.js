@@ -18,7 +18,7 @@ export const KINDS = {
   },
 };
 
-// the window's rows and required keys for a kind (a game asks for a genre instead of a type; a watch item for a rating)
+// the window's rows and required keys for a kind (a game asks for a genre instead of a type)
 export const itemForm = kind => {
   const k = KINDS[kind];
   return {
@@ -26,8 +26,8 @@ export const itemForm = kind => {
       { name: "Title", key: "title", text: "title" },
       k.types ? { name: "Type", key: "media_type", options: k.types } : { name: "Genre", key: "genre", text: "optional" },
       { name: "Status", key: "status", options: k.statuses },
-      // a film or a series: a rating 1–10, now or later (in the note's properties); _index.base shows it as stars
-      ...(kind === "watch" ? [{ name: "Rating", key: "rating", options: Array.from({ length: 10 }, (_, i) => ({ label: String(i + 1), value: i + 1 })) }] : []),
+      // a rating 1–10, now or later (in the note's properties); the collection's _index.base shows it as stars
+      { name: "Rating", key: "rating", options: Array.from({ length: 10 }, (_, i) => ({ label: String(i + 1), value: i + 1 })) },
     ],
     values: { status: k.statuses[0].value },
     required: ["title", "status", ...(k.types ? ["media_type"] : [])],
