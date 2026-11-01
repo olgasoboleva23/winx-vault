@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { KINDS, itemNote, itemPath, fillTemplate } from "../src/commands/items.js";
+import { KINDS, itemForm, itemNote, itemPath, fillTemplate } from "../src/commands/items.js";
 
 test("a watch item's note", () => {
   const note = itemNote("watch", { title: 'The "Tea" Shop', media_type: "anime", status: "to_watch" }, "2026-10-29");
@@ -42,4 +42,12 @@ test("the note's path: in its folder, no characters a file name can't have, numb
 test("a template gets the title and today's date", () => {
   const text = "created: {{date}}\nname: {{title}}\n# <% tp.file.title %>\n# {{title}}\n";
   assert.equal(fillTemplate(text, "Fix login", "2026-10-31"), "created: 2026-10-31\nname: Fix login\n# Fix login\n# Fix login\n");
+});
+
+test("a watch item can get a rating 1–10 in its window; it goes into the note", () => {
+  const { rows, required } = itemForm("watch");
+  const rating = rows.find(r => r.key === "rating");
+  assert.deepEqual(rating.options.map(o => o.value), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  assert.ok(!required.includes("rating"));   // rated later, after watching
+  assert.match(itemNote("watch", { title: "X", media_type: "movie", status: "completed", rating: 7 }, "2026-11-01"), /\nrating: 7\n/);
 });
