@@ -2,7 +2,11 @@
 
 A gamified personal productivity system built in Obsidian with a magical-girl aesthetic. Track tasks, habits, goals and life balance through an RPG-style dashboard and a task calendar.
 
-![Dashboard](dashboard.png)
+![Dashboard](docs/images/dashboard.webp)
+
+![Calendar](docs/images/calendar.webp)
+
+<p><img src="docs/images/phone-dashboard.webp" alt="Dashboard on the phone" width="260"> <img src="docs/images/phone-calendar.webp" alt="Calendar on the phone" width="260"></p>
 
 The repo is two things at once:
 

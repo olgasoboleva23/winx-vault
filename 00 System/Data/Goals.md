@@ -1,16 +1,16 @@
 # Goals
 
 One goal per list item. A goal is a recurring task in `Tasks/Master.md` tagged with `tag`.
-`days` (пн вт ср чт пт сб вс) wins over `perWeek`. `min` and `plan` are shown as hints.
+`days` (Mon Tue Wed Thu Fri Sat Sun) wins over `perWeek`. `min` and `plan` are shown as hints.
 
-- name:: Растяжка
+- name:: Stretching
   tag:: #goal/stretch
-  days:: вт, чт, сб
-  min:: 5 минут на коврике
-  plan:: если выключила компьютер вечером, раскатываю коврик
+  days:: Tue, Thu, Sat
+  min:: 5 minutes on the mat
+  plan:: when I shut the laptop in the evening, I roll out the mat
 
-- name:: Чтение
+- name:: Reading
   tag:: #goal/reading
   perWeek:: 4
-  min:: одна страница
-  plan:: если легла в кровать, открываю книгу
+  min:: one page
+  plan:: when I get into bed, I open the book

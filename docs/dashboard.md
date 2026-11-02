@@ -4,6 +4,8 @@
 
 A tab of its own: the ✨ icon on the left (it opens the dashboard and the calendar, both pinned, or goes back to the one you used last) or **Winx: Open dashboard** (Cmd+P). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/dashboard/layout.md`: the same callouts and `winx` blocks a note would have.
 
+![Dashboard](images/dashboard.webp)
+
 | Card | What it shows |
 |---|---|
 | **Level** | Current level, total XP, progress to the next level |

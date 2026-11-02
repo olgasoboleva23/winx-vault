@@ -1,31 +1,45 @@
-- [ ] #⭐easy #area/body #goal/stretch растяжка 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-24
-- [x] #⭐easy #area/body #goal/stretch растяжка 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-20 ✅ 2026-10-20
-- [x] #⭐easy #area/body #goal/stretch растяжка 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-15 ✅ 2026-10-15
-- [ ] #⭐easy #area/mind #goal/reading чтение 🔁 every day 📅 2026-10-22
-- [x] #⭐easy #area/mind #goal/reading чтение 🔁 every day 📅 2026-10-19 ✅ 2026-10-19
-- [x] #⭐easy #area/mind #goal/reading чтение 🔁 every day 📅 2026-10-21 ✅ 2026-10-21
-- [x] #⭐⭐medium #area/body optimize all code 📅 2026-05-02 ✅ 2026-05-02
-- [ ] #⭐easy #area/rest tower of fasntasy 📅 2026-05-02 
-- [ ] #⭐easy #area/wealth купить сено 📅 2026-05-02 
-- [x] #⭐easy #area/mind redo xp today colors 📅 2026-05-01 ✅ 2026-05-01
-- [x] #⭐easy #area/mind sticker to daily note 📅 2026-05-02 ✅ 2026-05-02
-- [x] #⭐easy #area/base постирать цветное 📅 2026-05-01 ✅ 2026-05-01
-- [x] #⭐⭐medium #area/mind стили скроллбаров,пофиксить крылья на скроллящихся карточках 📅 2026-04-30 ✅ 2026-04-30
-- [x] #⭐easy #area/mind добавить светяшки на звездочки 📅 2026-04-30 ✅ 2026-04-30
-- [x] #⭐⭐medium #area/work add global rule to claude 📅 2026-04-30 ✅ 2026-04-30
-- [x] #⭐easy #area/work wrap whole prompt into prompt file 📅 2026-04-30 ✅ 2026-04-30
-- [x] #⭐easy #area/base массаж 📅 2026-05-01 ✅ 2026-05-01
-- [ ] #⭐⭐medium #area/mind bases (to watch, to play) 📅 2026-05-02
-- [x] #⭐⭐⭐hard  #area/mind добавить помодоро 📅 2026-05-01 ✅ 2026-05-01
-- [ ] #⭐⭐medium #area/body высчитать количество воды
-- [x] #⭐easy #area/mind оставить в делах только карандаш 📅 2026-04-30 ✅ 2026-04-30
-- [x] #⭐⭐⭐hard  #area/mind переделать habits виджет, углубить хештеги 📅 2026-05-01 ✅ 2026-05-01
-- [ ] #⭐⭐medium  #area/mind подумать над повторяющимися задачами и очистить старые, переделать хештеги (добавить дом и тд) 📅 2026-05-02
-- [x] #⭐easy #area/base  сходить за мирамистином и др 📅 2026-05-01 ✅ 2026-05-01
-- [x] #⭐⭐medium #area/mind #zed применить обновления zed 📅 2026-04-30 ✅ 2026-04-30
-- [x] #⭐⭐medium  #area/mind переделать виджет xp today 📅 2026-05-01 ✅ 2026-05-01
-- [ ] #⭐⭐⭐hard #area/mind реорганизовать и может замержить хранилища (сделать вторую ветку и туда запушить обсидиан апп),коммитить папку .obisdian.mobile,current keyboard layout (vial) добавить 📅 2026-05-02
-- [x] #⭐⭐medium  #area/mind  areas и xp heatmap добавить привычки (за каждую 1 xp) 📅 2026-05-01 ✅ 2026-05-01
-- [x] #⭐easy #area/mind for level add incrementing xp 📅 2026-05-01 ✅ 2026-05-01
-- [ ] #⭐easy #area/wealth заказать свинкам домик+сенник
-- [x] #⭐⭐medium #area/work work on taxonomy 📅 2026-04-30 ✅ 2026-04-30
+- [ ] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-11-03
+- [x] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-31 ✅ 2026-10-31
+- [x] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-29 ✅ 2026-10-29
+- [x] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-27 ✅ 2026-10-27
+- [ ] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-11-02
+- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-11-01 ✅ 2026-11-01
+- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-10-31 ✅ 2026-10-31
+- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-10-29 ✅ 2026-10-29
+- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-10-28 ✅ 2026-10-28
+- [ ] #⭐easy #area/base #time/morning make the bed 🔁 every day 📅 2026-11-03
+- [x] #⭐easy #area/base #time/morning make the bed 🔁 every day 📅 2026-11-02 ✅ 2026-11-02
+- [ ] #⭐⭐medium #area/body #id/workout workout ![[mikasa-blades.webp|28]] 🔁 every week on Monday, Wednesday, Friday when done 📅 2026-11-02
+- [x] #⭐⭐medium #area/body #id/workout workout ![[mikasa-blades.webp|28]] 🔁 every week on Monday, Wednesday, Friday when done 📅 2026-10-30 ✅ 2026-10-30
+- [ ] #⭐easy #area/body #after/id/workout wash hair ![[kiruko-hair.webp|28]] 🔁 every week on Monday, Wednesday, Friday when done 📅 2026-11-02
+- [ ] #⭐easy #area/base tidy the desk ![[levi-cleaning.webp|28]] 🔁 every week on Sunday 📅 2026-11-08
+- [ ] #⭐easy #area/rest video games ![[anders.webp|28]] 🔁 every week on Saturday 📅 2026-11-07
+- [x] #⭐⭐medium #area/wealth pay the internet bill 📅 2026-11-02 ✅ 2026-11-02
+- [x] #⭐easy #area/mind reply to emails 📅 2026-11-02 ✅ 2026-11-02
+- [x] #⭐⭐⭐hard #area/mind finish the chapter 3 draft 📅 2026-11-02 ✅ 2026-11-02
+- [ ] #⭐easy #area/base buy groceries 📅 2026-11-02
+- [ ] #⭐⭐medium #area/mind review notes 18:30 📅 2026-11-02
+- [ ] #⭐⭐medium #area/body dentist 10:00 📅 2026-11-03
+- [ ] #⭐easy #area/occasions call grandma 📅 2026-11-04
+- [ ] #⭐⭐medium #area/base fix the bike ![[rings.webp|28]] 📅 2026-11-05
+- [ ] #⭐easy #area/rest movie night 📅 2026-11-06
+- [ ] #⭐⭐medium #area/wealth plan the monthly budget 📅 2026-11-07
+- [ ] #⭐⭐medium #area/base meal prep 📅 2026-11-08
+- [ ] #⭐easy #area/wealth renew the library card 📅 2026-10-30
+- [ ] #⭐⭐medium #area/base return the parcel 📅 2026-10-29
+- [x] #⭐⭐medium #area/mind read an article on habits 📅 2026-10-26 ✅ 2026-10-26
+- [x] #⭐easy #area/base laundry 📅 2026-10-27 ✅ 2026-10-27
+- [x] #⭐⭐⭐hard #area/wealth update the CV 📅 2026-10-27 ✅ 2026-10-27
+- [x] #⭐easy #area/occasions send a postcard 📅 2026-10-28 ✅ 2026-10-28
+- [x] #⭐⭐medium #area/rest long walk in the park 📅 2026-10-29 ✅ 2026-10-29
+- [x] #⭐easy #area/base water the plants 📅 2026-10-30 ✅ 2026-10-30
+- [x] #⭐⭐medium #area/mind finish the online course module 📅 2026-10-31 ✅ 2026-10-31
+- [x] #⭐easy #area/rest bake cookies 📅 2026-11-01 ✅ 2026-11-01
+- [ ] #⭐⭐medium #area/occasions book train tickets 📅 2026-11-20
+- [ ] #⭐⭐⭐hard #area/wealth file the tax form 📅 2026-12-10
+- [ ] #⭐easy #area/occasions buy a gift for Mia 📅 2026-12-18
+- [ ] #⭐easy #area/occasions 🎂 Mia's birthday 🔁 every year 📅 2026-12-20
+- [ ] #⭐easy #area/occasions 🎂 Leo's birthday 🔁 every year 📅 2027-01-14
+- [ ] #⭐⭐medium #area/mind learn ten Japanese words
+- [ ] #⭐easy #area/base sort the bookshelf
+- [ ] #⭐⭐⭐hard #area/body run 5 km

@@ -2,7 +2,7 @@
 
 An Obsidian vault with an RPG look, and the **Winx plugin** that draws it: dashboard cards, a task calendar, one-window commands for new tasks and notes, and all the styles.
 
-![Dashboard](../dashboard.png)
+![Dashboard](images/dashboard.webp)
 
 | Page | What's in it |
 |---|---|
