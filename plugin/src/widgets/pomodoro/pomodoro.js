@@ -2,16 +2,16 @@
 // (settings, the current session, today's stats). A running session lives on in this module through redraws;
 // the ticking stops when the block goes.
 import { sanitizeHTMLToDom } from "obsidian";
-import { html, raw } from "../core/html.js";
-import { Widget } from "./widget.js";
-import { todayYmd } from "../core/dates.js";
-import { readJson } from "../core/files.js";
-import { AudioEngine } from "../core/sounds.js";
-import { Form } from "../uikit/form.ts";
-import { app } from "../core/app.js";
+import { html, raw } from "../../core/html.js";
+import { Widget } from "../widget.js";
+import { todayYmd } from "../../core/dates.js";
+import { readJson } from "../../core/files.js";
+import { AudioEngine } from "../../core/sounds.js";
+import { Form } from "../../uikit/form.ts";
+import { app } from "../../core/app.js";
+import { Timer, addStats } from "./timer.js";
 
 const PATH = "00 System/Data/pomodoro.json";
-const DEFAULTS = { focusMin: 25, breakMin: 5 };
 const ICON = {
   play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
   pause: `<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>`,
@@ -21,31 +21,7 @@ const ICON = {
   skip: `<svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-3.5 6L4 6v12z"/></svg>`,
 };
 
-// the running session: { sessionType, baseElapsed, startedAt }, in memory only (gone after a restart or a reload)
-let live = null;
-
 const load = () => readJson(PATH, {});
-
-// focus or break and its time: a stopped session counts `elapsed` (ms), a running one also the time since `start`
-class Timer {
-  constructor(settings, current) {
-    this.settings = { ...DEFAULTS, ...settings };
-    this.type     = current?.sessionType ?? "focus";
-    this.sessions = current?.sessions ?? 0;
-    this.elapsed  = current?.elapsed ?? 0;
-    this.start    = 0;
-    if (live?.sessionType === this.type) { this.elapsed = live.baseElapsed; this.start = live.startedAt; }   // picked up after a redraw
-  }
-  get running()   { return this.start > 0; }
-  get duration()  { return (this.type === "focus" ? this.settings.focusMin : this.settings.breakMin) * 60_000; }
-  get remaining() { return Math.max(0, this.duration - this.elapsed - (this.running ? Date.now() - this.start : 0)); }
-  get other()     { return this.type === "focus" ? "break" : "focus"; }
-  play()  { if (this.running) return; this.start = Date.now(); live = { sessionType: this.type, baseElapsed: this.elapsed, startedAt: this.start }; }
-  pause() { if (!this.running) return; this.elapsed += Date.now() - this.start; this.stop(); }
-  reset(type = this.type) { this.type = type; this.elapsed = 0; this.stop(); }   // a session of `type` from zero, stopped
-  stop()  { this.start = 0; live = null; }
-  get current() { return { sessionType: this.type, elapsed: this.elapsed, sessions: this.sessions, date: todayYmd(), savedAt: Date.now() }; }
-}
 
 export class Pomodoro extends Widget {
   static followsChanges = false;   // the timer redraws itself every second; a redraw would restart its markup
@@ -137,9 +113,7 @@ export class Pomodoro extends Widget {
     if (this.timer.running) this.ending = window.setTimeout(() => this.finish(), this.timer.remaining);
   }
   async finish() {
-    const t = this.timer, wasFocus = t.type === "focus", focusMin = t.settings.focusMin;
-    if (wasFocus) t.sessions++;
-    t.reset(t.other);
+    const t = this.timer, focusMin = t.settings.focusMin, wasFocus = t.next();
     this.sound.play({ rate: t.type === "focus" ? 1.0 : 0.8 });
     t.play(); this.arm(); this.tick();
     await this.save(wasFocus ? focusMin : 0);
@@ -150,8 +124,7 @@ export class Pomodoro extends Widget {
     data.settings = this.timer.settings;
     data.current = this.timer.current;
     data.mini = this.mini;
-    if (data.stats?.date !== today) data.stats = { date: today, sessions: 0, minutes: 0 };
-    if (focusMin) { data.stats.sessions++; data.stats.minutes += focusMin; }
+    addStats(data, focusMin, today);
     await app.vault.adapter.write(PATH, JSON.stringify(data, null, 2));
   }
 

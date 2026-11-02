@@ -25,7 +25,8 @@
 │   │   │                           fields), Search (a search window over a list), busy.js (the ✦ pill)
 │   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget;
 │   │                               a topic's own logic next to its widgets, as classes: market/ (MarketItem, the search),
-│   │                               goals/ (Goal), body/ (CycleLog, WeightLog, BodyLog), savings/ (SavingsJar, paydays), xp/ (HP / MP: vitals.js), shop/ (gold)
+│   │                               goals/ (Goal), body/ (CycleLog, WeightLog, BodyLog), savings/ (SavingsJar, paydays), xp/ (HP / MP: vitals.js), shop/ (gold),
+│   │                               finance/ (ledger.js: rows, totals, the report), pomodoro/ (timer.js: the clock)
 │   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; uikit/ the parts' looks;
 │   │                               _mixins.scss has the shared sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian

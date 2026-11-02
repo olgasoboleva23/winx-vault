@@ -1,30 +1,19 @@
 // Finance: the per-month ledger notes (one per month, in core/paths.js LEDGER) — a month's totals,
 // categories against their budgets, a 6-month trend and the latest operations; ◀ ▶ step through the months.
 // The data (00 System/Data/Finance) stays in the vault; styles in styles/widgets/_finance.scss (blocks winx-fin, winx-fin-month).
-import { html } from "../core/html.js";
-import { Widget } from "./widget.js";
-import { dm } from "../core/dates.js";
-import { NoteLink } from "../uikit/noteLink.js";
-import { money } from "../core/format.js";
-import { readJson } from "../core/files.js";
-import { LEDGER, RULES } from "../core/paths.js";
+import { html } from "../../core/html.js";
+import { Widget } from "../widget.js";
+import { dm } from "../../core/dates.js";
+import { NoteLink } from "../../uikit/noteLink.js";
+import { money } from "../../core/format.js";
+import { readJson } from "../../core/files.js";
+import { LEDGER, RULES } from "../../core/paths.js";
+import { monthReport, parseLedger, summarize } from "./ledger.js";
 
-const TRANSFER = "Переводы";
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const MONTHS_SHORT = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 // palette cycled across categories, in winx token order
 const PALETTE = ["--winx-pink", "--winx-gold", "--winx-purple", "--winx-lavender", "--winx-blue", "--winx-pink-deep", "--winx-gold-deep", "--winx-purple-light"];
-
-// transfers move money between your own accounts or split bills: kept in the ledger, not spending or income
-function summarize(rows) {
-  const totals = { spent: 0, income: 0, transfers: 0, categories: {} };
-  for (const row of rows) {
-    if (row.category === TRANSFER) totals.transfers += Math.abs(row.amount);
-    else if (row.amount < 0) { totals.spent += -row.amount; totals.categories[row.category] = (totals.categories[row.category] ?? 0) + -row.amount; }
-    else totals.income += row.amount;
-  }
-  return totals;
-}
 
 export class Finance extends Widget {
   current = null;   // the shown month, "YYYY-MM"
@@ -40,15 +29,7 @@ export class Finance extends Widget {
     if (!listing) return {};
     const months = {};
     for (const file of listing.files.filter(f => f.endsWith(".md"))) {
-      const rows = [];
-      for (const line of (await this.app.vault.adapter.read(file)).split("\n")) {
-        const text = line.trim();
-        if (!text.startsWith("|")) continue;
-        const cells = text.slice(1, -1).split("|").map(c => c.trim());
-        if (cells.length !== 5 || cells[0] === "date" || /^[-:\s]+$/.test(cells[0])) continue;
-        const amount = Number(cells[2]);
-        if (Number.isFinite(amount)) rows.push({ date: cells[0], time: cells[1], amount, category: cells[3], description: cells[4] });
-      }
+      const rows = parseLedger(await this.app.vault.adapter.read(file));
       if (rows.length) months[file.slice(file.lastIndexOf("/") + 1, -3)] = rows;
     }
     return months;
@@ -66,12 +47,7 @@ export class Finance extends Widget {
 
   view({ ledger, budgets, months, current }) {
     if (!months.length) return html`<div class="winx-fin"><div class="winx-fin__empty">The ledger is empty: a note per month goes to ${LEDGER}</div></div>`;
-    const rows = ledger[current] ?? [], totals = summarize(rows), [year, month] = current.split("-");
-    const index = months.indexOf(current), net = totals.income - totals.spent;
-    const categories = Object.entries(totals.categories).sort((a, b) => b[1] - a[1]);
-    const window6 = months.slice(Math.max(0, index - 5), index + 1);
-    const spends = window6.map(m => summarize(ledger[m]).spent), peak = Math.max(...spends, 1);
-    const latest = rows.filter(r => r.category !== TRANSFER).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)).slice(0, 8);
+    const { totals, index, net, categories, trend, peak, latest } = monthReport(ledger, months, current), [year, month] = current.split("-");
     const bar = (name, value, max, color, budget) => {
       const ratio = budget ? Math.min(value / budget, 1) : value / (max || 1);
       const fill = budget && value > budget ? "var(--winx-pink-deep)" : `var(${color})`;
@@ -86,7 +62,7 @@ export class Finance extends Widget {
         .map(([label, value, sign]) => html`<div class="winx-fin__total winx-fin__total--${sign}"><span class="winx-fin__total-label">${label}</span><b class="winx-fin__total-value">${money(value)}</b></div>`)}</div>
       ${totals.transfers > 0 ? html`<div class="winx-fin__section">transfers ${money(totals.transfers)} — not counted as spending</div>` : ""}
       ${categories.length ? html`<div class="winx-fin__section">Categories</div><div class="winx-fin__rows">${categories.map(([name, value], i) => bar(name, value, categories[0][1], PALETTE[i % PALETTE.length], budgets[name]))}</div>` : ""}
-      ${window6.length > 1 ? html`<div class="winx-fin__section">Spending by month</div><div class="winx-fin__trend">${window6.map((m, i) => html`<div class="winx-fin__bar${m === current ? " winx-fin__bar--current" : ""}"><div class="winx-fin__col" style="height: ${Math.max(spends[i] / peak * 100, 3)}%;" aria-label="${money(spends[i])}"></div><small class="winx-fin__bar-label">${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small></div>`)}</div>` : ""}
+      ${trend.length > 1 ? html`<div class="winx-fin__section">Spending by month</div><div class="winx-fin__trend">${trend.map(({ month: m, spent }) => html`<div class="winx-fin__bar${m === current ? " winx-fin__bar--current" : ""}"><div class="winx-fin__col" style="height: ${Math.max(spent / peak * 100, 3)}%;" aria-label="${money(spent)}"></div><small class="winx-fin__bar-label">${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small></div>`)}</div>` : ""}
       ${latest.length ? html`<div class="winx-fin__section">Recent transactions</div><div class="winx-fin__list">${latest.map(r => html`<div class="winx-fin__item"><span class="winx-fin__item-date">${dm(r.date)}</span><span class="winx-fin__item-text">${r.category} · ${r.description}</span><span class="winx-fin__item-sum">${money(r.amount)}</span></div>`)}</div>` : ""}
     </div>`;
   }
