@@ -123,8 +123,9 @@ export class Grid extends Part {
     const { model, shown, TASKS } = this.ctx;
     const { rows, routine, routineRows, hidden, routineHidden } = model.dayParts(d, shown);
     const marks = es => es.length ? html`<div class="winx-cal__marks"><span title="${es.map(e => this.view.info(e.t).label).join("\n")}">✓${es.length}</span></div>` : "";
-    const row = e => new TaskRow({ task: this.view.info(e.t), kind: e.kind, compact, tick: !!TASKS });
-    const groups = TIMES.map(([tag, name]) => [name, routineRows.filter(e => T(e.t).time === tag || (!tag && !TIMES.some(([g]) => g && T(e.t).time === g)))]).filter(([, es]) => es.length);
+    const time = e => T((e.follows ?? e).t).time;   // a task after another goes in that one's group
+    const row = e => new TaskRow({ after: !!e.follows, task: this.view.info(e.t), kind: e.kind, compact, tick: !!TASKS });
+    const groups = TIMES.map(([tag, name]) => [name, routineRows.filter(e => time(e) === tag || (!tag && !TIMES.some(([g]) => g && time(e) === g)))]).filter(([, es]) => es.length);
     return html`${rows.map(row)}${routine.length ? html`<div class="winx-cal__routine" data-action="fold" data-day="${d}"><div class="winx-cal__routine-pill" title="${routine.map(e => this.view.info(e.t).label).join("\n")}"><span>🔁 ${routine.filter(e => e.kind === "done").length}/${routine.length}</span></div><div class="winx-cal__routine-list">${groups.map(([name, es]) => html`<div class="winx-cal__routine-time">${name}</div>${es.map(row)}`)}${marks(routineHidden)}</div></div>` : ""}${marks(hidden)}`;
   }
   zones(d) {

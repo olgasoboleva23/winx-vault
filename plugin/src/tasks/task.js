@@ -1,6 +1,6 @@
 // One task line in the Tasks plugin's emoji format: what it is (getters) and how to change it (methods that
 // return the new line; widgets write it). The only place that knows the format:
-//   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening · ![[sticker]]
+//   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening · #id/<id> · #after/id/<id> · ![[sticker]]
 //   🔁 rule (up to the next field) · 📅 due (an old ⏳ still counts) · ✅ done · ❌ skipped · ➕ created · 🛫 start
 // No Obsidian globals (tested by tests/task.test.mjs).
 // Wrap a Dataview task with Task.of(t) (t is kept as .src, for its path and line) or a raw line with new Task(line).
@@ -26,6 +26,8 @@ export class Task {
   get tags()       { return this.line.match(/#[^\s#]+/gu) ?? []; }
   get area()       { return this.tags.find(t => t.startsWith("#area/")) ?? null; }   // "#area/body"
   get difficulty() { return this.tags.find(t => t.startsWith("#⭐")) ?? null; }
+  get id()         { return this.tags.find(t => t.startsWith("#id/"))?.slice(4) ?? null; }          // its id, for #after
+  get after()      { return this.tags.find(t => t.startsWith("#after/id/"))?.slice(10) ?? null; }   // the id it follows
   get time()       { return this.tags.find(t => t.startsWith("#time/"))?.slice(6) ?? null; }   // "morning" | "evening"
   get rule()       { return this.line.match(new RegExp(`🔁\\s*([^${FIELDS}]+)`, "u"))?.[1].trim() ?? null; }
   get isRecurring(){ return this.rule !== null; }

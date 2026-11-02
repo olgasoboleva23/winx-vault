@@ -152,3 +152,12 @@ test("taskChoices: one per task, by area, the most done first; the picks of its 
   ]);
   assert.deepEqual(c[1].picks, { difficulty: "#⭐⭐medium", area: "#area/base", time: "#time/evening", sticker: "cat.png" });
 });
+
+test("#id/<id> and #after/id/<id>: a task's id and the one it comes after, not part of the words", () => {
+  const t = T("- [ ] #⭐easy #area/body #after/id/workout помыть голову 🔁 every week on Monday when done 📅 2026-11-04");
+  assert.equal(t.after, "workout");
+  assert.equal(t.text, "помыть голову");
+  assert.equal(T("- [ ] #id/workout треня").id, "workout");
+  assert.equal(T("- [ ] треня").after, null);
+  assert.equal(T("- [ ] треня").id, null);
+});

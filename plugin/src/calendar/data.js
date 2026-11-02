@@ -7,6 +7,19 @@ import { projectRepeats } from "../tasks/repeats.js";
 export const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
 
 const ORDER = { open: 0, ghost: 1, done: 2 };
+// a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its earlier followers), with
+// .follows set to it; the rest in their order
+const chain = list => {
+  const lead = e => T(e.t).after && list.find(x => x !== e && T(x.t).id === T(e.t).after);
+  const out = list.filter(e => !lead(e));
+  for (const e of list.filter(lead)) {
+    e.follows = lead(e);
+    let i = out.indexOf(e.follows);
+    while (out[i + 1]?.follows === e.follows) i++;
+    out.splice(i + 1, 0, e);
+  }
+  return out;
+};
 const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 
 // What the calendar shows, worked out once per draw from the tasks, Pool.md's lines, the shown days, today and
@@ -71,7 +84,7 @@ export class CalendarData {
   // a day's entries by where they go: rows (not 🔁), the 🔁 box (all of them for its n/m pill; routineRows
   // listed in it) and the done ones `shown` hides, counted as ✓N: under the day, and the 🔁 ones inside the box
   dayParts(d, shown) {
-    const all = this.byDay[d], routine = all.filter(e => T(e.t).isRecurring);
+    const all = chain(this.byDay[d]), routine = all.filter(e => T(e.t).isRecurring);
     return {
       rows: all.filter(e => shown[e.kind] && !routine.includes(e)),
       routine, routineRows: routine.filter(e => shown[e.kind]),

@@ -25,6 +25,8 @@ test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons 
   const month = new TaskRow({ task: info(), kind: "open", compact: true, tick: true }).html;
   assert.match(month, / title="🌺 walk &lt;fast&gt;"/);
   assert.doesNotMatch(month, /checkbox|winx-task-btns/);
+  const after = new TaskRow({ task: info(), kind: "open", compact: false, tick: true, after: true }).html;
+  assert.match(after, /data-swipeable="7"><span class="winx-cal__after">↳<\/span><input type="checkbox"/);
 });
 
 test("TaskCard: a panel card, its meta line and buttons", () => {

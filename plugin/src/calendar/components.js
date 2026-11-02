@@ -23,16 +23,17 @@ export class TaskButtons extends Component {
 }
 
 // a task in a day: kind open | ghost (a 🔁 repeat to come) | done. The week view has a checkbox (tick: the Tasks
-// plugin is there) and, for an open one, the hover buttons and swipes; the month view only the text (title: label)
+// plugin is there) and, for an open one, the hover buttons and swipes; the month view only the text (title: label).
+// after: it comes after the row above it (#after/id/<id>), a ↳ in front
 export class TaskRow extends Component {
-  view({ task, kind, compact, tick }) {
+  view({ task, kind, compact, tick, after = false }) {
     const box = !compact && tick && kind !== "ghost";
     const live = !compact && kind === "open";
     const attrs = html`${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}"${kind !== "ghost" ? html` draggable="true" data-drag="${task.key}"` : ""}${live && box ? html` data-swipeable="${task.key}"` : ""}${compact ? html` title="${task.label}"` : ""}`;
     const check = kind === "done"
       ? html`<input type="checkbox" class="task-list-item-checkbox" aria-label="done" checked disabled>`
       : html`<input type="checkbox" class="task-list-item-checkbox" aria-label="done" data-action="tick">`;
-    return html`<div class="winx-cal__task winx-cal__task--${kind}"${attrs}>${box ? check : ""}${kind === "ghost" ? "🔁 " : ""}${new TaskText({ task })}${live ? html`<div class="winx-task-btns">${new TaskButtons({ task })}</div>` : ""}</div>`;
+    return html`<div class="winx-cal__task winx-cal__task--${kind}"${attrs}>${after ? html`<span class="winx-cal__after">↳</span>` : ""}${box ? check : ""}${kind === "ghost" ? "🔁 " : ""}${new TaskText({ task })}${live ? html`<div class="winx-task-btns">${new TaskButtons({ task })}</div>` : ""}</div>`;
   }
 }
 

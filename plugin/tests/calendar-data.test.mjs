@@ -163,3 +163,17 @@ test("Ahead: open dated tasks after this week, by month; in a month by date, the
   ]);
   assert.deepEqual(m.ahead.map(g => [g.month, texts(g.items)]), [["2026-12", ["tea", "Bo", "dentist", "book"]], ["2027-02", ["visa"]]]);
 });
+
+test("a day's parts: a task with #after/id/<id> stands right under the task with #id/<id> the same day, in its time group", () => {
+  const m = data([
+    task(" ", "#time/evening #id/workout треня 🔁 every week 📅 2026-10-28"),
+    task(" ", "#time/evening stretch 🔁 every day 📅 2026-10-28"),
+    task(" ", "#after/id/workout помыть голову 🔁 every week 📅 2026-10-28"),
+    task(" ", "#after/id/workout маска 🔁 every week 📅 2026-10-29"),   // no workout that day: an ordinary task
+  ], { days: ["2026-10-28", "2026-10-29"] });
+  const shown = { open: true, ghost: true, done: true };
+  const day = m.dayParts("2026-10-28", shown).routineRows;
+  assert.deepEqual(day.map(e => T(e.t).text), ["треня", "помыть голову", "stretch"]);
+  assert.equal(T(day[1].follows.t).text, "треня");
+  assert.equal(m.dayParts("2026-10-29", shown).routineRows[0].follows, undefined);
+});
