@@ -1,7 +1,7 @@
 // Cycle: the day of the cycle on the page's date, the next start forecast, then one of two tabs: the current cycle and
 // the 3 before it as rows of day pills (the period, the fertile window and the ovulation marked), or the last 10
 // cycles' lengths and period lengths as columns with their average; "started / ended today", the dates.
-// Folded (the default; a click on the head toggles it, kept per device): only the head.
+// Folded (the default; a click on the head toggles it, kept per device): only the head and the buttons.
 import { html } from "../../core/html.js";
 import { Button } from "../../uikit/button.js";
 import { Widget } from "../widget.js";
@@ -50,7 +50,7 @@ export class Cycle extends Widget {
   view({ day, page, info, cycles = [], stats = [] }) {
     const ending = info?.isPeriod && !info.ended;
     const when = info && (info.daysUntil >= 0 ? `in ${info.daysUntil} d` : `${-info.daysUntil} d late`);
-    return html`<div class="winx-cycle">
+    return html`<div class="winx-cycle${this.folded && info ? " winx-cycle--folded" : ""}">
       ${!page ? new Missing({ path: CYCLE_PATH })
         : !info ? new Empty({ text: "No data yet" })
         : html`<div class="winx-cycle__head" data-action="fold" title="${this.folded ? "show the cycles" : "fold"}"><div class="winx-cycle__day${info.isPeriod ? " winx-cycle__day--period" : ""}" title="${mpLine(mana(info))}\n\n${mpTable(mana(info))}">day ${info.day}<span class="winx-cycle__phase"> · ${mana(info).phase}</span></div><div class="winx-cycle__next">next ~${dm(info.nextStart)}, ${when}</div></div>`}
@@ -60,11 +60,11 @@ export class Cycle extends Widget {
         : html`<div class="winx-cycle__rows">${cycles.map(c => html`<div class="winx-cycle__row">
         <div class="winx-cycle__when"><span>${dm(c.start)} – ${c.current ? "now" : dm(c.end)}</span><span>${c.period ? `${c.period} d period · ` : ""}${c.days} d${c.current ? " so far" : ""}</span></div>
         <div class="winx-cycle__pills">${Array.from({ length: c.days }, (_, i) => html`<i class="winx-cycle__pill winx-cycle__pill--${pill(c, i + 1)}"></i>`)}</div>
-      </div>`)}</div>`}
+      </div>`)}</div>`}`}
       <div class="winx-cycle__btns">
         ${new Button({ text: ending ? "ended today" : "started today", action: "mark", kind: "pill", data: { kind: ending ? "end" : "start", day } })}
         ${new NoteLink({ text: "dates", path: CYCLE_PATH })}
-      </div>`}
+      </div>
     </div>`;
   }
 }
