@@ -9,9 +9,9 @@ import { taskWindow } from "../tasks/taskEdit.js";
 import { pickTask } from "../tasks/taskSearch.js";
 import { addMarketItem } from "../widgets/market/marketSearch.js";
 import { logPurchase } from "../widgets/shop/wallet.js";
-import { appendLine, edit } from "../core/files.js";
 import { tasksApi } from "../core/plugins.js";
-import { MASTER, POOL } from "../core/paths.js";
+import { MASTER } from "../core/paths.js";
+import { addPoolLine, addTask } from "../tasks/master.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
@@ -33,13 +33,9 @@ export function registerCommands(plugin: Plugin) {
     const result = await api.editTaskLineModal(`- [ ] ${[pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ")}  ➕ ${todayYmd()}`);
     if (!result) return;
     const line = new Task(result).setSticker(pick.sticker);   // after the text typed in the Tasks modal
-    // a pool line (no checkbox, no dates) goes to the end of Pool.md, made on first use; a task to the top of Master.md
-    if (pick.pool) {
-      const poolLine = new Task(line).poolLine;
-      return void await appendLine(POOL, poolLine, { header: "Tasks to pick when it's time: drag one from the calendar's Pool tab onto a day.\n\n" });
-    }
-    if (!app.vault.getFileByPath(MASTER)) return void new Notice(`✦ ${MASTER} not found — task not saved`);
-    await edit(MASTER, (c: string) => line + "\n" + c);
+    // a pool line (no checkbox, no dates) to the end of Pool.md; a task to the top of Master.md
+    if (pick.pool) return void await addPoolLine(new Task(line).poolLine);
+    if (!await addTask(line)) new Notice(`✦ ${MASTER} not found — task not saved`);
   });
 
   // a watch / read / game / recipe / work task note (notes/kinds.js), in its folder, opened in a new tab
@@ -61,7 +57,7 @@ export function registerCommands(plugin: Plugin) {
       { name: "Name", key: "name", text: "what you bought" },
       { name: "Cost", key: "cost", text: "coins", number: true },
     ], { required: ["name", "cost"], submit: "Buy" });
-    if (v) await logPurchase(v.name, v.cost);
+    if (v && !await logPurchase(v.name, v.cost)) new Notice(`✦ Not enough gold for ${v.name}`);
   });
 
   // a shopping item in the Celestial Market: one bought before, or a new one with its category

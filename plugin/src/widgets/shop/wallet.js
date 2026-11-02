@@ -3,6 +3,7 @@ import config from "../../core/config.js";
 import { todayYmd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
 import { TASKS } from "../../core/paths.js";
+import { dataview } from "../../core/plugins.js";
 
 const PURCHASES = "00 System/Data/Purchases.md";
 
@@ -15,4 +16,9 @@ export function balance(dv) {
   return earned - spent;
 }
 
-export const logPurchase = (name, cost) => appendLine(PURCHASES, `- ${todayYmd()} | ${name} | ${cost}`, { header: "# Purchases\n\n" });
+// a purchase, only when the gold covers it (the Shop card and the Buy reward command): false when it doesn't
+export async function logPurchase(name, cost) {
+  if (balance(dataview()) < cost) return false;
+  await appendLine(PURCHASES, `- ${todayYmd()} | ${name} | ${cost}`, { header: "# Purchases\n\n" });
+  return true;
+}

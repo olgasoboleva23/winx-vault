@@ -2,8 +2,7 @@
 // most come with an undo notice. A 🔁 task ticked goes through the Tasks plugin, so it gets its next copy.
 import { Task } from "../tasks/task.js";
 import { T } from "./data.js";
-import { edit as editFile } from "../core/files.js";
-import { MASTER } from "../core/paths.js";
+import { addTask } from "../tasks/master.js";
 import { deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal } from "../tasks/taskEdit.js";
 
 
@@ -17,7 +16,7 @@ export function makeActions(ctx) {
   const tick    = t => editTaskLineWithUndo(t, line => TASKS.executeToggleTaskDoneCommand(line, t.path), "✓");
   const unplan  = t => editTaskLineWithUndo(t, line => new Task(line).place(null, false), "↩ no date");
   // a pool item's copy goes to the top of Master.md, like a new task: open on `day` (no date for null), or done that day
-  const fromPool = (t, day, done) => editFile(MASTER, c => new Task(Task.fromPool(T(t).line, today)).place(day, done) + "\n" + c);
+  const fromPool = (t, day, done) => addTask(new Task(Task.fromPool(T(t).line, today)).place(day, done));
   // a task dropped on `day` (null: the backlog): open and due that day, or done that day. An open 🔁 task done on
   // a day goes through the Tasks plugin (so it gets its next copy), then back to that day
   const place = async (t, day, done) => {

@@ -12,7 +12,7 @@ export class Shop extends Widget {
     buy: async (e, el) => {
       const { name } = el.dataset, cost = Number(el.dataset.cost);
       this.sound.play();
-      await logPurchase(name, cost);
+      if (!await logPurchase(name, cost)) return void new Notice(`✦ Not enough gold for ${name}`);
       new Notice(`✨ Bought ${name} for ${cost} gold`);
       await this.draw();
     },

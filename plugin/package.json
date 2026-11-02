@@ -7,7 +7,7 @@
     "dev": "node esbuild.config.mjs --watch",
     "check": "tsc",
     "lint": "eslint src",
-    "test": "node --test --experimental-strip-types tests/*.test.mjs"
+    "test": "node --test --experimental-strip-types --import ./tests/stubs/register.mjs tests/*.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

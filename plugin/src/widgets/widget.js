@@ -7,13 +7,15 @@
 //                        opens that note without a handler
 //   after(root, data)   what markup can't do (a chart: this.keep(chart) so it's destroyed on the next draw);
 //                       root is where view() went (the card's content when there's a card)
-// Until its first draw a card widget shows its card with a shimmering placeholder (a skeleton).
+// Until its first draw a card widget shows its card with a shimmering placeholder (a skeleton). A draw overtaken by
+// a newer one, or ending after the block went, writes nothing; an error in data() shows "✦ couldn't draw: …".
 // It draws on load and again a moment after Dataview's index or its own note changes (or the dashboard's date); a hidden block when it
 // shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
 // listeners when the block goes.
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
 import { MarkdownRenderChild, debounce, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../uikit/card.js";
+import { Empty } from "../uikit/empty.js";
 import { html } from "../core/html.js";
 import { useActions, useRedraw } from "../core/use.js";
 import { dataview } from "../core/plugins.js";
@@ -30,6 +32,7 @@ export class Widget extends MarkdownRenderChild {
     this.args = args;
     this.on = {};
     this.kept = [];
+    this.draws = 0;   // a draw is stale once a newer one starts or the block goes (onunload)
   }
 
   async data() { return {}; }
@@ -95,9 +98,19 @@ export class Widget extends MarkdownRenderChild {
   }
 
   drop() { for (const k of this.kept.splice(0)) k?.destroy?.(); }
+  onunload() { this.draws = -1; }
 
   async draw() {
-    const data = await this.data();
+    if (this.draws < 0) return;
+    const n = ++this.draws;
+    let data;
+    try { data = await this.data(); }
+    catch (e) {
+      if (n !== this.draws) return;
+      console.error(e);
+      return void this.containerEl.replaceChildren(sanitizeHTMLToDom(new Empty({ text: `couldn't draw: ${e.message}` }).html));
+    }
+    if (n !== this.draws) return;   // a newer draw is on its way, or the block is gone
     this.drop();
     const restore = this.keepTyped();
     const body = this.view(data), { card, meta } = this.args;
