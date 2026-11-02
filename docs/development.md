@@ -15,7 +15,8 @@
 │   │   ├── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
 │   │   ├── 📁 notes              — note.js (Note: a new note from data), kinds.js (watch / read / game / recipe / work task)
 │   │   ├── 📁 services           — no markup: notify.js (desktop reminders), mobileConfig.js (obsidian-mobile/ → .obsidian-mobile)
-│   │   ├── 📁 core               — dates, files (edit / editLine / appendLine a note), config, sounds (and 🔇),
+│   │   ├── 📁 core               — paths.js (where the data lives), app.js (Obsidian's app for modules), dates,
+│   │   │                           files (edit / editLine / appendLine a note), config, sounds (and 🔇),
 │   │   │                           html.js (markup in backticks), chart.js
 │   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
 │   │   │                           taskEdit.js (rewrite a line with undo, the task window), taskSearch.js (New task: a past task)
@@ -30,13 +31,10 @@
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
 ├── 📁 00 System
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)
-│   └── 📁 Data                   — the widgets' notes: Shop.md, Celestial Market.md, Supplies.md, Cycle.md (cycle dates),
-│                                   Weight.md, Body log.md, Savings/ (a note per goal)
-├── 📁 02 Areas
-│   └── 📁 Personal
-│       ├── Goals.md
-│       ├── 📁 Daily Notes
-│       └── 📁 Tasks              — Master.md (all tasks), Pool.md
+│   └── 📁 Data                   — everything Winx reads and writes (paths: plugin/src/core/paths.js):
+│                                   Tasks/ (Master.md: all tasks, Pool.md), Goals.md, Finance/ (Ledger/, rules.json),
+│                                   Shop.md, Celestial Market.md, Supplies.md, Cycle.md, Weight.md, Body log.md, Savings/
+├── 📁 02 Areas/Personal/Daily Notes — daily notes (the folder set in Obsidian's Daily notes)
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
 ```
 

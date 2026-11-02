@@ -6,6 +6,7 @@ import { dm } from "../../core/dates.js";
 import { addToMarket, marketCats, marketChoices, marketState } from "./market.js";
 import { findChoices } from "../../core/find.js";
 import { dataview } from "../../core/plugins.js";
+import { app } from "../../core/app.js";
 
 const catLabel = tag => marketCats.find(c => c.tag === tag)?.label ?? tag;
 

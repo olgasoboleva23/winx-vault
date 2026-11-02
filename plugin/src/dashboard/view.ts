@@ -5,13 +5,14 @@ import { busyPill } from "../uikit/busy.js";
 import { useActions, useBusy, useNewDay } from "../core/use.js";
 import { Button } from "../uikit/button.js";
 import { html } from "../core/html.js";
+import { DATA } from "../core/paths.js";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn by Obsidian's
 // markdown renderer, as a note in reading view would be, for the tab's date. The date is the tab's own (no date:
 // today, and it moves on at midnight); Obsidian saves it with the layout. After a write to the tasks or the data,
 // the tab dims with the calendar's ✦ pill until a widget has drawn again (5 s at most).
 export const DASHBOARD_VIEW = "winx-dashboard";
-const WATCHED = ["02 Areas/Personal/Tasks/", "00 System/Data/"];
+const WATCHED = [`${DATA}/`];
 const QUIET = "00 System/Data/pomodoro.json";   // the timer saves itself all the time
 // layout.md: the grid, then the Quests card's Tasks query (drawn into the card on its own: a new day redraws only it)
 const [GRID, QUESTS] = layout.split(/\n%%.*%%\n/);

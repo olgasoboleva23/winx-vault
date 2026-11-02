@@ -5,22 +5,22 @@ import { Widget } from "../widget.js";
 import { dm, pageDay, todayYmd, weekOf, ymd } from "../../core/dates.js";
 import { Goal } from "./goal.js";
 import { Missing } from "../../uikit/empty.js";
+import { GOALS, TASKS } from "../../core/paths.js";
 
-const GOALS_PATH = "02 Areas/Personal/Goals.md";
 
 export class Goals extends Widget {
   async data() {
-    if (!this.app.vault.getAbstractFileByPath(GOALS_PATH)) return { missing: true };
+    if (!this.app.vault.getAbstractFileByPath(`${GOALS}.md`)) return { missing: true };
     const selected = ymd(pageDay(this.dv)), today = todayYmd();
-    const goals = this.dv.pages('"02 Areas/Personal/Goals"').file.lists.map(i => Goal.parse(i.text)).where(Boolean).array();
-    const tasks = this.dv.pages('"02 Areas/Personal/Tasks"').file.tasks;
+    const goals = this.dv.pages(`"${GOALS}"`).file.lists.map(i => Goal.parse(i.text)).where(Boolean).array();
+    const tasks = this.dv.pages(`"${TASKS}"`).file.tasks;
     return {
       selected, today, week: weekOf(selected),
       rows: goals.map(goal => ({ goal, done: tasks.where(t => t.completed && t.completion && t.tags.includes(goal.tag)).map(t => ymd(t.completion)).array() })),
     };
   }
   view({ missing, selected, today, week, rows }) {
-    if (missing) return new Missing({ path: GOALS_PATH });
+    if (missing) return new Missing({ path: `${GOALS}.md` });
     return html`<div class="winx-goals">${rows.map(({ goal, done }) => {
       const doneSet = new Set(done), last = [...done].sort().at(-1);
       // "I've done this before": total and last time, from the ✅ dates already in the tasks

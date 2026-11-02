@@ -1,17 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { appendLine, edit, editLine, readJson } from "../src/core/files.js";
+import { setApp } from "../src/core/app.js";
 
 // a vault in memory: path → text, folders as a set
 const vault = (files = {}, folders = []) => {
   const dirs = new Set(folders);
-  globalThis.app = { vault: {
+  setApp({ vault: {
     getFileByPath: p => p in files ? { path: p } : null,
     getFolderByPath: p => dirs.has(p) ? { path: p } : null,
     process: async (f, fn) => { files[f.path] = fn(files[f.path]); },
     create: async (p, text) => { files[p] = text; },
     createFolder: async p => { dirs.add(p); },
-  } };
+  } });
   return { files, dirs };
 };
 
@@ -52,7 +53,7 @@ test("edit on a missing note does nothing", async () => {
 
 test("readJson: the parsed file; the fallback when it's missing or not JSON", async () => {
   const files = { "a.json": '{"n": 1}', "b.json": "not json" };
-  globalThis.app = { vault: { adapter: { read: async p => p in files ? files[p] : Promise.reject(new Error("missing")) } } };
+  setApp({ vault: { adapter: { read: async p => p in files ? files[p] : Promise.reject(new Error("missing")) } } });
   assert.deepEqual(await readJson("a.json"), { n: 1 });
   assert.deepEqual(await readJson("b.json", { budgets: {} }), { budgets: {} });
   assert.equal(await readJson("c.json"), null);

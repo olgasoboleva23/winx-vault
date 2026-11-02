@@ -5,6 +5,7 @@ import config from "../../core/config.js";
 import { pageDay } from "../../core/dates.js";
 import { collectHabitDays, taskXp } from "./xp.js";
 import { chartColor } from "../../core/chart.js";
+import { TASKS, dailyFolder } from "../../core/paths.js";
 
 export class LifeAreas extends Widget {
   async data() {
@@ -12,12 +13,12 @@ export class LifeAreas extends Widget {
     const sel = pageDay(this.dv), since = sel.minus({ days: 27 }).startOf("day");
     const scores = Object.fromEntries(areas.map(a => [a.name, 0]));
     // task XP per area, last 4 weeks up to the selected date
-    for (const t of this.dv.pages('"02 Areas/Personal/Tasks"').file.tasks.where(t => t.completed && t.completion && t.completion.ts >= since.ts && t.completion.ts <= sel.endOf("day").ts)) {
+    for (const t of this.dv.pages(`"${TASKS}"`).file.tasks.where(t => t.completed && t.completion && t.completion.ts >= since.ts && t.completion.ts <= sel.endOf("day").ts)) {
       const area = Object.entries(areaMap).find(([tag]) => t.tags.includes(tag))?.[1];
       if (area) scores[area] += taskXp(t, xpMap);
     }
     // habit bonus per area — shared scan from xp.js
-    for (const { area, days } of Object.values(collectHabitDays(this.dv, sel.startOf("month"), sel.endOf("month"))))
+    for (const { area, days } of Object.values(collectHabitDays(this.dv, dailyFolder(this.app), sel.startOf("month"), sel.endOf("month"))))
       if (days.size >= HABIT_BONUS_THRESHOLD && areaMap[area]) scores[areaMap[area]] += HABIT_BONUS_XP;
     return { scores };
   }

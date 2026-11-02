@@ -1,15 +1,14 @@
-// Finance: the per-month ledgers written by 00 System/Scripts/finance/import_statement.py — a month's totals,
+// Finance: the per-month ledger notes (one per month, in core/paths.js LEDGER) — a month's totals,
 // categories against their budgets, a 6-month trend and the latest operations; ◀ ▶ step through the months.
-// The data (02 Areas/Finance) stays in the vault; styles in styles/widgets/_finance.scss (blocks winx-fin, winx-fin-month).
+// The data (00 System/Data/Finance) stays in the vault; styles in styles/widgets/_finance.scss (blocks winx-fin, winx-fin-month).
 import { html } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { dm } from "../core/dates.js";
 import { NoteLink } from "../uikit/noteLink.js";
 import { money } from "../core/format.js";
 import { readJson } from "../core/files.js";
+import { LEDGER, RULES } from "../core/paths.js";
 
-const LEDGER = "02 Areas/Finance/Ledger";
-const RULES = "02 Areas/Finance/rules.json";
 const TRANSFER = "Переводы";
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const MONTHS_SHORT = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
@@ -66,7 +65,7 @@ export class Finance extends Widget {
   }
 
   view({ ledger, budgets, months, current }) {
-    if (!months.length) return html`<div class="winx-fin"><div class="winx-fin__empty">The ledger is empty. Export a statement from SberBank Online to 02 Areas/Finance/Statements and run 00 System/Scripts/finance/import.sh</div></div>`;
+    if (!months.length) return html`<div class="winx-fin"><div class="winx-fin__empty">The ledger is empty: a note per month goes to ${LEDGER}</div></div>`;
     const rows = ledger[current] ?? [], totals = summarize(rows), [year, month] = current.split("-");
     const index = months.indexOf(current), net = totals.income - totals.spent;
     const categories = Object.entries(totals.categories).sort((a, b) => b[1] - a[1]);

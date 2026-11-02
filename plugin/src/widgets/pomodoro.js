@@ -7,6 +7,7 @@ import { todayYmd } from "../core/dates.js";
 import { readJson } from "../core/files.js";
 import { AudioEngine } from "../core/sounds.js";
 import { Form } from "../uikit/form.ts";
+import { app } from "../core/app.js";
 
 const PATH = "00 System/Data/pomodoro.json";
 const DEFAULTS = { focusMin: 25, breakMin: 5 };

@@ -6,6 +6,7 @@ import { edit, editLine } from "../core/files.js";
 import { tasksApi } from "../core/plugins.js";
 import { Task } from "./task.js";
 import { Form } from "../uikit/form.ts";
+import { app } from "../core/app.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
 // only if that line is still the same task.

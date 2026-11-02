@@ -8,12 +8,13 @@ import { Task } from "../../tasks/task.js";
 import { levelInfo, taskXp } from "./xp.js";
 import { vitals, mana, mpLine, mpTable } from "./vitals.js";
 import { cycleLog } from "../body/cycle.js";
+import { TASKS } from "../../core/paths.js";
 
 export class LevelToday extends Widget {
   async data() {
     const { xpMap } = config;
     const day = ymd(pageDay(this.dv)), today = todayYmd();
-    const tasks = this.dv.pages('"02 Areas/Personal/Tasks"').file.tasks.array();
+    const tasks = this.dv.pages(`"${TASKS}"`).file.tasks.array();
     const total = tasks.filter(t => t.completed && ymd(t.completion) <= day).reduce((sum, t) => sum + taskXp(t, xpMap), 0);
     const all = tasks.map(t => Task.of(t));
     const v = vitals({ missed: all.filter(t => t.isOverdue(today)), doneToday: all.filter(t => t.doneOn === today) });

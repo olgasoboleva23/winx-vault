@@ -4,6 +4,7 @@ import { DashboardView, DASHBOARD_VIEW } from "./dashboard/view.ts";
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./widgets/blocks.js";
 import { useNotify } from "./services/notify.js";
+import { setApp } from "./core/app.js";
 import { installSounds } from "./core/sounds.js";
 
 // The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the commands, and the
@@ -11,6 +12,7 @@ import { installSounds } from "./core/sounds.js";
 
 export default class WinxPlugin extends Plugin {
   async onload() {
+    setApp(this.app);
     installSounds(this);
     registerCommands(this);
     // a ```winx block in a note: a widget class by name (widgets/blocks.js)

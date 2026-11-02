@@ -69,7 +69,7 @@
 
 ```tasks
 due on {{date}}
-path includes Tasks
+path includes 00 System/Data/Tasks
 short mode
 sort by status
 sort by tags

@@ -65,7 +65,7 @@ A shopping list card. Items are checkbox lines in `00 System/Data/Celestial Mark
 
 ## 🎯 Goals
 
-A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any task. `02 Areas/Personal/Goals.md` describes each one:
+A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any task. `00 System/Data/Goals.md` describes each one:
 
 ```
 - name:: Stretching

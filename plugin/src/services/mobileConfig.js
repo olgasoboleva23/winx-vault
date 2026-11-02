@@ -1,4 +1,5 @@
 import { Notice } from "obsidian";
+import { app } from "../core/app.js";
 
 // The synced visible folder obsidian-mobile/ copied into the real mobile config folder .obsidian-mobile.
 // Obsidian wants a config folder starting with a dot, Remotely Save never syncs dot folders, and iOS can't make

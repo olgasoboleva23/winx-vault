@@ -17,6 +17,7 @@ import { Card } from "../uikit/card.js";
 import { html } from "../core/html.js";
 import { useActions, useRedraw } from "../core/use.js";
 import { dataview } from "../core/plugins.js";
+import { app } from "../core/app.js";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
 
@@ -49,7 +50,7 @@ export class Widget extends MarkdownRenderChild {
       api,
     };
   }
-  get app() { return window.app; }
+  get app() { return app; }
 
   // a chart or anything with destroy(), dropped on the next draw
   keep(thing) { this.kept.push(thing); return thing; }

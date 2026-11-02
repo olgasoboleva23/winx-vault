@@ -5,6 +5,7 @@ import { Widget } from "../widget.js";
 import config from "../../core/config.js";
 import { pageDay, ymd } from "../../core/dates.js";
 import { collectHabitDays, taskXp } from "./xp.js";
+import { TASKS, dailyFolder } from "../../core/paths.js";
 
 export class XpToday extends Widget {
   async data() {
@@ -13,11 +14,11 @@ export class XpToday extends Widget {
     const levelOf = xp => levels.find(l => xp <= l.max) ?? levels.at(-1);
     // task XP by completion day
     const xpByDay = new Map();
-    for (const t of this.dv.pages('"02 Areas/Personal/Tasks"').file.tasks.where(t => t.completed && t.completion)) {
+    for (const t of this.dv.pages(`"${TASKS}"`).file.tasks.where(t => t.completed && t.completion)) {
       const day = ymd(t.completion);
       xpByDay.set(day, (xpByDay.get(day) ?? 0) + taskXp(t, xpMap));
     }
-    const habitBonus = Object.values(collectHabitDays(this.dv, start, end)).filter(h => h.days.size >= HABIT_BONUS_THRESHOLD).length * HABIT_BONUS_XP;
+    const habitBonus = Object.values(collectHabitDays(this.dv, dailyFolder(this.app), start, end)).filter(h => h.days.size >= HABIT_BONUS_THRESHOLD).length * HABIT_BONUS_XP;
     const days = Array.from({ length: Math.floor(end.diff(start, "days").days) + 1 }, (_, i) => ymd(start.plus({ days: i })));
     // the 7 days ending on the selected day (not the month's first week: future days would pull it down)
     const last7 = Array.from({ length: 7 }, (_, i) => ymd(sel.minus({ days: 6 - i })));

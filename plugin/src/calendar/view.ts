@@ -1,4 +1,5 @@
 import { ItemView, Notice, TAbstractFile, WorkspaceLeaf, debounce, sanitizeHTMLToDom } from "obsidian";
+import { POOL, TASKS } from "../core/paths.js";
 import { useActions, useBusy, useNewDay, useRedraw } from "../core/use.js";
 import { dataview, tasksApi } from "../core/plugins.js";
 import { CalendarData, T, findTask, taskKey } from "./data.js";
@@ -9,7 +10,7 @@ import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
 import { AudioEngine } from "../core/sounds.js";
 
-// The calendar tab: the week (7 day columns) or the month around a date, the tasks of 02 Areas/Personal/Tasks on
+// The calendar tab: the week (7 day columns) or the month around a date, the tasks of 00 System/Data/Tasks on
 // their days, "Missed?" above, and the No date | Regulars | Pool panel below. Its state (date, view, tab, folds)
 // is the tab's own: Obsidian saves it with the layout, so a pinned calendar comes back as it was.
 // The parts are classes (parts.js): markup in html``, handlers by data-action. One set of listeners on the tab
@@ -18,8 +19,7 @@ import { AudioEngine } from "../core/sounds.js";
 // Parts redraw on their own: a tab or a fold the panel; a date, the week/month or ✓ done everything, from
 // fresh data; a change to the tasks (Dataview's index) everything too.
 export const VIEW_TYPE = "winx-calendar";
-const TASKS_DIR = "02 Areas/Personal/Tasks/";
-const POOL = "02 Areas/Personal/Tasks/Pool.md";
+const TASKS_DIR = `${TASKS}/`;
 type PartName = "header" | "missed" | "grid" | "panel";
 const PARTS: PartName[] = ["header", "missed", "grid", "panel"];
 
@@ -100,7 +100,7 @@ export class CalendarView extends ItemView {
     if (!dv) return say("✦ the calendar needs the Dataview plugin");
     if (!dv.index?.initialized) return say("✦ waiting for Dataview…");   // index-ready draws again
     const today = todayYmd(), days = shownDays(this.state, today);
-    const tasks = dv.pages(`"${TASKS_DIR.slice(0, -1)}"`).file.tasks.array();
+    const tasks = dv.pages(`"${TASKS}"`).file.tasks.array();
     const poolLines = (dv.page(POOL)?.file.lists.array() ?? []).filter((l: any) => !l.task);
     // the data, all of it or one area's tasks and pool lines
     const data = (area: string | null) => new CalendarData({

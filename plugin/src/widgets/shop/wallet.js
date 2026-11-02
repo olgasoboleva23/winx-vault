@@ -2,12 +2,13 @@
 import config from "../../core/config.js";
 import { todayYmd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
+import { TASKS } from "../../core/paths.js";
 
 const PURCHASES = "00 System/Data/Purchases.md";
 
 export function balance(dv) {
   let earned = 0, spent = 0;
-  for (const t of dv.pages('"02 Areas/Personal/Tasks"').file.tasks)
+  for (const t of dv.pages(`"${TASKS}"`).file.tasks)
     if (t.completed) earned += config.difficulties.find(d => t.tags.includes(d.tag))?.gold ?? 0;
   for (const line of dv.pages('"00 System/Data/Purchases"').file.lists)
     spent += Number(line.text.match(/\|\s*(\d+)/)?.[1] ?? 0);

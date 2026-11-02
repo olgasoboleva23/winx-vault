@@ -15,12 +15,12 @@ export const levelInfo = (total, base = 100, step = 25) => {
   }
 };
 
-// Single pass over daily notes in [start, end]:
+// Single pass over the daily notes (in `folder`) in [start, end]:
 // { habitName: { area: "#area/x", days: Set<"yyyy-MM-dd"> } }
 // Tag shape is #habit/area/name, or #habit/name (area doubles as name).
-export function collectHabitDays(dv, start, end) {
+export function collectHabitDays(dv, folder, start, end) {
   const habits = {};
-  for (const page of dv.pages('"02 Areas/Personal/Daily Notes"')
+  for (const page of dv.pages(`"${folder}"`)
       .where(p => p.date?.ts >= start.ts && p.date?.ts <= end.ts)) {
     const dateStr = ymd(page.date);
     for (const t of page.file.tasks) {

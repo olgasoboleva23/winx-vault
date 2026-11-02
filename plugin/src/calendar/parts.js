@@ -13,6 +13,7 @@ import { dateFor } from "./state.js";
 import { addDays, addMonths, diffDays, dm } from "../core/dates.js";
 import { ruleText } from "../tasks/repeats.js";
 import { AudioEngine, isMuted, toggleMute } from "../core/sounds.js";
+import { app } from "../core/app.js";
 
 const M = d => window.moment(d);
 const PART = name => html` data-part="${name}"`;

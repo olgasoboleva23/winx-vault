@@ -2,6 +2,7 @@
 // edit: the note's text through fn (vault.process, so nothing is lost between read and write); a missing note: nothing.
 // editLine: line n through fn (null deletes it; a line that's gone: nothing).
 // appendLine: a line at the end (unique: not when it's already there); a missing note is made with `header` on top.
+import { app } from "./app.js";
 export const edit = (path, fn) => {
   const file = app.vault.getFileByPath(path);
   return file ? app.vault.process(file, fn) : Promise.resolve();

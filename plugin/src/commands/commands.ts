@@ -11,9 +11,8 @@ import { addMarketItem } from "../widgets/market/marketSearch.js";
 import { logPurchase } from "../widgets/shop/wallet.js";
 import { appendLine, edit } from "../core/files.js";
 import { tasksApi } from "../core/plugins.js";
+import { MASTER, POOL } from "../core/paths.js";
 
-const MASTER = "02 Areas/Personal/Tasks/Master.md";
-const POOL   = "02 Areas/Personal/Tasks/Pool.md";
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
 export function registerCommands(plugin: Plugin) {

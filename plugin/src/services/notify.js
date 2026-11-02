@@ -3,10 +3,10 @@ import { dataview } from "../core/plugins.js";
 import { useNewDay } from "../core/use.js";
 import { todayYmd } from "../core/dates.js";
 import { Goal, reminders } from "../widgets/goals/goal.js";
+import { GOALS, TASKS } from "../core/paths.js";
 
 // by name at run time, desktop only: a require("electron") in main.js would stop the phone loading it
 const ELECTRON = "electron";
-const TASKS = "02 Areas/Personal/Tasks", GOALS = "02 Areas/Personal/Goals";
 
 // Desktop notifications: today's reminders (goals.js reminders(): a goal task at its remind time, a task with
 // "HH:MM" 30 minutes before) and a morning summary once a day. Rescheduled when tasks or goals change and on a new

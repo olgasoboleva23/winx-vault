@@ -6,7 +6,7 @@
 
 ![Task window](../task-window.png)
 
-Tasks live in `02 Areas/Personal/Tasks/Master.md` in the Tasks plugin's format, tagged with a difficulty and a life area:
+Tasks live in `00 System/Data/Tasks/Master.md` in the Tasks plugin's format, tagged with a difficulty and a life area:
 
 ```
 - [ ] #⭐⭐medium #area/mind #time/evening read a chapter ![[rings.webp|28]] 🔁 every week on Tuesday, Thursday 📅 2026-11-03
@@ -30,7 +30,7 @@ Tasks live in `02 Areas/Personal/Tasks/Master.md` in the Tasks plugin's format, 
 
 ## 📅 Calendar
 
-A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (with the dashboard). The tasks of `02 Areas/Personal/Tasks` on a week or a month. Pin the tab, drag it to a sidebar or a window; it keeps its week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
+A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (with the dashboard). The tasks of `00 System/Data/Tasks` on a week or a month. Pin the tab, drag it to a sidebar or a window; it keeps its week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
 
 ![Calendar](../calendar.png)
 
