@@ -131,12 +131,14 @@
 }
 
 /* a card widget until its first draw */
-.winx-widget__skeleton {
-  height: 72px;
-  border-radius: $radius-l;
-  background: linear-gradient(90deg, rgb(255 255 255 / 25%) 25%, rgb(255 255 255 / 60%) 50%, rgb(255 255 255 / 25%) 75%);
-  background-size: 200% 100%;
-  animation: winx-shimmer 1.6s linear infinite;
+.winx-widget {
+  &__skeleton {
+    height: 72px;
+    border-radius: $radius-l;
+    background: linear-gradient(90deg, rgb(255 255 255 / 25%) 25%, rgb(255 255 255 / 60%) 50%, rgb(255 255 255 / 25%) 75%);
+    background-size: 200% 100%;
+    animation: winx-shimmer 1.6s linear infinite;
+  }
 }
 
 /* Obsidian 1.13 sets --corner-shape: superellipse(1.33) on .mod-macos, and app.css

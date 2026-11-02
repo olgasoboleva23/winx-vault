@@ -12,34 +12,34 @@
   &:last-child { border-bottom: none; }
   &:hover { background: fade(white, 35%); border-radius: $radius-m; }
   &--paused { opacity: 0.55; }
+  &__text { font-size: $text-xl; line-height: 1.35; }
+  &__meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
 }
-.winx-task-card__text { font-size: $text-xl; line-height: 1.35; }
-.winx-task-card__meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
 
 /* round buttons on a task: ⏭ ✏️ 🗑 */
 .winx-cal .winx-task-btns {
   display: flex;
   gap: $space-xs;
-}
-body:not(.is-mobile) .winx-cal .winx-task-btns {
-  position: absolute;
-  right: $space-xs;
-  top: 50%;
-  translate: 0 -50%;
-  padding-left: 18px;
-  background: linear-gradient(90deg, transparent, var(--winx-pink-light) 18px);
-  border-radius: $pill;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
+  body:not(.is-mobile) & {
+    position: absolute;
+    right: $space-xs;
+    top: 50%;
+    translate: 0 -50%;
+    padding-left: 18px;
+    background: linear-gradient(90deg, transparent, var(--winx-pink-light) 18px);
+    border-radius: $pill;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  body.is-mobile & { margin-top: $space-s; }
+  button.winx-task-btns__del--armed {
+    width: auto;
+    padding: 0 $space-m;
+    border-color: #d0457a;
+    background: #d0457a;
+    color: #fff;
+    font-size: $text-m;
+  }
 }
 body:not(.is-mobile) :is(.winx-task-card, .winx-cal__task, .winx-missed__row):hover .winx-task-btns { opacity: 1; pointer-events: auto; }
-body.is-mobile .winx-cal .winx-task-btns { margin-top: $space-s; }
-.winx-cal .winx-task-btns button.winx-task-btns__del--armed {
-  width: auto;
-  padding: 0 $space-m;
-  border-color: #d0457a;
-  background: #d0457a;
-  color: #fff;
-  font-size: $text-m;
-}

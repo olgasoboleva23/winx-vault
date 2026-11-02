@@ -2,13 +2,11 @@
 
 @use "../mixins" as *;
 
-:is(.dashboard, .kanban-board) {
-  .winx-level {
-    @include row;
-    gap: $space-3xl;
-  }
+.winx-level {
+  @include row;
+  gap: $space-3xl;
 
-  .winx-level__icon {
+  &__icon {
     flex: 0 0 auto;
     width: $deco;
     height: $deco;
@@ -18,19 +16,19 @@
     animation: pulse-glow 2s infinite alternate;
   }
 
-  .winx-level__body {
+  &__body {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: $space-xs;
   }
 
-  .winx-level__text {
+  &__text {
     color: var(--winx-text-dark);
     font-size: $text-xl;
   }
 
-  .winx-level__progress {
+  &__progress {
     margin-top: $space-s;
     height: 10px;
     border-radius: $radius-s;
@@ -38,7 +36,7 @@
     position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
   }
 
-  .winx-level__progress-fill {
+  &__progress-fill {
     height: 100%;
     background: linear-gradient(
       90deg,
@@ -52,25 +50,24 @@
     position: relative;
   }
 
+  /* HP / MP: red and blue like a game's bars */
+  &__vitals { display: grid; gap: $space-xs; margin-top: $space-m; }
+  &__vital {
+    @include row;
+    gap: $space-s;
+    font-size: $text-s;
+    color: var(--winx-purple-deep);
+    &-name { width: 1.8em; font-family: "Cinzel", serif; letter-spacing: 1px; }
+    &-value { min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; }   /* 50/50 and 0/4: bars of one length */
+    &-bar {
+      flex: 1;
+      height: $space-m;
+      overflow: hidden;
+      border-radius: $pill;
+      background: alpha(--winx-purple, 20%);
+    }
+    &-fill { display: block; height: 100%; border-radius: $pill; transition: width 0.3s; }
+    &--hp &-fill { background: linear-gradient(90deg, #c2304a, #ff6b81); box-shadow: 0 0 6px rgb(255 107 129 / 70%); }
+    &--mp &-fill { background: linear-gradient(90deg, #2f5fc4, #6fa8ff); box-shadow: 0 0 6px rgb(111 168 255 / 70%); }
+  }
 }
-
-/* HP / MP in the Level card (src/widgets/xp/levelToday.js): red and blue like a game's bars */
-.winx-level__vitals { display: grid; gap: $space-xs; margin-top: $space-m; }
-.winx-level__vital {
-  @include row;
-  gap: $space-s;
-  font-size: $text-s;
-  color: var(--winx-purple-deep);
-  &-name { width: 1.8em; font-family: "Cinzel", serif; letter-spacing: 1px; }
-  &-value { min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; }   /* 50/50 and 0/4: bars of one length */
-}
-.winx-level__vital-bar {
-  flex: 1;
-  height: $space-m;
-  overflow: hidden;
-  border-radius: $pill;
-  background: alpha(--winx-purple, 20%);
-}
-.winx-level__vital-fill { display: block; height: 100%; border-radius: $pill; transition: width 0.3s; }
-.winx-level__vital--hp .winx-level__vital-fill { background: linear-gradient(90deg, #c2304a, #ff6b81); box-shadow: 0 0 6px rgb(255 107 129 / 70%); }
-.winx-level__vital--mp .winx-level__vital-fill { background: linear-gradient(90deg, #2f5fc4, #6fa8ff); box-shadow: 0 0 6px rgb(111 168 255 / 70%); }

@@ -17,9 +17,9 @@
   @include wings(40px, 3px);
   > * { position: relative; z-index: 1; }
 
-  .winx-missed__head { grid-column: 1 / -1; padding-left: 34px; font-family: "Cinzel", serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
+  &__head { grid-column: 1 / -1; padding-left: 34px; font-family: "Cinzel", serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
   /* rounded coloured rows like the day entries; ✏️ 🗑 sit in the row, before the date */
-  .winx-missed__row {
+  &__row {
     @include row;
     position: relative;
     gap: $space-s;
@@ -30,11 +30,16 @@
     color: var(--winx-text-dark);
     cursor: grab;
   }
-  .winx-missed__text { flex: 1; }
-  .winx-missed__date { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }
+  &__text { flex: 1; }
+  &__date { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }
+  /* desktop: the buttons float over the end of the text on hover (opacity only, so the row height stays) */
+  body:not(.is-mobile) & {
+    &__row .winx-task-btns { right: 104px; }
+  }
+  /* the phone: the task's text on its own line, the buttons and the date under it */
+  body.is-mobile & {
+    &__row { flex-wrap: wrap; }
+    &__row .winx-task-btns { margin: 0; }
+    &__text { flex-basis: 100%; }
+  }
 }
-/* desktop: the buttons float over the end of the text on hover (opacity only, so the row height stays) */
-body:not(.is-mobile) .winx-missed__row .winx-task-btns { right: 104px; }
-body.is-mobile .winx-missed__row .winx-task-btns { margin: 0; }
-/* the phone: the task's text on its own line, the buttons and the date under it */
-body.is-mobile .winx-missed__row { flex-wrap: wrap; .winx-missed__text { flex-basis: 100%; } }

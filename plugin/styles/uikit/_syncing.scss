@@ -14,5 +14,5 @@
   box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%);
   color: #fff;
   font-size: $text-m;
+  &__star { animation: winx-spin 1.2s linear infinite; }
 }
-.winx-syncing__star { animation: winx-spin 1.2s linear infinite; }

@@ -21,18 +21,18 @@
   padding-top: $space-l;
 
   /* ── Small row (the default); --mini hides the full ring ── */
-  .winx-pomodoro__mini {
+  &__mini {
     display: none;
     align-items: center;
     gap: $space-xl;
   }
-  &.winx-pomodoro--mini {
+  &--mini {
     padding-top: 0;
-    .winx-pomodoro__mini { display: flex; }
-    .winx-pomodoro__body { display: none; }
   }
+  &--mini &__mini { display: flex; }
+  &--mini &__body { display: none; }
 
-  .winx-pomodoro__mini-ring {
+  &__mini-ring {
     width: 52px;
     height: 52px;
     flex: none;
@@ -45,27 +45,29 @@
       conic-gradient(var(--winx-pink-deep) calc(var(--p) * 360deg), var(--winx-purple-light) 0);
   }
 
-  .winx-pomodoro__mini-info {
-    .winx-pomodoro__stars { align-items: center; }
+  &__mini-info {
     flex: 1;
     min-width: 0;
     cursor: pointer;
   }
+  &__mini-info &__stars { align-items: center; }
 
-  .winx-pomodoro__mini-time {
+  &__mini-time {
     font-size: 30px;
     font-weight: 700;
     line-height: 1.1;
     color: var(--winx-text-dark);
   }
 
-  .winx-pomodoro__mini-mode {
+  &__mini-mode {
     color: var(--winx-text-dark);
     opacity: 0.75;
     margin-right: $space-xs;
   }
 
-  button.winx-pomodoro__mini-play {
+  /* the buttons: the doubled block in front (.winx-pomodoro.winx-pomodoro …) outweighs Obsidian's button styles,
+     .is-tablet / .is-phone button:not(.clickable-icon) included */
+  &#{&} &__mini-play {
     width: 44px;
     height: 44px;
     flex: none;
@@ -81,14 +83,14 @@
     svg { width: 20px; height: 20px; fill: var(--winx-text-dark); }
   }
 
-  .winx-pomodoro__body {
+  &__body {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: $space-2xl;
   }
 
-  .winx-pomodoro__ring {
+  &__ring {
     width: 180px;
     height: 180px;
     border-radius: $round;
@@ -102,26 +104,6 @@
       var(--winx-purple-light) 0
     );
 
-    /* Wing decoration — SVG lives in winx-assets.css */
-    .winx-pomodoro__wing {
-      position: absolute;
-      width: $deco;
-      height: $deco;
-      background: var(--winx-wing-svg) 0 0 / contain no-repeat;
-      pointer-events: none;
-
-      &--left {
-        left: -42px;
-        top: 50%;
-        transform: translateY(-50%) scaleX(-1);
-      }
-      &--right {
-        right: -42px;
-        top: 50%;
-        transform: translateY(-50%) rotate(180deg) scaleX(-1) scaleY(-1);
-      }
-    }
-
     &::before {
       content: "";
       position: absolute;
@@ -130,135 +112,156 @@
       background: var(--winx-pink-light);
       border: 2px solid var(--winx-border);
     }
+  }
 
-    .winx-pomodoro__top-star {
-      position: absolute;
-      top: -10px;
-      width: 20px;
-      height: 20px;
+  /* Wing decoration — SVG lives in winx-assets.css */
+  &__wing {
+    position: absolute;
+    width: $deco;
+    height: $deco;
+    background: var(--winx-wing-svg) 0 0 / contain no-repeat;
+    pointer-events: none;
 
+    &--left {
+      left: -42px;
+      top: 50%;
+      transform: translateY(-50%) scaleX(-1);
+    }
+    &--right {
+      right: -42px;
+      top: 50%;
+      transform: translateY(-50%) rotate(180deg) scaleX(-1) scaleY(-1);
+    }
+  }
+
+  &__top-star {
+    position: absolute;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+
+    svg {
+      fill: var(--winx-gold);
+      stroke: var(--winx-border);
+    }
+  }
+
+  &__time {
+    position: relative;
+    cursor: pointer;
+    font-size: 30px;
+    color: var(--winx-text-dark);
+    z-index: 2;
+  }
+
+  &__controls {
+    position: absolute;
+    bottom: -20px;
+    @include center;
+    gap: $space-xl;
+    margin-top: -10px;   /* with bottom: -20px it still lifts the row: keep */
+  }
+
+  &#{&} &__btn {
+    border-radius: $round;
+    border: 2px solid var(--winx-border);
+    background: var(--winx-pink);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s ease;   /* both ways: grows on hover, shrinks back */
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    svg {
+      fill: var(--winx-text-dark);
+    }
+
+    &--play {
+      width: 48px;
+      height: 48px;
       svg {
-        fill: var(--winx-gold);
-        stroke: var(--winx-border);
+        width: 20px;
+        height: 20px;
       }
     }
 
-    .winx-pomodoro__time {
-      position: relative;
-      cursor: pointer;
-      font-size: 30px;
-      color: var(--winx-text-dark);
-      z-index: 2;
-    }
-
-    .winx-pomodoro__controls {
-      position: absolute;
-      bottom: -20px;
-      @include center;
-      gap: $space-xl;
-      margin-top: -10px;   /* with bottom: -20px it still lifts the row: keep */
-
-      .winx-pomodoro__btn {
-        border-radius: $round;
-        border: 2px solid var(--winx-border);
-        background: var(--winx-pink);
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        padding: 0;
-        transition: transform 0.15s ease;   /* both ways: grows on hover, shrinks back */
-
-        &:hover {
-          transform: scale(1.05);
-        }
-
-        svg {
-          fill: var(--winx-text-dark);
-        }
-
-        &.winx-pomodoro__btn--play {
-          width: 48px;
-          height: 48px;
-          svg {
-            width: 20px;
-            height: 20px;
-          }
-        }
-
-        &.winx-pomodoro__btn--reset,
-        &.winx-pomodoro__btn--skip {
-          width: 36px;
-          height: 36px;
-          svg {
-            width: 14px;
-            height: 14px;
-          }
-        }
+    &--reset,
+    &--skip {
+      width: 36px;
+      height: 36px;
+      svg {
+        width: 14px;
+        height: 14px;
       }
     }
   }
 
-  .winx-pomodoro__stars {
+  &__stars {
     display: flex;
     gap: $space-m;
+  }
 
-    .winx-pomodoro__multiplier {
-      font-size: $text-xl;
-      font-weight: 500;
-      margin-left: $space-xs;
+  &__multiplier {
+    font-size: $text-xl;
+    font-weight: 500;
+    margin-left: $space-xs;
+  }
+
+  &__star {
+    width: 18px;
+    height: 18px;
+    opacity: 0.3;
+    svg {
+      fill: var(--winx-purple);
     }
 
-    .winx-pomodoro__star {
-      width: 18px;
-      height: 18px;
-      opacity: 0.3;
+    &--on {
+      opacity: 1;
       svg {
-        fill: var(--winx-purple);
-      }
-
-      &.winx-pomodoro__star--on {
-        opacity: 1;
-        svg {
-          fill: var(--winx-gold);
-        }
+        fill: var(--winx-gold);
       }
     }
   }
 
-  .winx-pomodoro__mode {
+  &__mode {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: $space-2xs;
     margin-top: $space-2xl;
 
-    .winx-pomodoro__mode-text {
+    &-text {
       font-size: $text-l;
       font-weight: 600;
       color: var(--winx-text-dark);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
-    .winx-pomodoro__session {
-      font-size: $text-xs;
-      color: var(--winx-purple);
-      opacity: 0.7;
-    }
+  }
+
+  &__session {
+    font-size: $text-xs;
+    color: var(--winx-purple);
+    opacity: 0.7;
   }
 
   /* ── Bottom bar ── */
-  .winx-pomodoro__bottom {
+  &__bottom {
     @include center;
     gap: $space-m;
-
-    .winx-pomodoro__settings-info {
-      font-size: $text-xs;
-      color: var(--winx-purple);
-      opacity: 0.6;
-    }
   }
 
-  .winx-pomodoro__gear {
+  &__settings-info {
+    font-size: $text-xs;
+    color: var(--winx-purple);
+    opacity: 0.6;
+  }
+
+  & &__gear {
     width: 22px;
     min-width: 22px;
     height: 22px;

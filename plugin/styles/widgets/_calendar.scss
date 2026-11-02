@@ -1,10 +1,12 @@
 /* ── Calendar (week / month) ── */
 
 @use "../mixins" as *;
-.winx-cal__top { @include row; gap: $space-s; margin-bottom: $space-l; }
-.winx-cal__top button.winx-cal__mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
-/* the areas' colours: the balance bar's pieces and a stripe before each task */
 .winx-cal {
+  &__top {
+    @include row; gap: $space-s; margin-bottom: $space-l;
+    & button.winx-cal__mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
+  }
+  /* the areas' colours: the balance bar's pieces and a stripe before each task */
   [data-area="body"]      { --area: #e8609a; }
   [data-area="mind"]      { --area: #9b6bd6; }
   [data-area="wealth"]    { --area: #e0a12e; }
@@ -15,209 +17,227 @@
   [data-area="work"]      { --area: #8a7f9e; }
   [data-area="personal"]  { --area: #e88fc0; }
   [data-area="health"]    { --area: #5ec4c4; }
-}
-.winx-cal :is(.winx-cal__task, .winx-missed__row, .winx-task-card)[data-area] { border-left: 3px solid var(--area); }
-/* the week's balance: one thin bar split by area (its share of the week's tasks), the done part brighter;
-   the areas with nothing this week as grey icons after it */
-.winx-cal__balance { display: flex; align-items: flex-end; gap: $space-m; margin: (-$space-s) 0 $space-l; }
-.winx-cal__balance-bar {
-  flex: 1;
-  display: flex;
-  gap: 2px;
+  :is(.winx-cal__task, .winx-missed__row, .winx-task-card)[data-area] { border-left: 3px solid var(--area); }
+  /* the week's balance: one thin bar split by area (its share of the week's tasks), the done part brighter;
+     the areas with nothing this week as grey icons after it */
+  &__balance {
+    display: flex; align-items: flex-end; gap: $space-m; margin: (-$space-s) 0 $space-l;
+    &-bar {
+      flex: 1;
+      display: flex;
+      gap: 2px;
+    }
+  }
   /* a picked area (a click shows only its tasks): the others fade */
-  &--picked .winx-cal__area:not(.winx-cal__area--on) { opacity: 0.4; }
+  &__balance-bar--picked &__area:not(.winx-cal__area--on) { opacity: 0.4; }
+  /* a piece of the balance bar: its icon and done / all, the bar with the done part brighter */
+  &__area {
+    min-width: 2.6em; cursor: pointer;
+    &-label { display: block; overflow: hidden; white-space: nowrap; text-overflow: clip; font-size: $text-xs; color: var(--winx-lavender); }
+    &--on &-label { font-weight: 600; }
+    /* hover: the piece glows in its area's colour (a click filters by the area) */
+    &:hover &-label { text-shadow: 0 0 6px var(--area); }
+    &:hover &-track { box-shadow: 0 0 10px var(--area), 0 0 4px var(--area); }
+    &-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); transition: box-shadow 0.15s ease; }
+    &-fill { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
+  }
+  &__balance-none { display: flex; gap: $space-2xs; filter: grayscale(1); opacity: 0.6; font-size: $text-l; }
+  &__week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: $space-m;
+    align-items: stretch;
+  }
+  &__day,
+  &__cell {
+    border-radius: $radius-xl;
+    border: 1px solid var(--winx-border);
+    background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    position: relative;
+  }
+  /* the Missed strip's blue */
+  &__day--today,
+  &__cell--today { border-color: rgb(168 200 240); background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240) 60%, rgb(232 213 245)); }
+  &__day { min-height: 220px; padding: $space-m $space-s; }
+  /* the phone: the week's days one under another, each as tall as its tasks */
+  body.is-mobile & {
+    &__week { grid-template-columns: minmax(0, 1fr); }
+    &__day { min-height: 0; }
+  }
 }
-/* a piece of the balance bar: its icon and done / all, the bar with the done part brighter */
-.winx-cal__area { min-width: 2.6em; cursor: pointer; }
-.winx-cal__area-label { display: block; overflow: hidden; white-space: nowrap; text-overflow: clip; font-size: $text-xs; color: var(--winx-lavender); }
-.winx-cal__area--on .winx-cal__area-label { font-weight: 600; }
-/* hover: the piece glows in its area's colour (a click filters by the area) */
-.winx-cal__area:hover .winx-cal__area-label { text-shadow: 0 0 6px var(--area); }
-.winx-cal__area:hover .winx-cal__area-track { box-shadow: 0 0 10px var(--area), 0 0 4px var(--area); }
-.winx-cal__area-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); transition: box-shadow 0.15s ease; }
-.winx-cal__area-fill { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
-.winx-cal__balance-none { display: flex; gap: $space-2xs; filter: grayscale(1); opacity: 0.6; font-size: $text-l; }
-.winx-cal__week {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: $space-m;
-  align-items: stretch;
-}
-.winx-cal__day, .winx-cal__cell {
-  border-radius: $radius-xl;
-  border: 1px solid var(--winx-border);
-  background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
-  position: relative;
-}
-/* the Missed strip's blue */
-.winx-cal__day--today, .winx-cal__cell--today { border-color: rgb(168 200 240); background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240) 60%, rgb(232 213 245)); }
-.winx-cal__day { min-height: 220px; padding: $space-m $space-s; }
-/* the phone: the week's days one under another, each as tall as its tasks */
-body.is-mobile .winx-cal__week { grid-template-columns: minmax(0, 1fr); }
-body.is-mobile .winx-cal__day { min-height: 0; }
 /* while dragging, today and past days split into ✓ done / ⏳ plan halves */
-.winx-cal__zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
-.winx-cal--dragging .winx-cal__zones { display: flex; flex-direction: column; }
-.winx-cal__zone {
-  flex: 1;
-  @include center;
-  border: 1px dashed var(--winx-border);
-  border-radius: $radius-m;
-  background: rgb(255 248 252 / 90%);
-  font-size: 22px;
-  color: var(--winx-purple-deep);
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+.winx-cal {
+  &__zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
+  &--dragging &__zones { display: flex; flex-direction: column; }
+  &__zone {
+    flex: 1;
+    @include center;
+    border: 1px dashed var(--winx-border);
+    border-radius: $radius-m;
+    background: rgb(255 248 252 / 90%);
+    font-size: 22px;
+    color: var(--winx-purple-deep);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
 
-  &--over { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
-}
-/* drop bar: sticky at the top while dragging (zero height, so nothing below jumps) */
-.winx-cal__dropbar { position: sticky; top: $space-m; z-index: 5; height: 0; }
-.winx-cal__dropbar-in {
-  display: none;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: $space-s;
-  padding: $space-s;
-  border-radius: $radius-xl;
-  border: 1px solid var(--winx-gold-deep);
-  background: rgb(255 248 252 / 95%);
-  box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
-}
-.winx-cal--dragging .winx-cal__dropbar-in { display: grid; }
-.winx-cal__chip {
-  padding: $space-l $space-xs;
-  border-radius: $radius-m;
-  border: 1px dashed var(--winx-border);
-  text-align: center;
-  font-family: "Cinzel", serif;
-  font-size: $text-l;
-  color: var(--winx-purple-deep);
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+    &--over { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
+  }
+  /* drop bar: sticky at the top while dragging (zero height, so nothing below jumps) */
+  &__dropbar {
+    position: sticky; top: $space-m; z-index: 5; height: 0;
+    &-in {
+      display: none;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: $space-s;
+      padding: $space-s;
+      border-radius: $radius-xl;
+      border: 1px solid var(--winx-gold-deep);
+      background: rgb(255 248 252 / 95%);
+      box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
+    }
+  }
+  &--dragging &__dropbar-in { display: grid; }
+  &__chip {
+    padding: $space-l $space-xs;
+    border-radius: $radius-m;
+    border: 1px dashed var(--winx-border);
+    text-align: center;
+    font-family: "Cinzel", serif;
+    font-size: $text-l;
+    color: var(--winx-purple-deep);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
 
-  &--today { border-color: rgb(168 200 240); }
-  &--over  { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
-}
-.winx-cal__backlog {
-  margin-top: $space-2xl;
-  padding: $space-m $space-l;
-  border-radius: $radius-xl;
-  border: 1px solid var(--winx-border);
-  background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
-  transition: box-shadow 0.15s ease;
+    &--today { border-color: rgb(168 200 240); }
+    &--over  { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
+  }
+  &__backlog {
+    margin-top: $space-2xl;
+    padding: $space-m $space-l;
+    border-radius: $radius-xl;
+    border: 1px solid var(--winx-border);
+    background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
+    transition: box-shadow 0.15s ease;
 
-  &--over { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
-  button.winx-cal__more { margin-top: $space-s; padding: $space-2xs $space-xl; border-radius: $pill; border: 1px solid var(--winx-border); background: rgb(255 255 255 / 75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer; }
-}
-.winx-cal__backlog-grid { columns: 260px; column-gap: $space-xl; }   /* masonry: area cards fill the columns top to bottom */
-.winx-cal__group-card {
-  break-inside: avoid;
-  margin-bottom: $space-xl;
-  padding: $space-s $space-m;
-  border-radius: $radius-xl;
-  background: fade(var(--winx-border), 25%);
-  .winx-task-card:last-child { border-bottom: none; }
-}
-.winx-cal__head {
-  margin-bottom: $space-xs;
-  text-align: center;
-  font-family: "Cinzel", serif;
-  color: var(--winx-purple-deep);
-}
-.winx-cal__task {
-  position: relative;
-  padding: $space-xs 5px;
-  border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
-  font-size: $text-l;
-  line-height: 1.3;
-  color: var(--winx-text-dark);
+    &--over { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
+    button.winx-cal__more { margin-top: $space-s; padding: $space-2xs $space-xl; border-radius: $pill; border: 1px solid var(--winx-border); background: rgb(255 255 255 / 75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer; }
+    &-grid { columns: 260px; column-gap: $space-xl; }
+  }   /* masonry: area cards fill the columns top to bottom */
+  &__group-card {
+    break-inside: avoid;
+    margin-bottom: $space-xl;
+    padding: $space-s $space-m;
+    border-radius: $radius-xl;
+    background: fade(var(--winx-border), 25%);
+    .winx-task-card:last-child { border-bottom: none; }
+  }
+  &__head {
+    margin-bottom: $space-xs;
+    text-align: center;
+    font-family: "Cinzel", serif;
+    color: var(--winx-purple-deep);
+  }
+  &__task {
+    position: relative;
+    padding: $space-xs 5px;
+    border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
+    font-size: $text-l;
+    line-height: 1.3;
+    color: var(--winx-text-dark);
 
-  &:last-child { border-bottom: none; }
-  &[draggable="true"] { cursor: grab; }
-  &[draggable="true"]:hover { background: fade(white, 35%); border-radius: 8px; }
-  &--ghost   { opacity: 0.5; }
-  &--done    { opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
-  &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
-  > input.task-list-item-checkbox { position: absolute; left: $space-xs; top: 5px; margin: 0; }
-}
-/* ✦ dashboard on the right of the top row */
-.winx-cal__top .winx-cal__to-dash { margin-left: auto; }
-/* stickers from ![[...]] in the task text */
-.winx-cal__sticker { height: 24px; width: auto; vertical-align: middle; }
-.winx-cal__month .winx-cal__sticker { height: 14px; }
-/* hover: the sticker grows to its full 84px over the card */
-.winx-cal__sticker { position: relative; transition: transform 0.15s; }
-.winx-cal__sticker:hover { z-index: 20; transform: scale(3.5); border-radius: $radius-s; box-shadow: 0 2px 10px rgb(0 0 0 / 35%); }
-.winx-cal__month .winx-cal__sticker:hover { transform: scale(6); }
-.winx-cal__task:has(.winx-cal__sticker:hover) { overflow: visible; }
-/* backlog area headings: pills like the Kanban's group headings */
-.winx-cal__group {
-  width: fit-content;
-  margin: $space-2xs 0 $space-xs;
-  padding: $space-2xs $space-xl;
-  border-radius: $pill;
-  background: fade(var(--winx-border), 40%);
-  color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep));
-  font-weight: 600;
-}
-/* Ahead: a date over its tasks inside a month card */
-.winx-cal__date {
-  margin: $space-m 0 $space-2xs;
-  color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep));
-  font-size: 0.9em;
-  font-weight: 600;
-  opacity: 0.8;
-}
-/* today's column gets the card's fairy wings in two corners */
-.winx-cal__day--today {
-  @include wings(30px, 3px);
-  > :not(.winx-cal__zones) { position: relative; z-index: 1; }
-}
-.winx-cal__month {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: $space-s;
-}
-.winx-cal__weekday { text-align: center; font-family: "Cinzel", serif; font-size: $text-m; color: var(--winx-lavender); }
-.winx-cal__cell {
-  min-height: 92px;
-  padding: $space-xs 5px;
-  cursor: pointer;
+    &:last-child { border-bottom: none; }
+    &[draggable="true"] { cursor: grab; }
+    &[draggable="true"]:hover { background: fade(white, 35%); border-radius: 8px; }
+    &--ghost   { opacity: 0.5; }
+    &--done    { opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
+    &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
+    > input.task-list-item-checkbox { position: absolute; left: $space-xs; top: 5px; margin: 0; }
+  }
+  /* ✦ dashboard on the right of the top row */
+  &__top &__to-dash { margin-left: auto; }
+  /* stickers from ![[...]] in the task text */
+  &__sticker { height: 24px; width: auto; vertical-align: middle; }
+  &__month &__sticker { height: 14px; }
+  /* hover: the sticker grows to its full 84px over the card */
+  &__sticker {
+    position: relative; transition: transform 0.15s;
+    &:hover { z-index: 20; transform: scale(3.5); border-radius: $radius-s; box-shadow: 0 2px 10px rgb(0 0 0 / 35%); }
+  }
+  &__month &__sticker:hover { transform: scale(6); }
+  &__task:has(.winx-cal__sticker:hover) { overflow: visible; }
+  /* backlog area headings: pills like the Kanban's group headings */
+  &__group {
+    width: fit-content;
+    margin: $space-2xs 0 $space-xs;
+    padding: $space-2xs $space-xl;
+    border-radius: $pill;
+    background: fade(var(--winx-border), 40%);
+    color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep));
+    font-weight: 600;
+  }
+  /* Ahead: a date over its tasks inside a month card */
+  &__date {
+    margin: $space-m 0 $space-2xs;
+    color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep));
+    font-size: 0.9em;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+  /* today's column gets the card's fairy wings in two corners */
+  &__day--today {
+    @include wings(30px, 3px);
+    > :not(.winx-cal__zones) { position: relative; z-index: 1; }
+  }
+  &__month {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: $space-s;
+  }
+  &__weekday { text-align: center; font-family: "Cinzel", serif; font-size: $text-m; color: var(--winx-lavender); }
+  &__cell {
+    min-height: 92px;
+    padding: $space-xs 5px;
+    cursor: pointer;
 
-  &--outside { opacity: 0.5; }
-  .winx-cal__task { padding: 1px $space-2xs; border: none; font-size: $text-s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-}
-.winx-cal__num { font-size: $text-m; font-weight: 600; color: var(--winx-purple-deep); }
-/* the phone's month: small cells with a dot per task, the picked day's card under the grid */
-.winx-cal__phone-month {
-  display: grid;
-  gap: $space-l;
-  .winx-cal__month { gap: $space-2xs; }
-  .winx-cal__cell { min-height: 48px; padding: $space-2xs; text-align: center; }
-  .winx-cal__cell--picked { border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 80%); }
-}
-.winx-cal__dots {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 3px;
-  margin-top: $space-2xs;
-}
-.winx-cal__dot { width: 6px; height: 6px; border-radius: $round; background: var(--winx-pink-deep); }
-.winx-cal__dot--done { background: var(--winx-gold-deep); }
-.winx-cal__dots-more { font-size: $text-2xs; color: var(--winx-purple-deep); }
-/* a tick waits 2 s before it's written: struck through, a gold shimmer runs over it */
-.winx-cal__task--ticking {
-  text-decoration: line-through;
-  background-image: linear-gradient(100deg, transparent 30%, alpha(--winx-gold, 55%) 50%, transparent 70%);
-  background-size: 250% 100%;
-  animation: winx-tick-shimmer 1s ease-in-out 2;
+    &--outside { opacity: 0.5; }
+  }
+  &__cell &__task { padding: 1px $space-2xs; border: none; font-size: $text-s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  &__num { font-size: $text-m; font-weight: 600; color: var(--winx-purple-deep); }
+  /* the phone's month: small cells with a dot per task, the picked day's card under the grid */
+  &__phone-month {
+    display: grid;
+    gap: $space-l;
+  }
+  &__phone-month &__month { gap: $space-2xs; }
+  &__phone-month &__cell { min-height: 48px; padding: $space-2xs; text-align: center; }
+  &__phone-month &__cell--picked { border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 80%); }
+  &__dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    margin-top: $space-2xs;
+  }
+  &__dot {
+    width: 6px; height: 6px; border-radius: $round; background: var(--winx-pink-deep);
+    &--done { background: var(--winx-gold-deep); }
+  }
+  &__dots-more { font-size: $text-2xs; color: var(--winx-purple-deep); }
+  /* a tick waits 2 s before it's written: struck through, a gold shimmer runs over it */
+  &__task--ticking {
+    text-decoration: line-through;
+    background-image: linear-gradient(100deg, transparent 30%, alpha(--winx-gold, 55%) 50%, transparent 70%);
+    background-size: 250% 100%;
+    animation: winx-tick-shimmer 1s ease-in-out 2;
+  }
 }
 @keyframes winx-tick-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
 /* after a write, until the redraw (the view adds --busy): the days and the tabs dim, the ✦ pill shows */
-.winx-cal--busy {
-  .winx-busy__pill { display: flex; }
-  :is(.winx-cal__week, .winx-cal__month, .winx-cal__backlog-grid) { opacity: 0.55; transition: opacity 0.2s; pointer-events: none; }
+.winx-cal {
+  &--busy {
+    .winx-busy__pill { display: flex; }
+    :is(.winx-cal__week, .winx-cal__month, .winx-cal__backlog-grid) { opacity: 0.55; transition: opacity 0.2s; pointer-events: none; }
+  }
 }
 @keyframes winx-spin { to { transform: rotate(360deg); } }
 /* phone swipes: right = done (green), left = skip / no date (lilac); the row follows the finger */
@@ -225,60 +245,60 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
 .winx-cal {
   [data-swipe] { transition: none; }
   [data-swipe="done"] { box-shadow: -40px 0 0 -6px rgb(120 200 150 / 70%); }
-}
-.winx-cal :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px alpha(--winx-purple-deep, 40%); }
-/* what the swipe will do, in the band it uncovers: ✓ done on the left, ⏭ skip / ↩ no date on the right */
-.winx-cal [data-swipe] { position: relative; overflow: visible; }
-.winx-cal [data-swipe]::after { position: absolute; top: 50%; transform: translateY(-50%); font-size: $text-xl; pointer-events: none; }
-.winx-cal [data-swipe="done"]::after { content: "✓"; left: -30px; color: #fff; font-weight: 700; }
-.winx-cal [data-swipe="skip"]::after { content: "⏭"; right: -32px; }
-.winx-cal [data-swipe="nodate"]::after { content: "↩"; right: -30px; color: #fff; font-weight: 700; }
+  :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px alpha(--winx-purple-deep, 40%); }
+  /* what the swipe will do, in the band it uncovers: ✓ done on the left, ⏭ skip / ↩ no date on the right */
+  [data-swipe] { position: relative; overflow: visible; }
+  [data-swipe]::after { position: absolute; top: 50%; transform: translateY(-50%); font-size: $text-xl; pointer-events: none; }
+  [data-swipe="done"]::after { content: "✓"; left: -30px; color: #fff; font-weight: 700; }
+  [data-swipe="skip"]::after { content: "⏭"; right: -32px; }
+  [data-swipe="nodate"]::after { content: "↩"; right: -30px; color: #fff; font-weight: 700; }
 
-/* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
-.winx-cal__routine {
-  margin: 3px 0;
-  border-radius: $radius-xl;
-  border: 1px dashed alpha(--winx-purple-deep, 35%);
-  background: rgb(255 255 255 / 40%);
-  &--open { padding: 0 3px 3px; }
-}
-.winx-cal__routine-time {
-  margin: $space-xs 0 1px $space-s;
-  cursor: pointer;
-  font-size: $text-s;
-  color: var(--winx-purple-deep);
-  opacity: 0.7;
-}
-.winx-cal__routine-pill {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-2xs $space-l;
-  span { white-space: nowrap; }
-  padding: 3px $space-l;
-  font-size: $text-m;
-  color: var(--winx-purple-deep);
-  cursor: pointer;
-}
-.winx-cal__marks {
-  display: flex;
-  gap: $space-m;
-  padding: $space-2xs $space-xs;
-  font-size: $text-s;
-  color: var(--winx-purple-deep);
-  opacity: 0.7;
+  /* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
+  &__routine {
+    margin: 3px 0;
+    border-radius: $radius-xl;
+    border: 1px dashed alpha(--winx-purple-deep, 35%);
+    background: rgb(255 255 255 / 40%);
+    &--open { padding: 0 3px 3px; }
+    &-time {
+      margin: $space-xs 0 1px $space-s;
+      cursor: pointer;
+      font-size: $text-s;
+      color: var(--winx-purple-deep);
+      opacity: 0.7;
+    }
+    &-pill {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $space-2xs $space-l;
+      span { white-space: nowrap; }
+      padding: 3px $space-l;
+      font-size: $text-m;
+      color: var(--winx-purple-deep);
+      cursor: pointer;
+    }
+  }
+  &__marks {
+    display: flex;
+    gap: $space-m;
+    padding: $space-2xs $space-xs;
+    font-size: $text-s;
+    color: var(--winx-purple-deep);
+    opacity: 0.7;
 
-  span { cursor: help; }
-}
+    span { cursor: help; }
+  }
 
-/* the bottom panel: No date | Regulars | Pool tabs */
-.winx-cal__tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-xs $space-2xl;
-  margin-bottom: $space-xs;
-  button.winx-cal__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: "Cinzel", serif; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
-  button.winx-cal__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
+  /* the bottom panel: No date | Regulars | Pool tabs */
+  &__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-xs $space-2xl;
+    margin-bottom: $space-xs;
+    button.winx-cal__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: "Cinzel", serif; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
+    button.winx-cal__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
+  }
+  &__late { color: #b0306a; font-weight: 600; }
+  &__zone--plan { font-family: "Cinzel", serif; font-size: $text-2xl; text-align: center; }
+  &__month &__zone { font-size: $text-m; }
 }
-.winx-cal__late { color: #b0306a; font-weight: 600; }
-.winx-cal__zone--plan { font-family: "Cinzel", serif; font-size: $text-2xl; text-align: center; }
-.winx-cal__month .winx-cal__zone { font-size: $text-m; }

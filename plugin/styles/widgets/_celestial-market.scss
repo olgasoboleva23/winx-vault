@@ -11,9 +11,9 @@
   display: grid;
   gap: $space-l;
 
-  .winx-market__list { display: grid; }
+  &__list { display: grid; }
 
-  .winx-market__item {
+  &__item {
     position: relative;
     @include row;
     gap: $space-l;
@@ -25,7 +25,7 @@
     &:hover { background: fade(white, 30%); border-radius: $radius-m; }
   }
 
-  .winx-market__text {
+  &__text {
     flex: 1;
     color: var(--winx-text-dark);
     font-size: $text-xl;
@@ -33,7 +33,7 @@
 
   /* round "bought" button: pink circle, white tick */
   /* same look as the scroll arrows, but round: pink, glowing white mark, sparkles on hover */
-  .winx-market__buy {
+  & &__buy {   /* a button: the block in front outweighs Obsidian's button styles */
     flex: none;
     width: $btn-m;
     height: $btn-m;
@@ -54,11 +54,10 @@
   }
 
   /* bought: strike, sparkle burst over the button, slide away */
-  .winx-market__item--bought {
+  &__item--bought {
     animation: winx-bought 0.65s ease-in forwards;
     pointer-events: none;
 
-    .winx-market__text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
 
     &::after {
       content: "";
@@ -72,10 +71,11 @@
       animation: winx-bought-flash 0.65s ease-out forwards;
     }
   }
+  &__item--bought &__text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
 
-  .winx-market__soon { margin: $space-s 0 $space-2xs; font-size: $text-m; color: var(--winx-pink-deep); }
+  &__soon { margin: $space-s 0 $space-2xs; font-size: $text-m; color: var(--winx-pink-deep); }
 
-  .winx-market__footer {
+  &__footer {
     text-align: center;
     color: var(--winx-purple);
     font-size: $text-m;
@@ -83,7 +83,7 @@
     letter-spacing: 0.12em;
   }
 
-  .winx-market__link {
+  &__link {
     cursor: pointer;
     color: var(--winx-purple-deep);
     margin-inline-start: $space-xl;
@@ -121,15 +121,15 @@
   color: var(--winx-purple-deep);
 
   &:first-child { margin-top: 0; }
-}
 
-.winx-group-header__count {
-  min-width: 20px;
-  padding: 0 $space-s;
-  border-radius: $pill;
-  text-align: center;
-  font-size: $text-xs;
-  letter-spacing: 0;
-  color: #fff;
-  background: var(--winx-pink-deep);
+  &__count {
+    min-width: 20px;
+    padding: 0 $space-s;
+    border-radius: $pill;
+    text-align: center;
+    font-size: $text-xs;
+    letter-spacing: 0;
+    color: #fff;
+    background: var(--winx-pink-deep);
+  }
 }
