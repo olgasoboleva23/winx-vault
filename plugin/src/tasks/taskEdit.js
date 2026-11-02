@@ -57,7 +57,7 @@ export const editTaskLineWithUndo = async (t, fn, mark) => {
   const frag  = document.createDocumentFragment();
   frag.append(`${mark} ${new Task(before).text.slice(0, 40)}  `);
   const undo = frag.appendChild(document.createElement("button"));
-  undo.textContent = "undo";
+  undo.textContent = "Undo";
   undo.onclick = () => edit(t.path, c => {
     const lines = c.split("\n");
     if (lines.slice(t.line, t.line + added.length).join("\n") !== added.join("\n")) return c;   // changed since

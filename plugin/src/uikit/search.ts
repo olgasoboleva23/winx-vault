@@ -18,5 +18,5 @@ export class Search<T> extends SuggestModal<T> {
   renderSuggestion(item: T, el: HTMLElement) { this.render(item, el); }
   onChooseSuggestion(item: T) { this.resolve(item); }
   // Obsidian closes the window before it reports the pick: wait a tick, so a pick isn't lost to the null
-  onClose() { setTimeout(() => this.resolve(null)); }
+  onClose() { window.setTimeout(() => this.resolve(null)); }
 }

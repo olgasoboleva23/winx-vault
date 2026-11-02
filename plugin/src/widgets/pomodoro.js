@@ -1,6 +1,7 @@
 // Pomodoro: a 25/5 focus timer, a small row that opens into a ring (click the time), session stars, and its settings; state in 00 System/Data/pomodoro.json
 // (settings, the current session, today's stats). A running session lives on in this module through redraws;
 // the ticking stops when the block goes.
+import { sanitizeHTMLToDom } from "obsidian";
 import { html, raw } from "../core/html.js";
 import { Widget } from "./widget.js";
 import { todayYmd } from "../core/dates.js";
@@ -118,8 +119,8 @@ export class Pomodoro extends Widget {
     this.mini = saved.mini ?? true;
     this.box.classList.toggle("winx-pomodoro--mini", this.mini);
     this.arm(); this.tick();
-    const every = setInterval(() => this.tick(), 1000);
-    this.keep({ destroy: () => { clearInterval(every); clearTimeout(this.ending); } });
+    const every = window.setInterval(() => this.tick(), 1000);
+    this.keep({ destroy: () => { window.clearInterval(every); window.clearTimeout(this.ending); } });
   }
 
   onload() {
@@ -132,8 +133,8 @@ export class Pomodoro extends Widget {
   async act(change) { change(this.timer); this.arm(); this.tick(); await this.save(); }
   // the end of a running session: the next one starts by itself
   arm() {
-    clearTimeout(this.ending);
-    if (this.timer.running) this.ending = setTimeout(() => this.finish(), this.timer.remaining);
+    window.clearTimeout(this.ending);
+    if (this.timer.running) this.ending = window.setTimeout(() => this.finish(), this.timer.remaining);
   }
   async finish() {
     const t = this.timer, wasFocus = t.type === "focus", focusMin = t.settings.focusMin;
@@ -164,7 +165,7 @@ export class Pomodoro extends Widget {
     set(".winx-pomodoro__mode-text, .winx-pomodoro__mini-mode", el => el.textContent = mode);
     this.q(".winx-pomodoro__session").textContent = `Session ${t.sessions + 1}`;
     this.q(".winx-pomodoro__settings-info").textContent = `${t.settings.focusMin}m · ${t.settings.breakMin}m`;
-    if (this.box.dataset.running !== String(t.running)) { this.box.dataset.running = t.running; set("[data-action=play]", el => el.innerHTML = t.running ? ICON.pause : ICON.play); }
+    if (this.box.dataset.running !== String(t.running)) { this.box.dataset.running = t.running; set("[data-action=play]", el => el.replaceChildren(sanitizeHTMLToDom(t.running ? ICON.pause : ICON.play))); }
     // stars cycle every 4 sessions, ×N counts the full sets: 4 → 4 stars; 5 → 1 star ×1; 13 → 1 star ×3
     const sets = t.sessions === 0 ? 0 : Math.floor((t.sessions - 1) / 4), filled = t.sessions - sets * 4;
     this.box.querySelectorAll(".winx-pomodoro__star").forEach((el, i) => el.classList.toggle("winx-pomodoro__star--on", i % 4 < filled));

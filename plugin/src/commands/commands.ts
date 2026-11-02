@@ -28,7 +28,7 @@ export function registerCommands(plugin: Plugin) {
     const pick = ready ? found.picks : await taskWindow(found.picks ?? {}, true);
     if (!pick) return;
     const api = tasksApi();
-    if (!api) return void new Notice("✦ the Tasks plugin is off — task not saved");
+    if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
     // ➕ shows how long it waits on the board
     const result = await api.editTaskLineModal(`- [ ] ${[pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ")}  ➕ ${todayYmd()}`);
     if (!result) return;
@@ -70,9 +70,9 @@ export function registerCommands(plugin: Plugin) {
   // the phone: the synced obsidian-mobile/ copied into the real config folder .obsidian-mobile (then restart)
   if (Platform.isMobile) add("update-mobile-config", "Update mobile config", mirrorMobileConfig);
 
-  // Alt+T: every Winx command in one list to pick from
+  // every Winx command in one list to pick from (Alt+T in this vault's hotkeys.json)
   plugin.addCommand({
-    id: "menu", name: "Menu", hotkeys: [{ modifiers: ["Alt"], key: "t" }],
+    id: "menu", name: "Menu",
     callback: () => new WinxMenu(app).open(),
   });
 }

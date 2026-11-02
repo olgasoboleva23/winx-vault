@@ -60,7 +60,7 @@ export class Header extends Part {
   }
   routineDays() { return this.ctx.days.filter(d => this.ctx.model.byDay[d].some(e => T(e.t).isRecurring)); }
   render() {
-    const { state, days, today, base, view, model, shown } = this.ctx;
+    const { state, days, today, base, view } = this.ctx;
     // while dragging, a bar of 7 days sticks to the top: the shown week, or in the month view the next 7 days
     const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
     const other = view === "week" ? "month" : "week";

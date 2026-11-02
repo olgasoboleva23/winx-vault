@@ -20,7 +20,7 @@ export class CelestialMarket extends Widget {
       const row = el.closest(".winx-market__item");
       if (row.classList.contains("winx-market__item--bought")) return;
       row.classList.add("winx-market__item--bought");
-      await new Promise(r => setTimeout(r, 650));
+      await new Promise(r => window.setTimeout(r, 650));
       await editLine(MARKET, Number(el.dataset.line), line => new MarketItem(line).bought(todayYmd()));
     },
   };

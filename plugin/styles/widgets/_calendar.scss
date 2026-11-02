@@ -243,7 +243,7 @@
 /* phone swipes: right = done (green), left = skip / no date (lilac); the row follows the finger */
 body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-action: pan-y; }
 .winx-cal {
-  [data-swipe] { transition: none; }
+  [data-swipe] { transition: none; transform: translateX(var(--winx-swipe, 0)); }
   [data-swipe="done"] { box-shadow: -40px 0 0 -6px rgb(120 200 150 / 70%); }
   :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px alpha(--winx-purple-deep, 40%); }
   /* what the swipe will do, in the band it uncovers: ✓ done on the left, ⏭ skip / ↩ no date on the right */

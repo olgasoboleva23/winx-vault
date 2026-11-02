@@ -63,7 +63,7 @@ export class DashboardView extends ItemView {
     this.contentEl.append(sanitizeHTMLToDom(busyPill().html));
     // the widgets' page date (Widget's dv.current())
     const body = this.body = this.contentEl.createDiv({ cls: "markdown-preview-sizer markdown-preview-section", attr: { "data-date": date } });
-    MarkdownRenderer.render(this.app, GRID, body, "", this.page).then(() => {
+    void MarkdownRenderer.render(this.app, GRID, body, "", this.page).then(() => {
       this.dateRow();
       this.quests();
     });
@@ -89,7 +89,7 @@ export class DashboardView extends ItemView {
     if (this.questsPart) this.page!.removeChild(this.questsPart);
     this.questsPart = this.page!.addChild(new Component());
     slot.empty();
-    MarkdownRenderer.render(this.app, QUESTS.replaceAll("{{date}}", this.shownDate), slot, "", this.questsPart);
+    void MarkdownRenderer.render(this.app, QUESTS.replaceAll("{{date}}", this.shownDate), slot, "", this.questsPart);
   }
 
   private on: Record<string, (e: Event, el: HTMLElement) => any> = {
@@ -106,8 +106,8 @@ export class DashboardView extends ItemView {
     useActions(this, el, (name: string, target: HTMLElement) => target.closest(".winx-dash__date") ? this.on[name] : null);
     // [[links]] in the layout open their note, as in a note (Cmd/Ctrl: a new tab)
     this.registerDomEvent(el, "click", e => {
-      const link = (e.target as HTMLElement).closest?.("a.internal-link[data-href]") as HTMLAnchorElement | null;
-      if (link) { e.preventDefault(); this.app.workspace.openLinkText(link.dataset.href!, "", Keymap.isModEvent(e)); }
+      const link = (e.target as HTMLElement).closest?.<HTMLAnchorElement>("a.internal-link[data-href]") ?? null;
+      if (link) { e.preventDefault(); void this.app.workspace.openLinkText(link.dataset.href!, "", Keymap.isModEvent(e)); }
     });
     // a write to the tasks or the data: dim with the ✦ pill until a widget draws again
     useBusy(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el, "winx-dash--busy");

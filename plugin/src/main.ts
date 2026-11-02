@@ -43,14 +43,13 @@ export default class WinxPlugin extends Plugin {
     }
     // desktop: today's reminders; a click opens the calendar
     useNotify(this, () => this.open(VIEW_TYPE));
-    console.log("winx loaded");
   }
   // a Winx tab, pinned: the one already open, or a new one
   async open(type: string, reveal = true) {
     const { workspace } = this.app;
     let leaf = workspace.getLeavesOfType(type)[0];
     if (!leaf) { leaf = workspace.getLeaf("tab"); await leaf.setViewState({ type, active: reveal }); leaf.setPinned(true); }
-    if (reveal) workspace.revealLeaf(leaf);
+    if (reveal) void workspace.revealLeaf(leaf);
     return leaf;
   }
   // ✨: back to the Winx tab used last, or both tabs opened (the dashboard shown)
@@ -60,6 +59,6 @@ export default class WinxPlugin extends Plugin {
     if (open.length) return workspace.revealLeaf(open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0]);
     const dash = await this.open(DASHBOARD_VIEW, false);
     await this.open(VIEW_TYPE, false);
-    workspace.revealLeaf(dash);
+    void workspace.revealLeaf(dash);
   }
 }

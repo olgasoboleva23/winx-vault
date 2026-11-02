@@ -15,9 +15,7 @@ export class AudioEngine {
   async #load(path) {
     const file = app.metadataCache.getFirstLinkpathDest(path, "");
     if (!file) { console.warn(`AudioEngine: ${path} not found`); return null; }
-    const url = app.vault.adapter.getResourcePath(file.path);
-    const res = await fetch(url);
-    return _ctx().decodeAudioData(await res.arrayBuffer());
+    return _ctx().decodeAudioData(await app.vault.adapter.readBinary(file.path));
   }
 
   async play({ rate = 1.0, gain = 0.3, duration = 1.2 } = {}) {

@@ -43,17 +43,17 @@ export class CalendarView extends ItemView {
   async setState(saved: unknown, result: any) {
     this.state = readState(saved);
     await super.setState(saved, result);
-    if (this.root) this.draw();
+    if (this.root) void this.draw();
   }
 
   async onOpen() {
     // a note in reading view (fonts, margins), with the dashboard pages' background and fonts on top
     this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
-    this.root = this.contentEl.createEl("div");
+    this.root = this.contentEl.createDiv();
     this.listen();
     // a cold start: Dataview reads the vault only once the layout is ready, after this tab opens; draw when it has
     this.registerEvent((this.app.metadataCache as any).on("dataview:index-ready", () => this.draw()));
-    this.draw();
+    void this.draw();
     // a task file changed in Dataview's index: new data, every part (a hidden tab waits until it shows)
     const { redraw, catchUp } = useRedraw(this, () => this.contentEl.isShown(), () => this.draw());
     this.catchUp = catchUp;
@@ -126,7 +126,8 @@ export class CalendarView extends ItemView {
     for (const p of PARTS) this.place(p, null);
     this.parts.header.mount(root);
     this.parts.grid.mount(root);
-    old ? old.replaceWith(root) : (this.root.empty(), this.root.appendChild(root));   // first time: over "waiting…"
+    if (old) old.replaceWith(root);
+    else { this.root.empty(); this.root.appendChild(root); }   // first time: over "waiting…"
   }
 
   // a part's markup into the calendar, before `next` (or at the end)
@@ -157,8 +158,8 @@ export class CalendarView extends ItemView {
     // 🗑: the first click arms it for 3 s, the second removes the task's line (with undo)
     remove: async (e, el) => {
       if (!el.classList.contains("winx-task-btns__del--armed")) {
-        el.classList.add("winx-task-btns__del--armed"); el.textContent = "✓?"; el.title = "click again to delete";
-        window.setTimeout(() => { el.classList.remove("winx-task-btns__del--armed"); el.textContent = "🗑"; el.title = "delete task"; }, 3000);
+        el.classList.add("winx-task-btns__del--armed"); el.textContent = "✓?"; el.title = "Click again to delete";
+        window.setTimeout(() => { el.classList.remove("winx-task-btns__del--armed"); el.textContent = "🗑"; el.title = "Delete task"; }, 3000);
         return;
       }
       const t = this.taskOf(el);
@@ -191,9 +192,9 @@ export class CalendarView extends ItemView {
     });
 
     // drag a task (data-drag) onto a day's zone, a chip of the drop bar, or the panel (data-drop; "" = no date)
-    const zone = (e: Event) => (e.target as HTMLElement).closest?.("[data-drop]") as HTMLElement | null;
+    const zone = (e: Event) => (e.target as HTMLElement).closest?.<HTMLElement>("[data-drop]") ?? null;
     this.registerDomEvent(el, "dragstart", e => {
-      const src = (e.target as HTMLElement).closest?.("[data-drag]") as HTMLElement | null;
+      const src = (e.target as HTMLElement).closest?.<HTMLElement>("[data-drag]") ?? null;
       if (!src || !this.ctx) return;
       this.dragged = this.taskOf(src);
       dragging = true;   // a drag, not a swipe: its finger moves don't tick or skip anything
@@ -211,7 +212,7 @@ export class CalendarView extends ItemView {
       if (!this.dragged) return;
       const t = this.dragged, done = z.dataset.done === "1";
       this.dragged = null;
-      (done ? this.sounds.gem : this.sounds.move).play({ gain: 0.25 });
+      void (done ? this.sounds.gem : this.sounds.move).play({ gain: 0.25 });
       await this.actions.place(t, z.dataset.drop || null, done);
     });
 
@@ -221,7 +222,7 @@ export class CalendarView extends ItemView {
     // A swipe stops its touches at the row, so Obsidian doesn't take a sideways one for opening a sidebar.
     const swipes = new WeakMap<Element, { x0: number; y0: number; dx: number; on: boolean }>();
     let dragging = false;
-    const row = (e: Event) => document.body.classList.contains("is-mobile") ? (e.target as HTMLElement).closest?.("[data-swipeable]") as HTMLElement | null : null;
+    const row = (e: Event) => document.body.classList.contains("is-mobile") ? (e.target as HTMLElement).closest?.<HTMLElement>("[data-swipeable]") ?? null : null;
     this.registerDomEvent(el, "touchstart", e => {
       const r = row(e); if (!r) return;
       dragging = false;
@@ -235,11 +236,11 @@ export class CalendarView extends ItemView {
       if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
       if (s.on) e.stopPropagation();
       if (dragging || !s.on || (mx < 0 && !left)) return;
-      s.dx = mx; r.style.transform = `translateX(${mx}px)`; r.dataset.swipe = mx > 0 ? "done" : this.actions.canSkip(t) ? "skip" : "nodate";
+      s.dx = mx; r.setCssProps({ "--winx-swipe": `${mx}px` }); r.dataset.swipe = mx > 0 ? "done" : this.actions.canSkip(t) ? "skip" : "nodate";
     }, { passive: true });
     this.registerDomEvent(el, "touchend", e => {
       const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
-      r.style.transform = ""; delete r.dataset.swipe;
+      r.setCssProps({ "--winx-swipe": "" }); delete r.dataset.swipe;
       if (dragging || !s.on || Math.abs(s.dx) <= 80) return;
       const t = this.taskOf(r);
       if (!t) return;
