@@ -36,7 +36,7 @@
 │   └── 📁 Personal
 │       ├── Goals.md
 │       ├── 📁 Daily Notes
-│       └── 📁 Tasks              — Master.md (all tasks), Pool.md, Kanban.md
+│       └── 📁 Tasks              — Master.md (all tasks), Pool.md
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
 ```
 
