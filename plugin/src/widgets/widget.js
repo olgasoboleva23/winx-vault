@@ -13,11 +13,11 @@
 // shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
 // listeners when the block goes.
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
-import { MarkdownRenderChild, debounce, sanitizeHTMLToDom } from "obsidian";
+import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../uikit/card.js";
 import { Empty } from "../uikit/empty.js";
 import { html } from "../core/html.js";
-import { useActions, useRedraw } from "../core/use.js";
+import { useActions, useDataviewChanges, useLeaveField, useRedraw, useTabDate, useWhenIndexed } from "../core/use.js";
 import { dataview } from "../core/plugins.js";
 import { app } from "../core/app.js";
 
@@ -61,26 +61,16 @@ export class Widget extends MarkdownRenderChild {
   async onload() {
     useActions(this, this.containerEl, (name, el) => this.on[name]?.bind(this)
       ?? (name === "open" && el.dataset.path ? () => this.app.workspace.openLinkText(el.dataset.path, this.sourcePath) : null), ["click", "change", "submit"]);
-    // drawn now, or once it shows and nobody is typing in it
+    // drawn now, or once it shows and nobody is typing in it (catchUp: ask again after leaving a field)
     ({ redraw: this.redraw, catchUp: this.catchUp } = useRedraw(this, () => this.shown && !this.typing, () => this.draw()));
-    // after leaving a field: a moment later, so a click on the widget's own button (which takes the focus) lands first
-    const left = debounce(() => this.catchUp(), 500, true), later = debounce(() => this.redraw(), DELAY, true);
-    this.registerDomEvent(this.containerEl, "focusout", left);
-    if (this.constructor.followsChanges) {
-      this.registerEvent(this.app.metadataCache.on("dataview:metadata-change", later));
-      this.registerEvent(this.app.metadataCache.on("changed", f => f.path === this.sourcePath && later()));
-      // the dashboard tab's date changed: drawn again in place, at once
-      this.registerEvent(this.app.workspace.on("winx:date", () => this.containerEl.closest("[data-date]") && this.redraw()));
-    }
-    this.register(() => { left.cancel(); later.cancel(); this.drop(); });
+    useLeaveField(this, this.containerEl, () => this.catchUp());
+    this.register(() => this.drop());
     this.skeleton();
-    // a cold start: Dataview reads the vault after the notes open; draw once it has
-    const api = dataview();
-    if (api && !api.index?.initialized && this.constructor.followsChanges) {
-      this.registerEvent(this.app.metadataCache.on("dataview:index-ready", () => this.draw()));
-      return;
-    }
-    await this.draw();
+    if (!this.constructor.followsChanges) return void this.draw();
+    // a moment after Dataview's index or the widget's own note changes; at once when the dashboard's date does
+    useDataviewChanges(this, () => this.redraw(), { note: this.sourcePath, delay: DELAY });
+    useTabDate(this, this.containerEl, () => this.redraw());
+    useWhenIndexed(this, () => this.draw());
   }
 
   // on screen: a card widget's block has no box of its own (display: contents), so ask the card

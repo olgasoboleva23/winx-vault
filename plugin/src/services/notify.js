@@ -1,6 +1,6 @@
-import { Platform, debounce } from "obsidian";
+import { Platform } from "obsidian";
 import { dataview } from "../core/plugins.js";
-import { useNewDay } from "../core/use.js";
+import { useDataviewChanges, useNewDay, useWhenIndexed } from "../core/use.js";
 import { todayYmd } from "../core/dates.js";
 import { Goal, reminders } from "../widgets/goals/goal.js";
 import { GOALS, TASKS } from "../core/paths.js";
@@ -50,17 +50,11 @@ export function useNotify(plugin, open) {
     notify(`✦ ${due} task${due === 1 ? "" : "s"} today`, overdue ? `Overdue: ${overdue}` : "Nothing overdue");
   };
 
-  let started = false;
-  const start = () => {
-    if (started || !dataview()) return;
-    started = true;
+  // once Dataview's index is there: the summary and today's reminders, again when tasks or goals change and each new day
+  useWhenIndexed(plugin, () => {
+    if (!dataview()) return;
     summary(); schedule();
-    const later = debounce(schedule, 2000, true);
-    plugin.register(() => later.cancel());
-    plugin.registerEvent(app.metadataCache.on("changed", f => { if (f.path.startsWith(TASKS) || f.path.startsWith(GOALS)) later(); }));
+    useDataviewChanges(plugin, schedule, { watched: p => p.startsWith(TASKS) || p.startsWith(GOALS), delay: 2000 });
     useNewDay(plugin, () => { summary(); schedule(); });
-  };
-  // Dataview's index ready: now, or its event (at Obsidian's start Winx loads first)
-  if (dataview()?.index.initialized) start();
-  else plugin.registerEvent(app.metadataCache.on("dataview:index-ready", start));
+  });
 }

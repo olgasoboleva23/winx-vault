@@ -1,6 +1,8 @@
-import { ItemView, Notice, TAbstractFile, WorkspaceLeaf, debounce, sanitizeHTMLToDom } from "obsidian";
+import { ItemView, Notice, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import { POOL, TASKS } from "../core/paths.js";
-import { useActions, useBusy, useNewDay, useRedraw } from "../core/use.js";
+import { useActions, useBusy, useDataviewChanges, useIndexReady, useNewDay, useRedraw } from "../core/use.js";
+import { useDrag } from "./drag.js";
+import { useSwipe } from "./swipe.js";
 import { dataview, tasksApi } from "../core/plugins.js";
 import { CalendarData, T, findTask, taskKey } from "./data.js";
 import { baseDate, readState, shownDays } from "./state.js";
@@ -8,7 +10,6 @@ import { makeActions } from "./actions.js";
 import { Grid, Header, Missed, Panel } from "./parts.js";
 import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
-import { AudioEngine } from "../core/sounds.js";
 
 // The calendar tab: the week (7 day columns) or the month around a date, the tasks of 00 System/Data/Tasks on
 // their days, "Missed?" above, and the No date | Regulars | Pool panel below. Its state (date, view, tab, folds)
@@ -31,8 +32,6 @@ export class CalendarView extends ItemView {
   ctx: any = null;
   actions: any = null;
   private catchUp = () => {};   // a hidden tab that missed changes, drawn when it shows (useRedraw)
-  private dragged: any = null;
-  private sounds = { move: new AudioEngine("00 System/Assets/winx music/snd_scroll_menu.wav"), gem: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem01.wav") };
 
   constructor(leaf: WorkspaceLeaf) { super(leaf); }
   getViewType() { return VIEW_TYPE; }
@@ -51,17 +50,13 @@ export class CalendarView extends ItemView {
     this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
     this.root = this.contentEl.createDiv();
     this.listen();
-    // a cold start: Dataview reads the vault only once the layout is ready, after this tab opens; draw when it has
-    this.registerEvent((this.app.metadataCache as any).on("dataview:index-ready", () => this.draw()));
+    // now ("waiting…" until Dataview's index is built), and again each time it is
     void this.draw();
+    useIndexReady(this, () => this.draw());
     // a task file changed in Dataview's index: new data, every part (a hidden tab waits until it shows)
     const { redraw, catchUp } = useRedraw(this, () => this.contentEl.isShown(), () => this.draw());
     this.catchUp = catchUp;
-    const later = debounce(redraw, 100, true);
-    this.register(() => later.cancel());
-    this.registerEvent((this.app.metadataCache as any).on("dataview:metadata-change", (_type: string, file: TAbstractFile) => {
-      if (file?.path?.startsWith(TASKS_DIR)) later();
-    }));
+    useDataviewChanges(this, redraw, { watched: (path: string) => path.startsWith(TASKS_DIR), delay: 100 });
     // a write to a task file: the calendar dims with a spinning ✦ until the redraw
     useBusy(this, (path: string) => path.startsWith(TASKS_DIR), () => this.ctx?.root, "winx-cal--busy");
     // a new day: following today, the days move on; and "today" in every action is the new one
@@ -181,7 +176,7 @@ export class CalendarView extends ItemView {
     },
   };
 
-  // one set of listeners for the whole tab: actions, ticks, drags, swipes
+  // one set of listeners for the whole tab: actions, ticks (taskOn), drags (drag.js), swipes (swipe.js)
   private listen() {
     const el = this.contentEl;
     // an action: its part's handler, else the task's own (✏️ 🗑 ⏭ ⭐ ✓)
@@ -190,68 +185,6 @@ export class CalendarView extends ItemView {
       const part = (target.closest("[data-part]") as HTMLElement)?.dataset.part as PartName;
       return this.parts[part]?.on[name] ?? this.taskOn[name];
     });
-
-    // drag a task (data-drag) onto a day's zone, a chip of the drop bar, or the panel (data-drop; "" = no date)
-    const zone = (e: Event) => (e.target as HTMLElement).closest?.<HTMLElement>("[data-drop]") ?? null;
-    this.registerDomEvent(el, "dragstart", e => {
-      const src = (e.target as HTMLElement).closest?.<HTMLElement>("[data-drag]") ?? null;
-      if (!src || !this.ctx) return;
-      this.dragged = this.taskOf(src);
-      dragging = true;   // a drag, not a swipe: its finger moves don't tick or skip anything
-      e.dataTransfer?.setData("text/plain", "");
-      window.setTimeout(() => this.ctx?.root.classList.add("winx-cal--dragging"));   // later: zones covering the card at dragstart cancel the drag
-    });
-    this.registerDomEvent(el, "dragend", () => this.ctx?.root.classList.remove("winx-cal--dragging"));
-    this.registerDomEvent(el, "dragover", e => { const z = zone(e); if (z) { e.preventDefault(); z.classList.add(`${z.classList[0]}--over`); } });
-    this.registerDomEvent(el, "dragleave", e => { const z = zone(e); z?.classList.remove(`${z.classList[0]}--over`); });
-    this.registerDomEvent(el, "drop", async e => {
-      const z = zone(e);
-      if (!z) return;
-      e.preventDefault(); e.stopPropagation();
-      z.classList.remove(`${z.classList[0]}--over`);
-      if (!this.dragged) return;
-      const t = this.dragged, done = z.dataset.done === "1";
-      this.dragged = null;
-      void (done ? this.sounds.gem : this.sounds.move).play({ gain: 0.25 });
-      await this.actions.place(t, z.dataset.drop || null, done);
-    });
-
-    // phone: swipe a row right = done (a day's row: its checkbox; a Missed row: its ✓; a panel card: ticked, a pool
-    // card: added to today), left = skip a 🔁 task / take an open one's date off. Only a mostly-sideways swipe
-    // counts, so scrolling still works (touch-action: pan-y in the styles)
-    // A swipe stops its touches at the row, so Obsidian doesn't take a sideways one for opening a sidebar.
-    const swipes = new WeakMap<Element, { x0: number; y0: number; dx: number; on: boolean }>();
-    let dragging = false;
-    const row = (e: Event) => document.body.classList.contains("is-mobile") ? (e.target as HTMLElement).closest?.<HTMLElement>("[data-swipeable]") ?? null : null;
-    this.registerDomEvent(el, "touchstart", e => {
-      const r = row(e); if (!r) return;
-      dragging = false;
-      e.stopPropagation();
-      swipes.set(r, { x0: e.touches[0].clientX, y0: e.touches[0].clientY, dx: 0, on: false });
-    }, { passive: true });
-    this.registerDomEvent(el, "touchmove", e => {
-      const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
-      const t = findTask(r.dataset.task, this.ctx?.model.all ?? []), left = t && this.left(t);
-      const mx = e.touches[0].clientX - s.x0, my = e.touches[0].clientY - s.y0;
-      if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
-      if (s.on) e.stopPropagation();
-      if (dragging || !s.on || (mx < 0 && !left)) return;
-      s.dx = mx; r.setCssProps({ "--winx-swipe": `${mx}px` }); r.dataset.swipe = mx > 0 ? "done" : this.actions.canSkip(t) ? "skip" : "nodate";
-    }, { passive: true });
-    this.registerDomEvent(el, "touchend", e => {
-      const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
-      r.setCssProps({ "--winx-swipe": "" }); delete r.dataset.swipe;
-      if (dragging || !s.on || Math.abs(s.dx) <= 80) return;
-      const t = this.taskOf(r);
-      if (!t) return;
-      if (s.dx > 80) this.right(r, t); else this.left(t)?.();
-    });
-  }
-  private left(t: any) { return this.actions.canSkip(t) ? () => this.actions.skip(t) : T(t).date ? () => this.actions.unplan(t) : null; }
-  private right(r: HTMLElement, t: any) {
-    if (r.matches(".winx-missed__row")) return (r.querySelector('[data-action="missedDone"]') as HTMLElement)?.click();
-    if (r.matches(".winx-cal__task")) { const box = r.querySelector('input[data-action="tick"]') as HTMLInputElement; if (box && !box.checked) box.click(); return; }
-    if (t.pool) return this.actions.fromPool(t, this.ctx.today, false);
-    if (this.ctx.TASKS) { r.remove(); this.actions.tick(t); }
+    useSwipe(this, useDrag(this));
   }
 }

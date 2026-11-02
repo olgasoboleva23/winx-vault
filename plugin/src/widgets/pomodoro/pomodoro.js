@@ -10,6 +10,7 @@ import { AudioEngine } from "../../core/sounds.js";
 import { Form } from "../../uikit/form.ts";
 import { app } from "../../core/app.js";
 import { Timer, addStats } from "./timer.js";
+import { useWindowBack } from "../../core/use.js";
 
 const PATH = "00 System/Data/pomodoro.json";
 const ICON = {
@@ -100,9 +101,7 @@ export class Pomodoro extends Widget {
   }
 
   onload() {
-    // back to the window: at once (timers in a window in the background run late)
-    this.registerDomEvent(document, "visibilitychange", () => document.hidden || this.timer && this.tick());
-    this.registerDomEvent(window, "focus", () => this.timer && this.tick());
+    useWindowBack(this, () => this.timer && this.tick());   // at once: a background window's timers run late
     return super.onload();
   }
   q(sel) { return this.box.querySelector(sel); }

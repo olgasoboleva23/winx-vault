@@ -1,8 +1,8 @@
-import { Component, ItemView, Keymap, MarkdownRenderer, Platform, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
+import { Component, ItemView, MarkdownRenderer, Platform, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
 import layout from "./layout.md";
 import { addDays, todayYmd } from "../core/dates.js";
 import { busyPill } from "../uikit/busy.js";
-import { useActions, useBusy, useNewDay } from "../core/use.js";
+import { useActions, useBusy, useNewDay, useNoteLinks } from "../core/use.js";
 import { Button } from "../uikit/button.js";
 import { html } from "../core/html.js";
 import { DATA } from "../core/paths.js";
@@ -104,11 +104,7 @@ export class DashboardView extends ItemView {
     const el = this.contentEl;
     // the date row's own actions (the widgets in the cards handle theirs)
     useActions(this, el, (name: string, target: HTMLElement) => target.closest(".winx-dash__date") ? this.on[name] : null);
-    // [[links]] in the layout open their note, as in a note (Cmd/Ctrl: a new tab)
-    this.registerDomEvent(el, "click", e => {
-      const link = (e.target as HTMLElement).closest?.<HTMLAnchorElement>("a.internal-link[data-href]") ?? null;
-      if (link) { e.preventDefault(); void this.app.workspace.openLinkText(link.dataset.href!, "", Keymap.isModEvent(e)); }
-    });
+    useNoteLinks(this, el);   // [[links]] in the layout open their note
     // a write to the tasks or the data: dim with the ✦ pill until a widget draws again
     useBusy(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el, "winx-dash--busy");
     this.registerDomEvent(el, "winx-drawn" as any, () => window.setTimeout(() => el.removeClass("winx-dash--busy"), 200));

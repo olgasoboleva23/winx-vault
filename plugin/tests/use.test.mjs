@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { useActions, useRedraw, useNewDay, useBusy } from "../src/core/use.js";
+import { useActions, useRedraw, useNewDay, useBusy, useDataviewChanges, useWhenIndexed, useWindowBack, useTabDate, useLeaveField, useNoteLinks } from "../src/core/use.js";
+import { setApp } from "../src/core/app.js";
 
 // a component that keeps what it's given: DOM listeners by type, workspace / vault events by name, intervals
 const component = () => {
@@ -8,8 +9,9 @@ const component = () => {
   const on = name => (fn => ({ name, fn }));
   return {
     dom, events, intervals,
-    app: { workspace: { on: (n, fn) => ({ n, fn }) }, vault: { on: (n, fn) => ({ n, fn }) } },
-    registerDomEvent(el, type, fn) { dom[type] = fn; },
+    app: { workspace: { on: (n, fn) => ({ n, fn }), opened: [], openLinkText(p, src, tab) { this.opened.push([p, tab]); } }, vault: { on: (n, fn) => ({ n, fn }) }, metadataCache: { on: (n, fn) => ({ n, fn }) } },
+    registerDomEvent(el, type, fn) { dom[type] = fn; (el.listeners ??= {})[type] = fn; },
+    register() {},
     registerEvent(ref) { (events[ref.n] ??= []).push(ref.fn); },
     registerInterval(id) { intervals.push(id); },
   };
@@ -64,4 +66,69 @@ test("useBusy: a write to a watched file adds the class, a write elsewhere doesn
   assert.equal(el.classList.has("x--busy"), false);
   c.events.modify[0]({ path: "Tasks/a.md" });
   assert.equal(el.classList.has("x--busy"), true);
+});
+
+test("useDataviewChanges: a re-indexed file it watches runs fn, another doesn't; the note option also listens to that note", () => {
+  const c = component(), seen = [];
+  useDataviewChanges(c, () => seen.push("tasks"), { watched: p => p.startsWith("Tasks/") });
+  c.events["dataview:metadata-change"][0]("update", { path: "Notes/a.md" });
+  c.events["dataview:metadata-change"][0]("update", { path: "Tasks/a.md" });
+  assert.deepEqual(seen, ["tasks"]);
+  const w = component(), drawn = [];
+  useDataviewChanges(w, () => drawn.push(1), { note: "Home.md" });
+  w.events["dataview:metadata-change"][0]("update", { path: "Any.md" });   // no watched: any file
+  w.events.changed[0]({ path: "Other.md" });
+  w.events.changed[0]({ path: "Home.md" });
+  assert.equal(drawn.length, 2);
+});
+
+test("useWhenIndexed: now when Dataview's index is ready (or Dataview is off), else once it's built, one time", () => {
+  const index = { initialized: false };
+  setApp({ plugins: { plugins: { dataview: { api: { index } } } } });
+  const c = component(); let n = 0;
+  useWhenIndexed(c, () => n++);
+  assert.equal(n, 0);
+  c.events["dataview:index-ready"][0]();
+  c.events["dataview:index-ready"][0]();   // built again: not again
+  assert.equal(n, 1);
+  index.initialized = true;
+  useWhenIndexed(component(), () => n++);
+  setApp({ plugins: { plugins: {} } });
+  useWhenIndexed(component(), () => n++);
+  assert.equal(n, 3);
+});
+
+test("useWindowBack: the window shown again or focused runs fn, hidden doesn't", () => {
+  const doc = { hidden: true }, win = {}, c = component(); let n = 0;
+  globalThis.document = doc; globalThis.window = win;
+  useWindowBack(c, () => n++);
+  doc.listeners.visibilitychange();
+  doc.hidden = false; doc.listeners.visibilitychange();
+  win.listeners.focus();
+  assert.equal(n, 2);
+});
+
+test("useTabDate: the dashboard's date change reaches a block inside a dated tab only", () => {
+  let dated = false; const el = { closest: () => dated ? {} : null }, c = component(); let n = 0;
+  useTabDate(c, el, () => n++);
+  c.events["winx:date"][0]();
+  dated = true; c.events["winx:date"][0]();
+  assert.equal(n, 1);
+});
+
+test("useLeaveField: leaving a field in el runs fn", () => {
+  const el = {}, c = component(); let n = 0;
+  useLeaveField(c, el, () => n++);
+  el.listeners.focusout();
+  assert.equal(n, 1);
+});
+
+test("useNoteLinks: a [[link]] opens its note (Cmd/Ctrl: a new tab); other clicks pass", () => {
+  const c = component(), el = {}; let stopped = 0;
+  useNoteLinks(c, el, e => e.mod);
+  const link = href => ({ closest: () => href && { dataset: { href } } });
+  el.listeners.click({ target: link("Finance"), preventDefault: () => stopped++, mod: true });
+  el.listeners.click({ target: link(null), preventDefault: () => stopped++ });
+  assert.deepEqual(c.app.workspace.opened, [["Finance", true]]);
+  assert.equal(stopped, 1);
 });

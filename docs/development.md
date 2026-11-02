@@ -10,14 +10,16 @@
 │   │   ├── main.ts               — loads everything; the ```winx block, the dashboard and calendar tabs, ✨, the commands
 │   │   ├── 📁 calendar           — the calendar tab: view.ts (state, redraws, one set of listeners), parts.js (Header,
 │   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js
-│   │   │                           (CalendarData, the model) and state.js (the tab's state), actions.js (what it writes)
+│   │   │                           (CalendarData, the model) and state.js (the tab's state), actions.js (what it writes),
+│   │   │                           drag.js / swipe.js (useDrag, useSwipe: drag and drop, the phone's swipes)
 │   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
 │   │   ├── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
 │   │   ├── 📁 notes              — note.js (Note: a new note from data), kinds.js (watch / read / game / recipe / work task)
 │   │   ├── 📁 services           — no markup: notify.js (desktop reminders), mobileConfig.js (obsidian-mobile/ → .obsidian-mobile)
 │   │   ├── 📁 core               — paths.js (where the data lives), app.js (Obsidian's app for modules), dates,
 │   │   │                           files (edit / editLine / appendLine a note), config, sounds (and 🔇),
-│   │   │                           html.js (markup in backticks), chart.js
+│   │   │                           html.js (markup in backticks), chart.js, use.js (composables: useActions, useRedraw,
+│   │   │                           useDataviewChanges, useWhenIndexed, useNewDay, useBusy, useWindowBack, useNoteLinks…)
 │   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
 │   │   │                           taskEdit.js (rewrite a line with undo, the task window), taskSearch.js (New task: a past task)
 │   │   ├── 📁 uikit              — the interface parts, props in, markup out: Button (round, nav, pill, chip, toggle,
