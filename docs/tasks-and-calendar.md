@@ -21,10 +21,12 @@ Tasks live in `02 Areas/Personal/Tasks/Master.md` in the Tasks plugin's format, 
 |---|---|
 | **Winx: New task** | a task in `Tasks/Master.md` |
 | **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
+| **Winx: New recipe** | a note in `03 Resources/Collections/Recipes` |
+| **Winx: New work task** | a note in `01 Projects/Work/tasks` (another folder: `"workTasks"` in the plugin's `data.json`) |
 | **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
 | **Winx: New market item** | an item in `00 System/Data/Celestial Market.md` |
 
-QuickAdd keeps two Templater choices: **Work task** (`task.md` → `01 Projects`; point it at your own project folder in Settings → QuickAdd) and **Recipe** (`recipe.md` → `03 Resources/Collections/Recipes`).
+**Winx: Menu** (Alt+T) lists every Winx command to pick from. On the desktop Winx also sends today's reminders: a goal's task at the goal's time, a task with `HH:MM` in its text 30 minutes before, and a morning summary.
 
 ## 📅 Calendar
 

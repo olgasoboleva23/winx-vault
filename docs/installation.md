@@ -54,7 +54,7 @@ Or let a GitHub Action do it, if your vault is a git repo: check out this repo n
 
 ## 📱 Phone
 
-The plugin works on the phone (no desktop-only code). It only has to get there: whatever syncs your vault (Obsidian Sync, iCloud, Remotely Save, …) must carry `.obsidian/plugins/winx/`, and **Winx** must be on in the phone's Community plugins. Tools that skip dot-folders (Remotely Save does) need a visible copy of the config folder that you move into place on the phone; `00 System/Scripts/QuickAdd/MirrorMobileConfig.js` does that from an `obsidian-mobile/` folder.
+The plugin works on the phone (no desktop-only code). It only has to get there: whatever syncs your vault (Obsidian Sync, iCloud, Remotely Save, …) must carry `.obsidian/plugins/winx/`, and **Winx** must be on in the phone's Community plugins. Tools that skip dot-folders (Remotely Save does) need a visible copy of the config folder that you move into place on the phone; **Winx: Update mobile config** (on the phone) does that from an `obsidian-mobile/` folder.
 
 ---
 
@@ -67,7 +67,5 @@ The plugin works on the phone (no desktop-only code). It only has to get there: 
 | **Winx** | this repo, `plugin/` | Widgets, task window, commands, all styles |
 | **Dataview** | 0.5.68 | Data for the widgets and the calendar (its index of tasks and pages) |
 | **Tasks** | 7.23.1 | Task format, the edit dialog, ticking 🔁 tasks |
-| **Templater** | 2.19.3 | Daily note template |
-| **QuickAdd** | 2.12.0 | Work task and Recipe notes |
 | **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
 | **Meta Bind** | 1.4.8 | `INPUT[slider]` in old daily notes (optional) |

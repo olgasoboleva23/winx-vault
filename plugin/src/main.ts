@@ -3,7 +3,7 @@ import { CalendarView, VIEW_TYPE } from "./calendar/view.ts";
 import { DashboardView, DASHBOARD_VIEW } from "./dashboard/view.ts";
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./widgets/blocks.js";
-import { Goal, reminders } from "./widgets/goals/goal.js";
+import { useNotify } from "./services/notify.js";
 import { installSounds } from "./core/sounds.js";
 
 // The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the commands, and the
@@ -11,8 +11,6 @@ import { installSounds } from "./core/sounds.js";
 
 export default class WinxPlugin extends Plugin {
   async onload() {
-    // for 00 System/Scripts/notify.js (Templater's startup script)
-    (window as any).winx = { L: { parseGoal: (text: string) => Goal.parse(text), reminders } };
     installSounds(this);
     registerCommands(this);
     // a ```winx block in a note: a widget class by name (widgets/blocks.js)
@@ -41,6 +39,8 @@ export default class WinxPlugin extends Plugin {
       this.register(() => badge.remove());
       this.registerInterval(window.setInterval(() => badge.style.display = (this.app as any).plugins.plugins["remotely-save"]?.isSyncing ? "flex" : "none", 500));
     }
+    // desktop: today's reminders; a click opens the calendar
+    useNotify(this, () => this.open(VIEW_TYPE));
     console.log("winx loaded");
   }
   // a Winx tab, pinned: the one already open, or a new one
@@ -60,5 +60,4 @@ export default class WinxPlugin extends Plugin {
     await this.open(VIEW_TYPE, false);
     workspace.revealLeaf(dash);
   }
-  onunload() { delete (window as any).winx; }
 }

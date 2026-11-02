@@ -17,7 +17,7 @@ const areas = [
 
 
 export default {
-  // raw arrays — for QuickAdd suggester
+  // raw arrays
   difficulties,
   areas,
 

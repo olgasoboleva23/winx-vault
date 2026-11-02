@@ -1,8 +1,8 @@
 ---
-date: <% tp.date.now("YYYY-MM-DD", 0, tp.file.title, "YYYY-MM-DD") %>
+date: {{date:YYYY-MM-DD}}
 ---
 
-# <% tp.date.now("dddd, MMMM D", 0, tp.file.title, "YYYY-MM-DD") %>
+# {{date:dddd, MMMM D}}
 
 ## 📝 Notes
 

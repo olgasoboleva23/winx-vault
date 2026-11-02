@@ -1,6 +1,8 @@
-import { Notice, Plugin } from "obsidian";
+import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
 import { Task } from "../tasks/task.js";
-import { KINDS, itemForm, itemNote, itemPath, fillTemplate } from "./items.js";
+import { KINDS } from "../notes/kinds.js";
+import { Note, notePath } from "../notes/note.js";
+import { mirrorMobileConfig } from "../services/mobileConfig.js";
 import { Form } from "../uikit/form.ts";
 import { todayYmd } from "../core/dates.js";
 import { taskWindow } from "../tasks/taskEdit.js";
@@ -41,34 +43,16 @@ export function registerCommands(plugin: Plugin) {
     await edit(MASTER, c => line + "\n" + c);
   });
 
-  // a watch / read / game note in its Collections folder, opened in a new tab
-  for (const [kind, name] of [["watch", "New watch item"], ["read", "New read item"], ["game", "New game"]] as const) {
-    add(`new-${kind}-item`, name, async () => {
-      const { rows, values, required } = itemForm(kind);
-      const v = await Form.ask(app, KINDS[kind].title, rows, { values, required, submit: "Create" });
+  // a watch / read / game / recipe / work task note (notes/kinds.js), in its folder, opened in a new tab
+  for (const kind of Object.values(KINDS) as any[]) {
+    add(kind.id, kind.name, async () => {
+      const { rows, values, required } = kind.form();
+      const v = await Form.ask(app, `✦ ${kind.name}`, rows, { values, required, submit: "Create" });
       if (!v) return;
-      const path = itemPath(KINDS[kind].folder, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
-      if (!app.vault.getFolderByPath(KINDS[kind].folder)) await app.vault.createFolder(KINDS[kind].folder);
-      await app.workspace.getLeaf("tab").openFile(await app.vault.create(path, itemNote(kind, v, todayYmd())));
-    });
-  }
-
-  // a note from a template in 00 System/Templates, in its folder, opened in a new tab (what QuickAdd did);
-  // the work tasks' folder can be set as "workTasks" in the plugin's data.json
-  for (const [id, name, template, folder] of [
-    ["new-recipe", "New recipe", "recipe.md", "03 Resources/Collections/Recipes"],
-    ["new-work-task", "New work task", "task.md", ""],
-  ]) {
-    add(id, name, async () => {
-      const dir = folder || (await plugin.loadData())?.workTasks || "01 Projects/Work/tasks";
-      const file = app.vault.getFileByPath(`00 System/Templates/${template}`);
-      if (!file) return void new Notice(`✦ 00 System/Templates/${template} not found`);
-      const v = await Form.ask(app, `✦ ${name}`, [{ name: "Title", key: "title", text: "title" }], { required: ["title"], submit: "Create" });
-      if (!v) return;
-      const path = itemPath(dir, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
+      const dir = (kind.setting && (await plugin.loadData())?.[kind.setting]) || kind.folder;
+      const path = notePath(dir, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
       if (!app.vault.getFolderByPath(dir)) await app.vault.createFolder(dir);
-      const text = fillTemplate(await app.vault.read(file), path.split("/").pop()!.slice(0, -3), todayYmd());
-      await app.workspace.getLeaf("tab").openFile(await app.vault.create(path, text));
+      await app.workspace.getLeaf("tab").openFile(await app.vault.create(path, new Note(kind.note(v, todayYmd())).text));
     });
   }
 
@@ -83,4 +67,19 @@ export function registerCommands(plugin: Plugin) {
 
   // a shopping item in the Celestial Market: one bought before, or a new one with its category
   add("new-market-item", "New market item", addMarketItem);
+
+  // the phone: the synced obsidian-mobile/ copied into the real config folder .obsidian-mobile (then restart)
+  if (Platform.isMobile) add("update-mobile-config", "Update mobile config", mirrorMobileConfig);
+
+  // Alt+T: every Winx command in one list to pick from
+  plugin.addCommand({
+    id: "menu", name: "Menu", hotkeys: [{ modifiers: ["Alt"], key: "t" }],
+    callback: () => new WinxMenu(app).open(),
+  });
+}
+
+class WinxMenu extends FuzzySuggestModal<any> {
+  getItems() { return (this.app as any).commands.listCommands().filter((c: any) => c.id.startsWith("winx:") && c.id !== "winx:menu"); }
+  getItemText(c: any) { return c.name.replace(/^Winx: /, ""); }
+  onChooseItem(c: any) { (this.app as any).commands.executeCommandById(c.id); }
 }

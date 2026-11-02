@@ -12,7 +12,9 @@
 │   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js
 │   │   │                           (CalendarData, the model) and state.js (the tab's state), actions.js (what it writes)
 │   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
-│   │   ├── 📁 commands           — commands.ts (the Cmd+P commands), items.js (watch / read / game notes)
+│   │   ├── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
+│   │   ├── 📁 notes              — note.js (Note: a new note from data), kinds.js (watch / read / game / recipe / work task)
+│   │   ├── 📁 services           — no markup: notify.js (desktop reminders), mobileConfig.js (obsidian-mobile/ → .obsidian-mobile)
 │   │   ├── 📁 core               — dates, files (edit / editLine / appendLine a note), config, sounds (and 🔇),
 │   │   │                           html.js (markup in backticks), chart.js
 │   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
@@ -30,8 +32,8 @@
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)
 │   ├── 📁 Data                   — the widgets' notes: Shop.md, Celestial Market.md, Supplies.md, Cycle.md (cycle dates),
 │   │                               Weight.md, Body log.md, Savings/ (a note per goal)
-│   ├── 📁 Scripts                — notify.js (desktop reminders, Templater startup), QuickAdd/MirrorMobileConfig.js
-│   └── 📁 Templates              — Daily Note.md, recipe.md, task.md
+│   ├── 📁 Scripts                — finance/ (bank statement import)
+│   └── 📁 Templates              — Daily Note.md (Obsidian's Daily notes and the ✦ Open widget)
 ├── 📁 02 Areas
 │   └── 📁 Personal
 │       ├── Goals.md
