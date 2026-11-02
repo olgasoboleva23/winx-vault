@@ -23,8 +23,3 @@ export function notePath(folder, title, exists) {
   for (let i = 1; exists(path); i++) path = `${folder}/${name} ${i}.md`;
   return path;
 }
-
-// the daily template's text for a day, as Obsidian's Daily notes fills it: {{date}} / {{date:FORMAT}} by
-// format(FORMAT) (moment of that day), {{title}} the note's name
-export const fillDaily = (text, format, title) =>
-  text.replace(/{{date(?::([^}]+))?}}/g, (_, f) => format(f)).replace(/{{title}}/g, title);

@@ -65,3 +65,6 @@ export const KINDS = {
     }),
   },
 };
+
+// a daily note (the dashboard's ✦ Open makes it): the day's date, "Monday, November 2" as the title
+export const daily = (date, title) => ({ props: { date }, title, sections: { "📝 Notes": "", "🎯 XP Log": "-" } });

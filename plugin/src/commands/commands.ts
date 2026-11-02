@@ -40,7 +40,7 @@ export function registerCommands(plugin: Plugin) {
       return void await appendLine(POOL, poolLine, { header: "Tasks to pick when it's time: drag one from the calendar's Pool tab onto a day.\n\n" });
     }
     if (!app.vault.getFileByPath(MASTER)) return void new Notice(`✦ ${MASTER} not found — task not saved`);
-    await edit(MASTER, c => line + "\n" + c);
+    await edit(MASTER, (c: string) => line + "\n" + c);
   });
 
   // a watch / read / game / recipe / work task note (notes/kinds.js), in its folder, opened in a new tab

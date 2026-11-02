@@ -30,10 +30,8 @@
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
 ├── 📁 00 System
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)
-│   ├── 📁 Data                   — the widgets' notes: Shop.md, Celestial Market.md, Supplies.md, Cycle.md (cycle dates),
-│   │                               Weight.md, Body log.md, Savings/ (a note per goal)
-│   ├── 📁 Scripts                — finance/ (bank statement import)
-│   └── 📁 Templates              — Daily Note.md (Obsidian's Daily notes and the ✦ Open widget)
+│   └── 📁 Data                   — the widgets' notes: Shop.md, Celestial Market.md, Supplies.md, Cycle.md (cycle dates),
+│                                   Weight.md, Body log.md, Savings/ (a note per goal)
 ├── 📁 02 Areas
 │   └── 📁 Personal
 │       ├── Goals.md
@@ -48,6 +46,7 @@
 cd plugin
 npm ci
 npm test                                   # unit tests
+npm run check                              # types (tsc)
 WINX_VAULT=/path/to/your/vault npm run dev # build into <vault>/.obsidian/plugins/winx on every save
 ```
 

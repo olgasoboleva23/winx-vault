@@ -37,6 +37,7 @@ const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 //   all      every task and pool item: what a data-task key is looked up in
 // and the meta lines of the bottom panel's cards.
 export class CalendarData {
+  /** @param {{ tasks: any[], poolLines: any[], days: string[], today: string, areaOrder?: string[] }} args */
   constructor({ tasks, poolLines, days, today, areaOrder = [] }) {
     this.today = today;
     this.areaOrder = areaOrder;

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Note, notePath, fillDaily } from "../src/notes/note.js";
-import { KINDS } from "../src/notes/kinds.js";
+import { Note, notePath } from "../src/notes/note.js";
+import { KINDS, daily } from "../src/notes/kinds.js";
 
 const make = (kind, v, today = "2026-10-29") => new Note(KINDS[kind].note(v, today)).text;
 
@@ -79,7 +79,16 @@ test("a watch, read or game item can get a rating 1–10 in its window; it goes 
   assert.match(make("watch", { title: "X", media_type: "movie", status: "completed", rating: 7 }), /\nrating: 7\n/);
 });
 
-test("the daily template, as Obsidian's Daily notes fills it: {{date}}, {{date:FORMAT}}, {{title}}", () => {
-  const format = f => `<${f ?? "YYYY-MM-DD"}>`;
-  assert.equal(fillDaily("date: {{date}}\n# {{date:dddd, MMMM D}}\n{{title}}", format, "2026-11-02"), "date: <YYYY-MM-DD>\n# <dddd, MMMM D>\n2026-11-02");
+test("a daily note: its date, the day as the title, Notes and the XP log", () => {
+  assert.equal(new Note(daily("2026-11-02", "Monday, November 2")).text, `---
+date: 2026-11-02
+---
+
+# Monday, November 2
+
+## 📝 Notes
+
+## 🎯 XP Log
+-
+`);
 });
