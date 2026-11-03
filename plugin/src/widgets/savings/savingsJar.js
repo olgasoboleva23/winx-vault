@@ -2,8 +2,9 @@
 // note's properties. Paydays: the 16th and the 30th (a short month's last day), a Saturday or Sunday one on the Friday
 // before (tested by tests/entities.test.mjs).
 import { addDays, addMonths, weekday } from "../../core/dates.js";
+import { AMOUNT, amount } from "../../core/format.js";
 
-const DEPOSIT = /^- (\d{4}-\d{2}-\d{2}) (\d[\d\s]*(?:[.,]\d+)?)$/;
+const DEPOSIT = new RegExp(`^- (\\d{4}-\\d{2}-\\d{2}) (${AMOUNT.source})$`);
 
 // the paydays from `from` to `to`, both "YYYY-MM-DD"
 export function paydays(from, to) {
@@ -22,7 +23,7 @@ export class SavingsJar {
   constructor(text, { per_payday = null, price = null } = {}) { this.text = text; this.perPayday = per_payday; this.price = price; }
   // { date, sum } in the note's order
   get deposits() {
-    return this.text.split("\n").map(l => l.trim().match(DEPOSIT)).filter(Boolean).map(m => ({ date: m[1], sum: Number(m[2].replace(/\s/g, "").replace(",", ".")) }));
+    return this.text.split("\n").map(l => l.trim().match(DEPOSIT)).filter(Boolean).map(m => ({ date: m[1], sum: amount(m[2]) }));
   }
   get saved() { return this.deposits.reduce((a, d) => a + d.sum, 0); }
   get pct()   { return this.price ? Math.round(this.saved / this.price * 100) : null; }

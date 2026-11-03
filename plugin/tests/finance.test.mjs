@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseLedger, summarize, monthReport } from "../src/widgets/finance/ledger.js";
+import { amount } from "../src/core/format.js";
 
 const note = `---
 type: finance-ledger
@@ -35,4 +36,20 @@ test("a month's report: categories biggest first, up to 6 months of spending, th
   assert.equal(r.peak, 1150.5);
   assert.deepEqual(r.latest.map(x => x.description), ["cash", "GREEN BASKET", "EMPLOYER"]);
   assert.equal(r.net, 72000 - 1150.5);
+});
+
+test("a row written by hand with a space and a comma counts", () => {
+  assert.equal(parseLedger("| 2026-10-07 |  | −1 200,50 | Cafes | cash |")[0].amount, -1200.5);
+});
+
+test("amount: a number as people write it, the same rule wherever a sum is read or typed", () => {
+  assert.equal(amount("20 000"), 20000);
+  assert.equal(amount("2,5"), 2.5);
+  assert.equal(amount(" 2.5 "), 2.5);
+  assert.equal(amount("−300"), -300);
+  assert.equal(amount("-1\u00a0200,50"), -1200.5);
+  assert.equal(amount("+72000.00"), 72000);
+  assert.equal(amount("n/a"), null);
+  assert.equal(amount("1.2.3"), null);
+  assert.equal(amount(""), null);
 });

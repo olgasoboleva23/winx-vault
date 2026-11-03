@@ -69,3 +69,8 @@ test("a purchase for 2.5 counts 2.5", async () => {
   assert.equal(await logPurchase("Gum", 2.5), true);
   assert.match(files[BUY], /Gum \| 2\.5/);
 });
+
+test("a purchase for 1 000 (a space in it) counts 1000", async () => {
+  vault({ [MASTER]: "- [x] #⭐⭐⭐⭐epic #area/base a\n", [BUY]: "# Purchases\n\n- 2026-10-01 | Tea | 1 000\n" });
+  assert.equal(await logPurchase("Gum", 1), false);   // 25 − 1000
+});

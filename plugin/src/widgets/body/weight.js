@@ -11,6 +11,7 @@ import { Widget } from "../widget.js";
 import { addDays, dm, todayYmd } from "../../core/dates.js";
 import { edit } from "../../core/files.js";
 import { WeightLog } from "./weightLog.js";
+import { amount } from "../../core/format.js";
 import { BodyLog } from "./bodyLog.js";
 import { cycleLog } from "./cycle.js";
 import { chartColor } from "../../core/chart.js";
@@ -24,7 +25,7 @@ export class Weight extends Widget {
   on = {
     save: async (e, form) => {
       const box = form.querySelector("input[name=kg]");
-      const kg = Number(String(box.value).replace(",", "."));
+      const kg = amount(box.value);
       if (!kg || kg <= 0) return;
       await edit(PATH, c => new WeightLog(c).set(todayYmd(), kg));
       box.value = "";

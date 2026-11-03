@@ -5,6 +5,7 @@ import { html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import { AudioEngine } from "../../core/sounds.js";
 import { balance, logPurchase } from "./wallet.js";
+import { AMOUNT, amount } from "../../core/format.js";
 
 export class Shop extends Widget {
   sound = new AudioEngine("00 System/Assets/star.wav");
@@ -20,8 +21,8 @@ export class Shop extends Widget {
   async data() {
     const items = [];
     for (const list of this.dv.pages('"00 System/Data/Shop"').file.lists) {
-      const name = list.text.match(/name::\s*(.+)/), cost = list.text.match(/cost::\s*(\d+)/);
-      if (name && cost) items.push({ name: name[1].trim(), cost: Number(cost[1]) });
+      const name = list.text.match(/name::\s*(.+)/), cost = list.text.match(new RegExp(`cost::\\s*(${AMOUNT.source})`));
+      if (name && cost) items.push({ name: name[1].trim(), cost: amount(cost[1]) });
     }
     return { items, balance: balance(this.dv) };
   }

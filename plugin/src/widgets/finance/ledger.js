@@ -1,5 +1,7 @@
 // The ledger's numbers, without markup (tested by tests/finance.test.mjs): a month note's rows, a month's totals, the
 // Finance page's report. A row: { date, time, amount, category, description }; spending is negative.
+import { amount as toAmount } from "../../core/format.js";
+
 const TRANSFER = "Переводы";   // transfers move money between your own accounts or split bills: not spending or income
 
 // a ledger note's pipe table (no Dataview fields), so a hand-added cash row works like an imported one
@@ -10,8 +12,8 @@ export function parseLedger(text) {
     if (!t.startsWith("|")) continue;
     const cells = t.slice(1, -1).split("|").map(c => c.trim());
     if (cells.length !== 5 || cells[0] === "date" || /^[-:\s]+$/.test(cells[0])) continue;
-    const amount = Number(cells[2]);
-    if (Number.isFinite(amount)) rows.push({ date: cells[0], time: cells[1], amount, category: cells[3], description: cells[4] });
+    const amount = toAmount(cells[2]);
+    if (amount !== null) rows.push({ date: cells[0], time: cells[1], amount, category: cells[3], description: cells[4] });
   }
   return rows;
 }
