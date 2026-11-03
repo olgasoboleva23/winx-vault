@@ -47,6 +47,7 @@
   background: var(--winx-bg-image) left center / cover no-repeat;
   mix-blend-mode: multiply;
   pointer-events: none;
+  // stylelint-disable-next-line property-no-vendor-prefix -- WebKit before iOS 15.4 knows only this one
   -webkit-mask-image: linear-gradient(
     to right,
     black 0%,
@@ -70,12 +71,12 @@
 /* ── Shared base styles for both views ── */
 :is(.dashboard, .kanban-board) {
   --callout-blend-mode: normal;
-  font-family: "Quicksand", sans-serif;
+  font-family: Quicksand, sans-serif;
   color: var(--winx-text-dark);
 
   /* Headings */
   :is(.inline-title, h1, h2, h3, h4) {
-    font-family: "Cinzel", serif !important;
+    font-family: Cinzel, serif !important;
     color: var(--winx-blue) !important;
     letter-spacing: 1.5px !important;
   }

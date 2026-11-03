@@ -185,17 +185,11 @@
 
       /* Position wired to scoped custom props above */
       &::before {
-        top: var(--star-before-top);
-        bottom: var(--star-before-bottom);
-        left: var(--star-before-left);
-        right: var(--star-before-right);
+        inset: var(--star-before-top) var(--star-before-right) var(--star-before-bottom) var(--star-before-left);
         animation-delay: var(--star-before-delay);
       }
       &::after {
-        top: var(--star-after-top);
-        bottom: var(--star-after-bottom);
-        left: var(--star-after-left);
-        right: var(--star-after-right);
+        inset: var(--star-after-top) var(--star-after-right) var(--star-after-bottom) var(--star-after-left);
         animation-delay: var(--star-after-delay);
       }
     }

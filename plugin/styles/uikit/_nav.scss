@@ -5,7 +5,7 @@
   gap: $space-l;
   margin-bottom: $space-l;
   &__title {
-    font-family: "Cinzel", serif; font-size: $text-3xl; color: var(--winx-lavender); min-width: 220px; text-align: center;
+    font-family: Cinzel, serif; font-size: $text-3xl; color: var(--winx-lavender); min-width: 220px; text-align: center;
     .callout & { color: var(--winx-purple-deep); }   /* on a pink card */
   }
   /* the phone: ‹ the title › on the first line, the chips (today, week / month, ✓ done, 🔁) under it */

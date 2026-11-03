@@ -6,7 +6,7 @@
     "build": "node esbuild.config.mjs",
     "dev": "node esbuild.config.mjs --watch",
     "check": "tsc",
-    "lint": "eslint src",
+    "lint": "eslint src && stylelint \"styles/**/*.scss\"",
     "test": "node --test --experimental-strip-types --import ./tests/stubs/register.mjs tests/*.test.mjs"
   },
   "devDependencies": {
@@ -17,6 +17,8 @@
     "eslint-plugin-obsidianmd": "^0.4.2",
     "obsidian": "^1.14.4",
     "sass": "^1.107.0",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1"
   }

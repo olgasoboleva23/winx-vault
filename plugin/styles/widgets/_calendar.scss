@@ -102,7 +102,7 @@
     border-radius: $radius-m;
     border: 1px dashed var(--winx-border);
     text-align: center;
-    font-family: "Cinzel", serif;
+    font-family: Cinzel, serif;
     font-size: $text-l;
     color: var(--winx-purple-deep);
     transition: background 0.15s ease, box-shadow 0.15s ease;
@@ -133,7 +133,7 @@
   &__head {
     margin-bottom: $space-xs;
     text-align: center;
-    font-family: "Cinzel", serif;
+    font-family: Cinzel, serif;
     color: var(--winx-purple-deep);
   }
   &__task {
@@ -192,7 +192,7 @@
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: $space-s;
   }
-  &__weekday { text-align: center; font-family: "Cinzel", serif; font-size: $text-m; color: var(--winx-lavender); }
+  &__weekday { text-align: center; font-family: Cinzel, serif; font-size: $text-m; color: var(--winx-lavender); }
   &__cell {
     min-height: 92px;
     padding: $space-xs 5px;
@@ -295,11 +295,11 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
     flex-wrap: wrap;
     gap: $space-xs $space-2xl;
     margin-bottom: $space-xs;
-    button.winx-cal__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: "Cinzel", serif; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
+    button.winx-cal__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: Cinzel, serif; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
     button.winx-cal__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
   }
   &__late { color: #b0306a; font-weight: 600; }
   &__after { margin-right: $space-2xs; color: var(--winx-purple-deep); opacity: 0.6; }   /* ↳ a task after the one above */
-  &__zone--plan { font-family: "Cinzel", serif; font-size: $text-2xl; text-align: center; }
+  &__zone--plan { font-family: Cinzel, serif; font-size: $text-2xl; text-align: center; }
   &__month &__zone { font-size: $text-m; }
 }

@@ -57,7 +57,7 @@
     gap: $space-s;
     font-size: $text-s;
     color: var(--winx-purple-deep);
-    &-name { width: 1.8em; font-family: "Cinzel", serif; letter-spacing: 1px; }
+    &-name { width: 1.8em; font-family: Cinzel, serif; letter-spacing: 1px; }
     &-value { min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; }   /* 50/50 and 0/4: bars of one length */
     &-bar {
       flex: 1;

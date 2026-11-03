@@ -17,7 +17,7 @@
   @include wings(40px, 3px);
   > * { position: relative; z-index: 1; }
 
-  &__head { grid-column: 1 / -1; padding-left: 34px; font-family: "Cinzel", serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
+  &__head { grid-column: 1 / -1; padding-left: 34px; font-family: Cinzel, serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
   /* rounded coloured rows like the day entries; ✏️ 🗑 sit in the row, before the date */
   &__row {
     @include row;
