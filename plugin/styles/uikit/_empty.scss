@@ -1,10 +1,12 @@
 @use "../mixins" as *;
 /* Empty / Missing (src/uikit/empty.js) */
-// a list with nothing in it, a widget whose note isn't there
+// a list with nothing in it, a widget whose note isn't there; --error: a widget that couldn't draw (Failed), ↻ retry after it
 .winx-empty {
   text-align: center;
   padding-block: $space-3xl;
   color: var(--winx-purple-deep);
   font-size: $text-xl;
   letter-spacing: 0.05em;
+  &--error { color: var(--text-error); }
+  &__retry { margin-inline-start: $space-m; vertical-align: middle; }
 }

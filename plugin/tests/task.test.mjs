@@ -161,3 +161,10 @@ test("#id/<id> and #after/id/<id>: a task's id and the one it comes after, not p
   assert.equal(T("- [ ] треня").after, null);
   assert.equal(T("- [ ] треня").id, null);
 });
+
+test("sameAs: the same copy of a task (words, status, day), not its done copy or another day's", () => {
+  const open = new Task("- [ ] workout 🔁 every day 📅 2026-10-28");
+  assert.ok(open.sameAs(new Task("  - [ ] #⭐easy workout 🔁 every day 📅 2026-10-28")));
+  assert.ok(!open.sameAs(new Task("- [x] workout 🔁 every day 📅 2026-10-28 ✅ 2026-10-28")));
+  assert.ok(!open.sameAs(new Task("- [ ] workout 🔁 every day 📅 2026-10-29")));
+});

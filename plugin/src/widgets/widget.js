@@ -15,7 +15,7 @@
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
 import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../uikit/card.js";
-import { Empty } from "../uikit/empty.js";
+import { Failed } from "../uikit/empty.js";
 import { html } from "../core/html.js";
 import { useActions, useDataviewChanges, useLeaveField, useRedraw, useTabDate, useWhenIndexed } from "../core/use.js";
 import { dataview } from "../core/plugins.js";
@@ -59,8 +59,7 @@ export class Widget extends MarkdownRenderChild {
   keep(thing) { this.kept.push(thing); return thing; }
 
   async onload() {
-    useActions(this, this.containerEl, (name, el) => this.on[name]?.bind(this)
-      ?? (name === "open" && el.dataset.path ? () => this.app.workspace.openLinkText(el.dataset.path, this.sourcePath) : null), ["click", "change", "submit"]);
+    useActions(this, this.containerEl, (name, el) => this.action(name, el), ["click", "change", "submit"]);
     // drawn now, or once it shows and nobody is typing in it (catchUp: ask again after leaving a field)
     ({ redraw: this.redraw, catchUp: this.catchUp } = useRedraw(this, () => this.shown && !this.typing, () => this.draw()));
     useLeaveField(this, this.containerEl, () => this.catchUp());
@@ -71,6 +70,13 @@ export class Widget extends MarkdownRenderChild {
     useDataviewChanges(this, () => this.redraw(), { note: this.sourcePath, delay: DELAY });
     useTabDate(this, this.containerEl, () => this.redraw());
     useWhenIndexed(this, () => this.draw());
+  }
+
+  // a data-action's handler: the widget's own (on), else the base's: open a note, retry a draw that failed
+  action(name, el) {
+    return this.on[name]?.bind(this)
+      ?? (name === "open" && el?.dataset.path ? () => this.app.workspace.openLinkText(el.dataset.path, this.sourcePath)
+      : name === "retry" ? () => this.draw() : null);
   }
 
   // on screen: a card widget's block has no box of its own (display: contents), so ask the card
@@ -98,7 +104,7 @@ export class Widget extends MarkdownRenderChild {
     catch (e) {
       if (n !== this.draws) return;
       console.error(e);
-      return void this.containerEl.replaceChildren(sanitizeHTMLToDom(new Empty({ text: `couldn't draw: ${e.message}` }).html));
+      return void this.containerEl.replaceChildren(sanitizeHTMLToDom(new Failed({ text: e.message }).html));
     }
     if (n !== this.draws) return;   // a newer draw is on its way, or the block is gone
     this.drop();

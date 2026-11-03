@@ -38,7 +38,7 @@ test("Card: the markup Obsidian draws for a > [!card] callout, the body as it is
 
 test("NoteLink, Empty / Missing, GroupHeader, AddForm", async () => {
   const { NoteLink } = await import("../src/uikit/noteLink.js");
-  const { Empty, Missing } = await import("../src/uikit/empty.js");
+  const { Empty, Missing, Failed } = await import("../src/uikit/empty.js");
   const { GroupHeader } = await import("../src/uikit/groupHeader.js");
   const { AddForm } = await import("../src/uikit/addForm.js");
   assert.equal(new NoteLink({ text: "dates", path: "02 Areas/Cycle.md" }).html,
@@ -46,6 +46,8 @@ test("NoteLink, Empty / Missing, GroupHeader, AddForm", async () => {
   assert.equal(new Empty({ text: "All bought" }).html, '<div class="winx-empty">✦ All bought</div>');
   assert.equal(new Empty().html, '<div class="winx-empty">✦ Nothing here yet</div>');
   assert.equal(new Missing({ path: "x/Goals.md" }).html, '<div class="winx-empty">✦ Create x/Goals.md</div>');
+  assert.equal(new Failed({ text: "Goals.md is broken" }).html,
+    '<div class="winx-empty winx-empty--error">⚠ couldn&#39;t draw: Goals.md is broken<button class="winx-btn winx-btn--chip winx-empty__retry" data-action="retry">retry</button></div>');
   assert.equal(new GroupHeader({ label: "🌿 Harvest", count: 3 }).html, '<div class="winx-group-header"><span>🌿 Harvest</span><span class="winx-group-header__count">3</span></div>');
   assert.equal(new GroupHeader({ label: "🌿 Harvest" }).html, '<div class="winx-group-header"><span>🌿 Harvest</span></div>');
   assert.equal(new AddForm({ action: "save", input: { name: "kg", type: "number" }, submit: "Save" }).html,

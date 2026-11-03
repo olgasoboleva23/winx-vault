@@ -32,4 +32,13 @@ test("an error in data() shows a message, not a blank block", async () => {
   const d = w.draw();
   w.waits[0].fail(new Error("Goals.md is broken")); await d;
   assert.match(w.containerEl.drawn, /couldn(&#39;|')t draw: Goals\.md is broken/);
+  assert.match(w.containerEl.drawn, /data-action="retry"/);
+});
+
+test("retry draws again", async () => {
+  const w = new Slow(block(), "note.md");
+  const d = w.action("retry")();
+  assert.equal(w.waits.length, 1);
+  w.waits[0].ok({ n: 3 }); await d;
+  assert.equal(w.containerEl.drawn, "<b>3</b>");
 });

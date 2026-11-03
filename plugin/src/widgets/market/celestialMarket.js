@@ -21,7 +21,8 @@ export class CelestialMarket extends Widget {
       if (row.classList.contains("winx-market__item--bought")) return;
       row.classList.add("winx-market__item--bought");
       await new Promise(r => window.setTimeout(r, 650));
-      await editLine(MARKET, Number(el.dataset.line), line => new MarketItem(line).bought(todayYmd()));
+      const same = line => { const item = new MarketItem(line); return !item.isBought && item.name === el.dataset.name; };
+      await editLine(MARKET, Number(el.dataset.line), same, line => new MarketItem(line).bought(todayYmd()));
     },
   };
   async data() {
@@ -43,7 +44,7 @@ export class CelestialMarket extends Widget {
         ${items.length ? "" : new Empty({ text: "Merchant inventory cleared" })}
         ${groups.map(({ cat, items }) => html`
           ${new GroupHeader({ label: cat.label, count: items.length })}
-          ${items.map(t => html`<div class="winx-market__item"><span class="winx-market__text">${t.text.replace(/#[\w/]+/g, "").trim()}</span><button class="winx-market__buy" aria-label="bought" title="bought" data-action="buy" data-line="${t.line}"></button></div>`)}`)}
+          ${items.map(t => html`<div class="winx-market__item"><span class="winx-market__text">${t.text.replace(/#[\w/]+/g, "").trim()}</span><button class="winx-market__buy" aria-label="bought" title="bought" data-action="buy" data-line="${t.line}" data-name="${MarketItem.of(t).name}"></button></div>`)}`)}
       </div>
       ${soon.length ? html`<div class="winx-market__soon">⏳ running low soon: ${soon.join(", ")}</div>` : ""}
       <div class="winx-market__footer"><span>${items.length} item${items.length === 1 ? "" : "s"} left</span>${link("✦ open market", "00 System/Data/Celestial Market")}${link("✦ supplies", "00 System/Data/Supplies")}</div>

@@ -19,13 +19,13 @@
 │   │   ├── 📁 services           — no markup: notify.js (desktop reminders), mobileConfig.js (obsidian-mobile/ → .obsidian-mobile)
 │   │   ├── 📁 core               — paths.js (where the data lives), app.js (Obsidian's app for modules), store.js
 │   │   │                           (createStore: a tab's state, set / watch), dates,
-│   │   │                           files (edit / editLine / appendLine a note), config, sounds (and 🔇),
+│   │   │                           files (edit / editLine, only while the line is the same / appendLine a note), config, sounds (and 🔇),
 │   │   │                           html.js (markup in backticks), chart.js, use.js (composables: useActions, useRedraw,
 │   │   │                           useDataviewChanges, useWhenIndexed, useNewDay, useBusy, useWindowBack, useNoteLinks…)
 │   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
 │   │   │                           taskEdit.js (rewrite a line with undo, the task window), taskSearch.js (New task: a past task)
 │   │   ├── 📁 uikit              — the interface parts, props in, markup out: Button (round, nav, pill, chip, toggle,
-│   │   │                           text), Card, NoteLink, Empty / Missing, GroupHeader, AddForm; Form (one window of
+│   │   │                           text), Card, NoteLink, Empty / Missing / Failed, GroupHeader, AddForm; Form (one window of
 │   │   │                           fields), Search (a search window over a list), busy.js (the ✦ pill)
 │   │   └── 📁 widgets            — widget.js (the base class), blocks.js (names → classes), one class per widget;
 │   │                               a topic's own logic next to its widgets, as classes: market/ (MarketItem, the search),

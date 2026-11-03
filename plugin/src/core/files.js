@@ -1,20 +1,28 @@
 // Writes to the vault's notes by path (Obsidian's app; inside Obsidian only).
 // edit: the note's text through fn (vault.process, so nothing is lost between read and write); a missing note: nothing.
-// editLine: line n through fn (null deletes it; a line that's gone: nothing).
+// editLine: line n through fn (null deletes it), only while same(line) holds: it may have moved or changed since it
+//   was read (a line that's gone or isn't the same: nothing, a notice, false).
 // appendLine: a line at the end (unique: not when it's already there); a missing note is made with `header` on top.
+import { Notice } from "obsidian";
 import { app } from "./app.js";
 export const edit = (path, fn) => {
   const file = app.vault.getFileByPath(path);
   return file ? app.vault.process(file, fn) : Promise.resolve();
 };
 
-export const editLine = (path, n, fn) => edit(path, c => {
-  const lines = c.split("\n");
-  if (lines[n] === undefined) return c;
-  const next = fn(lines[n]);
-  next === null ? lines.splice(n, 1) : (lines[n] = next);
-  return lines.join("\n");
-});
+export async function editLine(path, n, same, fn) {
+  let done = false;
+  await edit(path, c => {
+    const lines = c.split("\n");
+    if (lines[n] === undefined || !same(lines[n])) return c;
+    const next = fn(lines[n]);
+    next === null ? lines.splice(n, 1) : (lines[n] = next);
+    done = true;
+    return lines.join("\n");
+  });
+  if (!done) new Notice("✦ The line changed meanwhile: nothing written");
+  return done;
+}
 
 export async function appendLine(path, line, { header = "", unique = false } = {}) {
   const file = app.vault.getFileByPath(path);

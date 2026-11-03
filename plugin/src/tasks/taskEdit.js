@@ -9,8 +9,8 @@ import { Form } from "../uikit/form.ts";
 import { app } from "../core/app.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
-// only if that line is still the same task.
-export const editTaskLine = (t, fn) => editLine(t.path, t.line, line => Task.keyOf(line) === Task.keyOf(t.text) ? fn(line) : line);
+// only if that line is still the same copy of the task.
+export const editTaskLine = (t, fn) => editLine(t.path, t.line, line => new Task(line).sameAs(Task.of(t)), fn);
 
 // What the Tasks modal doesn't ask: difficulty, area, time of day, sticker (from 00 System/Assets/stickers);
 // `preset` (Task#picks) has the current ones. A new task must have a difficulty and an area (`required`) and can

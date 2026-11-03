@@ -49,6 +49,8 @@ export class Task {
   // identity across copies (open, done, skipped) of the same task, for history and for finding its line again
   get key() { return this.text.toLowerCase(); }
   static keyOf = line => new Task(line).key;
+  // the same copy: its words, status and day (not its done copy, nor another day's)
+  sameAs(other) { return this.key === other.key && this.status === other.status && this.date === other.date; }
 
   // { count, last } over `list` (Tasks) with the same key, by ✅ date (❌ for skipped ones), or null
   history(list) {

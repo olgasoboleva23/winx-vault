@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { appendLine, edit, editLine, readJson } from "../src/core/files.js";
 import { setApp } from "../src/core/app.js";
+import { Notice } from "obsidian";
 
 // a vault in memory: path → text, folders as a set
 const vault = (files = {}, folders = []) => {
@@ -37,12 +38,23 @@ test("appendLine makes a missing note, its folder first, with the header on top"
 
 test("editLine changes one line, null deletes it, a line that's gone changes nothing", async () => {
   const { files } = vault({ "a.md": "a\nb\nc" });
-  await editLine("a.md", 1, l => l.toUpperCase());
+  const any = () => true;
+  await editLine("a.md", 1, any, l => l.toUpperCase());
   assert.equal(files["a.md"], "a\nB\nc");
-  await editLine("a.md", 0, () => null);
+  await editLine("a.md", 0, any, () => null);
   assert.equal(files["a.md"], "B\nc");
-  await editLine("a.md", 9, () => "zzz");
+  await editLine("a.md", 9, any, () => "zzz");
   assert.equal(files["a.md"], "B\nc");
+});
+
+test("editLine writes only when the line is still the same: else nothing, false and a notice", async () => {
+  const { files } = vault({ "a.md": "- [ ] tea\n- [ ] milk" });
+  Notice.last = null;
+  assert.equal(await editLine("a.md", 0, l => l.includes("milk"), () => "- [x] milk"), false);
+  assert.equal(files["a.md"], "- [ ] tea\n- [ ] milk");
+  assert.match(String(Notice.last), /changed/);
+  assert.equal(await editLine("a.md", 1, l => l.includes("milk"), () => "- [x] milk"), true);
+  assert.equal(files["a.md"], "- [ ] tea\n- [x] milk");
 });
 
 test("edit on a missing note does nothing", async () => {
