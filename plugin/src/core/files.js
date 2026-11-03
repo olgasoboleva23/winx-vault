@@ -44,5 +44,7 @@ export async function appendLine(path, line, { header = "", unique = false } = {
   await app.vault.create(path, `${header}${line}\n`);
 }
 
-// a JSON file (by the adapter: any file, not only notes), parsed; `fallback` when it's missing or not JSON
-export const readJson = (path, fallback = null) => app.vault.adapter.read(path).then(JSON.parse).catch(() => fallback);
+// a JSON file (by the adapter: any file, not only notes), parsed; `fallback` when it's missing. A file that isn't
+// JSON throws, so nothing is saved over it (the pomodoro's stats) and the widget says it couldn't draw
+export const readJson = async (path, fallback = null) =>
+  await app.vault.adapter.exists(path) ? JSON.parse(await app.vault.adapter.read(path)) : fallback;

@@ -33,6 +33,6 @@ export class SavingsJar {
     return payday && !this.deposits.some(d => d.date >= payday) ? { payday, sum: this.perPayday } : null;
   }
   next(today, n) { return paydays(addDays(today, 1), addDays(today, 62)).slice(0, n); }
-  // the note's text with a deposit added at the end
-  deposit(date, sum = this.perPayday) { return `${this.text.trimEnd()}\n- ${date} ${sum}\n`; }
+  // the note's text with a deposit added at the end; as it is without a sum (no per_payday and none given)
+  deposit(date, sum = this.perPayday) { return sum > 0 ? `${this.text.trimEnd()}\n- ${date} ${sum}\n` : this.text; }
 }

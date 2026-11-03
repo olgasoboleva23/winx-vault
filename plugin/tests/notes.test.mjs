@@ -92,3 +92,13 @@ date: 2026-11-02
 -
 `);
 });
+
+test("a string that YAML would read as another type stays a string: true, null, 123 in quotes", () => {
+  const text = new Note({ props: { a: "true", b: "null", c: "123", d: "no", e: 5, f: "Tea 2" }, title: "T" }).text;
+  assert.match(text, /^a: "true"$/m);
+  assert.match(text, /^b: "null"$/m);
+  assert.match(text, /^c: "123"$/m);
+  assert.match(text, /^d: "no"$/m);
+  assert.match(text, /^e: 5$/m);
+  assert.match(text, /^f: Tea 2$/m);
+});

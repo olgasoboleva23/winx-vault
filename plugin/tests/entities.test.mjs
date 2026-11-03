@@ -125,6 +125,9 @@ test("SavingsJar: saved, deposits, the payday's deposit until it's in, the halfw
   assert.deepEqual(jar.due("2026-11-17"), { payday: "2026-11-16", sum: 12000 });
   assert.deepEqual(jar.next("2026-11-17", 2), ["2026-11-30", "2026-12-16"]);
   assert.equal(jar.deposit("2026-11-17").trim().split("\n").at(-1), "- 2026-11-17 12000");
+  const free = new SavingsJar("- 2026-10-16 500\n");   // no per_payday: a deposit needs its sum
+  assert.equal(free.deposit("2026-11-17"), "- 2026-10-16 500\n");
+  assert.equal(free.deposit("2026-11-17", 700).trim().split("\n").at(-1), "- 2026-11-17 700");
 
   const priced = new SavingsJar(note, { per_payday: 12000, price: 60000 });
   assert.equal(priced.pct, 53);

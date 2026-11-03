@@ -9,6 +9,7 @@ import { Button } from "../../uikit/button.js";
 import { Empty } from "../../uikit/empty.js";
 import { money } from "../../core/format.js";
 import { SavingsJar } from "./savingsJar.js";
+import { Form } from "../../uikit/form.ts";
 
 const FOLDER = "00 System/Data/Savings";
 const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -18,7 +19,10 @@ export class Savings extends Widget {
   on = {
     deposit: async (e, el) => {
       const props = this.app.metadataCache.getCache(el.dataset.path)?.frontmatter ?? {};
-      await edit(el.dataset.path, c => new SavingsJar(c, props).deposit(todayYmd()));
+      // no per_payday: "your part", so ask how much
+      const sum = props.per_payday ?? (await Form.ask(this.app, "✦ Deposit", [{ name: "Sum", key: "sum", text: "how much", number: true }],
+        { values: { sum: null }, required: ["sum"], submit: "Put in" }))?.sum;
+      if (sum > 0) await edit(el.dataset.path, c => new SavingsJar(c, props).deposit(todayYmd(), sum));
     },
   };
   async data() {

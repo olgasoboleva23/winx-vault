@@ -63,12 +63,13 @@ test("edit on a missing note does nothing", async () => {
   assert.deepEqual(files, {});
 });
 
-test("readJson: the parsed file; the fallback when it's missing or not JSON", async () => {
+test("readJson: the parsed file; the fallback when it's missing; an error when it isn't JSON (so nothing saves over it)", async () => {
   const files = { "a.json": '{"n": 1}', "b.json": "not json" };
-  setApp({ vault: { adapter: { read: async p => p in files ? files[p] : Promise.reject(new Error("missing")) } } });
+  setApp({ vault: { adapter: { exists: async p => p in files, read: async p => p in files ? files[p] : Promise.reject(new Error("missing")) } } });
   assert.deepEqual(await readJson("a.json"), { n: 1 });
-  assert.deepEqual(await readJson("b.json", { budgets: {} }), { budgets: {} });
+  assert.deepEqual(await readJson("c.json", { budgets: {} }), { budgets: {} });
   assert.equal(await readJson("c.json"), null);
+  await assert.rejects(readJson("b.json", {}), SyntaxError);
 });
 
 test("undoLines puts a deleted line back once: a second undo adds no copy", async () => {
