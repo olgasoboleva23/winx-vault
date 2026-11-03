@@ -4,6 +4,7 @@ import { setApp } from "../src/core/app.js";
 import { logPurchase } from "../src/widgets/shop/wallet.js";
 import { addTask, addPoolLine } from "../src/tasks/master.js";
 
+const later = () => new Promise(r => setTimeout(r, 5));
 // a vault in memory and a Dataview whose pages are its tasks (done ones earn gold) and Purchases' lines
 const vault = (files = {}) => {
   globalThis.window = { moment: () => ({ format: () => "2026-11-02" }) };
@@ -16,8 +17,10 @@ const vault = (files = {}) => {
     vault: {
       getFileByPath: p => p in files ? { path: p } : null,
       getFolderByPath: () => ({}),
-      process: async (f, fn) => { files[f.path] = fn(files[f.path]); },
-      create: async (p, text) => { files[p] = text; },
+      // a write lands a moment later, like a real one (and Dataview sees it later still)
+      process: async (f, fn) => { await later(); files[f.path] = fn(files[f.path]); },
+      read: async f => files[f.path],
+      create: async (p, text) => { await later(); files[p] = text; },
     },
   });
   return files;
@@ -45,4 +48,17 @@ test("a pool line goes to the end of Pool.md, made with its header on first use"
   const files = vault({});
   await addPoolLine("- #⭐easy water the herbs");
   assert.match(files[POOL], /^Tasks to pick when it's time.*\n\n- #⭐easy water the herbs\n$/);
+});
+
+test("a purchase's cost is the line's last number, not one in its name", async () => {
+  const files = vault({ [MASTER]: "- [x] #⭐⭐medium #area/base laundry\n", [BUY]: "# Purchases\n\n- 2026-10-01 | 1984 | 2\n" });
+  assert.equal(await logPurchase("Candy", 3), true);   // 5 earned − 2 spent = 3
+  assert.match(files[BUY], /Candy/);
+});
+
+test("two purchases at once: the second sees the first (10 gold, two for 10: one goes through)", async () => {
+  const files = vault({ [MASTER]: "- [x] #⭐⭐medium #area/base a\n- [x] #⭐⭐medium #area/base b\n" });
+  const [one, two] = await Promise.all([logPurchase("Tea", 10), logPurchase("Cake", 10)]);
+  assert.deepEqual([one, two], [true, false]);
+  assert.doesNotMatch(files[BUY], /Cake/);
 });
