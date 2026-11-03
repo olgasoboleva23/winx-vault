@@ -57,13 +57,14 @@ export class DashboardView extends ItemView {
   private render() {
     const date = this.shownDate = this.date ?? todayYmd();
     if (this.page) this.removeChild(this.page);
-    this.page = this.addChild(new Component());
+    const page = this.page = this.addChild(new Component());
     this.contentEl.empty();
     this.contentEl.removeClass("winx-dash--busy");
     this.contentEl.append(sanitizeHTMLToDom(busyPill().html));
     // the widgets' page date (Widget's dv.current())
     const body = this.body = this.contentEl.createDiv({ cls: "markdown-preview-sizer markdown-preview-section", attr: { "data-date": date } });
-    void MarkdownRenderer.render(this.app, GRID, body, "", this.page).then(() => {
+    void MarkdownRenderer.render(this.app, GRID, body, "", page).then(() => {
+      if (this.page !== page) return;   // closed, or drawn again, meanwhile
       this.dateRow();
       this.quests();
     });
