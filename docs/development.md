@@ -8,15 +8,17 @@
 ├── 📁 plugin — the Winx plugin
 │   ├── 📁 src
 │   │   ├── main.ts               — loads everything; the ```winx block, the dashboard and calendar tabs, ✨, the commands
-│   │   ├── 📁 calendar           — the calendar tab: view.ts (state, redraws, one set of listeners), parts.js (Header,
-│   │   │                           Missed, Grid, Panel), components.js (TaskText, TaskRow, TaskCard), data.js
-│   │   │                           (CalendarData, the model) and state.js (the tab's state), actions.js (what it writes),
-│   │   │                           drag.js / swipe.js (useDrag, useSwipe: drag and drop, the phone's swipes)
+│   │   ├── 📁 calendar           — the calendar tab: view.ts (the store, the listeners, draw), parts/ (part.js, header.js,
+│   │   │                           missed.js, grid.js, panel.js), layout.js (the parts in order, one redrawn in place),
+│   │   │                           components.js (TaskText, TaskRow, TaskCard), taskButtons.js (✏️ 🗑 ⏭ ✓), data.js
+│   │   │                           (CalendarData, the model, taskInfo) and state.js (the tab's state: saved and data keys),
+│   │   │                           actions.js (what it writes), drag.js / swipe.js (useDrag, useSwipe)
 │   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
 │   │   ├── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
 │   │   ├── 📁 notes              — note.js (Note: a new note from data), kinds.js (watch / read / game / recipe / work task)
 │   │   ├── 📁 services           — no markup: notify.js (desktop reminders), mobileConfig.js (obsidian-mobile/ → .obsidian-mobile)
-│   │   ├── 📁 core               — paths.js (where the data lives), app.js (Obsidian's app for modules), dates,
+│   │   ├── 📁 core               — paths.js (where the data lives), app.js (Obsidian's app for modules), store.js
+│   │   │                           (createStore: a tab's state, set / watch), dates,
 │   │   │                           files (edit / editLine / appendLine a note), config, sounds (and 🔇),
 │   │   │                           html.js (markup in backticks), chart.js, use.js (composables: useActions, useRedraw,
 │   │   │                           useDataviewChanges, useWhenIndexed, useNewDay, useBusy, useWindowBack, useNoteLinks…)

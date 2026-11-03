@@ -131,3 +131,19 @@ export function findTask(key, tasks) {
   const same = tasks.filter(t => t.path === path && stateOf(t) === state && words(t) === text);
   return same.sort((a, b) => Math.abs(a.line - want) - Math.abs(b.line - want))[0] ?? null;
 }
+
+// what a part shows of a task, with its key (data-task); made once per draw (ctx.infos). `app` finds the
+// stickers' pictures, ctx.actions whether it can be skipped
+export function taskInfo(t, ctx, app) {
+  const known = ctx.infos.get(t);
+  if (known) return known;
+  const task = T(t), area = task.area;
+  const i = {
+    key: taskKey(t), area: area?.slice(6) ?? null, difficulty: task.difficulty, text: task.text, pool: !!t.pool,
+    label: `${ctx.config.areaIcons[area] ?? ""} ${task.text}`.trim(),
+    stickers: task.stickers.map(name => app.metadataCache.getFirstLinkpathDest(name, t.path)).filter(Boolean).map(f => app.vault.getResourcePath(f)),
+    canSkip: ctx.actions.canSkip(t),
+  };
+  ctx.infos.set(t, i);
+  return i;
+}

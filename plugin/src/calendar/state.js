@@ -3,6 +3,10 @@ import { monthGrid, weekOf } from "../core/dates.js";
 // `date` null = follow today (the week or month of today, moving on by itself); a date = the one picked.
 
 export const DEFAULT = Object.freeze({ date: null, view: "week", showDone: false, tab: "nodate", unfolded: [], backlogOpen: false });
+export const SAVED = Object.keys(DEFAULT);   // what's saved with the layout; the rest of the tab's state is not
+// the keys the data comes from: a change draws the whole calendar again, from fresh data (area: one area's tasks
+// only, null all; picked: the day shown under the phone's month)
+export const DATA = ["date", "view", "showDone", "area", "picked"];
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const pick = (v, ok, fallback) => (ok(v) ? v : fallback);

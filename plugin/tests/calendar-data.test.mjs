@@ -177,3 +177,18 @@ test("a day's parts: a task with #after/id/<id> stands right under the task with
   assert.equal(T(day[1].follows.t).text, "треня");
   assert.equal(m.dayParts("2026-10-29", shown).routineRows[0].follows, undefined);
 });
+
+test("taskInfo: what a part shows of a task — its key, area, text, label, stickers as images, whether it can be skipped; once per draw", async () => {
+  const { taskInfo } = await import("../src/calendar/data.js");
+  const t = { text: "#⭐easy #area/body stretch ![[fist.webp|28]] 🔁 every day 📅 2026-11-03", status: " ", path: "Tasks/Master.md", line: 4 };
+  let lookups = 0;
+  const app = {
+    metadataCache: { getFirstLinkpathDest: (name, from) => (lookups++, name === "fist.webp" ? { path: `Assets/${name}` } : null) },
+    vault: { getResourcePath: f => `app://${f.path}` },
+  };
+  const ctx = { infos: new Map(), config: { areaIcons: { "#area/body": "🌺" } }, actions: { canSkip: () => true } };
+  const i = taskInfo(t, ctx, app);
+  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true });
+  assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
+  assert.equal(lookups, 1);
+});
