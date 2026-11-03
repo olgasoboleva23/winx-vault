@@ -42,3 +42,19 @@ test("retry draws again", async () => {
   w.waits[0].ok({ n: 3 }); await d;
   assert.equal(w.containerEl.drawn, "<b>3</b>");
 });
+
+test("an error in view() shows the same message", async () => {
+  class Broken extends Slow { view() { throw new Error("bad markup"); } }
+  const w = new Broken(block(), "note.md");
+  const d = w.draw(); w.waits[0].ok({ n: 1 }); await d;
+  assert.match(w.containerEl.drawn, /couldn(&#39;|')t draw: bad markup/);
+});
+
+test("what after() makes once the block is gone is let go at once", async () => {
+  let destroyed = 0;
+  const w = new Slow(block(), "note.md");
+  w.onunload();
+  w.keep({ destroy: () => destroyed++ });
+  assert.equal(destroyed, 1);
+  assert.equal(w.kept.length, 0);
+});

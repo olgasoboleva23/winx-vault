@@ -56,7 +56,8 @@ export class Widget extends MarkdownRenderChild {
   get app() { return app; }
 
   // a chart or anything with destroy(), dropped on the next draw
-  keep(thing) { this.kept.push(thing); return thing; }
+  // a block that's gone lets go at once of what a late after() makes
+  keep(thing) { this.draws < 0 ? thing?.destroy?.() : this.kept.push(thing); return thing; }
 
   async onload() {
     useActions(this, this.containerEl, (name, el) => this.action(name, el), ["click", "change", "submit"]);
@@ -99,23 +100,24 @@ export class Widget extends MarkdownRenderChild {
   async draw() {
     if (this.draws < 0) return;
     const n = ++this.draws;
-    let data;
-    try { data = await this.data(); }
-    catch (e) {
+    try {
+      const data = await this.data();
+      if (n !== this.draws) return;   // a newer draw is on its way, or the block is gone
+      this.drop();
+      const restore = this.keepTyped();
+      const body = this.view(data), { card, meta } = this.args;
+      const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body, button: this.cardButton?.() ?? "" }) : body;
+      this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
+      restore();
+      // the widget's own place: inside the card when there is one
+      const root = card ? this.containerEl.querySelector(":scope > .winx-widget > .winx-widget__body") : this.containerEl;
+      await this.after(root, data);
+    } catch (e) {   // in data(), view() or after(): said in the block, with ↻ retry
       if (n !== this.draws) return;
       console.error(e);
+      this.drop();
       return void this.containerEl.replaceChildren(sanitizeHTMLToDom(new Failed({ text: e.message }).html));
     }
-    if (n !== this.draws) return;   // a newer draw is on its way, or the block is gone
-    this.drop();
-    const restore = this.keepTyped();
-    const body = this.view(data), { card, meta } = this.args;
-    const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body, button: this.cardButton?.() ?? "" }) : body;
-    this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
-    restore();
-    // the widget's own place: inside the card when there is one
-    const root = card ? this.containerEl.querySelector(":scope > .winx-widget > .winx-widget__body") : this.containerEl;
-    await this.after(root, data);
     this.containerEl.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));   // the dashboard tab's ✦ pill goes
   }
 }
