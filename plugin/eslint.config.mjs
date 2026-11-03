@@ -14,6 +14,8 @@ export default defineConfig([
     "no-unsafe-argument", "no-unsafe-return"].map(r => [`@typescript-eslint/${r}`, "off"])) },
   // sentence case, but the plugins' names keep their capital ("Tasks plugin is off")
   { rules: { "obsidianmd/ui/sentence-case": ["warn", { brands: [...DEFAULT_BRANDS, "Tasks", "Dataview"] }] } },
+  // lines up to 120 characters: an html`` template breaks by element, a call by argument
+  { rules: { "max-len": ["error", { code: 120, ignoreUrls: true }] } },
   // a 🔁 rule is read by `(m = rule.match(…)) ? … :` chains, on purpose
   { files: ["src/tasks/repeats.js"], rules: { "no-cond-assign": "off" } },
 ]);

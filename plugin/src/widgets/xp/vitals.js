@@ -16,7 +16,11 @@ export function vitals({ missed, doneToday }) {
 export function mpPhases(length, period) {
   const ov = length - 14, phases = [];
   let from = 1;
-  for (const [to, value, phase] of [[period, 1, "period"], [ov - 6, 3, "follicular"], [ov + 1, 4, "ovulation"], [length - 5, 3, "luteal"], [length, 2, "pre-period"]]) {
+  const bounds = [
+    [period, 1, "period"], [ov - 6, 3, "follicular"], [ov + 1, 4, "ovulation"], [length - 5, 3, "luteal"],
+    [length, 2, "pre-period"],
+  ];
+  for (const [to, value, phase] of bounds) {
     if (to >= from) phases.push({ from, to, value, phase });
     from = Math.max(from, to + 1);
   }
@@ -35,11 +39,13 @@ export function mana(cycle) {
   if (isPeriod) now = phases[0];
   else if (now.phase === "period") now = phases[1] ?? now;
   const next = phases.slice(i + 1).find(p => p.value > now.value);
-  return { value: now.value, max: MP_MAX, phase: now.phase, day, up: next ? { value: next.value, in: next.from - day } : null, phases };
+  const up = next ? { value: next.value, in: next.from - day } : null;
+  return { value: now.value, max: MP_MAX, phase: now.phase, day, up, phases };
 }
 
 // "MP 3/4 · follicular · ↑4 in 4 d", and the cycle's phases one a line (a tooltip)
-export const mpLine = mp => `MP ${mp.value}/${mp.max} · ${mp.phase}${mp.up ? ` · ↑${mp.up.value} in ${mp.up.in} d` : ""}`;
+export const mpLine = mp =>
+  `MP ${mp.value}/${mp.max} · ${mp.phase}${mp.up ? ` · ↑${mp.up.value} in ${mp.up.in} d` : ""}`;
 export const mpTable = mp => mp.phases.map(p => `day ${p.from}–${p.to} · ${p.phase} · MP ${p.value}`).join("\n");
 
 

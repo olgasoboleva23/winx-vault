@@ -6,7 +6,8 @@ import { addDays, addMonths, diffDays, weekOf, weekday } from "../core/dates.js"
 export const ruleText = rule => {
   const r = rule.trim(), base = r.replace(/\s*when done$/, ""), after = base !== r;
   let m;
-  const text = (m = base.match(/^every week on (.+)$/)) ? m[1].split(/,\s*|\s+and\s+/).map(d => d.slice(0, 3)).join(" · ")
+  const text = (m = base.match(/^every week on (.+)$/))
+      ? m[1].split(/,\s*|\s+and\s+/).map(d => d.slice(0, 3)).join(" · ")
     : (m = base.match(/^every (\d+) (day|week|month|year)s?$/)) ? `every ${m[1]} ${m[2]}s`
     : (m = base.match(/^every (day|week|month|year)$/)) ? (m[1] === "day" ? "daily" : `${m[1]}ly`)
     : (m = base.match(/^every month on the (\w+)$/)) ? `monthly, the ${m[1]}`

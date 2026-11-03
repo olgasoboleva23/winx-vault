@@ -30,7 +30,8 @@ export function registerCommands(plugin: Plugin) {
     const api = tasksApi();
     if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
     // ➕ shows how long it waits on the board
-    const result = await api.editTaskLineModal(`- [ ] ${[pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ")}  ➕ ${todayYmd()}`);
+    const words = [pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ");
+    const result = await api.editTaskLineModal(`- [ ] ${words}  ➕ ${todayYmd()}`);
     if (!result) return;
     const line = new Task(result).setSticker(pick.sticker);   // after the text typed in the Tasks modal
     // a pool line (no checkbox, no dates) to the end of Pool.md; a task to the top of Master.md
@@ -47,7 +48,8 @@ export function registerCommands(plugin: Plugin) {
       const dir = (kind.setting && (await plugin.loadData())?.[kind.setting]) || kind.folder;
       const path = notePath(dir, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
       if (!app.vault.getFolderByPath(dir)) await app.vault.createFolder(dir);
-      await app.workspace.getLeaf("tab").openFile(await app.vault.create(path, new Note(kind.note(v, todayYmd())).text));
+      const file = await app.vault.create(path, new Note(kind.note(v, todayYmd())).text);
+      await app.workspace.getLeaf("tab").openFile(file);
     });
   }
 
@@ -74,7 +76,10 @@ export function registerCommands(plugin: Plugin) {
 }
 
 class WinxMenu extends FuzzySuggestModal<any> {
-  getItems() { return (this.app as any).commands.listCommands().filter((c: any) => c.id.startsWith("winx:") && c.id !== "winx:menu"); }
+  getItems() {
+    return (this.app as any).commands.listCommands()
+      .filter((c: any) => c.id.startsWith("winx:") && c.id !== "winx:menu");
+  }
   getItemText(c: any) { return c.name.replace(/^Winx: /, ""); }
   onChooseItem(c: any) { (this.app as any).commands.executeCommandById(c.id); }
 }

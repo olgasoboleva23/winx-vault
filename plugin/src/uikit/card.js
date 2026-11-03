@@ -6,6 +6,12 @@ import { Component } from "./component.js";
 // meta: the callout's metadata words ("scroll", "tall"); body: the widget's markup; button: one next to the title
 export class Card extends Component {
   view({ title, body, meta = [], button = "" }) {
-    return html`<div class="callout winx-widget" data-callout="card" data-callout-metadata="${meta.join(" ")}" data-callout-fold=""><div class="callout-title winx-widget__title" dir="auto"><div class="callout-icon"></div><div class="callout-title-inner">${title}</div>${button}</div><div class="callout-content winx-widget__body">${body}</div></div>`;
+    const callout = html` data-callout="card" data-callout-metadata="${meta.join(" ")}" data-callout-fold=""`;
+    return html`<div class="callout winx-widget"${callout}>
+      <div class="callout-title winx-widget__title" dir="auto">
+        <div class="callout-icon"></div><div class="callout-title-inner">${title}</div>${button}
+      </div>
+      <div class="callout-content winx-widget__body">${body}</div>
+    </div>`;
   }
 }

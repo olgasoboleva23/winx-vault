@@ -6,6 +6,9 @@ import { Component } from "./component.js";
 export class AddForm extends Component {
   view({ action, input, submit }) {
     const attrs = Object.entries(input).map(([k, v]) => html` ${k}="${v}"`);
-    return html`<form class="winx-add-form" data-action="${action}"><input class="winx-add-form__input"${attrs}><button class="winx-add-form__submit" type="submit">${submit}</button></form>`;
+    return html`<form class="winx-add-form" data-action="${action}">
+      <input class="winx-add-form__input"${attrs}>
+      <button class="winx-add-form__submit" type="submit">${submit}</button>
+    </form>`;
   }
 }

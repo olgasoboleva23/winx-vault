@@ -1,9 +1,11 @@
 // One task line in the Tasks plugin's emoji format: what it is (getters) and how to change it (methods that
 // return the new line; widgets write it). The only place that knows the format:
-//   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening · #id/<id> · #after/id/<id> · ![[sticker]]
+//   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening · #id/<id> · #after/id/<id>
+//   · ![[sticker]]
 //   🔁 rule (up to the next field) · 📅 due (an old ⏳ still counts) · ✅ done · ❌ skipped · ➕ created · 🛫 start
 // No Obsidian globals (tested by tests/task.test.mjs).
-// Wrap a Dataview task (or a pool item, { text, pool: true }) with Task.of(t) (t is kept as .src, for its path and line) or a raw line with new Task(line).
+// Wrap a Dataview task (or a pool item, { text, pool: true }) with Task.of(t) (t is kept as .src, for its path and
+// line) or a raw line with new Task(line).
 // A pool line (Pool.md: a task to pick when it's time, "- #⭐easy #area/base take out trash") is the same without
 // checkbox, rule or dates; its copies on the days are ordinary tasks with the same text.
 import { addDays, diffDays } from "../core/dates.js";
@@ -17,7 +19,8 @@ const OPEN   = /^\s*- \[ \]/, ANY = /^\s*- \[.\]/, DONE = /^\s*- \[[xX]\]/;
 
 export class Task {
   constructor(line, src = null) { this.line = line; this.src = src; }
-  static of(t) { return new Task(t.pool ? `- ${t.text}` : `- [${t.status}] ${t.text}`, t); }   // a pool item: no checkbox
+  // a pool item: no checkbox
+  static of(t) { return new Task(t.pool ? `- ${t.text}` : `- [${t.status}] ${t.text}`, t); }
 
   get status()     { return this.line.match(/^\s*- \[(.)\]/)?.[1] ?? null; }
   get isOpen()     { return this.status === " "; }
@@ -26,7 +29,7 @@ export class Task {
   get tags()       { return this.line.match(/#[^\s#]+/gu) ?? []; }
   get area()       { return this.tags.find(t => t.startsWith("#area/")) ?? null; }   // "#area/body"
   get difficulty() { return this.tags.find(t => t.startsWith("#⭐")) ?? null; }
-  get id()         { return this.tags.find(t => t.startsWith("#id/"))?.slice(4) ?? null; }          // its id, for #after
+  get id()         { return this.tags.find(t => t.startsWith("#id/"))?.slice(4) ?? null; }   // its id, for #after
   get after()      { return this.tags.find(t => t.startsWith("#after/id/"))?.slice(10) ?? null; }   // the id it follows
   get time()       { return this.tags.find(t => t.startsWith("#time/"))?.slice(6) ?? null; }   // "morning" | "evening"
   get rule()       { return this.line.match(new RegExp(`🔁\\s*([^${FIELDS}]+)`, "u"))?.[1].trim() ?? null; }
@@ -40,7 +43,8 @@ export class Task {
   get isPaused()   { return this.isOpen && this.isRecurring && !this.date; }   // a 🔁 task with its dates dropped
   get canSkip()    { return this.isOpen && this.isRecurring && !!this.date; }  // ⏭ this time: a dated open 🔁 task
   isOverdue(today) { return this.isOpen && !!this.date && this.date < today; }   // open, its day gone by
-  get stickers()   { return [...this.line.matchAll(/!\[\[([^\]|]+)/g)].map(m => m[1]); }   // file names of ![[x.png|28]]
+  // file names of ![[x.png|28]]
+  get stickers()   { return [...this.line.matchAll(/!\[\[([^\]|]+)/g)].map(m => m[1]); }
   // the words alone: no checkbox, sticker, tags, rule or date fields
   get text() {
     return drop(this.line.replace(ANY, "").replace(/^\s*- /, "").replace(/!\[\[[^\]]*\]\]/g, "").replace(/#[^\s]+/g, "")
@@ -55,7 +59,8 @@ export class Task {
   // { count, last } over `list` (Tasks) with the same key, by ✅ date (❌ for skipped ones), or null
   history(list) {
     const hits = list.filter(t => t.key === this.key);
-    return hits.length ? { count: hits.length, last: hits.map(t => t.doneOn ?? t.skippedOn ?? "").sort().at(-1) } : null;
+    if (!hits.length) return null;
+    return { count: hits.length, last: hits.map(t => t.doneOn ?? t.skippedOn ?? "").sort().at(-1) };
   }
 
   // ── edits: each returns the new line ──
@@ -84,11 +89,16 @@ export class Task {
   setSticker(name) {
     const re = /\s*!\[\[[^\]]*\]\]/;
     if (re.test(this.line)) return this.line.replace(re, name ? ` ![[${name}|28]]` : "");
-    return name ? this.line.replace(new RegExp(`\\s*(?=[🔁${FIELDS}⏫🔼🔽🔺⏬🆔⛔🏁]|$)`, "u"), ` ![[${name}|28]] `).trimEnd() : this.line;
+    if (!name) return this.line;
+    const beforeFields = new RegExp(`\\s*(?=[🔁${FIELDS}⏫🔼🔽🔺⏬🆔⛔🏁]|$)`, "u");
+    return this.line.replace(beforeFields, ` ![[${name}|28]] `).trimEnd();
   }
   // what the task window shows and sets: difficulty, area, time ("#time/…") tags and the first sticker
   get picks() {
-    return { difficulty: this.difficulty, area: this.area, time: this.time && `#time/${this.time}`, sticker: this.stickers[0] ?? null };
+    return {
+      difficulty: this.difficulty, area: this.area,
+      time: this.time && `#time/${this.time}`, sticker: this.stickers[0] ?? null,
+    };
   }
   withPicks(p) {   // a key left out of p stays as it is
     let line = this.line;
@@ -99,7 +109,8 @@ export class Task {
 
   // as a pool line: no checkbox, rule or date fields
   get poolLine() {
-    return drop(this.line.replace(/^(\s*)- \[.\]\s*/, "$1- ").replace(new RegExp(`\\s*🔁[^${FIELDS}]*`, "u"), ""), FIELDS).trimEnd();
+    const noBox = this.line.replace(/^(\s*)- \[.\]\s*/, "$1- ");
+    return drop(noBox.replace(new RegExp(`\\s*🔁[^${FIELDS}]*`, "u"), ""), FIELDS).trimEnd();
   }
   // a pool line's new copy: an open task, created `today`
   static fromPool(line, today) { return `${line.trimEnd().replace(/^(\s*)- /, "$1- [ ] ")} ➕ ${today}`; }
@@ -111,7 +122,9 @@ export class Task {
   togglePause(today) { return this.isPaused ? this.resume(today) : this.pause(); }
   resume(today) {
     const rule = this.rule ?? "";
-    const day  = /^every (\d+ )?weeks? on /i.test(rule) ? projectRepeats(rule, addDays(today, -1), addDays(today, 30))[0] ?? today : today;
+    const day  = /^every (\d+ )?weeks? on /i.test(rule)
+      ? projectRepeats(rule, addDays(today, -1), addDays(today, 30))[0] ?? today
+      : today;
     return `${this.pause().trimEnd()} 📅 ${day}`;
   }
 
@@ -127,7 +140,9 @@ export class Task {
   // as a skip of this time: the done line turns cancelled ("- [-] … ❌ date"), so the rule moves on
   // but nothing counts as done
   static skipLines(toggled) {
-    return toggled.split("\n").map(l => /^\s*- \[x\]/.test(l) ? l.replace(/^(\s*- \[)x/, "$1-").replace(/✅(\s*\d{4}-\d{2}-\d{2})/u, "❌$1") : l).join("\n");
+    return toggled.split("\n").map(l => /^\s*- \[x\]/.test(l)
+      ? l.replace(/^(\s*- \[)x/, "$1-").replace(/✅(\s*\d{4}-\d{2}-\d{2})/u, "❌$1")
+      : l).join("\n");
   }
 }
 

@@ -7,8 +7,8 @@ import { projectRepeats } from "../tasks/repeats.js";
 export const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
 
 const ORDER = { open: 0, ghost: 1, done: 2 };
-// a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its earlier followers), with
-// .follows set to it; the rest in their order
+// a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its earlier
+// followers), with .follows set to it; the rest in their order
 const chain = list => {
   const lead = e => T(e.t).after && list.find(x => x !== e && T(x.t).id === T(e.t).after);
   const out = list.filter(e => !lead(e));
@@ -32,8 +32,8 @@ const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 //            longest since last done (never done first)
 //   regulars open 🔁 tasks (an undated one is paused) but dated birthdays (a yearly rule, in Ahead): by area,
 //            dated before paused, the longest overdue, then the longest since last done
-//   ahead    open dated tasks (no 🔁, but birthdays) after today's week, by month: [{ month: "2026-12", items }]; in a month
-//            by date, then area (the old Kanban's month / year / future columns)
+//   ahead    open dated tasks (no 🔁, but birthdays) after today's week, by month: [{ month: "2026-12", items }];
+//            in a month by date, then area (the old Kanban's month / year / future columns)
 //   all      every task and pool item: what a data-task key is looked up in
 // and the meta lines of the bottom panel's cards.
 export class CalendarData {
@@ -52,7 +52,8 @@ export class CalendarData {
       if (!d) { if (!task.isRecurring) backlog.push(t); continue; }
       if (d >= today) this.byDay[d]?.push({ t, kind: "open" });
       if ((!task.isRecurring || task.isBirthday) && d > sunday) ahead.push(t);
-      if (task.rule) for (const g of projectRepeats(task.rule, d, last)) if (g > today) this.byDay[g]?.push({ t, kind: "ghost" });
+      if (task.rule)
+        for (const g of projectRepeats(task.rule, d, last)) if (g > today) this.byDay[g]?.push({ t, kind: "ghost" });
     }
     ahead.sort((a, b) => T(a).date.localeCompare(T(b).date) || this.rank(a) - this.rank(b));
     this.ahead = [];
@@ -65,9 +66,14 @@ export class CalendarData {
     this.done = tasks.map(T).filter(t => t.isDone && t.doneOn);
     this.skips = tasks.map(T).filter(t => t.isSkipped);
     this.missed = tasks.filter(t => T(t).isOverdue(today)).sort((a, b) => T(b).date.localeCompare(T(a).date));
-    const pool = poolLines.map(l => { const p = { text: l.text, path: l.path, line: l.line, pool: true }; p.winxTask = new Task(`- ${l.text}`, p); return p; });
+    const pool = poolLines.map(l => {
+      const p = { text: l.text, path: l.path, line: l.line, pool: true };
+      p.winxTask = new Task(`- ${l.text}`, p);
+      return p;
+    });
     this.all = [...tasks, ...pool];
-    this.backlog = backlog.sort((a, b) => this.rank(a) - this.rank(b) || (T(a).created ?? "9").localeCompare(T(b).created ?? "9"));
+    this.backlog = backlog.sort((a, b) =>
+      this.rank(a) - this.rank(b) || (T(a).created ?? "9").localeCompare(T(b).created ?? "9"));
     this.pool = pool.sort((a, b) => this.rank(a) - this.rank(b) || this.lastDone(a).localeCompare(this.lastDone(b)));
     this.regulars = this.sortRegulars(tasks.filter(t => T(t).isOpen && T(t).isRecurring));
   }
@@ -101,7 +107,8 @@ export class CalendarData {
     const next = t => T(t).date, today = this.today;
     const late = t => next(t) && next(t) < today ? diffDays(today, next(t)) : -1;
     return list.filter(t => !(T(t).isBirthday && next(t)))
-      .sort((a, b) => this.rank(a) - this.rank(b) || !next(a) - !next(b) || late(b) - late(a) || this.lastDone(a).localeCompare(this.lastDone(b)));
+      .sort((a, b) => this.rank(a) - this.rank(b) || !next(a) - !next(b) || late(b) - late(a)
+        || this.lastDone(a).localeCompare(this.lastDone(b)));
   }
 
   backlogMeta(t) {
@@ -141,7 +148,8 @@ export function taskInfo(t, ctx, app) {
   const i = {
     key: taskKey(t), area: area?.slice(6) ?? null, difficulty: task.difficulty, text: task.text, pool: !!t.pool,
     label: `${ctx.config.areaIcons[area] ?? ""} ${task.text}`.trim(),
-    stickers: task.stickers.map(name => app.metadataCache.getFirstLinkpathDest(name, t.path)).filter(Boolean).map(f => app.vault.getResourcePath(f)),
+    stickers: task.stickers.map(name => app.metadataCache.getFirstLinkpathDest(name, t.path)).filter(Boolean)
+      .map(f => app.vault.getResourcePath(f)),
     canSkip: ctx.actions.canSkip(t),
   };
   ctx.infos.set(t, i);

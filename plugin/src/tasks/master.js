@@ -12,4 +12,6 @@ export async function addTask(line) {
 }
 
 export const addPoolLine = line =>
-  appendLine(POOL, line, { header: "Tasks to pick when it's time: drag one from the calendar's Pool tab onto a day.\n\n" });
+  appendLine(POOL, line, {
+    header: "Tasks to pick when it's time: drag one from the calendar's Pool tab onto a day.\n\n",
+  });

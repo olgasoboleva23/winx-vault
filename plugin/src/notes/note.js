@@ -2,7 +2,8 @@
 //   new Note({ props: { type: "recipe", tags: [] }, title: "Soup", sections: { Steps: "", Notes: "" } }).text
 const PLAIN = /^[\p{L}\p{N}][\p{L}\p{N} _.,!?()&'-]*$/u;   // written as is; anything else in "quotes"
 // bare only when YAML can read it as nothing but text: a word first (not true / no / null…), or a date
-const BARE = v => PLAIN.test(v) && (/^\d{4}-\d{2}-\d{2}$/.test(v) || /^\p{L}/u.test(v) && !/^(true|false|yes|no|on|off|y|n|null)$/i.test(v));
+const DATE = /^\d{4}-\d{2}-\d{2}$/, OTHER = /^(true|false|yes|no|on|off|y|n|null)$/i;
+const BARE = v => PLAIN.test(v) && (DATE.test(v) || /^\p{L}/u.test(v) && !OTHER.test(v));
 const value = v => typeof v === "number" ? String(v) : BARE(v) ? v : JSON.stringify(v);
 const prop = (k, v) =>
   v == null || v === "" ? `${k}:`

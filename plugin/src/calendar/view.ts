@@ -30,8 +30,11 @@ export const VIEW_TYPE = "winx-calendar";
 const TASKS_DIR = `${TASKS}/`;
 
 export class CalendarView extends ItemView {
-  store = createStore({ ...readState(undefined), area: null, picked: null }, { save: () => this.app.workspace.requestSaveLayout(), saved: SAVED });
-  parts: Record<string, any> = { header: new Header(this), missed: new Missed(this), grid: new Grid(this), panel: new Panel(this) };
+  store = createStore({ ...readState(undefined), area: null, picked: null },
+    { save: () => this.app.workspace.requestSaveLayout(), saved: SAVED });
+  parts: Record<string, any> = {
+    header: new Header(this), missed: new Missed(this), grid: new Grid(this), panel: new Panel(this),
+  };
   layout = new PartsLayout(this.parts);
   ctx: any = null;
   actions: any = null;
@@ -42,7 +45,8 @@ export class CalendarView extends ItemView {
     super(leaf);
     this.store.watch(DATA, () => this.draw());
     for (const [name, part] of Object.entries(this.parts))
-      if (part.constructor.watches.length) this.store.watch(part.constructor.watches, () => this.ctx && this.layout.redraw(name));
+      if (part.constructor.watches.length)
+        this.store.watch(part.constructor.watches, () => this.ctx && this.layout.redraw(name));
   }
   getViewType() { return VIEW_TYPE; }
   getDisplayText() { return "Calendar"; }
@@ -61,8 +65,10 @@ export class CalendarView extends ItemView {
     this.root = this.contentEl.createDiv();
     // an action: its part's handler, else the task's own (✏️ 🗑 ⏭ ⭐ ✓)
     const buttons: Record<string, any> = taskButtons(this);
+    const part = (target: HTMLElement) =>
+      this.parts[(target.closest("[data-part]") as HTMLElement)?.dataset.part ?? ""];
     useActions(this, this.contentEl, (name: string, target: HTMLElement) =>
-      this.ctx ? this.parts[(target.closest("[data-part]") as HTMLElement)?.dataset.part ?? ""]?.on[name] ?? buttons[name] : null);
+      this.ctx ? part(target)?.on[name] ?? buttons[name] : null);
     useSwipe(this, useDrag(this));
     // now ("waiting…" until Dataview's index is built), and again each time it is
     void this.draw();
@@ -90,7 +96,8 @@ export class CalendarView extends ItemView {
   // the whole calendar, with fresh data
   private async draw() {
     const dv: any = dataview();
-    const say = (text: string) => { this.ctx = null; this.root.empty(); this.root.setText(text); };   // no calendar to redraw in place
+    // no calendar to redraw in place
+    const say = (text: string) => { this.ctx = null; this.root.empty(); this.root.setText(text); };
     if (!dv) return say("✦ the calendar needs the Dataview plugin");
     if (!dv.index?.initialized) return say("✦ waiting for Dataview…");   // index-ready draws again
     const state = this.store.state, today = todayYmd(), days = shownDays(state, today);

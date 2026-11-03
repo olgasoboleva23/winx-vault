@@ -29,7 +29,8 @@ export class CycleLog {
     ended: !!end && end <= date,
   };
   }
-  // the last n finished cycles, oldest first: { start, length (days to the next start), period (days, null without an end) }
+  // the last n finished cycles, oldest first:
+  // { start, length (days to the next start), period (days, null without an end) }
   last(n) {
     const all = [...this.starts].sort();
     return all.slice(0, -1).map((start, i) => {
@@ -44,8 +45,14 @@ export class CycleLog {
     const all = [...this.starts].filter(s => s <= today).sort();
     if (!all.length) return [];
     const last = all.at(-1), end = this.ends.filter(e => e >= last && e <= today).sort()[0];
-    const current = { start: last, end: today, days: diffDays(today, last) + 1, period: end ? diffDays(end, last) + 1 : null, ovulation: null, current: true };
-    const done = this.last(n - 1).reverse().map(c => ({ start: c.start, end: addDays(c.start, c.length - 1), days: c.length, period: c.period, ovulation: c.length - 14, current: false }));
+    const current = {
+      start: last, end: today, days: diffDays(today, last) + 1,
+      period: end ? diffDays(end, last) + 1 : null, ovulation: null, current: true,
+    };
+    const done = this.last(n - 1).reverse().map(c => ({
+      start: c.start, end: addDays(c.start, c.length - 1), days: c.length,
+      period: c.period, ovulation: c.length - 14, current: false,
+    }));
     return [current, ...done];
   }
 }

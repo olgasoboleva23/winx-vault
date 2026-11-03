@@ -1,6 +1,7 @@
 // The base of every widget: a ```winx block in a note, owned by the plugin while the block is on screen.
 // A widget is a class with the same parts:
-//   async data()        what it shows (this.dv: Dataview's pages / page / current() / date, this.args: the block's lines)
+//   async data()        what it shows (this.dv: Dataview's pages / page / current() / date, this.args: the block's
+//                       lines)
 //   view(data)          its markup: html`…` (from ../core/html.js), with Button / Card (../uikit/)
 //   on = { name(e, el) } what an element with data-action="name" does: a click (a button, any element),
 //                        a change (an input, a select) or a submit (a form); "open" with data-path (NoteLink)
@@ -9,9 +10,9 @@
 //                       root is where view() went (the card's content when there's a card)
 // Until its first draw a card widget shows its card with a shimmering placeholder (a skeleton). A draw overtaken by
 // a newer one, or ending after the block went, writes nothing; an error in data() shows "✦ couldn't draw: …".
-// It draws on load and again a moment after Dataview's index or its own note changes (or the dashboard's date); a hidden block when it
-// shows, a block someone is typing in when they leave it (text typed in a named field stays). Obsidian drops its
-// listeners when the block goes.
+// It draws on load and again a moment after Dataview's index or its own note changes (or the dashboard's date); a
+// hidden block when it shows, a block someone is typing in when they leave it (text typed in a named field stays).
+// Obsidian drops its listeners when the block goes.
 // A block with a "card: Title" line (and "meta: scroll") is drawn inside a dashboard card with that title.
 import { MarkdownRenderChild, sanitizeHTMLToDom } from "obsidian";
 import { Card } from "../uikit/card.js";
@@ -62,7 +63,8 @@ export class Widget extends MarkdownRenderChild {
   async onload() {
     useActions(this, this.containerEl, (name, el) => this.action(name, el), ["click", "change", "submit"]);
     // drawn now, or once it shows and nobody is typing in it (catchUp: ask again after leaving a field)
-    ({ redraw: this.redraw, catchUp: this.catchUp } = useRedraw(this, () => this.shown && !this.typing, () => this.draw()));
+    ({ redraw: this.redraw, catchUp: this.catchUp } =
+      useRedraw(this, () => this.shown && !this.typing, () => this.draw()));
     useLeaveField(this, this.containerEl, () => this.catchUp());
     this.register(() => this.drop());
     this.skeleton();
@@ -82,16 +84,27 @@ export class Widget extends MarkdownRenderChild {
 
   // on screen: a card widget's block has no box of its own (display: contents), so ask the card
   get shown() { return (this.containerEl.firstElementChild ?? this.containerEl).isShown(); }
-  get typing() { return this.containerEl.contains(document.activeElement) && document.activeElement.matches("input, textarea, select"); }
+  get typing() {
+    const el = document.activeElement;
+    return this.containerEl.contains(el) && el.matches("input, textarea, select");
+  }
 
   // a card widget before its first draw: its card with a shimmering placeholder
   skeleton() {
-    if (this.args.card) this.containerEl.replaceChildren(sanitizeHTMLToDom(new Card({ title: String(this.args.card), body: html`<div class="winx-widget__skeleton"></div>` }).html));
+    if (!this.args.card) return;
+    const card = new Card({ title: String(this.args.card), body: html`<div class="winx-widget__skeleton"></div>` });
+    this.containerEl.replaceChildren(sanitizeHTMLToDom(card.html));
   }
   // what someone typed and hasn't saved: () => the fields (by their name) get their text back after a draw
   keepTyped() {
-    const typed = [...this.containerEl.querySelectorAll("input[name], textarea[name]")].filter(f => f.value).map(f => [f.name, f.value]);
-    return () => { for (const [name, value] of typed) { const f = this.containerEl.querySelector(`[name="${CSS.escape(name)}"]`); if (f && !f.value) f.value = value; } };
+    const typed = [...this.containerEl.querySelectorAll("input[name], textarea[name]")]
+      .filter(f => f.value).map(f => [f.name, f.value]);
+    return () => {
+      for (const [name, value] of typed) {
+        const f = this.containerEl.querySelector(`[name="${CSS.escape(name)}"]`);
+        if (f && !f.value) f.value = value;
+      }
+    };
   }
 
   drop() { for (const k of this.kept.splice(0)) k?.destroy?.(); }
@@ -106,11 +119,17 @@ export class Widget extends MarkdownRenderChild {
       this.drop();
       const restore = this.keepTyped();
       const body = this.view(data), { card, meta } = this.args;
-      const markup = card ? new Card({ title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body, button: this.cardButton?.() ?? "" }) : body;
+      const markup = card
+        ? new Card({
+          title: String(card), meta: meta ? String(meta).split(/\s+/) : [], body, button: this.cardButton?.() ?? "",
+        })
+        : body;
       this.containerEl.replaceChildren(sanitizeHTMLToDom(markup.html));
       restore();
       // the widget's own place: inside the card when there is one
-      const root = card ? this.containerEl.querySelector(":scope > .winx-widget > .winx-widget__body") : this.containerEl;
+      const root = card
+        ? this.containerEl.querySelector(":scope > .winx-widget > .winx-widget__body")
+        : this.containerEl;
       await this.after(root, data);
       if (n !== this.draws) return;   // gone, or drawn again, meanwhile
     } catch (e) {   // in data(), view() or after(): said in the block, with ↻ retry
@@ -119,6 +138,7 @@ export class Widget extends MarkdownRenderChild {
       this.drop();
       return void this.containerEl.replaceChildren(sanitizeHTMLToDom(new Failed({ text: e.message }).html));
     }
-    this.containerEl.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));   // the dashboard tab's ✦ pill goes
+    // the dashboard tab's ✦ pill goes
+    this.containerEl.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));
   }
 }

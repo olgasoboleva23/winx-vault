@@ -18,3 +18,11 @@ test("null, undefined and false leave nothing; numbers stay", () => {
   assert.equal(html`<p>${null}${undefined}${false}${0}${12.5}</p>`.html, "<p>012.5</p>");
   assert.equal(html`<p>${[1, null, 2]}</p>`.html, "<p>12</p>");
 });
+
+test("a template across lines: whitespace with a line break in it goes (as in JSX), spaces on a line stay", () => {
+  const name = "tea";
+  assert.equal(html`<div class="a">
+      <b>${name}</b> <i>x</i>
+      ${name}
+    </div>`.html, '<div class="a"><b>tea</b> <i>x</i>tea</div>');
+});

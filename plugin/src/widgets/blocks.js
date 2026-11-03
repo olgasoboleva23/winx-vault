@@ -15,7 +15,11 @@ import { Weight } from "./body/weight.js";
 import { XpToday } from "./xp/xpToday.js";
 
 // name → class
-export const blocks = { celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, goals: Goals, levelToday: LevelToday, lifeAreas: LifeAreas, pomodoro: Pomodoro, savings: Savings, shop: Shop, supplies: Supplies, weight: Weight, xpToday: XpToday };
+export const blocks = {
+  celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth,
+  goals: Goals, levelToday: LevelToday, lifeAreas: LifeAreas, pomodoro: Pomodoro, savings: Savings, shop: Shop,
+  supplies: Supplies, weight: Weight, xpToday: XpToday,
+};
 
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);

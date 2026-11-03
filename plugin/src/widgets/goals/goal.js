@@ -13,9 +13,13 @@ export class Goal {
     if (!name || !tag) return null;
     const daysRaw = field("days");
     const days = daysRaw
-      ? daysRaw.toLowerCase().split(/[,\s]+/).map(d => (DAY_NAMES.indexOf(d) + 1) || (DAY_NAMES_EN.indexOf(d.slice(0, 3)) + 1)).filter(Boolean)
+      ? daysRaw.toLowerCase().split(/[,\s]+/)
+        .map(d => (DAY_NAMES.indexOf(d) + 1) || (DAY_NAMES_EN.indexOf(d.slice(0, 3)) + 1)).filter(Boolean)
       : null;
-    return Object.assign(new Goal(), { name, tag, days, perWeek: days ? null : Number(field("perWeek")) || null, min: field("min"), plan: field("plan"), remind: field("remind") ?? "18:00" });
+    return Object.assign(new Goal(), {
+      name, tag, days, perWeek: days ? null : Number(field("perWeek")) || null,
+      min: field("min"), plan: field("plan"), remind: field("remind") ?? "18:00",
+    });
   }
   get weeklyTarget() { return this.days?.length ?? this.perWeek ?? 0; }
   // how many days of `week` have a done task (doneDates: its ✅ dates)

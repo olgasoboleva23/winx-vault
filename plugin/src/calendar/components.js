@@ -7,18 +7,25 @@ import { html } from "../core/html.js";
 import { Component } from "../uikit/component.js";
 import { Button } from "../uikit/button.js";
 
-// the difficulty stars (in the area's colour), the text, its stickers; the difficulty is changed in the task window (✏️)
+// the difficulty stars (in the area's colour), the text, its stickers; the difficulty is changed in the task
+// window (✏️)
 export class TaskText extends Component {
   view({ task, withIcon = false }) {
-    const stars = task.difficulty ? html`<span class="tag" data-tag-name="${task.difficulty}" title="difficulty"></span>` : "";
-    return html`${stars} ${withIcon ? task.label : task.text} ${task.stickers.map(src => html`<img class="winx-cal__sticker" src="${src}" alt="">`)}`;
+    const stars = task.difficulty
+      ? html`<span class="tag" data-tag-name="${task.difficulty}" title="difficulty"></span>`
+      : "";
+    const stickers = task.stickers.map(src => html`<img class="winx-cal__sticker" src="${src}" alt="">`);
+    return html`${stars} ${withIcon ? task.label : task.text} ${stickers}`;
   }
 }
 
 // ⏭ (a dated 🔁 one), ✏️ (the task window, then the Tasks dialog), 🗑 (click twice)
 export class TaskButtons extends Component {
   view({ task, editTitle = "edit: difficulty, area, time, sticker, then text and dates" }) {
-    return html`${task.canSkip ? new Button({ icon: "⏭", title: "skip this time", action: "skip" }) : ""}${new Button({ icon: "✏️", title: editTitle, action: "edit" })}${new Button({ icon: "🗑", title: "delete task", action: "remove", cls: "winx-task-btns__del" })}`;
+    return html`
+      ${task.canSkip ? new Button({ icon: "⏭", title: "skip this time", action: "skip" }) : ""}
+      ${new Button({ icon: "✏️", title: editTitle, action: "edit" })}
+      ${new Button({ icon: "🗑", title: "delete task", action: "remove", cls: "winx-task-btns__del" })}`;
   }
 }
 
@@ -29,11 +36,23 @@ export class TaskRow extends Component {
   view({ task, kind, compact, tick, after = false }) {
     const box = !compact && tick && kind !== "ghost";
     const live = !compact && kind === "open";
-    const attrs = html`${task.area ? html` data-area="${task.area}"` : ""} data-task="${task.key}"${kind !== "ghost" ? html` draggable="true" data-drag="${task.key}"` : ""}${live && box ? html` data-swipeable="${task.key}"` : ""}${compact ? html` title="${task.label}"` : ""}`;
+    const attrs = [
+      task.area ? html` data-area="${task.area}"` : "",
+      html` data-task="${task.key}"`,
+      kind !== "ghost" ? html` draggable="true" data-drag="${task.key}"` : "",
+      live && box ? html` data-swipeable="${task.key}"` : "",
+      compact ? html` title="${task.label}"` : "",
+    ];
     const check = kind === "done"
       ? html`<input type="checkbox" class="task-list-item-checkbox" aria-label="done" checked disabled>`
       : html`<input type="checkbox" class="task-list-item-checkbox" aria-label="done" data-action="tick">`;
-    return html`<div class="winx-cal__task winx-cal__task--${kind}"${attrs}>${after ? html`<span class="winx-cal__after">↳</span>` : ""}${box ? check : ""}${kind === "ghost" ? "🔁 " : ""}${new TaskText({ task })}${live ? html`<div class="winx-task-btns">${new TaskButtons({ task })}</div>` : ""}</div>`;
+    return html`<div class="winx-cal__task winx-cal__task--${kind}"${attrs}>
+      ${after ? html`<span class="winx-cal__after">↳</span>` : ""}
+      ${box ? check : ""}
+      ${kind === "ghost" ? "🔁 " : ""}
+      ${new TaskText({ task })}
+      ${live ? html`<div class="winx-task-btns">${new TaskButtons({ task })}</div>` : ""}
+    </div>`;
   }
 }
 
@@ -42,8 +61,16 @@ export class TaskRow extends Component {
 export class TaskCard extends Component {
   view({ task, meta, extra = "", cls = "" }) {
     const btns = task.pool
-      ? html`${new Button({ icon: "✏️", title: "edit: difficulty, area, time, sticker, then text", action: "edit" })}${new Button({ icon: "🗑", title: "delete task", action: "remove", cls: "winx-task-btns__del" })}`
+      ? html`
+        ${new Button({ icon: "✏️", title: "edit: difficulty, area, time, sticker, then text", action: "edit" })}
+        ${new Button({ icon: "🗑", title: "delete task", action: "remove", cls: "winx-task-btns__del" })}`
       : new TaskButtons({ task });
-    return html`<div class="winx-task-card${cls ? " " + cls : ""}"${task.area ? html` data-area="${task.area}"` : ""} draggable="true" data-task="${task.key}" data-drag="${task.key}" data-swipeable="${task.key}"><div class="winx-task-card__text">${new TaskText({ task })}</div><div class="winx-task-card__meta">${meta}</div><div class="winx-task-btns">${extra}${btns}</div></div>`;
+    const area = task.area ? html` data-area="${task.area}"` : "";
+    const keys = html`data-task="${task.key}" data-drag="${task.key}" data-swipeable="${task.key}"`;
+    return html`<div class="winx-task-card${cls ? " " + cls : ""}"${area} draggable="true" ${keys}>
+      <div class="winx-task-card__text">${new TaskText({ task })}</div>
+      <div class="winx-task-card__meta">${meta}</div>
+      <div class="winx-task-btns">${extra}${btns}</div>
+    </div>`;
   }
 }

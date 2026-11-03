@@ -12,7 +12,8 @@ export class PartsLayout {
   }
   redraw(name) {
     const order = Object.keys(this.parts);
-    const next = order.slice(order.indexOf(name) + 1).map(q => this.els.get(q)?.[0]).find(Boolean) ?? null;   // what follows it
+    // what follows it
+    const next = order.slice(order.indexOf(name) + 1).map(q => this.els.get(q)?.[0]).find(Boolean) ?? null;
     this.els.get(name)?.forEach(e => e.remove());
     this.place(name, next);
   }

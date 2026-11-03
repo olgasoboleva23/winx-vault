@@ -12,10 +12,12 @@ export function makeActions(ctx) {
   // ⏭ skip a dated 🔁 task this time: the rule moves on (Tasks makes the next copy), this one stays as cancelled
   // "- [-] … ❌ date", which counts as neither done nor missed
   const canSkip = t => !!TASKS && T(t).canSkip;
-  const skip    = t => editTaskLineWithUndo(t, line => Task.skipLines(TASKS.executeToggleTaskDoneCommand(line, t.path)), "⏭");
+  const skip    = t => editTaskLineWithUndo(t,
+    line => Task.skipLines(TASKS.executeToggleTaskDoneCommand(line, t.path)), "⏭");
   const tick    = t => editTaskLineWithUndo(t, line => TASKS.executeToggleTaskDoneCommand(line, t.path), "✓");
   const unplan  = t => editTaskLineWithUndo(t, line => new Task(line).place(null, false), "↩ no date");
-  // a pool item's copy goes to the top of Master.md, like a new task: open on `day` (no date for null), or done that day
+  // a pool item's copy goes to the top of Master.md, like a new task: open on `day` (no date for null), or done
+  // that day
   const fromPool = (t, day, done) => addTask(new Task(Task.fromPool(T(t).line, today)).place(day, done));
   // a task dropped on `day` (null: the backlog): open and due that day, or done that day. An open 🔁 task done on
   // a day goes through the Tasks plugin (so it gets its next copy), then back to that day
@@ -27,10 +29,12 @@ export function makeActions(ctx) {
       : new Task(line).place(day, done));
   };
   // "Missed?": done on its own day, or moved to today
-  const doneOnItsDay = t => editTaskLine(t, line => Task.backdateDone(TASKS.executeToggleTaskDoneCommand(line, ""), T(t).date, today));
+  const doneOnItsDay = t => editTaskLine(t,
+    line => Task.backdateDone(TASKS.executeToggleTaskDoneCommand(line, ""), T(t).date, today));
   const toToday      = t => editTaskLine(t, line => new Task(line).setDue(today));
   // ⏸ pause: drop its dates; ▶ resume: from today, on the first day its rule allows
-  const pauseOrResume = t => editTaskLineWithUndo(t, line => new Task(line).togglePause(today), T(t).isPaused ? "▶" : "⏸");
+  const pauseOrResume = t =>
+    editTaskLineWithUndo(t, line => new Task(line).togglePause(today), T(t).isPaused ? "▶" : "⏸");
   const remove = t => deleteTaskLine(t);
   const edit   = t => editTaskModal(t);
   return { canSkip, skip, tick, unplan, fromPool, place, doneOnItsDay, toToday, pauseOrResume, remove, edit };

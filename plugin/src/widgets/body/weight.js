@@ -32,10 +32,12 @@ export class Weight extends Widget {
     },
     mode: (e, el) => { this.mode = el.dataset.mode; this.draw(); },
     // a level: one of 0–3 on; a reason: any number on
-    level: (e, el) => el.parentElement.querySelectorAll("[data-action=level]").forEach(b => b.classList.toggle("winx-btn--on", b === el)),
+    level: (e, el) => el.parentElement.querySelectorAll("[data-action=level]")
+      .forEach(b => b.classList.toggle("winx-btn--on", b === el)),
     reason: (e, el) => el.classList.toggle("winx-btn--on"),
     logSave: async (e, el) => {
-      const box = el.closest(".winx-weight__log"), level = box.querySelector("[data-action=level].winx-btn--on")?.dataset.level;
+      const box = el.closest(".winx-weight__log");
+      const level = box.querySelector("[data-action=level].winx-btn--on")?.dataset.level;
       if (level === undefined) return;
       const reasons = [...box.querySelectorAll("[data-action=reason].winx-btn--on")].map(b => b.dataset.reason);
       await edit(LOG_PATH, c => new BodyLog(c).set(todayYmd(), Number(level), reasons));
@@ -44,10 +46,16 @@ export class Weight extends Widget {
   async data() {
     const today = todayYmd(), days = Array.from({ length: DAYS }, (_, i) => addDays(today, i - DAYS + 1));
     const logFile = this.app.vault.getAbstractFileByPath(LOG_PATH);
-    const log = logFile && { ...(this.app.metadataCache.getFileCache(logFile)?.frontmatter ?? {}), entries: new BodyLog(await this.app.vault.cachedRead(logFile)).entries };
+    const log = logFile && {
+      ...(this.app.metadataCache.getFileCache(logFile)?.frontmatter ?? {}),
+      entries: new BodyLog(await this.app.vault.cachedRead(logFile)).entries,
+    };
     if (this.mode === "log" && log) {
       const byDay = new Map(log.entries.map(e => [e.date, e])), cycle = cycleLog(this.dv);
-      return { log, days, today, entries: days.map(d => byDay.get(d) ?? null), period: days.map(d => !!cycle?.on(d)?.isPeriod) };
+      return {
+        log, days, today, entries: days.map(d => byDay.get(d) ?? null),
+        period: days.map(d => !!cycle?.on(d)?.isPeriod),
+      };
     }
     const file = this.app.vault.getAbstractFileByPath(PATH);
     if (!file) return { missing: true, log };
@@ -55,25 +63,43 @@ export class Weight extends Widget {
     const last = ws.at(-1);
     const ref = last && [...ws].reverse().find(w => w.date <= addDays(last.date, -7));
     const byDay = new Map(ws.map(w => [w.date, w.kg]));
-    return { log, last, delta: ref ? +(last.kg - ref.kg).toFixed(1) : null, days, vals: days.map(d => byDay.get(d) ?? null) };
+    const delta = ref ? +(last.kg - ref.kg).toFixed(1) : null;
+    return { log, last, delta, days, vals: days.map(d => byDay.get(d) ?? null) };
   }
   view(d) {
-    const toggle = d.log ? html`<div class="winx-weight__modes">${new Button({ text: "⚖️ weight", kind: "toggle", on: this.mode === "weight", action: "mode", data: { mode: "weight" } })}${new Button({ text: String(d.log.name ?? "log"), kind: "toggle", on: this.mode === "log", action: "mode", data: { mode: "log" } })}</div>` : "";
-    return html`<div class="winx-weight">${toggle}${this.mode === "log" && d.log ? this.logView(d) : this.weightView(d)}</div>`;
+    const modeBtn = (text, mode) =>
+      new Button({ text, kind: "toggle", on: this.mode === mode, action: "mode", data: { mode } });
+    const toggle = d.log ? html`<div class="winx-weight__modes">
+      ${modeBtn("⚖️ weight", "weight")}
+      ${modeBtn(String(d.log.name ?? "log"), "log")}
+    </div>` : "";
+    return html`<div class="winx-weight">
+      ${toggle}
+      ${this.mode === "log" && d.log ? this.logView(d) : this.weightView(d)}
+    </div>`;
   }
   weightView({ missing, last, delta }) {
     if (missing) return new Missing({ path: PATH });
+    const input = { name: "kg", type: "number", step: "0.1", inputmode: "decimal", placeholder: "today, kg" };
     return html`<div class="winx-weight__head">${last
-        ? html`<span class="winx-weight__now">${last.kg} kg</span>${delta !== null ? html`<span class="winx-weight__delta">${delta > 0 ? "+" : ""}${delta} vs week ago</span>` : ""}`
+        ? html`<span class="winx-weight__now">${last.kg} kg</span>
+          ${delta !== null
+            ? html`<span class="winx-weight__delta">${delta > 0 ? "+" : ""}${delta} vs week ago</span>`
+            : ""}`
         : html`<span class="winx-weight__delta">no entries yet</span>`}</div>
-      ${new AddForm({ action: "save", input: { name: "kg", type: "number", step: "0.1", inputmode: "decimal", placeholder: "today, kg" }, submit: "Save" })}
+      ${new AddForm({ action: "save", input, submit: "Save" })}
       ${new NoteLink({ text: "✦ list", path: PATH, cls: "winx-weight__list" })}`;
   }
   logView({ log, today, entries }) {
     const now = entries.at(-1)?.date === today ? entries.at(-1) : null, reasons = (log.reasons ?? []).map(String);
+    const toggle = (text, on, action, data) => new Button({ text, kind: "toggle", on, action, data });
     return html`<div class="winx-weight__log">
-        <div class="winx-weight__log-row">${[0, 1, 2, 3].map(n => new Button({ text: String(n), kind: "toggle", on: now?.level === n, action: "level", data: { level: n } }))}</div>
-        <div class="winx-weight__log-row">${reasons.map(r => new Button({ text: r, kind: "toggle", on: !!now?.reasons.includes(r), action: "reason", data: { reason: r } }))}</div>
+        <div class="winx-weight__log-row">
+          ${[0, 1, 2, 3].map(n => toggle(String(n), now?.level === n, "level", { level: n }))}
+        </div>
+        <div class="winx-weight__log-row">
+          ${reasons.map(r => toggle(r, !!now?.reasons.includes(r), "reason", { reason: r }))}
+        </div>
         ${new Button({ text: now ? "Update today" : "Save today", kind: "pill", action: "logSave" })}
       </div>
       ${new NoteLink({ text: "✦ list", path: LOG_PATH, cls: "winx-weight__list" })}`;
@@ -87,13 +113,22 @@ export class Weight extends Widget {
       this.keep(await window.renderChart({
         type: "bar",
         data: { labels: d.days.map(dm), datasets: [
-          { label: "level", data: d.entries.map(e => e?.level ?? null), backgroundColor: pink, borderRadius: 4, order: 1 },
-          { label: "period", data: d.period.map(p => p ? 3 : null), backgroundColor: shade, barPercentage: 1, categoryPercentage: 1, grouped: false, order: 2 },
+          {
+            label: "level", data: d.entries.map(e => e?.level ?? null),
+            backgroundColor: pink, borderRadius: 4, order: 1,
+          },
+          {
+            label: "period", data: d.period.map(p => p ? 3 : null), backgroundColor: shade,
+            barPercentage: 1, categoryPercentage: 1, grouped: false, order: 2,
+          },
         ] },
         options: {
           plugins: { legend: { display: false }, tooltip: {
             filter: i => i.datasetIndex === 0,
-            callbacks: { label: i => { const e = d.entries[i.dataIndex]; return e ? `${e.level}${e.reasons.length ? " · " + e.reasons.join(", ") : ""}` : ""; } },
+            callbacks: { label: i => {
+              const e = d.entries[i.dataIndex];
+              return e ? `${e.level}${e.reasons.length ? " · " + e.reasons.join(", ") : ""}` : "";
+            } },
           } },
           scales: { y: { min: 0, max: 3, ticks: { stepSize: 1 } } },
         },
@@ -103,8 +138,14 @@ export class Weight extends Widget {
       if (!seen.length) return;
       this.keep(await window.renderChart({
         type: "line",
-        data: { labels: d.days.map(dm), datasets: [{ label: "⚖️ Weight", data: d.vals, spanGaps: true, borderColor: chartColor("--winx-pink-deep"), backgroundColor: chartColor("--winx-pink-deep", 0.3), tension: 0.3 }] },
-        options: { plugins: { legend: { display: false } }, scales: { y: { suggestedMin: Math.min(...seen) - 0.5, suggestedMax: Math.max(...seen) + 0.5 } } },
+        data: { labels: d.days.map(dm), datasets: [{
+          label: "⚖️ Weight", data: d.vals, spanGaps: true, tension: 0.3,
+          borderColor: chartColor("--winx-pink-deep"), backgroundColor: chartColor("--winx-pink-deep", 0.3),
+        }] },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { suggestedMin: Math.min(...seen) - 0.5, suggestedMax: Math.max(...seen) + 0.5 } },
+        },
       }, box));
     }
     box.append(list);   // the chart went last: the button back under it

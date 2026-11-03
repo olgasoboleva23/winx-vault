@@ -18,6 +18,7 @@ export class Missing extends Component {
 // a widget that couldn't draw: "⚠ couldn't draw: <why>" and ↻ retry (data-action="retry": the widget draws again)
 export class Failed extends Component {
   view({ text }) {
-    return new Empty({ text: `couldn't draw: ${text}`, mod: "error", icon: "⚠", slot: new Button({ text: "retry", action: "retry", kind: "chip", cls: "winx-empty__retry" }) });
+    const retry = new Button({ text: "retry", action: "retry", kind: "chip", cls: "winx-empty__retry" });
+    return new Empty({ text: `couldn't draw: ${text}`, mod: "error", icon: "⚠", slot: retry });
   }
 }

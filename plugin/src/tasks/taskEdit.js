@@ -17,16 +17,32 @@ export const editTaskLine = (t, fn) => editLine(t.path, t.line, line => new Task
 // go to the pool instead (a "to pool" checkbox: pick.pool). Resolves to the picks, null when closed.
 export const taskWindow = async (preset = {}, required = false) => {
   const { difficulties, areas } = config;
-  const stickers = (app.vault.getFolderByPath("00 System/Assets/stickers")?.children ?? []).sort((a, b) => a.name.localeCompare(b.name));
+  const stickers = (app.vault.getFolderByPath("00 System/Assets/stickers")?.children ?? [])
+    .sort((a, b) => a.name.localeCompare(b.name));
   return Form.ask(app, required ? "✦ New task" : "✦ Edit task", [
-    { name: "Difficulty", key: "difficulty", options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.tag })) },
+    {
+      name: "Difficulty", key: "difficulty",
+      options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.tag })),
+    },
     { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.tag })) },
     // a routine's time of day: the calendar groups its 🔁 box by it
-    { name: "Time of day", key: "time", options: [{ label: "—", value: null }, { label: "🌅 morning", value: "#time/morning" }, { label: "🌙 evening", value: "#time/evening" }] },
-    { name: "Sticker", key: "sticker", options: [{ label: "—", value: null }, ...stickers.map(f => ({ label: f.name, value: f.name, img: f }))] },
+    { name: "Time of day", key: "time", options: [
+      { label: "—", value: null },
+      { label: "🌅 morning", value: "#time/morning" },
+      { label: "🌙 evening", value: "#time/evening" },
+    ] },
+    { name: "Sticker", key: "sticker", options: [
+      { label: "—", value: null },
+      ...stickers.map(f => ({ label: f.name, value: f.name, img: f })),
+    ] },
     // Pool.md: tasks to pick when it's time (the calendar's Pool tab); no dates
-    ...(required ? [{ name: "To pool", key: "pool", check: "pick it from the calendar's Pool tab when it's time" }] : []),
-  ], { values: { difficulty: null, area: null, time: null, sticker: null, ...preset }, required: required ? ["difficulty", "area"] : [] });
+    ...(required
+      ? [{ name: "To pool", key: "pool", check: "pick it from the calendar's Pool tab when it's time" }]
+      : []),
+  ], {
+    values: { difficulty: null, area: null, time: null, sticker: null, ...preset },
+    required: required ? ["difficulty", "area"] : [],
+  });
 };
 
 // Edit a task: the task window, then the Tasks plugin's own edit dialog (text, dates; works on the phone).
@@ -51,7 +67,11 @@ export const editTaskModal = async t => {
 // a notice "<mark> <task>  undo" for 8 s; undo puts the old line back if the new lines are still there (once).
 export const editTaskLineWithUndo = async (t, fn, mark) => {
   let before = null, after = null, around = null;
-  await editTaskLine(t, (line, lines) => { before = line; around = { above: lines[t.line - 1], below: lines[t.line + 1] }; return after = fn(line); });
+  await editTaskLine(t, (line, lines) => {
+    before = line;
+    around = { above: lines[t.line - 1], below: lines[t.line + 1] };
+    return after = fn(line);
+  });
   if (before === null) return;
   const added = after === null ? [] : after.split("\n");
   const frag  = document.createDocumentFragment();

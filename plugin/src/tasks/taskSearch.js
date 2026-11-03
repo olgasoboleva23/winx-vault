@@ -10,13 +10,18 @@ import { app } from "../core/app.js";
 
 export function pickTask() {
   const lists = dataview().pages(`"${TASKS}"`).file.lists.array();
-  const choices = taskChoices(lists.map(l => l.task ? `- [${l.status}] ${l.text}` : `- ${l.text}`), config.areas.map(a => a.tag));
+  const choices = taskChoices(
+    lists.map(l => l.task ? `- [${l.status}] ${l.text}` : `- ${l.text}`),
+    config.areas.map(a => a.tag),
+  );
   const label = area => area ? `${config.areaIcons[area] ?? "✦"} ${config.areaMap[area] ?? area.slice(6)}` : "✦ other";
-  const find = q => findChoices(choices, q).map((c, i, all) => ({ ...c, header: !c.isNew && (i === 0 || c.area !== all[i - 1].area) }));
+  const find = q => findChoices(choices, q)
+    .map((c, i, all) => ({ ...c, header: !c.isNew && (i === 0 || c.area !== all[i - 1].area) }));
   return Search.pick(app, "Find a past task or type a new one…", find, (c, el) => {
     if (c.header) el.createDiv({ cls: "winx-search__group", text: label(c.area) });
     const row = el.createDiv({ cls: "winx-search__row" });
     row.createSpan({ text: c.isNew ? `+ new: ${c.name}` : c.name });
-    row.createSpan({ cls: "winx-search__note", text: c.isNew ? "" : c.done ? `×${c.done} · ${dm(c.last)}` : "not done yet" });
+    const note = c.isNew ? "" : c.done ? `×${c.done} · ${dm(c.last)}` : "not done yet";
+    row.createSpan({ cls: "winx-search__note", text: note });
   });
 }

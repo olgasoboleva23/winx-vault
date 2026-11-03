@@ -11,8 +11,11 @@ import { daily } from "../notes/kinds.js";
 export class DailyNote extends Widget {
   on = {
     open: async () => {
-      const date = ymd(this.dv.current()?.date), folder = dailyFolder(this.app), path = folder ? `${folder}/${date}` : date;
-      if (this.app.metadataCache.getFirstLinkpathDest(path, "")) return this.app.workspace.openLinkText(path, "", false);
+      const date = ymd(this.dv.current()?.date), folder = dailyFolder(this.app);
+      const path = folder ? `${folder}/${date}` : date;
+      if (this.app.metadataCache.getFirstLinkpathDest(path, "")) {
+        return this.app.workspace.openLinkText(path, "", false);
+      }
       if (folder && !this.app.vault.getFolderByPath(folder)) await this.app.vault.createFolder(folder);
       const text = new Note(daily(date, window.moment(date).format("dddd, MMMM D"))).text;
       await this.app.workspace.getLeaf(false).openFile(await this.app.vault.create(`${path}.md`, text));
@@ -20,5 +23,9 @@ export class DailyNote extends Widget {
   };
   async data() { return { date: ymd(this.dv.current()?.date) }; }
   // on the phone only the ✦ (the word didn't fit next to the date row)
-  view({ date }) { return date ? new Button({ text: Platform.isMobile ? "✦" : "✦ Open", title: "open the day's note", action: "open", kind: "pill" }) : { html: "" }; }
+  view({ date }) {
+    if (!date) return { html: "" };
+    const text = Platform.isMobile ? "✦" : "✦ Open";
+    return new Button({ text, title: "open the day's note", action: "open", kind: "pill" });
+  }
 }

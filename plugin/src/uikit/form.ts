@@ -21,7 +21,10 @@ export class Form extends Modal {
   private button!: HTMLButtonElement;
   private resolve: (v: Values | null) => void = () => {};
 
-  constructor(app: App, private title: string, private rows: Row[], { values = {}, required = [], submit = "Next →" }: Options = {}) {
+  constructor(
+    app: App, private title: string, private rows: Row[],
+    { values = {}, required = [], submit = "Next →" }: Options = {},
+  ) {
     super(app);
     this.values = { ...values };
     this.required = required;
@@ -39,7 +42,8 @@ export class Form extends Modal {
   onOpen() {
     this.titleEl.setText(this.title);
     for (const r of this.rows) this.row(r);
-    this.button = this.contentEl.createDiv("modal-button-container").createEl("button", { cls: "mod-cta", text: this.submit });
+    this.button = this.contentEl.createDiv("modal-button-container")
+      .createEl("button", { cls: "mod-cta", text: this.submit });
     this.button.onclick = () => this.send();
     this.update();
     this.scope.register([], "Enter", e => { e.preventDefault(); this.send(); });
@@ -59,7 +63,11 @@ export class Form extends Modal {
         const b = ctl.createEl("button", { text: img ? "" : label, attr: { title: label } });
         if (img) b.createEl("img", { attr: { src: this.app.vault.getResourcePath(img), style: "height: 24px" } });
         b.toggleClass("mod-cta", value === vals[r.key]);
-        b.onclick = () => { vals[r.key] = value; buttons.forEach(x => x.toggleClass("mod-cta", x === b)); this.update(); };
+        b.onclick = () => {
+          vals[r.key] = value;
+          buttons.forEach(x => x.toggleClass("mod-cta", x === b));
+          this.update();
+        };
         return b;
       });
     } else if ("check" in r) {
@@ -69,7 +77,10 @@ export class Form extends Modal {
     } else {
       const input = ctl.createEl("input", { type: r.number ? "number" : "text", attr: { placeholder: r.text } });
       input.value = vals[r.key] ?? "";
-      input.oninput = () => { vals[r.key] = r.number ? (input.value === "" ? null : Number(input.value)) : input.value.trim(); this.update(); };
+      input.oninput = () => {
+        vals[r.key] = r.number ? (input.value === "" ? null : Number(input.value)) : input.value.trim();
+        this.update();
+      };
     }
   }
 }

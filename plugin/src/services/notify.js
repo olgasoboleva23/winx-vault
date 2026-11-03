@@ -33,7 +33,8 @@ export function useNotify(plugin, open) {
   const schedule = () => {
     clear();
     const d = todayYmd();
-    const tasks = dueTasks().where(t => t.due.toFormat("yyyy-MM-dd") === d).array().map(t => ({ text: t.text, tags: t.tags }));
+    const tasks = dueTasks().where(t => t.due.toFormat("yyyy-MM-dd") === d).array()
+      .map(t => ({ text: t.text, tags: t.tags }));
     const goals = dataview().pages(`"${GOALS}"`).file.lists.map(i => Goal.parse(i.text)).where(Boolean).array();
     for (const r of reminders(tasks, goals)) {
       const ms = window.moment(`${d} ${r.at}`, "YYYY-MM-DD HH:mm").diff(window.moment());
@@ -46,11 +47,13 @@ export function useNotify(plugin, open) {
     if (app.loadLocalStorage("winx-notify-summary") === d) return;
     app.saveLocalStorage("winx-notify-summary", d);
     const due = dueTasks().where(t => t.due.toFormat("yyyy-MM-dd") === d).length;
-    const overdue = dueTasks().where(t => t.due.toFormat("yyyy-MM-dd") < d && !t.tags.some(tag => tag.startsWith("#goal"))).length;
+    const overdue = dueTasks()
+      .where(t => t.due.toFormat("yyyy-MM-dd") < d && !t.tags.some(tag => tag.startsWith("#goal"))).length;
     notify(`✦ ${due} task${due === 1 ? "" : "s"} today`, overdue ? `Overdue: ${overdue}` : "Nothing overdue");
   };
 
-  // once Dataview's index is there: the summary and today's reminders, again when tasks or goals change and each new day
+  // once Dataview's index is there: the summary and today's reminders, again when tasks or goals change and each new
+  // day
   useWhenIndexed(plugin, () => {
     if (!dataview()) return;
     summary(); schedule();

@@ -62,7 +62,9 @@ export class DashboardView extends ItemView {
     this.contentEl.removeClass("winx-dash--busy");
     this.contentEl.append(sanitizeHTMLToDom(busyPill().html));
     // the widgets' page date (Widget's dv.current())
-    const body = this.body = this.contentEl.createDiv({ cls: "markdown-preview-sizer markdown-preview-section", attr: { "data-date": date } });
+    const body = this.body = this.contentEl.createDiv({
+      cls: "markdown-preview-sizer markdown-preview-section", attr: { "data-date": date },
+    });
     void MarkdownRenderer.render(this.app, GRID, body, "", page).then(() => {
       if (this.page !== page) return;   // closed, or drawn again, meanwhile
       this.dateRow();
@@ -77,9 +79,17 @@ export class DashboardView extends ItemView {
     if (!slot) return;
     slot.className = "winx-dash__date winx-nav";
     slot.empty();
-    slot.createDiv({ cls: "mb-input-type-date" }).createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
-    const today = this.shownDate !== todayYmd() ? new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" }) : "";
-    slot.append(sanitizeHTMLToDom(html`${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}${today}${new Button({ text: "📅", title: "calendar", kind: "chip", action: "calendar", cls: "winx-is-phone-only" })}`.html));
+    slot.createDiv({ cls: "mb-input-type-date" })
+      .createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
+    const today = this.shownDate !== todayYmd()
+      ? new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" })
+      : "";
+    slot.append(sanitizeHTMLToDom(html`
+      ${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}
+      ${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}
+      ${today}
+      ${new Button({ text: "📅", title: "calendar", kind: "chip", action: "calendar", cls: "winx-is-phone-only" })}
+    `.html));
   }
 
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)
@@ -104,11 +114,14 @@ export class DashboardView extends ItemView {
   private listen() {
     const el = this.contentEl;
     // the date row's own actions (the widgets in the cards handle theirs)
-    useActions(this, el, (name: string, target: HTMLElement) => target.closest(".winx-dash__date") ? this.on[name] : null);
+    useActions(this, el, (name: string, target: HTMLElement) =>
+      target.closest(".winx-dash__date") ? this.on[name] : null);
     useNoteLinks(this, el);   // [[links]] in the layout open their note
     // a write to the tasks or the data: dim with the ✦ pill until a widget draws again
-    useBusy(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el, "winx-dash--busy");
-    this.registerDomEvent(el, "winx-drawn" as any, () => window.setTimeout(() => el.removeClass("winx-dash--busy"), 200));
+    useBusy(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el,
+      "winx-dash--busy");
+    this.registerDomEvent(el, "winx-drawn" as any,
+      () => window.setTimeout(() => el.removeClass("winx-dash--busy"), 200));
     // following today: a new day moves the dashboard on
     useNewDay(this, () => { if (!this.date) this.go(null); });
   }

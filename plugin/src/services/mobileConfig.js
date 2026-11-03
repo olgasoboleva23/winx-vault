@@ -12,7 +12,10 @@ export async function mirrorMobileConfig() {
   const mirror = async (src, dst) => {
     if (!(await ad.exists(dst))) await ad.mkdir(dst);
     const { files, folders } = await ad.list(src);
-    for (const f of files) { await ad.writeBinary(`${dst}/${f.slice(src.length + 1)}`, await ad.readBinary(f)); copied++; }
+    for (const f of files) {
+      await ad.writeBinary(`${dst}/${f.slice(src.length + 1)}`, await ad.readBinary(f));
+      copied++;
+    }
     for (const d of folders) await mirror(d, `${dst}/${d.slice(src.length + 1)}`);
   };
   await mirror(SRC, DST);

@@ -7,7 +7,10 @@ export class BodyLog {
   // { date, level, reasons } by date
   get entries() {
     return this.text.split("\n").map(l => l.trim().match(ENTRY)).filter(Boolean)
-      .map(m => ({ date: m[1], level: Number(m[2]), reasons: m[3] ? m[3].split(",").map(r => r.trim()).filter(Boolean) : [] }))
+      .map(m => ({
+        date: m[1], level: Number(m[2]),
+        reasons: m[3] ? m[3].split(",").map(r => r.trim()).filter(Boolean) : [],
+      }))
       .sort((a, b) => a.date.localeCompare(b.date));
   }
   // the text with a day's entry: that day's line replaced, or a new one at the end

@@ -14,6 +14,8 @@ export class Button extends Component {
   view({ icon, text, title, action, kind = "round", on = false, cls, data = {} }) {
     const label = title ? html` title="${title}" aria-label="${title}"` : "";
     const extra = Object.entries(data).map(([k, v]) => html` data-${k}="${v}"`);
-    return html`<button class="winx-btn winx-btn--${kind}${on ? " winx-btn--on" : ""}${cls ? " " + cls : ""}"${action ? html` data-action="${action}"` : ""}${extra}${label}>${icon ?? text}</button>`;
+    const classes = `winx-btn winx-btn--${kind}${on ? " winx-btn--on" : ""}${cls ? " " + cls : ""}`;
+    const act = action ? html` data-action="${action}"` : "";
+    return html`<button class="${classes}"${act}${extra}${label}>${icon ?? text}</button>`;
   }
 }

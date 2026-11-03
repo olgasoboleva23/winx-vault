@@ -5,7 +5,10 @@ import { AudioEngine } from "../core/sounds.js";
 
 export function useDrag(view) {
   const el = view.contentEl, drag = { on: false };
-  const sounds = { move: new AudioEngine("00 System/Assets/winx music/snd_scroll_menu.wav"), gem: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem01.wav") };
+  const sounds = {
+    move: new AudioEngine("00 System/Assets/winx music/snd_scroll_menu.wav"),
+    gem: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem01.wav"),
+  };
   let dragged = null;
   const zone = e => e.target.closest?.("[data-drop]") ?? null;
   view.registerDomEvent(el, "dragstart", e => {
@@ -14,10 +17,14 @@ export function useDrag(view) {
     dragged = view.taskOf(src);
     drag.on = true;
     e.dataTransfer?.setData("text/plain", "");
-    window.setTimeout(() => view.ctx?.root.classList.add("winx-cal--dragging"));   // later: zones covering the card at dragstart cancel the drag
+    // later: zones covering the card at dragstart cancel the drag
+    window.setTimeout(() => view.ctx?.root.classList.add("winx-cal--dragging"));
   });
   view.registerDomEvent(el, "dragend", () => view.ctx?.root.classList.remove("winx-cal--dragging"));
-  view.registerDomEvent(el, "dragover", e => { const z = zone(e); if (z) { e.preventDefault(); z.classList.add(`${z.classList[0]}--over`); } });
+  view.registerDomEvent(el, "dragover", e => {
+    const z = zone(e);
+    if (z) { e.preventDefault(); z.classList.add(`${z.classList[0]}--over`); }
+  });
   view.registerDomEvent(el, "dragleave", e => { const z = zone(e); z?.classList.remove(`${z.classList[0]}--over`); });
   view.registerDomEvent(el, "drop", async e => {
     const z = zone(e);

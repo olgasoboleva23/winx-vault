@@ -7,4 +7,5 @@ export const GOALS = `${DATA}/Goals`;
 export const LEDGER = `${DATA}/Finance/Ledger`, RULES = `${DATA}/Finance/rules.json`;
 
 // the daily notes: the folder set in Obsidian's Daily notes (the vault's root when none)
-export const dailyFolder = app => app.internalPlugins.getPluginById("daily-notes")?.instance?.options?.folder?.replace(/\/$/, "") ?? "";
+export const dailyFolder = app =>
+  app.internalPlugins.getPluginById("daily-notes")?.instance?.options?.folder?.replace(/\/$/, "") ?? "";

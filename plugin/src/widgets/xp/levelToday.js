@@ -15,13 +15,21 @@ export class LevelToday extends Widget {
     const { xpMap } = config;
     const day = ymd(pageDay(this.dv)), today = todayYmd();
     const tasks = this.dv.pages(`"${TASKS}"`).file.tasks.array();
-    const total = tasks.filter(t => t.completed && ymd(t.completion) <= day).reduce((sum, t) => sum + taskXp(t, xpMap), 0);
+    const total = tasks.filter(t => t.completed && ymd(t.completion) <= day)
+      .reduce((sum, t) => sum + taskXp(t, xpMap), 0);
     const all = tasks.map(t => Task.of(t));
     const v = vitals({ missed: all.filter(t => t.isOverdue(today)), doneToday: all.filter(t => t.doneOn === today) });
     return { total, ...levelInfo(total), v, mp: mana(cycleLog(this.dv)?.on(today)) };
   }
   view({ total, level, progress, cost, v, mp }) {
-    const bar = (name, value, max, title) => html`<div class="winx-level__vital winx-level__vital--${name.toLowerCase()}" title="${title}"><b class="winx-level__vital-name">${name}</b><div class="winx-level__vital-bar"><i class="winx-level__vital-fill" style="width: ${value / max * 100}%"></i></div><span class="winx-level__vital-value">${value}/${max}</span></div>`;
+    const bar = (name, value, max, title) => html`
+      <div class="winx-level__vital winx-level__vital--${name.toLowerCase()}" title="${title}">
+        <b class="winx-level__vital-name">${name}</b>
+        <div class="winx-level__vital-bar">
+          <i class="winx-level__vital-fill" style="width: ${value / max * 100}%"></i>
+        </div>
+        <span class="winx-level__vital-value">${value}/${max}</span>
+      </div>`;
     return html`<div class="winx-level">
       <div class="winx-level__icon"></div>
       <div class="winx-level__body">

@@ -35,11 +35,13 @@ export default class WinxPlugin extends Plugin {
     });
     // the phone has no status bar: "✦ syncing" (the star spinning) at the top while Remotely Save syncs
     if (Platform.isMobile) {
-      const badge = document.body.createDiv({ cls: "winx-syncing", attr: { style: "display: none" } });   // hidden even before the styles load
+      // hidden even before the styles load
+      const badge = document.body.createDiv({ cls: "winx-syncing", attr: { style: "display: none" } });
       badge.createSpan({ cls: "winx-syncing__star", text: "✦" });
       badge.appendText("syncing");
       this.register(() => badge.remove());
-      this.registerInterval(window.setInterval(() => badge.style.display = (this.app as any).plugins.plugins["remotely-save"]?.isSyncing ? "flex" : "none", 500));
+      const syncing = () => (this.app as any).plugins.plugins["remotely-save"]?.isSyncing;
+      this.registerInterval(window.setInterval(() => badge.style.display = syncing() ? "flex" : "none", 500));
     }
     // desktop: today's reminders; a click opens the calendar
     useNotify(this, () => this.open(VIEW_TYPE));
@@ -48,7 +50,11 @@ export default class WinxPlugin extends Plugin {
   async open(type: string, reveal = true) {
     const { workspace } = this.app;
     let leaf = workspace.getLeavesOfType(type)[0];
-    if (!leaf) { leaf = workspace.getLeaf("tab"); await leaf.setViewState({ type, active: reveal }); leaf.setPinned(true); }
+    if (!leaf) {
+      leaf = workspace.getLeaf("tab");
+      await leaf.setViewState({ type, active: reveal });
+      leaf.setPinned(true);
+    }
     if (reveal) void workspace.revealLeaf(leaf);
     return leaf;
   }
@@ -56,7 +62,8 @@ export default class WinxPlugin extends Plugin {
   async openWinx() {
     const { workspace } = this.app;
     const open = [DASHBOARD_VIEW, VIEW_TYPE].flatMap(t => workspace.getLeavesOfType(t));
-    if (open.length) return workspace.revealLeaf(open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0]);
+    if (open.length)
+      return workspace.revealLeaf(open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0]);
     const dash = await this.open(DASHBOARD_VIEW, false);
     await this.open(VIEW_TYPE, false);
     void workspace.revealLeaf(dash);

@@ -7,11 +7,18 @@ import { T, findTask } from "./data.js";
 export function useSwipe(view, drag) {
   const el = view.contentEl;
   const swipes = new WeakMap();   // row → { x0, y0, dx, on }
-  const row = e => document.body.classList.contains("is-mobile") ? e.target.closest?.("[data-swipeable]") ?? null : null;
-  const left = t => view.actions.canSkip(t) ? () => view.actions.skip(t) : T(t).date ? () => view.actions.unplan(t) : null;
+  const row = e =>
+    document.body.classList.contains("is-mobile") ? e.target.closest?.("[data-swipeable]") ?? null : null;
+  const left = t => view.actions.canSkip(t) ? () => view.actions.skip(t)
+    : T(t).date ? () => view.actions.unplan(t)
+    : null;
   const right = (r, t) => {
     if (r.matches(".winx-missed__row")) return r.querySelector('[data-action="missedDone"]')?.click();
-    if (r.matches(".winx-cal__task")) { const box = r.querySelector('input[data-action="tick"]'); if (box && !box.checked) box.click(); return; }
+    if (r.matches(".winx-cal__task")) {
+      const box = r.querySelector('input[data-action="tick"]');
+      if (box && !box.checked) box.click();
+      return;
+    }
     if (t.pool) return view.actions.fromPool(t, view.ctx.today, false);
     if (view.ctx.TASKS) { r.remove(); view.actions.tick(t); }
   };
@@ -28,7 +35,9 @@ export function useSwipe(view, drag) {
     if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
     if (s.on) e.stopPropagation();
     if (drag.on || !s.on || (mx < 0 && !back)) return;
-    s.dx = mx; r.setCssProps({ "--winx-swipe": `${mx}px` }); r.dataset.swipe = mx > 0 ? "done" : view.actions.canSkip(t) ? "skip" : "nodate";
+    s.dx = mx;
+    r.setCssProps({ "--winx-swipe": `${mx}px` });
+    r.dataset.swipe = mx > 0 ? "done" : view.actions.canSkip(t) ? "skip" : "nodate";
   }, { passive: true });
   view.registerDomEvent(el, "touchend", e => {
     const r = row(e), s = r && swipes.get(r); if (!r || !s) return;

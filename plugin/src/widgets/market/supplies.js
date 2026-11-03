@@ -11,7 +11,10 @@ import { GroupHeader } from "../../uikit/groupHeader.js";
 
 export class Supplies extends Widget {
   on = {
-    low: async (e, el) => { await addToMarket(el.dataset.name, el.dataset.tag); new Notice(`✦ ${el.dataset.name} → Celestial Market`); },
+    low: async (e, el) => {
+      await addToMarket(el.dataset.name, el.dataset.tag);
+      new Notice(`✦ ${el.dataset.name} → Celestial Market`);
+    },
   };
   async data() {
     const { history, open } = marketState(this.dv);
@@ -21,13 +24,22 @@ export class Supplies extends Widget {
     const groupOf = s => marketCats.some(c => c.tag === s.tag) ? s.tag : "#other";
     const row = s => {
       const listed = open.has(s.name);
-      const info = listed ? "on the shopping list ✦" : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}` : `bought ${s.buys} times`;
+      const info = listed ? "on the shopping list ✦"
+        : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}`
+        : `bought ${s.buys} times`;
       const low = new Button({ text: "running low", action: "low", kind: "pill", data: { name: s.name, tag: s.tag } });
-      return html`<div class="winx-supplies__row${s.due ? " winx-supplies__row--due" : ""}"><span class="winx-supplies__name">${s.name}</span><span class="winx-supplies__info">${info}</span>${listed ? "" : low}</div>`;
+      return html`<div class="winx-supplies__row${s.due ? " winx-supplies__row--due" : ""}">
+        <span class="winx-supplies__name">${s.name}</span>
+        <span class="winx-supplies__info">${info}</span>
+        ${listed ? "" : low}
+      </div>`;
     };
     return html`<div class="winx-supplies">
       ${stats.length ? "" : new Empty({ text: "Nothing bought twice yet" })}
-      ${marketCats.map(cat => { const items = stats.filter(s => groupOf(s) === cat.tag); return items.length ? html`${new GroupHeader({ label: cat.label })}${items.map(row)}` : ""; })}
+      ${marketCats.map(cat => {
+        const items = stats.filter(s => groupOf(s) === cat.tag);
+        return items.length ? html`${new GroupHeader({ label: cat.label })}${items.map(row)}` : "";
+      })}
     </div>`;
   }
 }

@@ -20,10 +20,13 @@ export function paydays(from, to) {
 }
 
 export class SavingsJar {
-  constructor(text, { per_payday = null, price = null } = {}) { this.text = text; this.perPayday = per_payday; this.price = price; }
+  constructor(text, { per_payday = null, price = null } = {}) {
+    this.text = text; this.perPayday = per_payday; this.price = price;
+  }
   // { date, sum } in the note's order
   get deposits() {
-    return this.text.split("\n").map(l => l.trim().match(DEPOSIT)).filter(Boolean).map(m => ({ date: m[1], sum: amount(m[2]) }));
+    return this.text.split("\n").map(l => l.trim().match(DEPOSIT)).filter(Boolean)
+      .map(m => ({ date: m[1], sum: amount(m[2]) }));
   }
   get saved() { return this.deposits.reduce((a, d) => a + d.sum, 0); }
   get pct()   { return this.price ? Math.round(this.saved / this.price * 100) : null; }

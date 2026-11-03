@@ -3,12 +3,19 @@ export function taskButtons(view) {
   const ticks = new WeakMap();   // a ticked row → its write, 2 s later
   return {
     edit: (e, el) => { const t = view.taskOf(el); if (t) view.actions.edit(t); },
-    skip: (e, el) => { const t = view.taskOf(el); if (!t) return; el.closest("[data-task]")?.remove(); view.actions.skip(t); },
+    skip: (e, el) => {
+      const t = view.taskOf(el);
+      if (!t) return;
+      el.closest("[data-task]")?.remove();
+      view.actions.skip(t);
+    },
     // 🗑: the first click arms it for 3 s, the second removes the task's line (with undo)
     remove: async (e, el) => {
       if (!el.classList.contains("winx-task-btns__del--armed")) {
         el.classList.add("winx-task-btns__del--armed"); el.textContent = "✓?"; el.title = "Click again to delete";
-        window.setTimeout(() => { el.classList.remove("winx-task-btns__del--armed"); el.textContent = "🗑"; el.title = "Delete task"; }, 3000);
+        window.setTimeout(() => {
+          el.classList.remove("winx-task-btns__del--armed"); el.textContent = "🗑"; el.title = "Delete task";
+        }, 3000);
         return;
       }
       const t = view.taskOf(el);

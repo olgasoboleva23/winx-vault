@@ -50,7 +50,8 @@ cd plugin
 npm ci
 npm test                                   # unit tests
 npm run check                              # types (tsc)
-npm run lint                               # ESLint with Obsidian's rules (eslint-plugin-obsidianmd)
+npm run lint                               # ESLint with Obsidian's rules (eslint-plugin-obsidianmd), lines ≤ 120;
+                                           # Stylelint for the Sass (standard SCSS rules, BEM class names)
 WINX_VAULT=/path/to/your/vault npm run dev # build into <vault>/.obsidian/plugins/winx on every save
 ```
 

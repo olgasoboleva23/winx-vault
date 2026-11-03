@@ -10,7 +10,9 @@ import { dataview } from "./plugins.js";
 export function actionOf(type, target, root) {
   const el = target.closest?.("[data-action]");
   if (!el || !root.contains(el)) return null;
-  if (type === "click") return el.matches("input, select, textarea, form") || target.closest("input, select, textarea") ? null : el;
+  if (type === "click") {
+    return el.matches("input, select, textarea, form") || target.closest("input, select, textarea") ? null : el;
+  }
   if (type === "change") return el === target ? el : null;
   if (type === "submit") return el.matches("form") ? el : null;
   return null;
@@ -59,12 +61,17 @@ export function useBusy(c, watched, el, cls) {
 
 // fn() a moment (delay ms) after Dataview re-indexes a file that watched(path) says yes to (no watched: any file);
 // with `note`, also when that note changes (Obsidian's own event, before Dataview has it)
-/** @param {any} c @param {() => void} fn @param {{ watched?: (path: string) => boolean, note?: string, delay?: number }} [options] */
+/**
+ * @param {any} c @param {() => void} fn
+ * @param {{ watched?: (path: string) => boolean, note?: string, delay?: number }} [options]
+ */
 export function useDataviewChanges(c, fn, options = {}) {
   const { watched = null, note = null, delay = 1000 } = options;
   const later = debounce(fn, delay, true);
   c.register(() => later.cancel());
-  c.registerEvent(c.app.metadataCache.on("dataview:metadata-change", (_type, file) => { if (!watched || watched(file?.path ?? "")) later(); }));
+  c.registerEvent(c.app.metadataCache.on("dataview:metadata-change", (_type, file) => {
+    if (!watched || watched(file?.path ?? "")) later();
+  }));
   if (note) c.registerEvent(c.app.metadataCache.on("changed", f => f.path === note && later()));
 }
 
@@ -87,9 +94,11 @@ export function useWindowBack(c, fn) {
 }
 
 // fn() when the dashboard tab's date changes, for a block `el` drawn in a dated tab
-export const useTabDate = (c, el, fn) => c.registerEvent(c.app.workspace.on("winx:date", () => el.closest("[data-date]") && fn()));
+export const useTabDate = (c, el, fn) =>
+  c.registerEvent(c.app.workspace.on("winx:date", () => el.closest("[data-date]") && fn()));
 
-// fn() a moment after leaving a field in `el`, so a click on the widget's own button (which takes the focus) lands first
+// fn() a moment after leaving a field in `el`, so a click on the widget's own button (which takes the focus) lands
+// first
 export function useLeaveField(c, el, fn, delay = 500) {
   const left = debounce(fn, delay, true);
   c.register(() => left.cancel());

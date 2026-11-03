@@ -13,12 +13,15 @@ export class LifeAreas extends Widget {
     const sel = pageDay(this.dv), since = sel.minus({ days: 27 }).startOf("day");
     const scores = Object.fromEntries(areas.map(a => [a.name, 0]));
     // task XP per area, last 4 weeks up to the selected date
-    for (const t of this.dv.pages(`"${TASKS}"`).file.tasks.where(t => t.completed && t.completion && t.completion.ts >= since.ts && t.completion.ts <= sel.endOf("day").ts)) {
+    const done = this.dv.pages(`"${TASKS}"`).file.tasks
+      .where(t => t.completed && t.completion && t.completion.ts >= since.ts && t.completion.ts <= sel.endOf("day").ts);
+    for (const t of done) {
       const area = Object.entries(areaMap).find(([tag]) => t.tags.includes(tag))?.[1];
       if (area) scores[area] += taskXp(t, xpMap);
     }
     // habit bonus per area — shared scan from xp.js
-    for (const { area, days } of Object.values(collectHabitDays(this.dv, dailyFolder(this.app), sel.startOf("month"), sel.endOf("month"))))
+    const habits = collectHabitDays(this.dv, dailyFolder(this.app), sel.startOf("month"), sel.endOf("month"));
+    for (const { area, days } of Object.values(habits))
       if (days.size >= HABIT_BONUS_THRESHOLD && areaMap[area]) scores[areaMap[area]] += HABIT_BONUS_XP;
     return { scores };
   }
@@ -27,7 +30,10 @@ export class LifeAreas extends Widget {
     const caption = root.querySelector(".winx-areas__caption");
     this.keep(await window.renderChart({
       type: "radar",
-      data: { labels: Object.keys(scores), datasets: [{ label: "Areas", data: Object.values(scores), backgroundColor: chartColor("--winx-pink-deep", 0.3), borderColor: chartColor("--winx-pink-deep"), borderWidth: 2 }] },
+      data: { labels: Object.keys(scores), datasets: [{
+        label: "Areas", data: Object.values(scores), borderWidth: 2,
+        backgroundColor: chartColor("--winx-pink-deep", 0.3), borderColor: chartColor("--winx-pink-deep"),
+      }] },
       options: { plugins: { legend: { display: false } } },
     }, root));
     root.append(caption);   // under the chart
