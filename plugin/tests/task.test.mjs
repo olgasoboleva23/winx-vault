@@ -168,3 +168,8 @@ test("sameAs: the same copy of a task (words, status, day), not its done copy or
   assert.ok(!open.sameAs(new Task("- [x] workout 🔁 every day 📅 2026-10-28 ✅ 2026-10-28")));
   assert.ok(!open.sameAs(new Task("- [ ] workout 🔁 every day 📅 2026-10-29")));
 });
+
+test("Task.of a pool item (no checkbox) is its pool line, so its line is found again", () => {
+  const p = { text: "#⭐easy #area/base take out trash", pool: true };
+  assert.ok(Task.of(p).sameAs(new Task("- #⭐easy #area/base take out trash")));
+});

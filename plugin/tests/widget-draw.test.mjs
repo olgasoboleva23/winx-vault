@@ -50,6 +50,18 @@ test("an error in view() shows the same message", async () => {
   assert.match(w.containerEl.drawn, /couldn(&#39;|')t draw: bad markup/);
 });
 
+test("a block gone while after() runs says nothing was drawn", async () => {
+  let drawn = 0;
+  const el = { ...block(), dispatchEvent() { drawn++; } };
+  let release;
+  class Late extends Slow { after() { return new Promise(r => release = r); } }
+  const w = new Late(el, "note.md");
+  const d = w.draw(); w.waits[0].ok({ n: 1 });
+  await new Promise(r => setTimeout(r));
+  w.onunload(); release(); await d;
+  assert.equal(drawn, 0);
+});
+
 test("what after() makes once the block is gone is let go at once", async () => {
   let destroyed = 0;
   const w = new Slow(block(), "note.md");

@@ -13,8 +13,8 @@ function earned(dv) {
   for (const t of dv.pages(`"${TASKS}"`).file.tasks) if (t.completed) gold += config.difficulties.find(d => t.tags.includes(d.tag))?.gold ?? 0;
   return gold;
 }
-// a purchase's cost: the line's last number ("… | 1984 | 20" costs 20)
-const cost = text => Number(text.match(/\|\s*(\d+)\s*$/)?.[1] ?? 0);
+// a purchase's cost: the line's last number ("… | 1984 | 20" costs 20; 2.5 or 2,5 too)
+const cost = text => Number(text.match(/\|\s*(\d+(?:[.,]\d+)?)\s*$/)?.[1].replace(",", ".") ?? 0);
 const spent = lines => [...lines].reduce((a, l) => a + cost(l), 0);
 
 export const balance = dv => earned(dv) - spent([...dv.pages('"00 System/Data/Purchases"').file.lists].map(l => l.text));

@@ -50,15 +50,15 @@ export const editTaskModal = async t => {
 // Change a task's line like editTaskLine (fn may return several lines, or null to delete), then show
 // a notice "<mark> <task>  undo" for 8 s; undo puts the old line back if the new lines are still there (once).
 export const editTaskLineWithUndo = async (t, fn, mark) => {
-  let before = null, after = null;
-  await editTaskLine(t, line => { before = line; return after = fn(line); });
+  let before = null, after = null, around = null;
+  await editTaskLine(t, (line, lines) => { before = line; around = { above: lines[t.line - 1], below: lines[t.line + 1] }; return after = fn(line); });
   if (before === null) return;
   const added = after === null ? [] : after.split("\n");
   const frag  = document.createDocumentFragment();
   frag.append(`${mark} ${new Task(before).text.slice(0, 40)}  `);
   const undo = frag.appendChild(document.createElement("button"));
   undo.textContent = "Undo";
-  undo.onclick = undoLines(t.path, t.line, added, before);
+  undo.onclick = undoLines(t.path, t.line, added, before, around);
   new Notice(frag, 8000);
 };
 export const deleteTaskLine = t => editTaskLineWithUndo(t, () => null, "🗑");

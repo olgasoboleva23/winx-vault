@@ -79,6 +79,12 @@ test("undoLines puts a deleted line back once: a second undo adds no copy", asyn
   assert.equal(files["a.md"], "a\nb\nc");
 });
 
+test("undoLines puts a deleted line back between its old neighbours, though a line came in above", async () => {
+  const { files } = vault({ "a.md": "new\na\nc" });   // "b" was deleted between a and c, then "new" went on top
+  await undoLines("a.md", 1, [], "b", { above: "a", below: "c" })();
+  assert.equal(files["a.md"], "new\na\nb\nc");
+});
+
 test("undoLines leaves lines that changed since", async () => {
   const { files } = vault({ "a.md": "a\nB2\nc" });
   await undoLines("a.md", 1, ["B"], "b")();

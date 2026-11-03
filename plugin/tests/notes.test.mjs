@@ -101,4 +101,9 @@ test("a string that YAML would read as another type stays a string: true, null, 
   assert.match(text, /^d: "no"$/m);
   assert.match(text, /^e: 5$/m);
   assert.match(text, /^f: Tea 2$/m);
+  const more = new Note({ props: { a: "0x10", b: "1e3", c: "2026-11-02", d: "y" }, title: "T" }).text;
+  assert.match(more, /^a: "0x10"$/m);
+  assert.match(more, /^b: "1e3"$/m);
+  assert.match(more, /^c: 2026-11-02$/m);   // a date stays a date
+  assert.match(more, /^d: "y"$/m);
 });

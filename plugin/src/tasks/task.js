@@ -3,7 +3,7 @@
 //   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening · #id/<id> · #after/id/<id> · ![[sticker]]
 //   🔁 rule (up to the next field) · 📅 due (an old ⏳ still counts) · ✅ done · ❌ skipped · ➕ created · 🛫 start
 // No Obsidian globals (tested by tests/task.test.mjs).
-// Wrap a Dataview task with Task.of(t) (t is kept as .src, for its path and line) or a raw line with new Task(line).
+// Wrap a Dataview task (or a pool item, { text, pool: true }) with Task.of(t) (t is kept as .src, for its path and line) or a raw line with new Task(line).
 // A pool line (Pool.md: a task to pick when it's time, "- #⭐easy #area/base take out trash") is the same without
 // checkbox, rule or dates; its copies on the days are ordinary tasks with the same text.
 import { addDays, diffDays } from "../core/dates.js";
@@ -17,7 +17,7 @@ const OPEN   = /^\s*- \[ \]/, ANY = /^\s*- \[.\]/, DONE = /^\s*- \[[xX]\]/;
 
 export class Task {
   constructor(line, src = null) { this.line = line; this.src = src; }
-  static of(t) { return new Task(`- [${t.status}] ${t.text}`, t); }
+  static of(t) { return new Task(t.pool ? `- ${t.text}` : `- [${t.status}] ${t.text}`, t); }   // a pool item: no checkbox
 
   get status()     { return this.line.match(/^\s*- \[(.)\]/)?.[1] ?? null; }
   get isOpen()     { return this.status === " "; }

@@ -62,3 +62,10 @@ test("two purchases at once: the second sees the first (10 gold, two for 10: one
   assert.deepEqual([one, two], [true, false]);
   assert.doesNotMatch(files[BUY], /Cake/);
 });
+
+test("a purchase for 2.5 counts 2.5", async () => {
+  const files = vault({ [MASTER]: "- [x] #⭐⭐medium #area/base a\n", [BUY]: "# Purchases\n\n- 2026-10-01 | Tea | 2.5\n" });
+  assert.equal(await logPurchase("Cake", 3), false);   // 5 − 2.5 = 2.5
+  assert.equal(await logPurchase("Gum", 2.5), true);
+  assert.match(files[BUY], /Gum \| 2\.5/);
+});

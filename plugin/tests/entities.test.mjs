@@ -128,6 +128,7 @@ test("SavingsJar: saved, deposits, the payday's deposit until it's in, the halfw
   const free = new SavingsJar("- 2026-10-16 500\n");   // no per_payday: a deposit needs its sum
   assert.equal(free.deposit("2026-11-17"), "- 2026-10-16 500\n");
   assert.equal(free.deposit("2026-11-17", 700).trim().split("\n").at(-1), "- 2026-11-17 700");
+  assert.equal(new SavingsJar("- 2026-10-16 2.5\n- 2026-10-31 1,5\n").saved, 4);   // a fraction counts
 
   const priced = new SavingsJar(note, { per_payday: 12000, price: 60000 });
   assert.equal(priced.pct, 53);

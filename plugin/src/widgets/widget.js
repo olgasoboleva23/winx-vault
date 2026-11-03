@@ -112,6 +112,7 @@ export class Widget extends MarkdownRenderChild {
       // the widget's own place: inside the card when there is one
       const root = card ? this.containerEl.querySelector(":scope > .winx-widget > .winx-widget__body") : this.containerEl;
       await this.after(root, data);
+      if (n !== this.draws) return;   // gone, or drawn again, meanwhile
     } catch (e) {   // in data(), view() or after(): said in the block, with ↻ retry
       if (n !== this.draws) return;
       console.error(e);

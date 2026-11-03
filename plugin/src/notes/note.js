@@ -1,8 +1,9 @@
 // A note Winx makes, from plain data: its properties (YAML), its # title and its ## sections.
 //   new Note({ props: { type: "recipe", tags: [] }, title: "Soup", sections: { Steps: "", Notes: "" } }).text
 const PLAIN = /^[\p{L}\p{N}][\p{L}\p{N} _.,!?()&'-]*$/u;   // written as is; anything else in "quotes"
-const OTHER = /^(true|false|yes|no|on|off|null|~|[-+]?(\d[\d_]*(\.\d*)?|\.\d+)(e[-+]?\d+)?)$/i;   // YAML would read these as no string
-const value = v => typeof v === "number" ? String(v) : PLAIN.test(v) && !OTHER.test(v) ? v : JSON.stringify(v);
+// bare only when YAML can read it as nothing but text: a word first (not true / no / null…), or a date
+const BARE = v => PLAIN.test(v) && (/^\d{4}-\d{2}-\d{2}$/.test(v) || /^\p{L}/u.test(v) && !/^(true|false|yes|no|on|off|y|n|null)$/i.test(v));
+const value = v => typeof v === "number" ? String(v) : BARE(v) ? v : JSON.stringify(v);
 const prop = (k, v) =>
   v == null || v === "" ? `${k}:`
   : Array.isArray(v) ? (v.length ? `${k}:\n${v.map(x => `  - ${value(x)}`).join("\n")}` : `${k}: []`)
