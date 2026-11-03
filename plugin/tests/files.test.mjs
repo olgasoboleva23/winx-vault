@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { appendLine, edit, editLine, readJson } from "../src/core/files.js";
+import { appendLine, edit, editLine, readJson, undoLines } from "../src/core/files.js";
 import { setApp } from "../src/core/app.js";
 import { Notice } from "obsidian";
 
@@ -69,4 +69,17 @@ test("readJson: the parsed file; the fallback when it's missing or not JSON", as
   assert.deepEqual(await readJson("a.json"), { n: 1 });
   assert.deepEqual(await readJson("b.json", { budgets: {} }), { budgets: {} });
   assert.equal(await readJson("c.json"), null);
+});
+
+test("undoLines puts a deleted line back once: a second undo adds no copy", async () => {
+  const { files } = vault({ "a.md": "a\nc" });
+  const undo = undoLines("a.md", 1, [], "b");
+  await undo(); await undo();
+  assert.equal(files["a.md"], "a\nb\nc");
+});
+
+test("undoLines leaves lines that changed since", async () => {
+  const { files } = vault({ "a.md": "a\nB2\nc" });
+  await undoLines("a.md", 1, ["B"], "b")();
+  assert.equal(files["a.md"], "a\nB2\nc");
 });

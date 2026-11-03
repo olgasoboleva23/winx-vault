@@ -2,6 +2,7 @@
 // edit: the note's text through fn (vault.process, so nothing is lost between read and write); a missing note: nothing.
 // editLine: line n through fn (null deletes it), only while same(line) holds: it may have moved or changed since it
 //   was read (a line that's gone or isn't the same: nothing, a notice, false).
+// undoLines: () => put `before` back at line `at` in place of `added` (a deleted line: []), once, while they're still there.
 // appendLine: a line at the end (unique: not when it's already there); a missing note is made with `header` on top.
 import { Notice } from "obsidian";
 import { app } from "./app.js";
@@ -20,8 +21,19 @@ export async function editLine(path, n, same, fn) {
     done = true;
     return lines.join("\n");
   });
-  if (!done) new Notice("✦ The line changed meanwhile: nothing written");
+  if (!done) new Notice("The line changed meanwhile, nothing written");
   return done;
+}
+
+export function undoLines(path, at, added, before) {
+  let done = false;
+  return () => done ? Promise.resolve() : edit(path, c => {
+    const lines = c.split("\n");
+    if (done || lines.slice(at, at + added.length).join("\n") !== added.join("\n")) return c;   // changed since
+    done = true;
+    lines.splice(Math.min(at, lines.length), added.length, before);
+    return lines.join("\n");
+  });
 }
 
 export async function appendLine(path, line, { header = "", unique = false } = {}) {

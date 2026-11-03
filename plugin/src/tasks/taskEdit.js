@@ -2,7 +2,7 @@
 // (difficulty, area, time, sticker) and the Tasks plugin's edit dialog.
 import { Notice } from "obsidian";
 import config from "../core/config.js";
-import { edit, editLine } from "../core/files.js";
+import { editLine, undoLines } from "../core/files.js";
 import { tasksApi } from "../core/plugins.js";
 import { Task } from "./task.js";
 import { Form } from "../uikit/form.ts";
@@ -48,7 +48,7 @@ export const editTaskModal = async t => {
 };
 
 // Change a task's line like editTaskLine (fn may return several lines, or null to delete), then show
-// a notice "<mark> <task>  undo" for 8 s; undo puts the old line back if the new lines are still there.
+// a notice "<mark> <task>  undo" for 8 s; undo puts the old line back if the new lines are still there (once).
 export const editTaskLineWithUndo = async (t, fn, mark) => {
   let before = null, after = null;
   await editTaskLine(t, line => { before = line; return after = fn(line); });
@@ -58,12 +58,7 @@ export const editTaskLineWithUndo = async (t, fn, mark) => {
   frag.append(`${mark} ${new Task(before).text.slice(0, 40)}  `);
   const undo = frag.appendChild(document.createElement("button"));
   undo.textContent = "Undo";
-  undo.onclick = () => edit(t.path, c => {
-    const lines = c.split("\n");
-    if (lines.slice(t.line, t.line + added.length).join("\n") !== added.join("\n")) return c;   // changed since
-    lines.splice(Math.min(t.line, lines.length), added.length, before);
-    return lines.join("\n");
-  });
+  undo.onclick = undoLines(t.path, t.line, added, before);
   new Notice(frag, 8000);
 };
 export const deleteTaskLine = t => editTaskLineWithUndo(t, () => null, "🗑");
