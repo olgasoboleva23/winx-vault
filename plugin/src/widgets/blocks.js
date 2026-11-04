@@ -3,7 +3,6 @@ import { parseBlock } from "./parse.js";
 import { Cycle } from "./body/cycle.js";
 import { DailyNote } from "./dailyNote.js";
 import { Finance, FinanceMonth } from "./finance/finance.js";
-import { Savings } from "./savings/savings.js";
 import { Pomodoro } from "./pomodoro/pomodoro.js";
 import { Weight } from "./body/weight.js";
 import { loadXpToday } from "./xp/xpToday.js";
@@ -21,6 +20,8 @@ import CelestialMarket from "./market/CelestialMarket.vue";
 import CelestialMarketAdd from "./market/CelestialMarketAdd.vue";
 import { loadGoals } from "./goals/goals.js";
 import GoalsWidget from "./goals/GoalsWidget.vue";
+import { loadSavings, savingsActions } from "./savings/savings.js";
+import SavingsJars from "./savings/SavingsJars.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
@@ -28,8 +29,7 @@ import { app } from "../core/app.js";
 
 // name → class
 export const blocks = {
-  cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, pomodoro: Pomodoro,
-  savings: Savings, weight: Weight,
+  cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, pomodoro: Pomodoro, weight: Weight,
 };
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
@@ -42,6 +42,7 @@ export const vueBlocks = {
   shop: { view: ShopWidget, load: loadShop, actions: shopActions, bodyClass: "winx-shop" },
   supplies: { view: SuppliesWidget, load: loadSupplies, actions: suppliesActions },
   goals: { view: GoalsWidget, load: loadGoals },
+  savings: { view: SavingsJars, load: loadSavings, actions: savingsActions },
   celestialMarket: {
     view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
   },
