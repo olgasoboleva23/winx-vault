@@ -39,6 +39,7 @@ export class VueHost<D = unknown> extends Component {
     const props = { state: this.state, actions: { ...this.opts.actions, retry: () => this.refresh() } };
     const { view, opts: { card } } = this;
     this.vue = createApp({ render: () => card ? h(WinxCard, card, () => h(view, props)) : h(view, props) });
+    this.vue.provide("sourcePath", this.opts.note ?? "");   // where a NoteLink opens a note from
     this.vue.mount(this.el);
     const { redraw } = useRedraw(this, () => this.shown, () => void this.refresh());
     useDataviewChanges(this, redraw, { note: this.opts.note, delay: 1000 });
