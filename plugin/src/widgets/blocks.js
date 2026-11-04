@@ -2,7 +2,6 @@
 import { parseBlock } from "./parse.js";
 import { DailyNote } from "./dailyNote.js";
 import { Pomodoro } from "./pomodoro/pomodoro.js";
-import { Weight } from "./body/weight.js";
 import { loadXpToday } from "./xp/xpToday.js";
 import XpToday from "./xp/XpToday.vue";
 import { loadLevelToday } from "./xp/levelToday.js";
@@ -25,6 +24,8 @@ import CycleWidget from "./body/CycleWidget.vue";
 import { loadFinance, loadFinanceLine } from "./finance/finance.js";
 import FinanceMonths from "./finance/FinanceMonths.vue";
 import FinanceLine from "./finance/FinanceLine.vue";
+import { loadWeight, weightActions } from "./body/weight.js";
+import WeightCard from "./body/WeightCard.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
@@ -32,7 +33,7 @@ import { app } from "../core/app.js";
 
 // name → class
 export const blocks = {
-  dailyNote: DailyNote, pomodoro: Pomodoro, weight: Weight,
+  dailyNote: DailyNote, pomodoro: Pomodoro,
 };
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
@@ -49,6 +50,7 @@ export const vueBlocks = {
   cycle: { view: CycleWidget, load: loadCycle, actions: cycleActions },
   finance: { view: FinanceMonths, load: loadFinance },
   financeMonth: { view: FinanceLine, load: loadFinanceLine },
+  weight: { view: WeightCard, load: loadWeight, actions: weightActions },
   celestialMarket: {
     view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
   },
