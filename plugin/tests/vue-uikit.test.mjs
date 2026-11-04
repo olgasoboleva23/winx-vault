@@ -17,7 +17,7 @@ const draws = (vue, html) => assert.equal(vue.element.outerHTML.replace(/<!--[^]
 test("WinxButton: kinds, on, title, extra classes", () => {
   draws(mount(ui.WinxButton, { props: { title: "delete task" }, slots: { default: "🗑" } }),
     '<button class="winx-btn winx-btn--round" title="delete task" aria-label="delete task">🗑</button>');
-  draws(mount(ui.WinxButton, { props: { kind: "pill", cls: "winx-weight__list" }, slots: { default: "✦ list" } }),
+  draws(mount(ui.WinxButton, { props: { kind: "pill" }, attrs: { class: "winx-weight__list" }, slots: { default: "✦ list" } }),
     '<button class="winx-btn winx-btn--pill winx-weight__list">✦ list</button>');
   draws(mount(ui.WinxButton, { props: { kind: "toggle", on: true }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle winx-btn--on">✓ done</button>');
   draws(mount(ui.WinxButton, { props: { kind: "toggle" }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle">✓ done</button>');

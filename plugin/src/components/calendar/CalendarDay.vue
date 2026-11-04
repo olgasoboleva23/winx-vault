@@ -6,11 +6,11 @@ import DayZones from "./DayZones.vue";
 const props = defineProps({ day: { type: String, required: true }, format: { type: String, required: true } });
 const view = inject("calendar");
 const head = computed(() => window.moment(props.day).format(props.format));
-const cls = computed(() => ["winx-cal__day", { "winx-cal__day--today": props.day === view.ctx.today }]);
+const today = computed(() => props.day === view.ctx.today);
 </script>
 
 <template>
-  <div :class="cls">
+  <div :class="['winx-cal__day', { 'winx-cal__day--today': today }]">
     <div class="winx-cal__head">{{ head }}</div>
     <DayFill :day="day" />
     <DayZones :day="day" />

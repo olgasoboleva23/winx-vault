@@ -44,7 +44,7 @@ const pause = c => {
       v-for="c in g.cards"
       :key="c.task.key"
       :task="c.task"
-      :cls="c.paused ? 'winx-task-card--paused' : null"
+      :paused="c.paused"
     >
       <!-- one line: the rule, when (late: in red), the history; no spaces between them -->
       <template #meta>{{ c.rule }}<span v-if="c.late" class="winx-cal__late">{{ c.when }}</span><span

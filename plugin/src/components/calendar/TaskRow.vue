@@ -19,15 +19,7 @@ const ticking = ref(false), done = ref(false), gone = ref(false);
 let timer = 0;
 const box = computed(() => !props.compact && props.tick && props.kind !== "ghost");
 const live = computed(() => !props.compact && props.kind === "open");
-const cls = computed(() => ["winx-cal__task", `winx-cal__task--${props.kind}`,
-  { "winx-cal__task--ticking": ticking.value, "winx-cal__task--done": done.value }]);
-const attrs = computed(() => ({
-  "data-area": props.task.area ?? undefined,
-  "data-task": props.task.key,
-  ...(props.kind !== "ghost" ? { draggable: "true", "data-drag": props.task.key } : {}),
-  ...(live.value && box.value ? { "data-swipeable": props.task.key } : {}),
-  ...(props.compact ? { title: props.task.label } : {}),
-}));
+const drags = computed(() => props.kind !== "ghost");   // a ghost (a 🔁 day ahead) isn't dragged
 const repeat = computed(() => props.kind === "ghost" ? "🔁 " : "");
 function onTick(e) {
   ticking.value = e.target.checked;
@@ -38,7 +30,20 @@ function onTick(e) {
 </script>
 
 <template>
-  <div v-if="!gone" :class="cls" v-bind="attrs">
+  <div
+    v-if="!gone"
+    :class="[
+      'winx-cal__task',
+      `winx-cal__task--${kind}`,
+      { 'winx-cal__task--ticking': ticking, 'winx-cal__task--done': done },
+    ]"
+    :data-area="task.area"
+    :data-task="task.key"
+    :draggable="drags ? 'true' : null"
+    :data-drag="drags ? task.key : null"
+    :data-swipeable="live && box ? task.key : null"
+    :title="compact ? task.label : null"
+  >
     <span v-if="after" class="winx-cal__after">↳</span>
     <template v-if="box">
       <input

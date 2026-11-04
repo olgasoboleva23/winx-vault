@@ -33,7 +33,7 @@ const label = props.phone ? "☀️" : "today";
   <WinxButton
     kind="chip"
     title="calendar"
-    cls="winx-is-phone-only"
+    class="winx-is-phone-only"
     @click="emit('calendar')"
   >📅</WinxButton>
 </template>

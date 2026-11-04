@@ -52,7 +52,7 @@ async function buy(r) {
         :key="l.path"
         :path="l.path"
         kind="text"
-        cls="winx-market__link"
+        class="winx-market__link"
       >
         {{ l.text }}
       </WinxNoteLink>

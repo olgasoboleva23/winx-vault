@@ -30,7 +30,7 @@ const dashboard = () => app.commands.executeCommandById("winx:open-dashboard");
     <WinxButton
       kind="chip"
       title="dashboard"
-      cls="winx-cal__to-dash winx-is-phone-only"
+      class="winx-cal__to-dash winx-is-phone-only"
       @click="dashboard"
     >✦</WinxButton>
   </div>

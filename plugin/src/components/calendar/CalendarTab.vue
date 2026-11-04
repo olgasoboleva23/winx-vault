@@ -9,12 +9,11 @@ import CalendarPanel from "./CalendarPanel/index.vue";
 
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);
-const cls = computed(() => `winx-cal winx-cal--${ctx.value.view}`);
 </script>
 
 <template>
   <template v-if="ctx.say">{{ ctx.say }}</template>
-  <div v-else :class="cls">
+  <div v-else :class="['winx-cal', `winx-cal--${ctx.view}`]">
     <CalendarHeader />
     <CalendarMissed />
     <CalendarGrid />

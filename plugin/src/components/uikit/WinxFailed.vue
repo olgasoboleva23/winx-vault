@@ -8,6 +8,6 @@ defineEmits(["retry"]);
 
 <template>
   <WinxEmpty :text="`couldn't draw: ${text}`" mod="error" icon="⚠">
-    <WinxButton kind="chip" cls="winx-empty__retry" @click="$emit('retry')">retry</WinxButton>
+    <WinxButton kind="chip" class="winx-empty__retry" @click="$emit('retry')">retry</WinxButton>
   </WinxEmpty>
 </template>

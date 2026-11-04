@@ -13,7 +13,6 @@ const armed = ref(false), disarmed = ref(false);
 const del = computed(() => armed.value
   ? { text: "✓?", title: "Click again to delete" }
   : { text: "🗑", title: disarmed.value ? "Delete task" : "delete task" });
-const delCls = computed(() => armed.value ? "winx-task-btns__del winx-task-btns__del--armed" : "winx-task-btns__del");
 const edit = () => { const t = view.task(props.task.key); if (t) view.actions.edit(t); };
 const skip = () => {
   const t = view.task(props.task.key);
@@ -37,5 +36,9 @@ async function remove() {
 <template>
   <WinxButton v-if="task.canSkip" title="skip this time" @click="skip">⏭</WinxButton>
   <WinxButton :title="editTitle" @click="edit">✏️</WinxButton>
-  <WinxButton :title="del.title" :cls="delCls" @click="remove">{{ del.text }}</WinxButton>
+  <WinxButton
+    :title="del.title"
+    :class="['winx-task-btns__del', { 'winx-task-btns__del--armed': armed }]"
+    @click="remove"
+  >{{ del.text }}</WinxButton>
 </template>

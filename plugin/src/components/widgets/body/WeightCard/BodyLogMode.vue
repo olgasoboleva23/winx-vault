@@ -42,5 +42,5 @@ const pick = r => {
       log.now ? "Update today" : "Save today" }}</WinxButton>
   </div>
   <WinxChart :config="log.chart" />
-  <WinxNoteLink :path="LOG_PATH" cls="winx-weight__list">✦ list</WinxNoteLink>
+  <WinxNoteLink :path="LOG_PATH" class="winx-weight__list">✦ list</WinxNoteLink>
 </template>

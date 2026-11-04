@@ -33,5 +33,5 @@ const INPUT = {
     @submit="$emit('save')"
   />
   <WinxChart v-if="weight.chart" :config="weight.chart" />
-  <WinxNoteLink :path="PATH" cls="winx-weight__list">✦ list</WinxNoteLink>
+  <WinxNoteLink :path="PATH" class="winx-weight__list">✦ list</WinxNoteLink>
 </template>

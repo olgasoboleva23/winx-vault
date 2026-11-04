@@ -8,7 +8,7 @@ const POOL_EDIT = "edit: difficulty, area, time, sticker, then text";
 const props = defineProps({
   task: { type: Object, required: true },
   meta: { type: String, default: "" },
-  cls: { type: String, default: null },
+  paused: { type: Boolean, default: false },   // Regulars: a paused 🔁 task, faded
 });
 const gone = ref(false);
 const editTitle = computed(() => props.task.pool ? POOL_EDIT : undefined);
@@ -17,7 +17,7 @@ const editTitle = computed(() => props.task.pool ? POOL_EDIT : undefined);
 <template>
   <div
     v-if="!gone"
-    :class="['winx-task-card', cls]"
+    :class="['winx-task-card', { 'winx-task-card--paused': paused }]"
     :data-area="task.area ?? undefined"
     draggable="true"
     :data-task="task.key"

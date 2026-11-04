@@ -8,7 +8,7 @@ defineProps({ actions: { type: Object, required: true } });
   <WinxButton
     kind="text"
     title="add item"
-    cls="winx-widget__add"
+    class="winx-widget__add"
     @click="actions.add()"
   >
     {{ "+" }}
