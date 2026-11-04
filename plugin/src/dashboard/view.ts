@@ -62,7 +62,7 @@ export class DashboardView extends ItemView {
     this.unmountDate();
     this.contentEl.empty();
     this.contentEl.removeClass("winx-dash--busy");
-    // the ✦ pill, as the calendar's (CalendarHeader.vue), shown by the tab's --busy
+    // the ✦ pill, as the calendar's (CalendarHeader/index.vue), shown by the tab's --busy
     this.contentEl.createDiv({ cls: "winx-busy" }).createDiv({ cls: "winx-busy__pill", attr: { title: "saving…" } })
       .createSpan({ cls: "winx-busy__star", text: "✦" });
     // the widgets' page date (Widget's dv.current())

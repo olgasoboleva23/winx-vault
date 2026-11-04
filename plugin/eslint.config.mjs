@@ -26,6 +26,8 @@ export default defineConfig([
   // a short element stays on one line (<span class="x">{{ v }}</span>, up to 3 attributes), a longer one breaks
   // by attribute
   { files: ["**/*.vue"], rules: {
+    // a folder's own component is its index.vue: the folder gives the name (CalendarPanel/index.vue)
+    "vue/multi-word-component-names": ["error", { ignores: ["index"] }],
     "vue/singleline-html-element-content-newline": "off",
     // its fix puts an element's text on a line of its own, and Vue then draws a space before it (" day 3")
     "vue/multiline-html-element-content-newline": "off",

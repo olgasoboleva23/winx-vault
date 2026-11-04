@@ -36,3 +36,6 @@ export const shownDays = (state, today) =>
 export const dateFor = (date, view, today) => !date || (view === "month"
   ? date.slice(0, 7) === today.slice(0, 7)
   : weekOf(date)[0] === weekOf(today)[0]) ? null : date;
+
+// show `date`'s week or month (null: follow today), from the shown view
+export const goTo = (state, date, { view, today }) => { state.date = dateFor(date, view, today); };
