@@ -20,7 +20,7 @@ before(async () => {
   ({ defineComponent, h, nextTick } = await import("vue"));
 });
 
-// a view that shows state.data.n, the error, or "…"
+// a view that shows state.data.n (the host draws the error and the placeholder)
 const View = () => defineComponent({
   props: { state: Object, actions: Object },
   setup: p => () => h("b", p.state.error ? `err ${p.state.error}` : p.state.data ? String(p.state.data.n) : "…"),
@@ -54,13 +54,13 @@ test("a load that ends after the block went writes nothing, and Vue is unmounted
   assert.equal(el.innerHTML, "");
 });
 
-test("an error shows, and retry loads again", async () => {
+test("an error shows with retry, which loads again", async () => {
   const s = slow(), { host, el } = mount({ load: s.load });
   const quiet = console.error; console.error = () => {};
   s.loads[0].fail(new Error("Weight.md is broken")); await settle();
   console.error = quiet;
-  assert.equal(el.textContent, "err Weight.md is broken");
-  host.refresh();   // retry
+  assert.equal(el.textContent, "⚠ couldn't draw: Weight.md is brokenretry");   // the host's own WinxFailed
+  el.querySelector("button").click();
   s.loads[1].ok({ n: 3 }); await settle();
   assert.equal(el.textContent, "3");
   host.unload();
@@ -85,5 +85,29 @@ test("a card's block without a box of its own (display: contents) counts as show
   s.loads[0].ok({ n: 1 }); await settle();
   bus.fire("dataview:metadata-change", "update", { path: "x.md" });
   assert.equal(s.loads.length, 2);
+  host.unload();
+});
+
+test("a card: its placeholder until the first data, then the view inside it; winx-drawn once drawn", async () => {
+  const s = slow(), el = document.body.appendChild(document.createElement("div"));
+  let drawn = 0;
+  el.addEventListener("winx-drawn", () => drawn++);
+  const { host } = mount({ load: s.load, card: { title: "Weight" } }, el);
+  await settle();
+  assert.ok(el.querySelector(".winx-widget .winx-widget__body .winx-widget__skeleton"));
+  s.loads[0].ok({ n: 4 }); await settle();
+  assert.equal(el.querySelector(".winx-widget__body").textContent, "4");
+  assert.equal(el.querySelector(".callout-title-inner").textContent, "Weight");
+  assert.equal(drawn, 1);
+  host.unload();
+});
+
+test("a view that takes no actions gets none (no actions attribute on its root)", async () => {
+  const Bare = defineComponent({ props: { state: Object }, setup: p => () => h("b", p.state.data ? "ok" : "…") });
+  const s = slow(), el = document.body.appendChild(document.createElement("div"));
+  const host = new VueHost(el, Bare, { load: s.load, actions: { save: () => {} } });
+  host.load();
+  s.loads[0].ok({}); await settle();
+  assert.equal(el.innerHTML, "<b>ok</b>");
   host.unload();
 });

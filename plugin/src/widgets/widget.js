@@ -19,7 +19,7 @@ import { Card } from "../uikit/card.js";
 import { Failed } from "../uikit/empty.js";
 import { html } from "../core/html.js";
 import { useActions, useDataviewChanges, useLeaveField, useRedraw, useTabDate, useWhenIndexed } from "../core/use.js";
-import { dataview } from "../core/plugins.js";
+import { blockDv } from "../core/plugins.js";
 import { app } from "../core/app.js";
 
 const DELAY = 1000;   // ms after the last change: typing in a note changes the index on every key
@@ -40,20 +40,7 @@ export class Widget extends MarkdownRenderChild {
   view(data) { return { html: "" }; }
   after(root, data) {}
 
-  get dv() {
-    const api = dataview();
-    return api && {
-      pages: q => api.pages(q, this.sourcePath),
-      page: p => api.page(p, this.sourcePath),
-      // the page: its note, with the date of the tab it's drawn in (the dashboard's data-date) over the note's
-      current: () => {
-        const page = api.page(this.sourcePath), date = this.containerEl.closest("[data-date]")?.dataset.date;
-        return date ? { ...page, date: api.date(date) } : page;
-      },
-      date: d => api.date(d),
-      api,
-    };
-  }
+  get dv() { return blockDv(this.sourcePath, this.containerEl); }
   get app() { return app; }
 
   // a chart or anything with destroy(), dropped on the next draw
