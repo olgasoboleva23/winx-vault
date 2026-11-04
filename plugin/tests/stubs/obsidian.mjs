@@ -15,7 +15,6 @@ export class Component {
 }
 export class MarkdownRenderChild extends Component { constructor(el) { super(); this.containerEl = el; } }
 export const debounce = fn => Object.assign(fn, { cancel() {} });
-export const sanitizeHTMLToDom = html => html;
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };
 export const Keymap = { isModEvent: () => false };

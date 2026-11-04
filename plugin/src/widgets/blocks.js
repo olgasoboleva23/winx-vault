@@ -29,7 +29,6 @@ import { dailyNoteActions, loadDailyNote } from "./dailyNote.js";
 import DailyNoteOpen from "../components/widgets/DailyNoteOpen.vue";
 import { loadPomodoro, pomodoroActions } from "./pomodoro/pomodoro.js";
 import PomodoroTimer from "../components/widgets/pomodoro/PomodoroTimer/index.vue";
-import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
 import { app } from "../core/app.js";
@@ -38,7 +37,7 @@ import { app } from "../core/app.js";
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes,
 // cardButton: a .vue next to the card's title, bodyClass: a class on the card's body, follows:
 // false to load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
-export const vueBlocks = {
+const vueBlocks = {
   xpToday: { view: XpToday, load: loadXpToday },
   levelToday: { view: LevelToday, load: loadLevelToday },
   lifeAreas: { view: LifeAreas, load: loadLifeAreas },
@@ -60,8 +59,7 @@ export const vueBlocks = {
   },
 };
 
-// a Vue widget on its block: a VueHost owned by the block, with the card when the block has a
-// "card:" line
+// a Vue widget on its block: its VueHost, with the card when the block has a "card:" line
 function vueBlock(def, el, sourcePath, args) {
   const ctx = { get dv() { return blockDv(sourcePath, el); }, app, args, sourcePath };
   const meta = args.meta ? String(args.meta).split(/\s+/) : [];
@@ -69,13 +67,11 @@ function vueBlock(def, el, sourcePath, args) {
 
   // no card: the class goes on the block itself
   if (!card && def.bodyClass) el.addClass(def.bodyClass);
-  const block = new MarkdownRenderChild(el);
   const load = () => def.load(ctx), actions = def.actions?.(ctx);
   const { cardButton, follows } = def;
   const opts = { load, actions, note: sourcePath, card, cardButton, follows };
 
-  block.addChild(new VueHost(el, def.view, opts));
-  return block;
+  return new VueHost(el, def.view, opts);
 }
 
 export const drawBlock = (source, el, ctx) => {

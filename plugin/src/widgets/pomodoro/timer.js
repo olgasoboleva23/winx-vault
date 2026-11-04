@@ -2,7 +2,7 @@
 // (Date.now; a test's own).
 import { todayYmd } from "../../core/dates.js";
 
-export const DEFAULTS = { focusMin: 25, breakMin: 5 };
+const DEFAULTS = { focusMin: 25, breakMin: 5 };
 
 // the running session: { sessionType, baseElapsed, startedAt }, in memory only (gone after a
 // restart or a reload)

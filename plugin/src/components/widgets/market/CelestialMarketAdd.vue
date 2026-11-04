@@ -11,7 +11,5 @@ defineProps({ actions: { type: Object, required: true } });
     title="add item"
     class="winx-widget__add"
     @click="actions.add()"
-  >
-    {{ "+" }}
-  </WinxButton>
+  >+</WinxButton>
 </template>

@@ -178,14 +178,6 @@ export class Task {
   }
 }
 
-// How many things are on today's plate, same rules as the old Kanban2 Today column:
-// picked for today (⏳ today), routines due by today, deadlines due by today.
-// tasks: [{done, recurring, due?, scheduled?}] with "YYYY-MM-DD" dates.
-export const todayCount = (tasks, date) => tasks.filter(t => !t.done && (
-  t.recurring ? (t.due ?? t.scheduled) !== undefined && (t.due ?? t.scheduled) <= date
-              : t.scheduled === date || (t.due !== undefined && t.due <= date)
-)).length;
-
 // Every task and pool line once, for the "New task" search: its latest spelling and picks, how many
 // times it was done and when last; by `areaOrder` (["#area/…"], the rest after), then the most done
 // and the most recent first.
