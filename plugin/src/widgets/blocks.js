@@ -1,6 +1,5 @@
 // The ```winx block: the widget classes by name, and what the plugin does with a block.
 import { parseBlock } from "./parse.js";
-import { DailyNote } from "./dailyNote.js";
 import { Pomodoro } from "./pomodoro/pomodoro.js";
 import { loadXpToday } from "./xp/xpToday.js";
 import XpToday from "./xp/XpToday.vue";
@@ -26,6 +25,8 @@ import FinanceMonths from "./finance/FinanceMonths.vue";
 import FinanceLine from "./finance/FinanceLine.vue";
 import { loadWeight, weightActions } from "./body/weight.js";
 import WeightCard from "./body/WeightCard.vue";
+import { dailyNoteActions, loadDailyNote } from "./dailyNote.js";
+import DailyNoteOpen from "./DailyNoteOpen.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
@@ -33,7 +34,7 @@ import { app } from "../core/app.js";
 
 // name → class
 export const blocks = {
-  dailyNote: DailyNote, pomodoro: Pomodoro,
+  pomodoro: Pomodoro,
 };
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
@@ -51,6 +52,7 @@ export const vueBlocks = {
   finance: { view: FinanceMonths, load: loadFinance },
   financeMonth: { view: FinanceLine, load: loadFinanceLine },
   weight: { view: WeightCard, load: loadWeight, actions: weightActions },
+  dailyNote: { view: DailyNoteOpen, load: loadDailyNote, actions: dailyNoteActions },
   celestialMarket: {
     view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
   },
