@@ -1,11 +1,10 @@
-import { Component, ItemView, MarkdownRenderer, Platform, WorkspaceLeaf, sanitizeHTMLToDom } from "obsidian";
+import { Component, ItemView, MarkdownRenderer, Platform, WorkspaceLeaf } from "obsidian";
+import { createApp, h, reactive, type App } from "vue";
 import layout from "./layout.md";
-import { addDays, todayYmd } from "../core/dates.js";
-import { busyPill } from "../uikit/busy.js";
-import { useActions, useBusy, useNewDay, useNoteLinks } from "../core/use.js";
-import { Button } from "../uikit/button.js";
-import { html } from "../core/html.js";
+import { todayYmd } from "../core/dates.js";
+import { useBusy, useNewDay, useNoteLinks } from "../core/use.js";
 import { DATA } from "../core/paths.js";
+import DashboardDate from "./DashboardDate.vue";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn by Obsidian's
 // markdown renderer, as a note in reading view would be, for the tab's date. The date is the tab's own (no date:
@@ -22,6 +21,8 @@ export class DashboardView extends ItemView {
   private page: Component | null = null;
   private shownDate = "";
   private body: HTMLElement | null = null;
+  private dateApp: App | null = null;   // the date row (DashboardDate.vue) in the layout's slot
+  private shown = reactive({ date: "", today: "" });
 
   constructor(leaf: WorkspaceLeaf) { super(leaf); }
   getViewType() { return DASHBOARD_VIEW; }
@@ -40,7 +41,7 @@ export class DashboardView extends ItemView {
     this.listen();
     this.render();
   }
-  async onClose() { this.page?.unload(); this.page = null; }
+  async onClose() { this.unmountDate(); this.page?.unload(); this.page = null; }
 
   // another day: the cards draw again in place (the pomodoro isn't touched), the date row and Quests anew
   private go(date: string | null) {
@@ -49,7 +50,7 @@ export class DashboardView extends ItemView {
     if (!this.body) return this.render();
     this.shownDate = this.date ?? todayYmd();
     this.body.dataset.date = this.shownDate;
-    this.dateRow();
+    Object.assign(this.shown, { date: this.shownDate, today: todayYmd() });
     this.quests();
     this.app.workspace.trigger("winx:date");
   }
@@ -58,9 +59,12 @@ export class DashboardView extends ItemView {
     const date = this.shownDate = this.date ?? todayYmd();
     if (this.page) this.removeChild(this.page);
     const page = this.page = this.addChild(new Component());
+    this.unmountDate();
     this.contentEl.empty();
     this.contentEl.removeClass("winx-dash--busy");
-    this.contentEl.append(sanitizeHTMLToDom(busyPill().html));
+    // the ✦ pill, as the calendar's (CalendarHeader.vue), shown by the tab's --busy
+    this.contentEl.createDiv({ cls: "winx-busy" }).createDiv({ cls: "winx-busy__pill", attr: { title: "saving…" } })
+      .createSpan({ cls: "winx-busy__star", text: "✦" });
     // the widgets' page date (Widget's dv.current())
     const body = this.body = this.contentEl.createDiv({
       cls: "markdown-preview-sizer markdown-preview-section", attr: { "data-date": date },
@@ -72,25 +76,22 @@ export class DashboardView extends ItemView {
     });
   }
 
-  // the day it shows, where the note had the Meta Bind field: the calendar's date field, round ‹ ›, "today" pill;
-  // and 📅 to the calendar, on the phone only (its tabs are out of sight)
+  // the date row: DashboardDate.vue in the layout's slot (the calendar's date field, ‹ ›, today, 📅 on the phone)
   private dateRow() {
     const slot = this.body?.querySelector(".winx-dash__date");
     if (!slot) return;
     slot.className = "winx-dash__date winx-nav";
-    slot.empty();
-    slot.createDiv({ cls: "mb-input-type-date" })
-      .createEl("input", { type: "date", value: this.shownDate, attr: { "data-action": "date" } });
-    const today = this.shownDate !== todayYmd()
-      ? new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" })
-      : "";
-    slot.append(sanitizeHTMLToDom(html`
-      ${new Button({ icon: "‹", kind: "nav", title: "previous", action: "prev" })}
-      ${new Button({ icon: "›", kind: "nav", title: "next", action: "next" })}
-      ${today}
-      ${new Button({ text: "📅", title: "calendar", kind: "chip", action: "calendar", cls: "winx-is-phone-only" })}
-    `.html));
+    Object.assign(this.shown, { date: this.shownDate, today: todayYmd() });
+    const { shown } = this, phone = Platform.isMobile;
+    const go = (date: string | null) => this.go(date || null);
+    const calendar = () => (this.app as any).commands.executeCommandById("winx:open-calendar");
+    // a render function, so the row follows shown.date (props given to createApp are read once)
+    this.dateApp = createApp({
+      render: () => h(DashboardDate, { date: shown.date, today: shown.today, phone, onGo: go, onCalendar: calendar }),
+    });
+    this.dateApp.mount(slot);
   }
+  private unmountDate() { this.dateApp?.unmount(); this.dateApp = null; }
 
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)
   private questsPart: Component | null = null;
@@ -103,19 +104,8 @@ export class DashboardView extends ItemView {
     void MarkdownRenderer.render(this.app, QUESTS.replaceAll("{{date}}", this.shownDate), slot, "", this.questsPart);
   }
 
-  private on: Record<string, (e: Event, el: HTMLElement) => any> = {
-    date: (e, el) => this.go((el as HTMLInputElement).value || null),   // emptied (the phone's "Reset"): today
-    prev: () => this.go(addDays(this.shownDate, -1)),
-    next: () => this.go(addDays(this.shownDate, 1)),
-    today: () => this.go(null),
-    calendar: () => (this.app as any).commands.executeCommandById("winx:open-calendar"),
-  };
-
   private listen() {
     const el = this.contentEl;
-    // the date row's own actions (the widgets in the cards handle theirs)
-    useActions(this, el, (name: string, target: HTMLElement) =>
-      target.closest(".winx-dash__date") ? this.on[name] : null);
     useNoteLinks(this, el);   // [[links]] in the layout open their note
     // a write to the tasks or the data: dim with the ✦ pill until a widget draws again
     useBusy(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el,

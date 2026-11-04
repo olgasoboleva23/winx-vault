@@ -1,34 +1,9 @@
 // Composables: a piece of behaviour — its listeners and their removal — added to any Obsidian component, a tab
-// (ItemView) or a widget (MarkdownRenderChild). They listen through the component's registerDomEvent /
+// (ItemView) or a widget's VueHost (core/vueHost.ts). They listen through the component's registerDomEvent /
 // registerEvent / registerInterval, so Obsidian drops it all when the component unloads.
 import { Keymap, debounce } from "obsidian";
 import { todayYmd } from "./dates.js";
 import { dataview } from "./plugins.js";
-
-// The element whose data-action an event runs, or null: a click on a button (or anything else that isn't a field
-// or a form), a field's change when the field itself has the action (not its form's), a form's submit.
-export function actionOf(type, target, root) {
-  const el = target.closest?.("[data-action]");
-  if (!el || !root.contains(el)) return null;
-  if (type === "click") {
-    return el.matches("input, select, textarea, form") || target.closest("input, select, textarea") ? null : el;
-  }
-  if (type === "change") return el === target ? el : null;
-  if (type === "submit") return el.matches("form") ? el : null;
-  return null;
-}
-
-// an event on an element with data-action="name" inside `el` runs find(name, element)'s handler (e, element)
-export function useActions(c, el, find, types = ["click", "change"]) {
-  const act = e => {
-    const target = actionOf(e.type, e.target, el);
-    const fn = target && find(target.dataset.action, target);
-    if (!fn) return;
-    if (e.type === "submit") e.preventDefault();
-    fn(e, target);
-  };
-  for (const type of types) c.registerDomEvent(el, type, act);
-}
 
 // redraw(): drawn now when shown, else once it shows (a leaf or the layout changes) — catchUp() asks again
 export function useRedraw(c, isShown, draw) {
@@ -87,23 +62,9 @@ export function useWhenIndexed(c, fn) {
   useIndexReady(c, () => { if (!done) { done = true; fn(); } });
 }
 
-// fn() when the window is back: shown again or focused (timers in a window in the background run late)
-export function useWindowBack(c, fn) {
-  c.registerDomEvent(document, "visibilitychange", () => document.hidden || fn());
-  c.registerDomEvent(window, "focus", fn);
-}
-
 // fn() when the dashboard tab's date changes, for a block `el` drawn in a dated tab
 export const useTabDate = (c, el, fn) =>
   c.registerEvent(c.app.workspace.on("winx:date", () => el.closest("[data-date]") && fn()));
-
-// fn() a moment after leaving a field in `el`, so a click on the widget's own button (which takes the focus) lands
-// first
-export function useLeaveField(c, el, fn, delay = 500) {
-  const left = debounce(fn, delay, true);
-  c.register(() => left.cancel());
-  c.registerDomEvent(el, "focusout", left);
-}
 
 // [[links]] in `el` open their note, as in a note (Cmd/Ctrl: a new tab)
 export function useNoteLinks(c, el, isMod = Keymap.isModEvent) {

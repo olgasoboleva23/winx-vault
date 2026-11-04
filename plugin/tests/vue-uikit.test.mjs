@@ -2,8 +2,8 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
-// each Vue component draws what its uikit/*.js twin draws, without data-action / data-* (Vue's @click does that)
-// and without Vue's <!--v-if--> placeholders (no box, no style)
+// each component draws the markup the styles expect (styles/uikit/*.scss): the same as the old uikit/*.js did,
+// written out here; Vue's <!--v-if--> placeholders left out (no box, no style)
 let mount, ui;
 before(async () => {
   GlobalRegistrator.register();
@@ -12,48 +12,33 @@ before(async () => {
   ui = Object.fromEntries(await Promise.all(["WinxButton", "WinxNoteLink", "WinxEmpty", "WinxMissing", "WinxFailed",
     "WinxGroupHeader", "WinxAddForm", "WinxCard"].map(async n => [n, await load(n)])));
 });
-const tidy = html => {
-  const box = document.createElement("div");
-  box.innerHTML = html.replace(/<!--[^]*?-->/g, "");
-  box.querySelectorAll("*").forEach(e => [...e.attributes].filter(a => a.name.startsWith("data-") && !a.name.startsWith("data-callout"))
-    .forEach(a => e.removeAttribute(a.name)));
-  return box.innerHTML;
-};
-const same = (vue, old) => assert.equal(tidy(vue.element.outerHTML), tidy(old.html));
+const draws = (vue, html) => assert.equal(vue.element.outerHTML.replace(/<!--[^]*?-->/g, ""), html);
 
-test("WinxButton draws as Button: kinds, on, title, extra classes", async () => {
-  const { Button } = await import("../src/uikit/button.js");
-  same(mount(ui.WinxButton, { props: { title: "delete task" }, slots: { default: "🗑" } }),
-    new Button({ icon: "🗑", title: "delete task", action: "remove" }));
-  same(mount(ui.WinxButton, { props: { kind: "pill", cls: "winx-weight__list" }, slots: { default: "✦ list" } }),
-    new Button({ text: "✦ list", action: "x", kind: "pill", cls: "winx-weight__list" }));
-  for (const on of [true, false])
-    same(mount(ui.WinxButton, { props: { kind: "toggle", on }, slots: { default: "✓ done" } }),
-      new Button({ text: "✓ done", kind: "toggle", on, action: "showDone" }));
+test("WinxButton: kinds, on, title, extra classes", () => {
+  draws(mount(ui.WinxButton, { props: { title: "delete task" }, slots: { default: "🗑" } }),
+    '<button class="winx-btn winx-btn--round" title="delete task" aria-label="delete task">🗑</button>');
+  draws(mount(ui.WinxButton, { props: { kind: "pill", cls: "winx-weight__list" }, slots: { default: "✦ list" } }),
+    '<button class="winx-btn winx-btn--pill winx-weight__list">✦ list</button>');
+  draws(mount(ui.WinxButton, { props: { kind: "toggle", on: true }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle winx-btn--on">✓ done</button>');
+  draws(mount(ui.WinxButton, { props: { kind: "toggle" }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle">✓ done</button>');
 });
 
-test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAddForm, WinxCard draw as their twins",
-  async () => {
-    const { NoteLink } = await import("../src/uikit/noteLink.js");
-    const { Empty, Missing, Failed } = await import("../src/uikit/empty.js");
-    const { GroupHeader } = await import("../src/uikit/groupHeader.js");
-    const { AddForm } = await import("../src/uikit/addForm.js");
-    const { Card } = await import("../src/uikit/card.js");
-    const { html } = await import("../src/core/html.js");
-    same(mount(ui.WinxNoteLink, { props: { path: "x/Cycle.md" }, slots: { default: "dates" } }),
-      new NoteLink({ text: "dates", path: "x/Cycle.md" }));
-    same(mount(ui.WinxEmpty, { props: { text: "All bought" } }), new Empty({ text: "All bought" }));
-    same(mount(ui.WinxEmpty), new Empty());
-    same(mount(ui.WinxMissing, { props: { path: "x/Goals.md" } }), new Missing({ path: "x/Goals.md" }));
-    same(mount(ui.WinxFailed, { props: { text: "Goals.md is broken" } }), new Failed({ text: "Goals.md is broken" }));
-    same(mount(ui.WinxGroupHeader, { props: { label: "🌿 Harvest", count: 3 } }),
-      new GroupHeader({ label: "🌿 Harvest", count: 3 }));
-    same(mount(ui.WinxGroupHeader, { props: { label: "🌿 Harvest" } }), new GroupHeader({ label: "🌿 Harvest" }));
-    const input = { name: "kg", type: "number", placeholder: "today, kg" };
-    same(mount(ui.WinxAddForm, { props: { input, submit: "Save" } }), new AddForm({ action: "save", input, submit: "Save" }));
-    same(mount(ui.WinxCard, { props: { title: "Weight", meta: ["scroll"] }, slots: { default: "<b>40 kg</b>" } }),
-      new Card({ title: "Weight", meta: ["scroll"], body: html`<b>40 kg</b>` }));
-  });
+test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAddForm, WinxCard", () => {
+  draws(mount(ui.WinxNoteLink, { props: { path: "x/Cycle.md" }, slots: { default: "dates" } }), '<button class="winx-btn winx-btn--pill">dates</button>');
+  draws(mount(ui.WinxEmpty, { props: { text: "All bought" } }), '<div class="winx-empty">✦ All bought</div>');
+  draws(mount(ui.WinxEmpty), '<div class="winx-empty">✦ Nothing here yet</div>');
+  draws(mount(ui.WinxMissing, { props: { path: "x/Goals.md" } }), '<div class="winx-empty">✦ Create x/Goals.md</div>');
+  draws(mount(ui.WinxFailed, { props: { text: "Goals.md is broken" } }),
+    '<div class="winx-empty winx-empty--error">⚠ couldn\'t draw: Goals.md is broken<button class="winx-btn winx-btn--chip winx-empty__retry">retry</button></div>');
+  draws(mount(ui.WinxGroupHeader, { props: { label: "🌿 Harvest", count: 3 } }),
+    '<div class="winx-group-header"><span>🌿 Harvest</span><span class="winx-group-header__count">3</span></div>');
+  draws(mount(ui.WinxGroupHeader, { props: { label: "🌿 Harvest" } }), '<div class="winx-group-header"><span>🌿 Harvest</span></div>');
+  const input = { name: "kg", type: "number", placeholder: "today, kg" };
+  draws(mount(ui.WinxAddForm, { props: { input, submit: "Save" } }),
+    '<form class="winx-add-form"><input class="winx-add-form__input" name="kg" type="number" placeholder="today, kg"><button class="winx-add-form__submit" type="submit">Save</button></form>');
+  draws(mount(ui.WinxCard, { props: { title: "Weight", meta: ["scroll"] }, slots: { default: "<b>40 kg</b>" } }),
+    '<div class="callout winx-widget" data-callout="card" data-callout-metadata="scroll" data-callout-fold=""><div class="callout-title winx-widget__title" dir="auto"><div class="callout-icon"></div><div class="callout-title-inner">Weight</div></div><div class="callout-content winx-widget__body"><b>40 kg</b></div></div>');
+});
 
 test("WinxButton: a mirrored nav chevron (next) gets its modifier", () => {
   const next = mount(ui.WinxButton, { props: { kind: "nav", mirrored: true, title: "next" }, slots: { default: "›" } });
