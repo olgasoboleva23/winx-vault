@@ -16,8 +16,10 @@ export class BodyLog {
   // the text with a day's entry: that day's line replaced, or a new one at the end
   set(date, level, reasons) {
     const line = `- ${date} ${level}${reasons.length ? " " + reasons.join(", ") : ""}`;
-    const lines = this.text.replace(/\s+$/, "").split("\n").filter((l, i, a) => !(a.length === 1 && l === ""));
+    const lines = this.text.replace(/\s+$/, "").split("\n")
+      .filter((l, i, a) => !(a.length === 1 && l === ""));
     const i = lines.findIndex(l => l.trim().match(ENTRY)?.[1] === date);
+
     if (i >= 0) lines[i] = line; else lines.push(line);
     return lines.join("\n") + "\n";
   }

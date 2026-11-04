@@ -1,8 +1,10 @@
-<!-- Supplies: by category, each with how long since the last time (or that it's listed) and "running low" -->
+<!-- Supplies: by category, each with how long since the last time (or that it's listed) and
+     "running low" -->
 <script setup>
 import WinxButton from "../../uikit/WinxButton.vue";
 import WinxEmpty from "../../uikit/WinxEmpty.vue";
 import WinxGroupHeader from "../../uikit/WinxGroupHeader.vue";
+
 defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 </script>
 
@@ -11,10 +13,18 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
     <WinxEmpty v-if="state.data.empty" text="Nothing bought twice yet" />
     <template v-for="g in state.data.groups" :key="g.label">
       <WinxGroupHeader :label="g.label" />
-      <div v-for="r in g.rows" :key="r.name" :class="['winx-supplies__row', { 'winx-supplies__row--due': r.due }]">
+      <div
+        v-for="r in g.rows"
+        :key="r.name"
+        :class="['winx-supplies__row', { 'winx-supplies__row--due': r.due }]"
+      >
         <span class="winx-supplies__name">{{ r.name }}</span>
         <span class="winx-supplies__info">{{ r.info }}</span>
-        <WinxButton v-if="!r.listed" kind="pill" @click="actions.low(r.name, r.tag)">running low</WinxButton>
+        <WinxButton
+          v-if="!r.listed"
+          kind="pill"
+          @click="actions.low(r.name, r.tag)"
+        >running low</WinxButton>
       </div>
     </template>
   </div>

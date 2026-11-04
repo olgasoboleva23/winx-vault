@@ -1,5 +1,5 @@
-<!-- The calendar tab's page (view.ts mounts it): the header's rows, "Missed?", the days, the bottom panel; the words
-     while there's nothing to draw ("waiting for Dataview…") -->
+<!-- The calendar tab's page (view.ts mounts it): the header's rows, "Missed?", the days, the bottom
+     panel; the words while there's nothing to draw ("waiting for Dataview…") -->
 <script setup>
 import { computed, inject } from "vue";
 import CalendarHeader from "./CalendarHeader/index.vue";

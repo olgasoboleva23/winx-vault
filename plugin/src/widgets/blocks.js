@@ -1,4 +1,5 @@
-// The ```winx block: the widgets by name (each a .vue on a VueHost), and what the plugin does with a block.
+// The ```winx block: the widgets by name (each a .vue on a VueHost) and what the plugin does
+// with a block.
 import { parseBlock } from "./parse.js";
 import { loadXpToday } from "./xp/xpToday.js";
 import XpToday from "../components/widgets/xp/XpToday.vue";
@@ -34,9 +35,9 @@ import { blockDv } from "../core/plugins.js";
 import { app } from "../core/app.js";
 
 
-// the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
-// a .vue next to the card's title, bodyClass: a class on the card's body, follows: false to load once },
-// where ctx is { dv, app, args, sourcePath } (dv: blockDv)
+// the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes,
+// cardButton: a .vue next to the card's title, bodyClass: a class on the card's body, follows:
+// false to load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
 export const vueBlocks = {
   xpToday: { view: XpToday, load: loadXpToday },
   levelToday: { view: LevelToday, load: loadLevelToday },
@@ -52,26 +53,35 @@ export const vueBlocks = {
   dailyNote: { view: DailyNoteOpen, load: loadDailyNote, actions: dailyNoteActions },
   pomodoro: { view: PomodoroTimer, load: loadPomodoro, actions: pomodoroActions, follows: false },
   celestialMarket: {
-    view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
+    view: CelestialMarket,
+    load: loadCelestialMarket,
+    actions: celestialMarketActions,
+    cardButton: CelestialMarketAdd,
   },
 };
 
-// a Vue widget on its block: a VueHost (with the card when the block has a "card:" line) owned by the block
+// a Vue widget on its block: a VueHost owned by the block, with the card when the block has a
+// "card:" line
 function vueBlock(def, el, sourcePath, args) {
   const ctx = { get dv() { return blockDv(sourcePath, el); }, app, args, sourcePath };
   const meta = args.meta ? String(args.meta).split(/\s+/) : [];
   const card = args.card ? { title: String(args.card), meta, bodyClass: def.bodyClass } : undefined;
-  if (!card && def.bodyClass) el.addClass(def.bodyClass);   // no card: the class goes on the block itself
+
+  // no card: the class goes on the block itself
+  if (!card && def.bodyClass) el.addClass(def.bodyClass);
   const block = new MarkdownRenderChild(el);
   const load = () => def.load(ctx), actions = def.actions?.(ctx);
   const { cardButton, follows } = def;
-  block.addChild(new VueHost(el, def.view, { load, actions, note: sourcePath, card, cardButton, follows }));
+  const opts = { load, actions, note: sourcePath, card, cardButton, follows };
+
+  block.addChild(new VueHost(el, def.view, opts));
   return block;
 }
 
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);
   const def = vueBlocks[name];
+
   if (!def) return void el.createDiv({ text: `winx: no widget "${name}"` });
   ctx.addChild(vueBlock(def, el, ctx.sourcePath, args));
 };

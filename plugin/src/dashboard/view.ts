@@ -6,14 +6,16 @@ import { useBusy, useNewDay, useNoteLinks } from "../core/use.js";
 import { DATA } from "../core/paths.js";
 import DashboardDate from "../components/dashboard/DashboardDate.vue";
 
-// The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn by Obsidian's
-// markdown renderer, as a note in reading view would be, for the tab's date. The date is the tab's own (no date:
-// today, and it moves on at midnight); Obsidian saves it with the layout. After a write to the tasks or the data,
-// the tab dims with the calendar's ✦ pill until a widget has drawn again (5 s at most).
+// The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn
+// by Obsidian's markdown renderer, as a note in reading view would be, for the tab's date. The date
+// is the tab's own (no date: today, and it moves on at midnight); Obsidian saves it with the
+// layout. After a write to the tasks or the data, the tab dims with the calendar's ✦ pill until a
+// widget has drawn again (5 s at most).
 export const DASHBOARD_VIEW = "winx-dashboard";
 const WATCHED = [`${DATA}/`];
 const QUIET = "00 System/Data/pomodoro.json";   // the timer saves itself all the time
-// layout.md: the grid, then the Quests card's Tasks query (drawn into the card on its own: a new day redraws only it)
+// layout.md: the grid, then the Quests card's Tasks query (drawn into the card on its own: a new
+// day redraws only it)
 const [GRID, QUESTS] = layout.split(/\n%%.*%%\n/);
 
 export class DashboardView extends ItemView {
@@ -37,13 +39,16 @@ export class DashboardView extends ItemView {
   }
 
   async onOpen() {
-    this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard", "winx-dash"]);
+    this.contentEl.addClasses(
+      ["markdown-preview-view", "markdown-rendered", "dashboard", "winx-dash"],
+    );
     this.listen();
     this.render();
   }
   async onClose() { this.unmountDate(); this.page?.unload(); this.page = null; }
 
-  // another day: the cards draw again in place (the pomodoro isn't touched), the date row and Quests anew
+  // another day: the cards draw again in place (the pomodoro isn't touched), the date row and
+  // Quests anew
   private go(date: string | null) {
     this.date = date === todayYmd() ? null : date;
     this.app.workspace.requestSaveLayout();
@@ -57,13 +62,15 @@ export class DashboardView extends ItemView {
 
   private render() {
     const date = this.shownDate = this.date ?? todayYmd();
+
     if (this.page) this.removeChild(this.page);
     const page = this.page = this.addChild(new Component());
     this.unmountDate();
     this.contentEl.empty();
     this.contentEl.removeClass("winx-dash--busy");
     // the ✦ pill, as the calendar's (CalendarHeader/index.vue), shown by the tab's --busy
-    this.contentEl.createDiv({ cls: "winx-busy" }).createDiv({ cls: "winx-busy__pill", attr: { title: "saving…" } })
+    this.contentEl.createDiv({ cls: "winx-busy" })
+      .createDiv({ cls: "winx-busy__pill", attr: { title: "saving…" } })
       .createSpan({ cls: "winx-busy__star", text: "✦" });
     // the widgets' page date (Widget's dv.current())
     const body = this.body = this.contentEl.createDiv({
@@ -76,9 +83,11 @@ export class DashboardView extends ItemView {
     });
   }
 
-  // the date row: DashboardDate.vue in the layout's slot (the calendar's date field, ‹ ›, today, 📅 on the phone)
+  // the date row: DashboardDate.vue in the layout's slot (the calendar's date field, ‹ ›, today, 📅
+  // on the phone)
   private dateRow() {
     const slot = this.body?.querySelector(".winx-dash__date");
+
     if (!slot) return;
     slot.className = "winx-dash__date winx-nav";
     Object.assign(this.shown, { date: this.shownDate, today: todayYmd() });
@@ -87,29 +96,36 @@ export class DashboardView extends ItemView {
     const calendar = () => (this.app as any).commands.executeCommandById("winx:open-calendar");
     // a render function, so the row follows shown.date (props given to createApp are read once)
     this.dateApp = createApp({
-      render: () => h(DashboardDate, { date: shown.date, today: shown.today, phone, onGo: go, onCalendar: calendar }),
+      render: () => h(DashboardDate, {
+        date: shown.date, today: shown.today, phone, onGo: go, onCalendar: calendar,
+      }),
     });
     this.dateApp.mount(slot);
   }
   private unmountDate() { this.dateApp?.unmount(); this.dateApp = null; }
 
-  // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day redraws only it)
+  // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day
+  // redraws only it)
   private questsPart: Component | null = null;
   private quests() {
     const slot = this.body?.querySelector(".winx-dash__quests") as HTMLElement | null;
+
     if (!slot) return;
     if (this.questsPart) this.page!.removeChild(this.questsPart);
     this.questsPart = this.page!.addChild(new Component());
     slot.empty();
-    void MarkdownRenderer.render(this.app, QUESTS.replaceAll("{{date}}", this.shownDate), slot, "", this.questsPart);
+    const query = QUESTS.replaceAll("{{date}}", this.shownDate);
+
+    void MarkdownRenderer.render(this.app, query, slot, "", this.questsPart);
   }
 
   private listen() {
     const el = this.contentEl;
     useNoteLinks(this, el);   // [[links]] in the layout open their note
     // a write to the tasks or the data: dim with the ✦ pill until a widget draws again
-    useBusy(this, (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d)), () => el,
-      "winx-dash--busy");
+    const watched = (path: string) => path !== QUIET && WATCHED.some(d => path.startsWith(d));
+
+    useBusy(this, watched, () => el, "winx-dash--busy");
     this.registerDomEvent(el, "winx-drawn" as any,
       () => window.setTimeout(() => el.removeClass("winx-dash--busy"), 200));
     // following today: a new day moves the dashboard on

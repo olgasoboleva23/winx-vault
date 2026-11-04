@@ -57,6 +57,7 @@ async function finish() {
 }
 
 async function act(change) { change(timer); arm(); tick(); await save(); }
+
 const play = () => act(t => t.running ? t.pause() : t.play());
 const reset = () => act(t => t.reset());
 const skip = () => act(t => t.reset(t.other));   // to the next session, this one not counted
@@ -66,6 +67,7 @@ const toggle = () => { mini.value = !mini.value; void save(); };
 
 async function gear() {
   const lengths = await props.actions.lengths(timer.settings);
+
   if (lengths) await act(t => { t.settings = lengths; t.reset(); });
 }
 

@@ -27,6 +27,7 @@ const fold = () => {
   open.value = !open.value;
   app.saveLocalStorage("winx-cycle-open", open.value ? "1" : null);
 };
+
 const folded = computed(() => !open.value && d.value.info);
 </script>
 

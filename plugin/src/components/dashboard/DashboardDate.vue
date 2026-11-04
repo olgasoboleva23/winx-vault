@@ -1,9 +1,10 @@
-<!-- The dashboard's date row (where the note had the Meta Bind field): the date field, ‹ ›, "today" when another
-     day shows, and 📅 to the calendar on the phone only (its tabs are out of sight). @go(date): another day
-     (null: today), @calendar: open the calendar -->
+<!-- The dashboard's date row (where the note had the Meta Bind field): the date field, ‹ ›, "today"
+     when another day shows, and 📅 to the calendar on the phone only (its tabs are out of sight).
+     @go(date): another day (null: today), @calendar: open the calendar -->
 <script setup>
 import { addDays } from "../../core/dates.js";
 import WinxButton from "../uikit/WinxButton.vue";
+
 const props = defineProps({
   date: { type: String, required: true },    // the day it shows
   today: { type: String, required: true },

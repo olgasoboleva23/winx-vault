@@ -1,9 +1,14 @@
-<!-- a day as a column (the week) or a card (under the phone's month): its heading, its tasks, its drop zones -->
+<!-- a day as a column (the week) or a card (under the phone's month): its heading, its tasks, its
+     drop zones -->
 <script setup>
 import { computed, inject } from "vue";
 import DayFill from "./DayFill.vue";
 import DayZones from "./DayZones.vue";
-const props = defineProps({ day: { type: String, required: true }, format: { type: String, required: true } });
+
+const props = defineProps({
+  day: { type: String, required: true },
+  format: { type: String, required: true },
+});
 const view = inject("calendar");
 const head = computed(() => window.moment(props.day).format(props.format));
 const today = computed(() => props.day === view.ctx.today);

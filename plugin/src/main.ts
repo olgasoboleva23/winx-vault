@@ -7,8 +7,8 @@ import { useNotify } from "./services/notify.js";
 import { setApp } from "./core/app.js";
 import { installSounds } from "./core/sounds.js";
 
-// The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the commands, and the
-// styles (styles.css, built from styles/*.scss).
+// The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the
+// commands, and the styles (styles.css, built from styles/*.scss).
 
 export default class WinxPlugin extends Plugin {
   async onload() {
@@ -18,11 +18,16 @@ export default class WinxPlugin extends Plugin {
     // a ```winx block in a note: a widget class by name (widgets/blocks.js)
     this.registerMarkdownCodeBlockProcessor("winx", drawBlock);
     // the calendar: its own tab; the command opens it, or goes to the one already open.
-    // The ✨ ribbon icon opens Winx: the dashboard and the calendar as two pinned tabs (or goes back to them)
+    // The ✨ ribbon icon opens Winx: the dashboard and the calendar as two pinned tabs (or goes back
+    // to them)
     this.registerView(VIEW_TYPE, leaf => new CalendarView(leaf));
     this.registerView(DASHBOARD_VIEW, leaf => new DashboardView(leaf));
-    this.addCommand({ id: "open-calendar", name: "Open calendar", callback: () => this.open(VIEW_TYPE) });
-    this.addCommand({ id: "open-dashboard", name: "Open dashboard", callback: () => this.open(DASHBOARD_VIEW) });
+    this.addCommand({
+      id: "open-calendar", name: "Open calendar", callback: () => this.open(VIEW_TYPE),
+    });
+    this.addCommand({
+      id: "open-dashboard", name: "Open dashboard", callback: () => this.open(DASHBOARD_VIEW),
+    });
     this.addRibbonIcon("sparkles", "Winx", () => this.openWinx());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",
@@ -33,16 +38,22 @@ export default class WinxPlugin extends Plugin {
         await plugins.enablePlugin(this.manifest.id);
       },
     });
-    // the phone has no status bar: "✦ syncing" (the star spinning) at the top while Remotely Save syncs
+    // the phone has no status bar: "✦ syncing" (the star spinning) at the top while Remotely Save
+    // syncs
     if (Platform.isMobile) {
       // hidden even before the styles load
-      const badge = document.body.createDiv({ cls: "winx-syncing", attr: { style: "display: none" } });
+      const badge = document.body.createDiv({
+        cls: "winx-syncing", attr: { style: "display: none" },
+      });
       badge.createSpan({ cls: "winx-syncing__star", text: "✦" });
       badge.appendText("syncing");
       this.register(() => badge.remove());
       const syncing = () => (this.app as any).plugins.plugins["remotely-save"]?.isSyncing;
-      this.registerInterval(window.setInterval(() => badge.style.display = syncing() ? "flex" : "none", 500));
+      this.registerInterval(window.setInterval(() => {
+        badge.style.display = syncing() ? "flex" : "none";
+      }, 500));
     }
+
     // desktop: today's reminders; a click opens the calendar
     useNotify(this, () => this.open(VIEW_TYPE));
   }
@@ -50,11 +61,13 @@ export default class WinxPlugin extends Plugin {
   async open(type: string, reveal = true) {
     const { workspace } = this.app;
     let leaf = workspace.getLeavesOfType(type)[0];
+
     if (!leaf) {
       leaf = workspace.getLeaf("tab");
       await leaf.setViewState({ type, active: reveal });
       leaf.setPinned(true);
     }
+
     if (reveal) void workspace.revealLeaf(leaf);
     return leaf;
   }
@@ -62,8 +75,11 @@ export default class WinxPlugin extends Plugin {
   async openWinx() {
     const { workspace } = this.app;
     const open = [DASHBOARD_VIEW, VIEW_TYPE].flatMap(t => workspace.getLeavesOfType(t));
+
     if (open.length)
-      return workspace.revealLeaf(open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0]);
+      return workspace.revealLeaf(
+        open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0],
+      );
     const dash = await this.open(DASHBOARD_VIEW, false);
     await this.open(VIEW_TYPE, false);
     void workspace.revealLeaf(dash);

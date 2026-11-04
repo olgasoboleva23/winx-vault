@@ -7,6 +7,7 @@ const state = view.state;
 
 const tabs = computed(() => {
   const { backlog, regulars, pool, ahead } = view.ctx.model;
+
   return [
     ["nodate", `No date · ${backlog.length}`],
     ["ahead", `Ahead · ${ahead.flatMap(g => g.items).length}`],

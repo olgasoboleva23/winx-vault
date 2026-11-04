@@ -1,9 +1,10 @@
-<!-- a card in the bottom panel: its text, a meta line (the meta slot, else `meta`), and the hover buttons: the
-     extra slot first, then ⏭ ✏️ 🗑 — or ✏️ 🗑 for a pool item -->
+<!-- a card in the bottom panel: its text, a meta line (the meta slot, else `meta`), and the hover
+     buttons: the extra slot first, then ⏭ ✏️ 🗑 — or ✏️ 🗑 for a pool item -->
 <script setup>
 import { computed, ref } from "vue";
 import TaskText from "./TaskText.vue";
 import TaskButtons from "./TaskButtons.vue";
+
 const POOL_EDIT = "edit: difficulty, area, time, sticker, then text";
 const props = defineProps({
   task: { type: Object, required: true },

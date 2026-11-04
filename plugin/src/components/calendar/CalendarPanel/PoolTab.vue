@@ -13,11 +13,13 @@ const view = inject("calendar");
 
 const groups = computed(() => {
   const { model, config } = view.ctx;
+
   return byArea(model.pool, t => ({ task: view.info(t), meta: model.poolMeta(t) }), config);
 });
 
 const toToday = c => {
   const t = view.task(c.task.key);
+
   if (t) view.actions.fromPool(t, view.ctx.today, false);
 };
 </script>

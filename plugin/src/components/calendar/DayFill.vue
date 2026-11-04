@@ -1,5 +1,6 @@
-<!-- a day's tasks: its rows, its 🔁 entries folded into one "🔁 2/5" box (unfolded: by time of day), the done ones
-     ✓ done hides as ✓N. A click on the box's edge, its pill or a group heading folds / unfolds the day (saved) -->
+<!-- a day's tasks: its rows, its 🔁 entries folded into one "🔁 2/5" box (unfolded: by time of
+     day), the done ones ✓ done hides as ✓N. A click on the box's edge, its pill or a group
+     heading folds / unfolds the day (saved) -->
 <script setup>
 import { computed, inject } from "vue";
 import TaskRow from "./TaskRow.vue";
@@ -7,20 +8,33 @@ import DoneMarks from "./DoneMarks.vue";
 import { T } from "../../calendar/data.js";
 
 const TIMES = [["morning", "🌅 morning"], ["evening", "🌙 evening"], [null, "🔁 other"]];
-const EDGE = ".winx-cal__routine, .winx-cal__routine-pill, .winx-cal__routine-pill *, .winx-cal__routine-time";
-const props = defineProps({ day: { type: String, required: true }, compact: { type: Boolean, default: false } });
+const EDGE = [
+  ".winx-cal__routine", ".winx-cal__routine-pill", ".winx-cal__routine-pill *",
+  ".winx-cal__routine-time",
+].join(", ");
+const props = defineProps({
+  day: { type: String, required: true },
+  compact: { type: Boolean, default: false },
+});
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);
 const state = view.state;
-const row = e => ({ key: `${view.info(e.t).key}|${e.kind}`, task: view.info(e.t), kind: e.kind, after: !!e.follows });
+const row = e => ({
+  key: `${view.info(e.t).key}|${e.kind}`, task: view.info(e.t), kind: e.kind, after: !!e.follows,
+});
 // the 🔁 box's groups by time of day: { name, rows }; a task after another goes in its group
 const groups = es => {
   const time = e => T((e.follows ?? e).t).time;
   const inGroup = tag => e => time(e) === tag || (!tag && !TIMES.some(([g]) => g && time(e) === g));
-  return TIMES.map(([tag, name]) => ({ name, rows: es.filter(inGroup(tag)).map(row) })).filter(g => g.rows.length);
+
+  return TIMES.map(([tag, name]) => ({ name, rows: es.filter(inGroup(tag)).map(row) }))
+    .filter(g => g.rows.length);
 };
+
 const fill = computed(() => {
-  const { rows, routine, routineRows, hidden, routineHidden } = ctx.value.model.dayParts(props.day, ctx.value.shown);
+  const { rows, routine, routineRows, hidden, routineHidden } =
+    ctx.value.model.dayParts(props.day, ctx.value.shown);
+
   return {
     rows: rows.map(row), routine: routine.length ? {
       count: `🔁 ${routine.filter(e => e.kind === "done").length}/${routine.length}`,
@@ -32,6 +46,7 @@ const fill = computed(() => {
 });
 const open = computed(() => state.unfolded.includes(props.day));
 const tick = computed(() => !!ctx.value.TASKS);
+
 function fold(e) {
   if (!e.target.matches(EDGE)) return;
   const d = props.day;

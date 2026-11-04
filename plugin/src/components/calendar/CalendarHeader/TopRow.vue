@@ -13,6 +13,7 @@ const muted = ref(isMuted());
 // emptied (the phone's "Reset"): today
 const onDate = e => goTo(view.state, e.target.value || null, view.ctx);
 const mute = () => { toggleMute(); muted.value = isMuted(); };
+
 const newTask = () => app.commands.executeCommandById("winx:new-task");
 const dashboard = () => app.commands.executeCommandById("winx:open-dashboard");
 </script>

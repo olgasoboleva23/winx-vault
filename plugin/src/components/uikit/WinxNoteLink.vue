@@ -1,8 +1,10 @@
-<!-- a button that opens a note (a pill by default, as uikit/noteLink.js): from the note the block is in -->
+<!-- a button that opens a note (a pill by default, as uikit/noteLink.js): from the note the
+     block is in -->
 <script setup>
 import { inject } from "vue";
 import { app } from "../../core/app.js";
 import WinxButton from "./WinxButton.vue";
+
 const props = defineProps({
   path: { type: String, required: true },
   kind: { type: String, default: "pill" },

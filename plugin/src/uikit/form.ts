@@ -1,15 +1,16 @@
 import { Modal, type App, type TFile } from "obsidian";
 
 // One window of fields instead of a chain of prompts. Each row is
-//   { name, key, options: [{ label, value, img? }] }  a row of buttons, the chosen one highlighted (mod-cta)
+//   { name, key, options: [{ label, value, img? }] }  buttons, the chosen one lit (mod-cta)
 //   { name, key, text: placeholder, number? }       a text box
 //   { name, key, check: description }               a checkbox
-// `values` has the starting ones; the keys in `required` must be set before the button works (it's greyed out).
-// Form.ask(...) resolves to the values on the button (or Enter), null when closed.
+// `values` has the starting ones; the keys in `required` must be set before the button works (it's
+// greyed out). Form.ask(...) resolves to the values on the button (or Enter), null when closed.
 export type Row =
   | { name: string; key: string; options: { label: string; value: unknown; img?: TFile }[] }
   | { name: string; key: string; text: string; number?: boolean }
   | { name: string; key: string; check: string };
+
 export type Values = Record<string, any>;
 type Options = { values?: Values; required?: string[]; submit?: string };
 
@@ -23,7 +24,10 @@ export class Form extends Modal {
   private button!: HTMLButtonElement;
   private resolve: (v: Values | null) => void = () => {};
 
-  constructor(app: App, title: string, rows: Row[], { values = {}, required = [], submit = "Next →" }: Options = {}) {
+  constructor(
+    app: App, title: string, rows: Row[],
+    { values = {}, required = [], submit = "Next →" }: Options = {},
+  ) {
     super(app);
     this.title = title;
     this.rows = rows;
@@ -33,10 +37,13 @@ export class Form extends Modal {
   }
   static ask(app: App, title: string, rows: Row[], options?: Options): Promise<Values | null> {
     const form = new Form(app, title, rows, options);
+
     return new Promise(resolve => { form.resolve = resolve; form.open(); });
   }
 
-  private get ready() { return this.required.every(k => ![null, undefined, ""].includes(this.values[k])); }
+  private get ready() {
+    return this.required.every(k => ![null, undefined, ""].includes(this.values[k]));
+  }
   private update()    { this.button.disabled = !this.ready; }
   private send()      { if (this.ready) { this.done = true; this.close(); } }
 
@@ -59,16 +66,24 @@ export class Form extends Modal {
     info.createDiv({ cls: "setting-item-name", text: r.name });
     if ("check" in r) info.createDiv({ cls: "setting-item-description", text: r.check });
     const ctl = item.createDiv({ cls: "setting-item-control", attr: { style: "flex-wrap: wrap" } });
+
     if ("options" in r) {
       const buttons = r.options.map(({ label, value, img }) => {
         const b = ctl.createEl("button", { text: img ? "" : label, attr: { title: label } });
-        if (img) b.createEl("img", { attr: { src: this.app.vault.getResourcePath(img), style: "height: 24px" } });
+
+        if (img) {
+          const src = this.app.vault.getResourcePath(img);
+
+          b.createEl("img", { attr: { src, style: "height: 24px" } });
+        }
+
         b.toggleClass("mod-cta", value === vals[r.key]);
         b.onclick = () => {
           vals[r.key] = value;
           buttons.forEach(x => x.toggleClass("mod-cta", x === b));
           this.update();
         };
+
         return b;
       });
     } else if ("check" in r) {
@@ -76,10 +91,14 @@ export class Form extends Modal {
       box.checked = !!vals[r.key];
       box.onchange = () => { vals[r.key] = box.checked; };
     } else {
-      const input = ctl.createEl("input", { type: r.number ? "number" : "text", attr: { placeholder: r.text } });
+      const input = ctl.createEl("input", {
+        type: r.number ? "number" : "text", attr: { placeholder: r.text },
+      });
       input.value = vals[r.key] ?? "";
       input.oninput = () => {
-        vals[r.key] = r.number ? (input.value === "" ? null : Number(input.value)) : input.value.trim();
+        vals[r.key] = !r.number ? input.value.trim()
+          : input.value === "" ? null
+          : Number(input.value);
         this.update();
       };
     }

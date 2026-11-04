@@ -1,5 +1,6 @@
-<!-- an empty list's line with a sparkle: "✦ All bought"; no text: "✦ Nothing here yet" (as uikit/empty.js);
-     mod: a modifier (winx-empty--error), icon instead of ✦; the slot goes after the text (a button) -->
+<!-- an empty list's line with a sparkle: "✦ All bought"; no text: "✦ Nothing here yet" (as
+     uikit/empty.js); mod: a modifier (winx-empty--error), icon instead of ✦; the slot goes
+     after the text (a button) -->
 <script setup>
 defineProps({
   text: { type: String, default: "Nothing here yet" },

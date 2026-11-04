@@ -21,6 +21,7 @@ provide("flipped", flipped);
 // No date's "show all N" / "show less", under its cards
 const more = computed(() => {
   const n = view.ctx.model.backlog.length;
+
   if (state.tab !== "nodate" || n <= SHOWN) return null;
   return state.backlogOpen ? "show less" : `show all ${n}`;
 });

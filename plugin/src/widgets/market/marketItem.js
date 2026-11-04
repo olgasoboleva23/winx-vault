@@ -10,14 +10,19 @@ export class MarketItem {
       .replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
   }
   // its category: the first tag that isn't nested
-  get tag() { return (this.line.match(/#[^\s#]+/gu) ?? []).find(tag => !tag.includes("/")) ?? "#other"; }
+  get tag() {
+    return (this.line.match(/#[^\s#]+/gu) ?? []).find(tag => !tag.includes("/")) ?? "#other";
+  }
   // bought on `date`, the way the Tasks plugin marks it; a line that isn't open comes back as it is
   bought(date) {
-    return /^\s*- \[ \]/.test(this.line) ? `${this.line.replace("- [ ]", "- [x]").trimEnd()} ✅ ${date}` : this.line;
+    if (!/^\s*- \[ \]/.test(this.line)) return this.line;
+
+    return `${this.line.replace("- [ ]", "- [x]").trimEnd()} ✅ ${date}`;
   }
   // back on the list: open, without its ✅ date
   unbought() {
     if (!this.isBought) return this.line;
-    return this.line.replace(/- \[x\]/i, "- [ ]").replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/u, "").trimEnd();
+    return this.line.replace(/- \[x\]/i, "- [ ]")
+      .replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/u, "").trimEnd();
   }
 }

@@ -1,6 +1,7 @@
-// Pomodoro: a 25/5 focus timer, a small row that opens into a ring (click the time), session stars, and its settings;
-// state in 00 System/Data/pomodoro.json (settings, the current session, today's stats). The markup and the ticking:
-// PomodoroTimer.vue (a running session lives on in timer.js through a remount; the ticking stops when the block goes).
+// Pomodoro: a 25/5 focus timer, a small row that opens into a ring (click the time), session stars,
+// and its settings; state in 00 System/Data/pomodoro.json (settings, the current session, today's
+// stats). The markup and the ticking: PomodoroTimer.vue (a running session lives on in timer.js
+// through a remount; the ticking stops when the block goes).
 import { todayYmd } from "../../core/dates.js";
 import { readJson } from "../../core/files.js";
 import { AudioEngine } from "../../core/sounds.js";
@@ -9,9 +10,11 @@ import { app } from "../../core/app.js";
 import { addStats } from "./timer.js";
 
 const PATH = "00 System/Data/pomodoro.json";
+
 export const ICON = {
   play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
   pause: `<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>`,
+  // eslint-disable-next-line max-len -- an SVG path
   star: `<svg viewBox="0 0 24 24"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg>`,
   // eslint-disable-next-line max-len -- an SVG path
   reset: `<svg viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>`,
@@ -25,13 +28,15 @@ const load = () => readJson(PATH, {});
 // the saved settings, mini and stats, and today's session (another day's starts over)
 export async function loadPomodoro() {
   const saved = await load();
+
   return { saved, current: saved.current?.date === todayYmd() ? saved.current : null };
 }
 
-// the block's sound (one per block), the lengths' window, and the save: settings, the current session, mini and
-// today's stats (a finished focus session adds its minutes)
+// the block's sound (one per block), the lengths' window, and the save: settings, the current
+// session, mini and today's stats (a finished focus session adds its minutes)
 export function pomodoroActions() {
   const sound = new AudioEngine("00 System/Assets/sparkle.wav");
+
   return {
     ding: rate => sound.play({ rate }),
     // ⚙: the session lengths in the shared window; null when closed or not both set
@@ -40,7 +45,10 @@ export function pomodoroActions() {
         { name: "Focus", key: "focusMin", text: "minutes", number: true },
         { name: "Break", key: "breakMin", text: "minutes", number: true },
       ], { values: settings, required: ["focusMin", "breakMin"], submit: "Save" });
-      return v?.focusMin > 0 && v.breakMin > 0 ? { focusMin: v.focusMin, breakMin: v.breakMin } : null;
+
+      const ok = v?.focusMin > 0 && v.breakMin > 0;
+
+      return ok ? { focusMin: v.focusMin, breakMin: v.breakMin } : null;
     },
     save: async ({ settings, current, mini }, focusMin = 0) => {
       const data = await load();

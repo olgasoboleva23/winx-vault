@@ -20,6 +20,7 @@ const layout = computed(() => ctx.value.view === "week" ? "week" : phone ? "phon
 
 const picked = computed(() => {
   const { days, today, base } = ctx.value, chosen = state.picked;
+
   return days.includes(chosen) ? chosen
     : days.includes(today) && sameMonth(today, base) ? today
     : base.slice(0, 8) + "01";
@@ -34,8 +35,10 @@ const weekdays = computed(() =>
 const cells = computed(() => {
   const { days, today, base, model, shown } = ctx.value;
   const p = layout.value === "phone" ? picked.value : null;
+
   return days.map(d => {
     const es = model.byDay[d].filter(e => e.kind !== "ghost" && shown[e.kind]);
+
     return {
       d, num: String(+d.slice(8)),
       today: d === today, picked: d === p, outside: !sameMonth(d, base),
@@ -48,6 +51,7 @@ const cells = computed(() => {
 function pick(e, d) {
   if (!(e.target === e.currentTarget || e.target.matches(EMPTY))) return;
   if (phone) { state.picked = d; return; }
+
   Object.assign(state, { date: dateFor(d, "week", ctx.value.today), view: "week" });
 }
 </script>

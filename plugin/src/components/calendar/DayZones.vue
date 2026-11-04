@@ -1,6 +1,8 @@
-<!-- a day's drop zones while dragging: ✓ (done that day: today and before) and 📅 (planned for it) -->
+<!-- a day's drop zones while dragging: ✓ (done that day: today and before) and 📅 (planned for
+     it) -->
 <script setup>
 import { computed, inject } from "vue";
+
 const props = defineProps({ day: { type: String, required: true } });
 const view = inject("calendar");
 const label = computed(() => `📅 ${window.moment(props.day).format("D MMM")}`);

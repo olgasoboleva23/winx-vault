@@ -12,6 +12,7 @@ const balance = computed(() => {
   const b = (everything ?? model).balance(areas.map(a => a.tag));
   const name = tag => areas.find(a => a.tag === tag).label;
   const icon = tag => name(tag).split(" ")[0];
+
   return {
     pieces: b.filter(x => x.planned).map(x => ({
       on: x.area === state.area, area: x.area.slice(6), style: `flex: ${x.planned}`,

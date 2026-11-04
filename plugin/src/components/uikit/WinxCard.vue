@@ -1,10 +1,11 @@
-<!-- a dashboard card: the markup Obsidian draws for a "> [!card] Title" callout (as uikit/card.js), with a slot; the
-     button slot: one next to the title -->
+<!-- a dashboard card: the markup Obsidian draws for a "> [!card] Title" callout (as uikit/card.js),
+     with a slot; the button slot: one next to the title -->
 <script setup>
 defineProps({
   title: { type: String, default: "" },
   meta: { type: Array, default: () => [] },
-  bodyClass: { type: String, default: null },   // the widget's own class on the body (the shop's winx-shop)
+  // the widget's own class on the body (the shop's winx-shop)
+  bodyClass: { type: String, default: null },
 });
 </script>
 

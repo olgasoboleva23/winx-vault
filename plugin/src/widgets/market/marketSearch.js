@@ -1,4 +1,5 @@
-// "+ add item": search everything bought before (by category, the most bought first) or type a new one.
+// "+ add item": search everything bought before (by category, the most bought first), or type
+// a new one.
 import { Notice } from "obsidian";
 import { Search } from "../../uikit/search.ts";
 import { Form } from "../../uikit/form.ts";
@@ -23,10 +24,16 @@ export async function addMarketItem() {
     const note = c.isNew ? "" : c.onList ? "on the list" : `×${c.buys} · ${dm(c.last)}`;
     row.createSpan({ cls: "winx-search__note", text: note });
   });
+
   if (!pick) return;
   if (pick.onList) return void new Notice(`✦ ${pick.name} is on the list already`);
   const tag = pick.isNew ? (await Form.ask(app, `✦ ${pick.name}`, [
-    { name: "Category", key: "tag", options: marketCats.map(c => ({ label: c.label, value: c.tag })) },
+    {
+      name: "Category",
+      key: "tag",
+      options: marketCats.map(c => ({ label: c.label, value: c.tag })),
+    },
   ], { required: ["tag"], submit: "Add" }))?.tag : pick.tag;
+
   if (tag) await addToMarket(pick.name, tag);
 }

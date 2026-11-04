@@ -15,6 +15,7 @@ const state = view.state;
 
 const nav = computed(() => {
   const { view: v, days, today, base } = ctx.value;
+
   return {
     v, other: v === "week" ? "month" : "week",
     title: v === "week"
@@ -35,8 +36,11 @@ const step = n => {
   const { view: v, base } = ctx.value;
   go(v === "week" ? addDays(base, 7 * n) : addMonths(base, n));
 };
+
 const switchView = () => { state.view = ctx.value.view === "week" ? "month" : "week"; };
+
 const showDone = () => { state.showDone = !state.showDone; };
+
 const repeats = () => {
   const open = !allOpen.value, days = routineDays.value;
   state.unfolded = open

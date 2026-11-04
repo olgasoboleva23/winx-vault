@@ -1,10 +1,11 @@
-// The one place Vue meets Obsidian: a Component that owns a Vue app on a container. Its owner (a ```winx block,
-// a tab) adds it as a child, so it goes when the owner goes. It holds the screen's state ({ data, loading,
-// error }) and runs `load` now and again a moment after Dataview has a change (or the block's own note changes,
-// or the dashboard's date); a hidden block once it shows. A load overtaken by a newer one, or ending after the
-// block went, writes nothing; an error is shown with retry. On unload: Vue is unmounted.
-// The .vue component gets `state` and `actions` (the screen's writes, and retry) as props; with `card` it is
-// drawn inside a dashboard card (components/uikit/WinxCard.vue).
+// The one place Vue meets Obsidian: a Component that owns a Vue app on a container. Its owner (a
+// ```winx block, a tab) adds it as a child, so it goes when the owner goes. It holds the screen's
+// state ({ data, loading, error }) and runs `load` now and again a moment after Dataview has a
+// change (or the block's own note changes, or the dashboard's date); a hidden block once it shows.
+// A load overtaken by a newer one, or ending after the block went, writes nothing; an error is
+// shown with retry. On unload: Vue is unmounted. The .vue component gets `state` and `actions` (the
+// screen's writes, and retry) as props; with `card` it is drawn inside a dashboard card
+// (components/uikit/WinxCard.vue).
 import { Component } from "obsidian";
 import { createApp, h, nextTick, reactive, type App, type Component as VueComponent } from "vue";
 import { useDataviewChanges, useRedraw, useTabDate, useWhenIndexed } from "./use.js";
@@ -18,7 +19,7 @@ export interface HostOptions<D> {
   note?: string;                               // the block's own note: its changes count too
   card?: { title: string; meta?: string[]; bodyClass?: string };   // drawn inside a dashboard card
   cardButton?: VueComponent;                   // a button next to the card's title (gets actions)
-  follows?: boolean;                           // false: loaded once (no vault data, like the pomodoro)
+  follows?: boolean;   // false: loaded once (no vault data, like the pomodoro)
 }
 
 export class VueHost<D = unknown> extends Component {
@@ -40,7 +41,8 @@ export class VueHost<D = unknown> extends Component {
 
   onload() {
     const retry = () => void this.refresh(), { view, state, opts: { card } } = this;
-    // actions only to a view that takes them (Vue would put an undeclared prop on its root as an attribute)
+    // actions only to a view that takes them (Vue would put an undeclared prop on its root as an
+    // attribute)
     const takes = "actions" in ((view as { props?: object }).props ?? {});
     const props = takes ? { state, actions: { ...this.opts.actions, retry } } : { state };
     // the error with retry, a card's shimmering placeholder until the first data, else the view
@@ -64,12 +66,15 @@ export class VueHost<D = unknown> extends Component {
 
   async refresh() {
     const n = ++this.runs;
+
     try {
       const data = await this.opts.load();
+
       if (this.gone || n !== this.runs) return;   // closed, or a newer load is on its way
       Object.assign(this.state, { data, error: null, loading: false });
       await nextTick();
-      this.el.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));   // the dashboard's ✦ pill goes
+      // the dashboard's ✦ pill goes
+      this.el.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));
     } catch (e) {
       if (this.gone || n !== this.runs) return;
       console.error(e);

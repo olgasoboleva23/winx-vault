@@ -1,8 +1,8 @@
-// Cycle: the day of the cycle on the page's date, the next start forecast, then one of two tabs: the current cycle and
-// the 3 before it as rows of day pills (the period, the fertile window and the ovulation marked), or the last 10
-// cycles' lengths and period lengths as columns with their average; "started / ended today", the dates.
-// Folded (the default; a click on the head toggles it, kept per device): only the head and the buttons.
-// The markup: CycleWidget.vue.
+// Cycle: the day of the cycle on the page's date, the next start forecast, then one of two tabs:
+// the current cycle and the 3 before it as rows of day pills (the period, the fertile window and
+// the ovulation marked), or the last 10 cycles' lengths and period lengths as columns with their
+// average; "started / ended today", the dates. Folded (the default; a click on the head toggles it,
+// kept per device): only the head and the buttons. The markup: CycleWidget.vue.
 import { CycleLog } from "./cycleLog.js";
 import { dm, pageDay, ymd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
@@ -10,12 +10,16 @@ import { mana, mpLine, mpTable } from "../xp/vitals.js";
 
 export const CYCLE_PATH = "00 System/Data/Cycle.md";
 
-// the log of Cycle.md (null without the note): also the period days shaded under the Weight widget's log
+// the log of Cycle.md (null without the note): also the period days shaded under the Weight
+// widget's log
 export function cycleLog(dv) {
   const page = dv.page(CYCLE_PATH);
+
   if (!page) return null;
   const pick = key => page.file.lists
-    .map(i => i.text.match(new RegExp(`${key}::\\s*(\\d{4}-\\d{2}-\\d{2})`))?.[1]).where(Boolean).array();
+    .map(i => i.text.match(new RegExp(`${key}::\\s*(\\d{4}-\\d{2}-\\d{2})`))?.[1])
+    .where(Boolean).array();
+
   return new CycleLog(pick("start"), pick("end"), page.period ?? 8);
 }
 
@@ -27,20 +31,29 @@ const pill = (c, n) => n <= (c.period ?? 0) ? "period"
 
 // columns of `values` against their largest, a line at their average (labelled "avg N d")
 function chart(values) {
-  const max = Math.max(...values), avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
-  return { avg: `avg ${avg} d`, line: avg / max * 100, cols: values.map(v => ({ v, height: v / max * 100 })) };
+  const max = Math.max(...values);
+  const avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+
+  return {
+    avg: `avg ${avg} d`,
+    line: avg / max * 100,
+    cols: values.map(v => ({ v, height: v / max * 100 })),
+  };
 }
 
 export async function loadCycle({ dv }) {
   const day = ymd(pageDay(dv)), log = cycleLog(dv);
   const mark = { kind: "start", text: "started today" };
+
   if (!log) return { day, page: false, info: false, mark, rows: [] };
   const info = log.on(day);
   // the current cycle with no end yet: its days so far are the period while it lasts
   const cycles = log.recent(4, day)
     .map(c => c.current && c.period === null && info?.isPeriod ? { ...c, period: c.days } : c);
   const stats = log.last(10), m = info && mana(info);
-  const lengths = stats.map(c => c.length), periods = stats.filter(c => c.period).map(c => c.period);
+  const lengths = stats.map(c => c.length);
+  const periods = stats.filter(c => c.period).map(c => c.period);
+
   return {
     day, page: true, info: !!info,
     mark: info?.isPeriod && !info.ended ? { kind: "end", text: "ended today" } : mark,
@@ -53,7 +66,8 @@ export async function loadCycle({ dv }) {
     rows: cycles.map(c => ({
       start: c.start,
       when: `${dm(c.start)} – ${c.current ? "now" : dm(c.end)}`,
-      length: `${c.period ? `${c.period} d period · ` : ""}${c.days} d` + (c.current ? " so far" : ""),
+      length: `${c.period ? `${c.period} d period · ` : ""}${c.days} d`
+        + (c.current ? " so far" : ""),
       pills: Array.from({ length: c.days }, (_, i) => pill(c, i + 1)),
     })),
     charts: [
@@ -65,5 +79,6 @@ export async function loadCycle({ dv }) {
 
 // "started / ended today": a line in Cycle.md (once)
 export const cycleActions = () => ({
-  mark: (kind, day) => appendLine(CYCLE_PATH, `- ${kind}:: ${day}`, { header: "period:: 8\n\n", unique: true }),
+  mark: (kind, day) =>
+    appendLine(CYCLE_PATH, `- ${kind}:: ${day}`, { header: "period:: 8\n\n", unique: true }),
 });

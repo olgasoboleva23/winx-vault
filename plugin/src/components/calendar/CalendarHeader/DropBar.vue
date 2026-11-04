@@ -9,6 +9,7 @@ const view = inject("calendar");
 const chips = computed(() => {
   const { view: v, days, today } = view.ctx;
   const list = v === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
+
   return list.map(d => ({ d, label: window.moment(d).format("ddd D"), today: d === today }));
 });
 </script>

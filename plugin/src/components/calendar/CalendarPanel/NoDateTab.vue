@@ -11,6 +11,7 @@ const groups = computed(() => {
   const { model, config } = view.ctx, { backlog } = model;
   const cut = backlog.length > SHOWN && !view.state.backlogOpen;
   const card = t => ({ task: view.info(t), meta: model.backlogMeta(t) });
+
   return byArea(cut ? backlog.slice(0, SHOWN) : backlog, card, config);
 });
 </script>

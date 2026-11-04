@@ -1,4 +1,5 @@
-<!-- Level and XP: the level, total XP, progress to the next level; HP and MP bars, their reasons in the tooltip -->
+<!-- Level and XP: the level, total XP, progress to the next level; HP and MP bars, their reasons in
+     the tooltip -->
 <script setup>
 defineProps({ state: { type: Object, required: true } });
 </script>
@@ -7,7 +8,8 @@ defineProps({ state: { type: Object, required: true } });
   <div class="winx-level">
     <div class="winx-level__icon" />
     <div class="winx-level__body">
-      <div class="winx-level__text">Level: {{ state.data.level }} | Total XP: {{ state.data.total }}</div>
+      <div class="winx-level__text">Level: {{ state.data.level }} |
+        Total XP: {{ state.data.total }}</div>
       <div class="winx-level__text">Progress: {{ state.data.progress }}/{{ state.data.cost }}</div>
       <div class="winx-level__progress">
         <div class="winx-level__progress-fill" :style="`width:${state.data.fill}%`" />

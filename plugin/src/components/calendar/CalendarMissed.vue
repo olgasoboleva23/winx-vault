@@ -1,5 +1,5 @@
-<!-- "Missed?": open tasks whose day has passed, only while today is on screen; a row's ✓ (done on its day, with
-     Tasks) or ☀️ (moved to today) takes it off at once, the write follows -->
+<!-- "Missed?": open tasks whose day has passed, only while today is on screen; a row's ✓ (done on
+     its day, with Tasks) or ☀️ (moved to today) takes it off at once, the write follows -->
 <script setup>
 import { computed, inject, reactive, watch } from "vue";
 import WinxButton from "../uikit/WinxButton.vue";
@@ -19,19 +19,26 @@ const gone = reactive(new Set());   // rows taken off until the new data comes
 watch(ctx, () => gone.clear());
 const rows = computed(() => {
   const { days, today, model: { missed }, TASKS } = ctx.value;
+
   if (!days.includes(today)) return [];
   return missed.map(t => {
     const task = view.info(t), day = T(t).date;
-    return { t, task, day, shortDay: dm(day), repeats: T(t).isRecurring ? "🔁 " : "", done: !!TASKS };
+
+    return {
+      t, task, day, shortDay: dm(day), repeats: T(t).isRecurring ? "🔁 " : "", done: !!TASKS,
+    };
   }).filter(r => !gone.has(r.task.key));
 });
+
 function act(r, sound, write) {
   const t = view.task(r.task.key);
+
   if (!t) return;
   gone.add(r.task.key);
   sound.play({ gain: 0.25 });
   return write(t);
 }
+
 const doneOnItsDay = r => act(r, sounds.done, t => view.actions.doneOnItsDay(t));
 const toToday = r => act(r, sounds.today, t => view.actions.toToday(t));
 </script>

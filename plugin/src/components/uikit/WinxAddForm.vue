@@ -1,9 +1,14 @@
-<!-- one field and a submit button, a finger's height (block winx-add-form): v-model is the field's text, @submit
-     the parent's save; input: the field's attributes ({ name, type, placeholder, … }) -->
+<!-- one field and a submit button, a finger's height (block winx-add-form): v-model is the
+     field's text, @submit the parent's save; input: the field's attributes ({ name, type,
+     placeholder, … }) -->
 <script setup>
-defineProps({ input: { type: Object, default: () => ({}) }, submit: { type: String, default: "Add" } });
+defineProps({
+  input: { type: Object, default: () => ({}) },
+  submit: { type: String, default: "Add" },
+});
 defineEmits(["submit"]);
-const value = defineModel({ type: [String, Number], default: "" });   // a number field gives a number
+// a number field gives a number
+const value = defineModel({ type: [String, Number], default: "" });
 </script>
 
 <template>

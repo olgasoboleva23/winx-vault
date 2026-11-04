@@ -13,12 +13,15 @@ import { byArea } from "./groups.js";
 const RESUME = "resume: from today, on the first day its rule allows";
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);
-const flipped = inject("flipped");   // paused / resumed at once (the panel's, kept across a tab switch)
+// paused / resumed at once (the panel's, kept across a tab switch)
+const flipped = inject("flipped");
 
 const groups = computed(() => {
   const { model, today, config } = ctx.value;
+
   return byArea(model.regulars, t => {
     const next = T(t).date, task = view.info(t), flip = flipped.has(task.key);
+
     return {
       task, flip, paused: flip ? !T(t).isPaused : !next,
       rule: `${ruleText(T(t).rule)}  ·  `, history: `  ·  ${model.regularHistory(t)}`,
@@ -32,6 +35,7 @@ const groups = computed(() => {
 // at once; the new data follows the write
 const pause = c => {
   const t = view.task(c.task.key);
+
   if (!t) return;
   flipped.add(c.task.key);
   view.actions.pauseOrResume(t);
@@ -47,7 +51,10 @@ const pause = c => {
       :paused="c.paused"
     >
       <!-- one line: the rule, when (late: in red), the history; no spaces between them -->
-      <template #meta>{{ c.rule }}<span v-if="c.late" class="winx-cal__late">{{ c.when }}</span><span
+      <template #meta>{{ c.rule }}<span
+        v-if="c.late"
+        class="winx-cal__late"
+      >{{ c.when }}</span><span
         v-else
       >{{ c.when }}</span>{{ c.history }}</template>
       <template #extra>

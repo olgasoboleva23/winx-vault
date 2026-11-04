@@ -17,36 +17,47 @@ import { addPoolLine, addTask } from "../tasks/master.js";
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
 export function registerCommands(plugin: Plugin) {
   const { app } = plugin;
-  const add = (id: string, name: string, run: () => Promise<void>) => plugin.addCommand({ id, name, callback: run });
+  const add = (id: string, name: string, run: () => Promise<void>) =>
+    plugin.addCommand({ id, name, callback: run });
 
-  // a past task (its difficulty, area, time and sticker come along) or a new one: then difficulty, area, time of day,
-  // sticker (or "to pool") in one window; then the Tasks modal for the text and dates
+  // a past task (its difficulty, area, time and sticker come along) or a new one: then difficulty,
+  // area, time of day, sticker (or "to pool") in one window; then the Tasks modal for the text and
+  // dates
   add("new-task", "New task", async () => {
     const found = await pickTask();
+
     if (!found) return;
     const ready = !found.isNew && found.picks.difficulty && found.picks.area;
     const pick = ready ? found.picks : await taskWindow(found.picks ?? {}, true);
+
     if (!pick) return;
     const api = tasksApi();
+
     if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
     // ➕ shows how long it waits on the board
     const words = [pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ");
     const result = await api.editTaskLineModal(`- [ ] ${words}  ➕ ${todayYmd()}`);
+
     if (!result) return;
-    const line = new Task(result).setSticker(pick.sticker);   // after the text typed in the Tasks modal
+    // after the text typed in the Tasks modal
+    const line = new Task(result).setSticker(pick.sticker);
+
     // a pool line (no checkbox, no dates) to the end of Pool.md; a task to the top of Master.md
     if (pick.pool) return void await addPoolLine(new Task(line).poolLine);
     if (!await addTask(line)) new Notice(`✦ ${MASTER} not found — task not saved`);
   });
 
-  // a watch / read / game / recipe / work task note (notes/kinds.js), in its folder, opened in a new tab
+  // a watch / read / game / recipe / work task note (notes/kinds.js), in its folder, opened in a
+  // new tab
   for (const kind of Object.values(KINDS) as any[]) {
     add(kind.id, kind.name, async () => {
       const { rows, values, required } = kind.form();
       const v = await Form.ask(app, `✦ ${kind.name}`, rows, { values, required, submit: "Create" });
+
       if (!v) return;
       const dir = (kind.setting && (await plugin.loadData())?.[kind.setting]) || kind.folder;
       const path = notePath(dir, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
+
       if (!app.vault.getFolderByPath(dir)) await app.vault.createFolder(dir);
       const file = await app.vault.create(path, new Note(kind.note(v, todayYmd())).text);
       await app.workspace.getLeaf("tab").openFile(file);
@@ -59,13 +70,15 @@ export function registerCommands(plugin: Plugin) {
       { name: "Name", key: "name", text: "what you bought" },
       { name: "Cost", key: "cost", text: "coins", number: true },
     ], { required: ["name", "cost"], submit: "Buy" });
+
     if (v && !await logPurchase(v.name, v.cost)) new Notice(`✦ Not enough gold for ${v.name}`);
   });
 
   // a shopping item in the Celestial Market: one bought before, or a new one with its category
   add("new-market-item", "New market item", addMarketItem);
 
-  // the phone: the synced obsidian-mobile/ copied into the real config folder .obsidian-mobile (then restart)
+  // the phone: the synced obsidian-mobile/ copied into the real config folder .obsidian-mobile
+  // (then restart)
   if (Platform.isMobile) add("update-mobile-config", "Update mobile config", mirrorMobileConfig);
 
   // every Winx command in one list to pick from (Alt+T in this vault's hotkeys.json)

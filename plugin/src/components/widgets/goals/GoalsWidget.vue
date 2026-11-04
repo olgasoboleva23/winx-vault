@@ -1,7 +1,8 @@
-<!-- Goals: per goal "X of Y this week", Mon–Sun dots (done, missed, planned or none; the page's day ringed),
-     the minimum version and how often it was done -->
+<!-- Goals: per goal "X of Y this week", Mon–Sun dots (done, missed, planned or none; the page's day
+     ringed), the minimum version and how often it was done -->
 <script setup>
 import WinxMissing from "../../uikit/WinxMissing.vue";
+
 defineProps({ state: { type: Object, required: true } });
 </script>
 
@@ -22,7 +23,11 @@ defineProps({ state: { type: Object, required: true } });
         <span
           v-for="d in g.dots"
           :key="d.day"
-          :class="['winx-goal__dot', `winx-goal__dot--${d.status}`, { 'winx-goal__dot--sel': d.sel }]"
+          :class="[
+            'winx-goal__dot',
+            `winx-goal__dot--${d.status}`,
+            { 'winx-goal__dot--sel': d.sel },
+          ]"
           :title="d.day"
         />
       </div>

@@ -1,5 +1,5 @@
-<!-- Celestial Market: the list by category, a round ✓ per item (the sparkle plays, then it's written as bought),
-     what runs low soon, and links to the market and the supplies -->
+<!-- Celestial Market: the list by category, a round ✓ per item (the sparkle plays, then it's
+     written as bought), what runs low soon, and links to the market and the supplies -->
 <script setup>
 import { reactive } from "vue";
 import WinxEmpty from "../../uikit/WinxEmpty.vue";
@@ -7,13 +7,17 @@ import WinxMissing from "../../uikit/WinxMissing.vue";
 import WinxGroupHeader from "../../uikit/WinxGroupHeader.vue";
 import WinxNoteLink from "../../uikit/WinxNoteLink.vue";
 
-const props = defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
+const props = defineProps({
+  state: { type: Object, required: true },
+  actions: { type: Object, required: true },
+});
 const LINKS = [
   { text: "✦ open market", path: "00 System/Data/Celestial Market" },
   { text: "✦ supplies", path: "00 System/Data/Supplies" },
 ];
 const bought = reactive(new Set());   // rows sparkling until the write redraws the list
 const key = r => `${r.line}|${r.name}`;
+
 async function buy(r) {
   if (bought.has(key(r))) return;
   bought.add(key(r));
@@ -44,7 +48,10 @@ async function buy(r) {
         </div>
       </template>
     </div>
-    <div v-if="state.data.soon" class="winx-market__soon">⏳ running low soon: {{ state.data.soon }}</div>
+    <div
+      v-if="state.data.soon"
+      class="winx-market__soon"
+    >⏳ running low soon: {{ state.data.soon }}</div>
     <div class="winx-market__footer">
       <span>{{ state.data.left }}</span>
       <WinxNoteLink

@@ -14,9 +14,11 @@ const view = inject("calendar");
 
 const months = computed(() => {
   const { model, today, config } = view.ctx;
+
   return model.ahead.map(({ month, items }) => {
     const year = month.startsWith(today.slice(0, 4)) ? "MMMM" : "MMMM YYYY";
     const title = M(month + "-01").format(year);
+
     return {
       key: month, title: `${title} · ${items.length}`,
       cards: items.map((t, i) => ({

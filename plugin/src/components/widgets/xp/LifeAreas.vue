@@ -1,6 +1,7 @@
 <!-- Life Areas: the radar of XP per area, the caption under it -->
 <script setup>
 import WinxChart from "../../uikit/WinxChart.vue";
+
 defineProps({ state: { type: Object, required: true } });
 </script>
 

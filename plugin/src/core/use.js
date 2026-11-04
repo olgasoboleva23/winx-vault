@@ -1,15 +1,19 @@
-// Composables: a piece of behaviour — its listeners and their removal — added to any Obsidian component, a tab
-// (ItemView) or a widget's VueHost (core/vueHost.ts). They listen through the component's registerDomEvent /
-// registerEvent / registerInterval, so Obsidian drops it all when the component unloads.
+// Composables: a piece of behaviour — its listeners and their removal — added to any Obsidian
+// component, a tab (ItemView) or a widget's VueHost (core/vueHost.ts). They listen through the
+// component's registerDomEvent / registerEvent / registerInterval, so Obsidian drops it all when
+// the component unloads.
 import { Keymap, debounce } from "obsidian";
 import { todayYmd } from "./dates.js";
 import { dataview } from "./plugins.js";
 
-// redraw(): drawn now when shown, else once it shows (a leaf or the layout changes) — catchUp() asks again
+// redraw(): drawn now when shown, else once it shows (a leaf or the layout changes) — catchUp()
+// asks again
 export function useRedraw(c, isShown, draw) {
   let stale = false;
   const redraw = () => { if (isShown()) { stale = false; draw(); } else stale = true; };
+
   const catchUp = () => { if (stale) redraw(); };
+
   c.registerEvent(c.app.workspace.on("active-leaf-change", catchUp));
   c.registerEvent(c.app.workspace.on("layout-change", catchUp));   // a sidebar or split shown
   return { redraw, catchUp };
@@ -18,15 +22,20 @@ export function useRedraw(c, isShown, draw) {
 // fn(day) when the date changes (checked every minute)
 export function useNewDay(c, fn) {
   let day = todayYmd();
-  c.registerInterval(window.setInterval(() => { const now = todayYmd(); if (now !== day) fn(day = now); }, 60_000));
+  c.registerInterval(window.setInterval(() => {
+    const now = todayYmd();
+
+    if (now !== day) fn(day = now);
+  }, 60_000));
 }
 
-// a write to a file watched(path) adds `cls` to el() (the tab's --busy: dimmed, the ✦ pill spinning) until the tab
-// draws again and takes it off; 5 s at most
+// a write to a file watched(path) adds `cls` to el() (the tab's --busy: dimmed, the ✦ pill
+// spinning) until the tab draws again and takes it off; 5 s at most
 export function useBusy(c, watched, el, cls) {
   let timer = 0;
   c.registerEvent(c.app.vault.on("modify", f => {
     const target = watched(f.path) && el();
+
     if (!target) return;
     target.classList.add(cls);
     window.clearTimeout(timer);
@@ -34,8 +43,9 @@ export function useBusy(c, watched, el, cls) {
   }));
 }
 
-// fn() a moment (delay ms) after Dataview re-indexes a file that watched(path) says yes to (no watched: any file);
-// with `note`, also when that note changes (Obsidian's own event, before Dataview has it)
+// fn() a moment (delay ms) after Dataview re-indexes a file that watched(path) says yes to (no
+// watched: any file); with `note`, also when that note changes (Obsidian's own event, before
+// Dataview has it)
 /**
  * @param {any} c @param {() => void} fn
  * @param {{ watched?: (path: string) => boolean, note?: string, delay?: number }} [options]
@@ -50,13 +60,16 @@ export function useDataviewChanges(c, fn, options = {}) {
   if (note) c.registerEvent(c.app.metadataCache.on("changed", f => f.path === note && later()));
 }
 
-// fn() each time Dataview's index is built (a cold start: Dataview reads the vault after the tabs and notes open)
-export const useIndexReady = (c, fn) => c.registerEvent(c.app.metadataCache.on("dataview:index-ready", fn));
+// fn() each time Dataview's index is built (a cold start: Dataview reads the vault after the tabs
+// and notes open)
+export const useIndexReady = (c, fn) =>
+  c.registerEvent(c.app.metadataCache.on("dataview:index-ready", fn));
 
-// fn() once Dataview's index is there: now (or now when Dataview is off: fn shows what's missing), else when it's
-// built; only the first time (Dataview builds it again when it reloads)
+// fn() once Dataview's index is there: now (or now when Dataview is off: fn shows what's missing),
+// else when it's built; only the first time (Dataview builds it again when it reloads)
 export function useWhenIndexed(c, fn) {
   const api = dataview();
+
   if (!api || api.index?.initialized) return void fn();
   let done = false;
   useIndexReady(c, () => { if (!done) { done = true; fn(); } });
@@ -70,6 +83,9 @@ export const useTabDate = (c, el, fn) =>
 export function useNoteLinks(c, el, isMod = Keymap.isModEvent) {
   c.registerDomEvent(el, "click", e => {
     const link = e.target.closest?.("a.internal-link[data-href]");
-    if (link) { e.preventDefault(); void c.app.workspace.openLinkText(link.dataset.href, "", isMod(e)); }
+
+    if (!link) return;
+    e.preventDefault();
+    void c.app.workspace.openLinkText(link.dataset.href, "", isMod(e));
   });
 }

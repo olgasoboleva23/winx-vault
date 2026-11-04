@@ -1,6 +1,10 @@
-<!-- Shop: the gold balance and the rewards; an affordable one is bought with a click, the rest are greyed out -->
+<!-- Shop: the gold balance and the rewards; an affordable one is bought with a click, the rest are
+     greyed out -->
 <script setup>
-const props = defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
+const props = defineProps({
+  state: { type: Object, required: true },
+  actions: { type: Object, required: true },
+});
 // bought: drawn again at once (the balance), as before
 const buy = async i => { if (await props.actions.buy(i.name, i.cost)) props.actions.retry(); };
 </script>

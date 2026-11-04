@@ -14,6 +14,7 @@ const props = defineProps({ state: { type: Object, required: true } });
 const picked = ref(null);
 const m = computed(() => {
   const { byMonth, start } = props.state.data;
+
   return byMonth?.[picked.value] ?? byMonth?.[start];
 });
 </script>

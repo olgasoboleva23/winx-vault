@@ -1,7 +1,12 @@
-<!-- a task's difficulty stars (in the area's colour), its text, its stickers (withIcon: the area's icon in front) -->
+<!-- a task's difficulty stars (in the area's colour), its text, its stickers (withIcon: the area's
+     icon in front) -->
 <script setup>
 import { computed } from "vue";
-const props = defineProps({ task: { type: Object, required: true }, withIcon: { type: Boolean, default: false } });
+
+const props = defineProps({
+  task: { type: Object, required: true },
+  withIcon: { type: Boolean, default: false },
+});
 const text = computed(() => props.withIcon ? props.task.label : props.task.text);
 </script>
 

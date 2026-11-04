@@ -1,6 +1,6 @@
-// Savings: a jar per note in the Savings folder (a goal: its picture, saved so far, a ✦ stamp per deposit). On a
-// payday "put in N" until the deposit is in; with a price the picture fills with colour from the bottom and, past
-// halfway, "saved" turns into "left". The markup: SavingsJars.vue.
+// Savings: a jar per note in the Savings folder (a goal: its picture, saved so far, a ✦ stamp per
+// deposit). On a payday "put in N" until the deposit is in; with a price the picture fills with
+// colour from the bottom and, past halfway, "saved" turns into "left". The markup: SavingsJars.vue.
 import { dm, todayYmd, weekday } from "../../core/dates.js";
 import { edit } from "../../core/files.js";
 import { money } from "../../core/format.js";
@@ -13,18 +13,26 @@ const day = d => `${DAYS[weekday(d)]} ${dm(d)}`;
 
 export async function loadSavings({ app }) {
   const today = todayYmd();
-  const files = (app.vault.getFolderByPath(FOLDER)?.children ?? []).filter(f => f.extension === "md");
+  const files = (app.vault.getFolderByPath(FOLDER)?.children ?? [])
+    .filter(f => f.extension === "md");
   const jars = await Promise.all(files.map(async f => {
     const props = app.metadataCache.getFileCache(f)?.frontmatter ?? {};
     const jar = new SavingsJar(await app.vault.cachedRead(f), props);
     const img = props.image && app.metadataCache.getFirstLinkpathDest(String(props.image), f.path);
-    return { path: f.path, name: props.goal ?? f.basename, img: img && app.vault.getResourcePath(img),
-      ...shown(jar, today) };
+
+    return {
+      path: f.path,
+      name: props.goal ?? f.basename,
+      img: img && app.vault.getResourcePath(img),
+      ...shown(jar, today),
+    };
   }));
+
   return { jars, empty: `A goal: a note in ${FOLDER}` };
 }
 
-// deposit(path): the payday's deposit into that jar's note; no per_payday ("your part"): it asks how much
+// deposit(path): the payday's deposit into that jar's note; no per_payday ("your part"): it asks
+// how much
 export function savingsActions({ app }) {
   return {
     deposit: async path => {
@@ -32,6 +40,7 @@ export function savingsActions({ app }) {
       const sum = props.per_payday ?? (await Form.ask(app, "✦ Deposit",
         [{ name: "Sum", key: "sum", text: "how much", number: true }],
         { values: { sum: null }, required: ["sum"], submit: "Put in" }))?.sum;
+
       if (sum > 0) await edit(path, c => new SavingsJar(c, props).deposit(todayYmd(), sum));
     },
   };
@@ -42,6 +51,7 @@ export function savingsActions({ app }) {
 function shown(jar, today) {
   const pct = jar.pct, count = jar.deposits.length, due = jar.due(today);
   const grey = pct === null ? 100 : Math.max(0, 100 - pct);
+
   return {
     greyed: `clip-path: inset(0 0 ${100 - grey}% 0)`,
     big: pct !== null && pct >= 50 ? `left ${money(jar.left)}` : money(jar.saved),

@@ -16,8 +16,18 @@ export default defineConfig([
     "no-unsafe-argument", "no-unsafe-return"].map(r => [`@typescript-eslint/${r}`, "off"])) },
   // sentence case, but the plugins' names keep their capital ("Tasks plugin is off")
   { rules: { "obsidianmd/ui/sentence-case": ["warn", { brands: [...DEFAULT_BRANDS, "Tasks", "Dataview"] }] } },
-  // lines up to 120 characters: an html`` template breaks by element, a call by argument
-  { rules: { "max-len": ["error", { code: 120, ignoreUrls: true }] } },
+  // lines up to 100 characters: a template breaks by element / attribute, a call by argument
+  { rules: { "max-len": ["error", { code: 100, ignoreUrls: true }] } },
+  // a blank line between logical blocks: after the imports and declarations, around functions and blocks
+  { rules: { "padding-line-between-statements": ["error",
+    { blankLine: "always", prev: "import", next: "*" },
+    { blankLine: "any", prev: "import", next: "import" },
+    { blankLine: "always", prev: "*", next: ["function", "class", "export"] },
+    { blankLine: "always", prev: ["function", "class"], next: "*" },
+    { blankLine: "always", prev: ["const", "let"], next: ["if", "for", "while", "return", "try"] },
+    { blankLine: "always", prev: ["block-like"], next: "*" },
+  ] } },
+  { files: ["**/*.vue"], rules: { "vue/padding-line-between-blocks": "error" } },
   // .vue files: Vue's recommended rules; the type-checked ones need a project that knows .vue (vue-tsc checks them)
   ...pluginVue.configs["flat/recommended"],
   { files: ["**/*.vue"], languageOptions: { parserOptions: { parser: tseslint.parser, extraFileExtensions: [".vue"] } } },

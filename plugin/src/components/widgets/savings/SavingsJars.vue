@@ -1,8 +1,9 @@
-<!-- Savings: a jar per goal (its picture greyed above what's saved, the bar, a ✦ stamp per deposit), the payday's
-     "put in" with ✓ done until the deposit is in, the next paydays -->
+<!-- Savings: a jar per goal (its picture greyed above what's saved, the bar, a ✦ stamp per
+     deposit), the payday's "put in" with ✓ done until the deposit is in, the next paydays -->
 <script setup>
 import WinxButton from "../../uikit/WinxButton.vue";
 import WinxEmpty from "../../uikit/WinxEmpty.vue";
+
 defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 </script>
 
@@ -32,7 +33,11 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
         <i class="winx-jar__fill" :style="`width: ${j.fill}%`" />
       </div>
       <div class="winx-jar__stamps">
-        <span v-for="(on, i) in j.stamps" :key="i" :class="['winx-jar__stamp', { 'winx-jar__stamp--on': on }]">✦</span>
+        <span
+          v-for="(on, i) in j.stamps"
+          :key="i"
+          :class="['winx-jar__stamp', { 'winx-jar__stamp--on': on }]"
+        >✦</span>
       </div>
       <div v-if="j.due" class="winx-jar__due">
         <span>{{ j.due.when }}: <b class="winx-jar__due-sum">put in {{ j.due.sum }}</b></span>
