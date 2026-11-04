@@ -1,6 +1,5 @@
-// The ```winx block: the widget classes by name, and what the plugin does with a block.
+// The ```winx block: the widgets by name (each a .vue on a VueHost), and what the plugin does with a block.
 import { parseBlock } from "./parse.js";
-import { Pomodoro } from "./pomodoro/pomodoro.js";
 import { loadXpToday } from "./xp/xpToday.js";
 import XpToday from "./xp/XpToday.vue";
 import { loadLevelToday } from "./xp/levelToday.js";
@@ -27,15 +26,13 @@ import { loadWeight, weightActions } from "./body/weight.js";
 import WeightCard from "./body/WeightCard.vue";
 import { dailyNoteActions, loadDailyNote } from "./dailyNote.js";
 import DailyNoteOpen from "./DailyNoteOpen.vue";
+import { loadPomodoro, pomodoroActions } from "./pomodoro/pomodoro.js";
+import PomodoroTimer from "./pomodoro/PomodoroTimer.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
 import { app } from "../core/app.js";
 
-// name → class
-export const blocks = {
-  pomodoro: Pomodoro,
-};
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
 // a .vue next to the card's title, bodyClass: a class on the card's body, follows: false to load once },
@@ -53,6 +50,7 @@ export const vueBlocks = {
   financeMonth: { view: FinanceLine, load: loadFinanceLine },
   weight: { view: WeightCard, load: loadWeight, actions: weightActions },
   dailyNote: { view: DailyNoteOpen, load: loadDailyNote, actions: dailyNoteActions },
+  pomodoro: { view: PomodoroTimer, load: loadPomodoro, actions: pomodoroActions, follows: false },
   celestialMarket: {
     view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
   },
@@ -73,8 +71,7 @@ function vueBlock(def, el, sourcePath, args) {
 
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);
-  if (vueBlocks[name]) return void ctx.addChild(vueBlock(vueBlocks[name], el, ctx.sourcePath, args));
-  const Widget = blocks[name];
-  if (!Widget) return void el.createDiv({ text: `winx: no widget "${name}"` });
-  ctx.addChild(new Widget(el, ctx.sourcePath, args));
+  const def = vueBlocks[name];
+  if (!def) return void el.createDiv({ text: `winx: no widget "${name}"` });
+  ctx.addChild(vueBlock(def, el, ctx.sourcePath, args));
 };
