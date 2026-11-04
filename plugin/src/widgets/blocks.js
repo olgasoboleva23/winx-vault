@@ -3,7 +3,6 @@ import { parseBlock } from "./parse.js";
 import { Cycle } from "./body/cycle.js";
 import { DailyNote } from "./dailyNote.js";
 import { Finance, FinanceMonth } from "./finance/finance.js";
-import { Goals } from "./goals/goals.js";
 import { Savings } from "./savings/savings.js";
 import { Pomodoro } from "./pomodoro/pomodoro.js";
 import { Weight } from "./body/weight.js";
@@ -20,6 +19,8 @@ import SuppliesWidget from "./market/SuppliesWidget.vue";
 import { celestialMarketActions, loadCelestialMarket } from "./market/celestialMarket.js";
 import CelestialMarket from "./market/CelestialMarket.vue";
 import CelestialMarketAdd from "./market/CelestialMarketAdd.vue";
+import { loadGoals } from "./goals/goals.js";
+import GoalsWidget from "./goals/GoalsWidget.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
@@ -27,7 +28,7 @@ import { app } from "../core/app.js";
 
 // name → class
 export const blocks = {
-  cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, goals: Goals, pomodoro: Pomodoro,
+  cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, pomodoro: Pomodoro,
   savings: Savings, weight: Weight,
 };
 
@@ -40,6 +41,7 @@ export const vueBlocks = {
   lifeAreas: { view: LifeAreas, load: loadLifeAreas },
   shop: { view: ShopWidget, load: loadShop, actions: shopActions, bodyClass: "winx-shop" },
   supplies: { view: SuppliesWidget, load: loadSupplies, actions: suppliesActions },
+  goals: { view: GoalsWidget, load: loadGoals },
   celestialMarket: {
     view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
   },
