@@ -1,6 +1,5 @@
 // The ```winx block: the widget classes by name, and what the plugin does with a block.
 import { parseBlock } from "./parse.js";
-import { CelestialMarket } from "./market/celestialMarket.js";
 import { Cycle } from "./body/cycle.js";
 import { DailyNote } from "./dailyNote.js";
 import { Finance, FinanceMonth } from "./finance/finance.js";
@@ -18,6 +17,9 @@ import { loadShop, shopActions } from "./shop/shop.js";
 import ShopWidget from "./shop/ShopWidget.vue";
 import { loadSupplies, suppliesActions } from "./market/supplies.js";
 import SuppliesWidget from "./market/SuppliesWidget.vue";
+import { celestialMarketActions, loadCelestialMarket } from "./market/celestialMarket.js";
+import CelestialMarket from "./market/CelestialMarket.vue";
+import CelestialMarketAdd from "./market/CelestialMarketAdd.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
@@ -25,8 +27,8 @@ import { app } from "../core/app.js";
 
 // name → class
 export const blocks = {
-  celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth,
-  goals: Goals, pomodoro: Pomodoro, savings: Savings, weight: Weight,
+  cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, goals: Goals, pomodoro: Pomodoro,
+  savings: Savings, weight: Weight,
 };
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
@@ -38,6 +40,9 @@ export const vueBlocks = {
   lifeAreas: { view: LifeAreas, load: loadLifeAreas },
   shop: { view: ShopWidget, load: loadShop, actions: shopActions, bodyClass: "winx-shop" },
   supplies: { view: SuppliesWidget, load: loadSupplies, actions: suppliesActions },
+  celestialMarket: {
+    view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
+  },
 };
 
 // a Vue widget on its block: a VueHost (with the card when the block has a "card:" line) owned by the block

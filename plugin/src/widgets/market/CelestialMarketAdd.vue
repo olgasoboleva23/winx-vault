@@ -1,0 +1,16 @@
+<!-- the ＋ by Celestial Market's card title: a new item from the search -->
+<script setup>
+import WinxButton from "../../vue/WinxButton.vue";
+defineProps({ actions: { type: Object, required: true } });
+</script>
+
+<template>
+  <WinxButton
+    kind="text"
+    title="add item"
+    cls="winx-widget__add"
+    @click="actions.add()"
+  >
+    {{ "+" }}
+  </WinxButton>
+</template>
