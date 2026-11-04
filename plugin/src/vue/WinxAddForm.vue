@@ -3,7 +3,7 @@
 <script setup>
 defineProps({ input: { type: Object, default: () => ({}) }, submit: { type: String, default: "Add" } });
 defineEmits(["submit"]);
-const value = defineModel({ type: String, default: "" });
+const value = defineModel({ type: [String, Number], default: "" });   // a number field gives a number
 </script>
 
 <template>

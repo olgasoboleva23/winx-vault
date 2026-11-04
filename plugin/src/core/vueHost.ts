@@ -18,6 +18,7 @@ export interface HostOptions<D> {
   note?: string;                               // the block's own note: its changes count too
   card?: { title: string; meta?: string[]; bodyClass?: string };   // drawn inside a dashboard card
   cardButton?: VueComponent;                   // a button next to the card's title (gets actions)
+  follows?: boolean;                           // false: loaded once (no vault data, like the pomodoro)
 }
 
 export class VueHost<D = unknown> extends Component {
@@ -51,6 +52,7 @@ export class VueHost<D = unknown> extends Component {
     this.vue = createApp({ render: () => card ? h(WinxCard, card, slots) : body() });
     this.vue.provide("sourcePath", this.opts.note ?? "");   // where a NoteLink opens a note from
     this.vue.mount(this.el);
+    if (this.opts.follows === false) return void this.refresh();
     const { redraw } = useRedraw(this, () => this.shown, () => void this.refresh());
     useDataviewChanges(this, redraw, { note: this.opts.note, delay: 1000 });
     useTabDate(this, this.el, () => void this.refresh());

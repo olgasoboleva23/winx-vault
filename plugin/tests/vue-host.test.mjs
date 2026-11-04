@@ -122,3 +122,11 @@ test("a card's button goes next to its title and gets the actions", async () => 
   assert.equal(added, 1);
   host.unload();
 });
+
+test("follows: false loads once: a Dataview change doesn't reload it", async () => {
+  const s = slow(), { host } = mount({ load: s.load, follows: false });
+  s.loads[0].ok({ n: 1 }); await settle();
+  bus.fire("dataview:metadata-change", "update", { path: "x.md" });
+  assert.equal(s.loads.length, 1);
+  host.unload();
+});
