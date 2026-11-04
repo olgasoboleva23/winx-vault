@@ -1,4 +1,4 @@
-import { App, Modal, TFile } from "obsidian";
+import { Modal, type App, type TFile } from "obsidian";
 
 // One window of fields instead of a chain of prompts. Each row is
 //   { name, key, options: [{ label, value, img? }] }  a row of buttons, the chosen one highlighted (mod-cta)
@@ -14,6 +14,8 @@ export type Values = Record<string, any>;
 type Options = { values?: Values; required?: string[]; submit?: string };
 
 export class Form extends Modal {
+  private title: string;
+  private rows: Row[];
   private values: Values;
   private required: string[];
   private submit: string;
@@ -21,11 +23,10 @@ export class Form extends Modal {
   private button!: HTMLButtonElement;
   private resolve: (v: Values | null) => void = () => {};
 
-  constructor(
-    app: App, private title: string, private rows: Row[],
-    { values = {}, required = [], submit = "Next →" }: Options = {},
-  ) {
+  constructor(app: App, title: string, rows: Row[], { values = {}, required = [], submit = "Next →" }: Options = {}) {
     super(app);
+    this.title = title;
+    this.rows = rows;
     this.values = { ...values };
     this.required = required;
     this.submit = submit;

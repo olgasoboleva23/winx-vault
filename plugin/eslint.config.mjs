@@ -27,6 +27,8 @@ export default defineConfig([
   // by attribute
   { files: ["**/*.vue"], rules: {
     "vue/singleline-html-element-content-newline": "off",
+    // its fix puts an element's text on a line of its own, and Vue then draws a space before it (" day 3")
+    "vue/multiline-html-element-content-newline": "off",
     "vue/max-attributes-per-line": ["warn", { singleline: { max: 3 } }],
   } },
   // a 🔁 rule is read by `(m = rule.match(…)) ? … :` chains, on purpose

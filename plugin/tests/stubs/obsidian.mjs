@@ -19,3 +19,5 @@ export const sanitizeHTMLToDom = html => html;
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };
 export const Keymap = { isModEvent: () => false };
+export class Modal { constructor(app) { this.app = app; } open() {} close() {} }
+export class SuggestModal extends Modal { setPlaceholder() {} }
