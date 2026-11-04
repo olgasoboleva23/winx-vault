@@ -2,17 +2,13 @@
 // the 3 before it as rows of day pills (the period, the fertile window and the ovulation marked), or the last 10
 // cycles' lengths and period lengths as columns with their average; "started / ended today", the dates.
 // Folded (the default; a click on the head toggles it, kept per device): only the head and the buttons.
-import { bem, html } from "../../core/html.js";
-import { Button } from "../../uikit/button.js";
-import { Widget } from "../widget.js";
+// The markup: CycleWidget.vue.
 import { CycleLog } from "./cycleLog.js";
 import { dm, pageDay, ymd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
-import { Empty, Missing } from "../../uikit/empty.js";
-import { NoteLink } from "../../uikit/noteLink.js";
 import { mana, mpLine, mpTable } from "../xp/vitals.js";
 
-const CYCLE_PATH = "00 System/Data/Cycle.md";
+export const CYCLE_PATH = "00 System/Data/Cycle.md";
 
 // the log of Cycle.md (null without the note): also the period days shaded under the Weight widget's log
 export function cycleLog(dv) {
@@ -29,102 +25,45 @@ const pill = (c, n) => n <= (c.period ?? 0) ? "period"
   : c.ovulation && n >= c.ovulation - 5 && n < c.ovulation ? "fertile"
   : "plain";
 
-export class Cycle extends Widget {
-  tab = "days";   // or "stats"
-  folded = this.app.loadLocalStorage("winx-cycle-open") !== "1";
-  on = {
-    fold: () => {
-      this.folded = !this.folded;
-      this.app.saveLocalStorage("winx-cycle-open", this.folded ? null : "1");
-      this.draw();
-    },
-    tab: (e, el) => { this.tab = el.dataset.tab; this.draw(); },
-    mark: (e, el) =>
-      appendLine(CYCLE_PATH, `- ${el.dataset.kind}:: ${el.dataset.day}`, { header: "period:: 8\n\n", unique: true }),
-  };
-  async data() {
-    const day = ymd(pageDay(this.dv)), log = cycleLog(this.dv);
-    if (!log) return { day, page: null };
-    const info = log.on(day);
-    // the current cycle with no end yet: its days so far are the period while it lasts
-    const cycles = log.recent(4, day)
-      .map(c => c.current && c.period === null && info?.isPeriod ? { ...c, period: c.days } : c);
-    const stats = log.last(10), m = info && mana(info);
-    return {
-      day, page: true, info, ending: info?.isPeriod && !info.ended,
-      head: info && {
-        day: info.day, period: info.isPeriod, phase: m.phase,
-        title: `${mpLine(m)}\n\n${mpTable(m)}`,
-        next: dm(info.nextStart),
-        when: info.daysUntil >= 0 ? `in ${info.daysUntil} d` : `${-info.daysUntil} d late`,
-      },
-      rows: cycles.map(c => ({
-        when: `${dm(c.start)} – ${c.current ? "now" : dm(c.end)}`,
-        length: `${c.period ? `${c.period} d period · ` : ""}${c.days} d`
-          + (c.current ? " so far" : ""),
-        pills: Array.from({ length: c.days }, (_, i) => pill(c, i + 1)),
-      })),
-      lengths: stats.map(c => c.length), periods: stats.filter(c => c.period).map(c => c.period),
-    };
-  }
-  // columns of `values` against their largest, a line at their average labelled on the right
-  columns(title, values, kind) {
-    const max = Math.max(...values), avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
-    const line = avg / max * 100, cols = values.map(v => ({ v, height: v / max * 100 }));
-    return html`<div class="winx-cycle__chart winx-cycle__chart--${kind}">
-      <div class="winx-cycle__chart-title">${title}<span class="winx-cycle__chart-avg">avg ${avg} d</span></div>
-      <div class="winx-cycle__cols">
-        <b class="winx-cycle__avg-line" style="bottom: ${line}%"></b>
-        ${cols.map(({ v, height }) => html`<i class="winx-cycle__col" style="height: ${height}%">
-          <span class="winx-cycle__col-value">${v}</span>
-        </i>`)}
-      </div>
-    </div>`;
-  }
-  // the day, its phase and the next start; a click folds the card
-  head(h) {
-    const title = this.folded ? "show the cycles" : "fold";
-    return html`<div class="winx-cycle__head" data-action="fold" title="${title}">
-      <div class="${bem("winx-cycle__day", { period: h.period })}" title="${h.title}">
-        day ${h.day}<span class="winx-cycle__phase"> · ${h.phase}</span>
-      </div>
-      <div class="winx-cycle__next">next ~${h.next}, ${h.when}</div>
-    </div>`;
-  }
-  tabBtn(tab) {
-    const on = this.tab === tab;
-    return new Button({ text: tab, kind: "toggle", on, action: "tab", data: { tab } });
-  }
-  row(r) {
-    return html`<div class="winx-cycle__row">
-      <div class="winx-cycle__when"><span>${r.when}</span><span>${r.length}</span></div>
-      <div class="winx-cycle__pills">${r.pills.map(p =>
-        html`<i class="winx-cycle__pill winx-cycle__pill--${p}"></i>`)}</div>
-    </div>`;
-  }
-  // the tabs, then the rows of pills or the columns
-  cycles({ rows = [], lengths, periods }) {
-    if (!rows.length) return "";
-    return html`<div class="winx-cycle__tabs">${this.tabBtn("days")}${this.tabBtn("stats")}</div>
-      ${this.tab === "stats"
-        ? html`${lengths.length ? this.columns("cycle", lengths, "len") : ""}
-          ${periods.length ? this.columns("period", periods, "per") : ""}`
-        : html`<div class="winx-cycle__rows">${rows.map(r => this.row(r))}</div>`}`;
-  }
-  view(d) {
-    const { day, page, info, head, ending } = d;
-    const mark = ending
-      ? { text: "ended today", data: { kind: "end", day } }
-      : { text: "started today", data: { kind: "start", day } };
-    return html`<div class="${bem("winx-cycle", { folded: this.folded && info })}">
-      ${!page ? new Missing({ path: CYCLE_PATH })
-        : !info ? new Empty({ text: "No data yet" })
-        : this.head(head)}
-      ${this.folded && info ? "" : this.cycles(d)}
-      <div class="winx-cycle__btns">
-        ${new Button({ ...mark, action: "mark", kind: "pill" })}
-        ${new NoteLink({ text: "dates", path: CYCLE_PATH })}
-      </div>
-    </div>`;
-  }
+// columns of `values` against their largest, a line at their average (labelled "avg N d")
+function chart(values) {
+  const max = Math.max(...values), avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  return { avg: `avg ${avg} d`, line: avg / max * 100, cols: values.map(v => ({ v, height: v / max * 100 })) };
 }
+
+export async function loadCycle({ dv }) {
+  const day = ymd(pageDay(dv)), log = cycleLog(dv);
+  const mark = { kind: "start", text: "started today" };
+  if (!log) return { day, page: false, info: false, mark, rows: [] };
+  const info = log.on(day);
+  // the current cycle with no end yet: its days so far are the period while it lasts
+  const cycles = log.recent(4, day)
+    .map(c => c.current && c.period === null && info?.isPeriod ? { ...c, period: c.days } : c);
+  const stats = log.last(10), m = info && mana(info);
+  const lengths = stats.map(c => c.length), periods = stats.filter(c => c.period).map(c => c.period);
+  return {
+    day, page: true, info: !!info,
+    mark: info?.isPeriod && !info.ended ? { kind: "end", text: "ended today" } : mark,
+    head: info && {
+      day: info.day, period: info.isPeriod, phase: m.phase,
+      title: `${mpLine(m)}\n\n${mpTable(m)}`,
+      next: dm(info.nextStart),
+      when: info.daysUntil >= 0 ? `in ${info.daysUntil} d` : `${-info.daysUntil} d late`,
+    },
+    rows: cycles.map(c => ({
+      start: c.start,
+      when: `${dm(c.start)} – ${c.current ? "now" : dm(c.end)}`,
+      length: `${c.period ? `${c.period} d period · ` : ""}${c.days} d` + (c.current ? " so far" : ""),
+      pills: Array.from({ length: c.days }, (_, i) => pill(c, i + 1)),
+    })),
+    charts: [
+      lengths.length && { title: "cycle", kind: "len", ...chart(lengths) },
+      periods.length && { title: "period", kind: "per", ...chart(periods) },
+    ].filter(Boolean),
+  };
+}
+
+// "started / ended today": a line in Cycle.md (once)
+export const cycleActions = () => ({
+  mark: (kind, day) => appendLine(CYCLE_PATH, `- ${kind}:: ${day}`, { header: "period:: 8\n\n", unique: true }),
+});

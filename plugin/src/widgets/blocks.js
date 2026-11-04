@@ -1,6 +1,5 @@
 // The ```winx block: the widget classes by name, and what the plugin does with a block.
 import { parseBlock } from "./parse.js";
-import { Cycle } from "./body/cycle.js";
 import { DailyNote } from "./dailyNote.js";
 import { Finance, FinanceMonth } from "./finance/finance.js";
 import { Pomodoro } from "./pomodoro/pomodoro.js";
@@ -22,6 +21,8 @@ import { loadGoals } from "./goals/goals.js";
 import GoalsWidget from "./goals/GoalsWidget.vue";
 import { loadSavings, savingsActions } from "./savings/savings.js";
 import SavingsJars from "./savings/SavingsJars.vue";
+import { cycleActions, loadCycle } from "./body/cycle.js";
+import CycleWidget from "./body/CycleWidget.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
@@ -29,7 +30,7 @@ import { app } from "../core/app.js";
 
 // name → class
 export const blocks = {
-  cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, pomodoro: Pomodoro, weight: Weight,
+  dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth, pomodoro: Pomodoro, weight: Weight,
 };
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
@@ -43,6 +44,7 @@ export const vueBlocks = {
   supplies: { view: SuppliesWidget, load: loadSupplies, actions: suppliesActions },
   goals: { view: GoalsWidget, load: loadGoals },
   savings: { view: SavingsJars, load: loadSavings, actions: savingsActions },
+  cycle: { view: CycleWidget, load: loadCycle, actions: cycleActions },
   celestialMarket: {
     view: CelestialMarket, load: loadCelestialMarket, actions: celestialMarketActions, cardButton: CelestialMarketAdd,
   },
