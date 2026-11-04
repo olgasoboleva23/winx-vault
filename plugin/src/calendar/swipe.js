@@ -20,7 +20,7 @@ export function useSwipe(view, drag) {
       return;
     }
     if (t.pool) return view.actions.fromPool(t, view.ctx.today, false);
-    if (view.ctx.TASKS) { r.remove(); view.actions.tick(t); }
+    if (view.ctx.TASKS) { r.hide(); view.actions.tick(t); }   // gone at once (hidden: the node is Vue's)
   };
   view.registerDomEvent(el, "touchstart", e => {
     const r = row(e); if (!r) return;
@@ -30,7 +30,7 @@ export function useSwipe(view, drag) {
   }, { passive: true });
   view.registerDomEvent(el, "touchmove", e => {
     const r = row(e), s = r && swipes.get(r); if (!r || !s) return;
-    const t = findTask(r.dataset.task, view.ctx?.model.all ?? []), back = t && left(t);
+    const t = findTask(r.dataset.task, view.ctx?.model?.all ?? []), back = t && left(t);
     const mx = e.touches[0].clientX - s.x0, my = e.touches[0].clientY - s.y0;
     if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
     if (s.on) e.stopPropagation();

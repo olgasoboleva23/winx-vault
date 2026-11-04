@@ -55,6 +55,11 @@ test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAdd
       new Card({ title: "Weight", meta: ["scroll"], body: html`<b>40 kg</b>` }));
   });
 
+test("WinxButton: a mirrored nav chevron (next) gets its modifier", () => {
+  const next = mount(ui.WinxButton, { props: { kind: "nav", mirrored: true, title: "next" }, slots: { default: "›" } });
+  assert.equal(next.find("button").classes().join(" "), "winx-btn winx-btn--nav winx-btn--mirrored");
+});
+
 test("WinxCard puts a widget's own class on its body (the shop's winx-shop)", () => {
   const card = mount(ui.WinxCard, { props: { title: "Shop", bodyClass: "winx-shop" } });
   assert.equal(card.find(".winx-widget__body").classes().join(" "), "callout-content winx-widget__body winx-shop");

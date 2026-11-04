@@ -21,3 +21,9 @@ export const Platform = { isMobile: false };
 export const Keymap = { isModEvent: () => false };
 export class Modal { constructor(app) { this.app = app; } open() {} close() {} }
 export class SuggestModal extends Modal { setPlaceholder() {} }
+// a tab: its leaf's app, its content element; the layout's state saved by Obsidian (setState: nothing here)
+export class ItemView extends Component {
+  constructor(leaf) { super(); this.leaf = leaf; this.app = leaf?.app; this.contentEl = globalThis.document?.createElement("div"); }
+  async setState() {}
+}
+export class WorkspaceLeaf {}

@@ -5,13 +5,18 @@
 defineProps({
   kind: { type: String, default: "round" },
   on: { type: Boolean, default: false },
+  mirrored: { type: Boolean, default: false },   // the nav chevron the other way: "next"
   title: { type: String, default: null },
   cls: { type: String, default: null },
 });
 </script>
 
 <template>
-  <button :class="['winx-btn', `winx-btn--${kind}`, { 'winx-btn--on': on }, cls]" :title="title" :aria-label="title">
+  <button
+    :class="['winx-btn', `winx-btn--${kind}`, { 'winx-btn--on': on, 'winx-btn--mirrored': mirrored }, cls]"
+    :title="title"
+    :aria-label="title"
+  >
     <slot />
   </button>
 </template>

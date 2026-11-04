@@ -13,14 +13,14 @@ export function useDrag(view) {
   const zone = e => e.target.closest?.("[data-drop]") ?? null;
   view.registerDomEvent(el, "dragstart", e => {
     const src = e.target.closest?.("[data-drag]") ?? null;
-    if (!src || !view.ctx) return;
+    if (!src || !view.ctx?.model) return;
     dragged = view.taskOf(src);
     drag.on = true;
     e.dataTransfer?.setData("text/plain", "");
     // later: zones covering the card at dragstart cancel the drag
-    window.setTimeout(() => view.ctx?.root.classList.add("winx-cal--dragging"));
+    window.setTimeout(() => view.ctx?.root?.classList.add("winx-cal--dragging"));
   });
-  view.registerDomEvent(el, "dragend", () => view.ctx?.root.classList.remove("winx-cal--dragging"));
+  view.registerDomEvent(el, "dragend", () => view.ctx?.root?.classList.remove("winx-cal--dragging"));
   view.registerDomEvent(el, "dragover", e => {
     const z = zone(e);
     if (z) { e.preventDefault(); z.classList.add(`${z.classList[0]}--over`); }
