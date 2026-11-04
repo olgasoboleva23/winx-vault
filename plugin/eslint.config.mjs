@@ -3,6 +3,8 @@
 import { defineConfig } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
 import { DEFAULT_BRANDS } from "eslint-plugin-obsidianmd/dist/lib/rules/ui/brands.js";
+import pluginVue from "eslint-plugin-vue";
+import tseslint from "typescript-eslint";
 
 export default defineConfig([
   { ignores: ["dist/", "node_modules/", "tests/", "esbuild.config.mjs", "eslint.config.mjs"] },
@@ -16,6 +18,17 @@ export default defineConfig([
   { rules: { "obsidianmd/ui/sentence-case": ["warn", { brands: [...DEFAULT_BRANDS, "Tasks", "Dataview"] }] } },
   // lines up to 120 characters: an html`` template breaks by element, a call by argument
   { rules: { "max-len": ["error", { code: 120, ignoreUrls: true }] } },
+  // .vue files: Vue's recommended rules; the type-checked ones need a project that knows .vue (vue-tsc checks them)
+  ...pluginVue.configs["flat/recommended"],
+  { files: ["**/*.vue"], languageOptions: { parserOptions: { parser: tseslint.parser, extraFileExtensions: [".vue"] } } },
+  { files: ["**/*.vue"], ...tseslint.configs.disableTypeChecked },
+  // a short element stays on one line: <span class="x">{{ v }}</span>
+  // a short element stays on one line (<span class="x">{{ v }}</span>, up to 3 attributes), a longer one breaks
+  // by attribute
+  { files: ["**/*.vue"], rules: {
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/max-attributes-per-line": ["warn", { singleline: { max: 3 } }],
+  } },
   // a 🔁 rule is read by `(m = rule.match(…)) ? … :` chains, on purpose
   { files: ["src/tasks/repeats.js"], rules: { "no-cond-assign": "off" } },
 ]);

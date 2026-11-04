@@ -2,6 +2,7 @@
 //   npm run build   into dist/
 //   npm run dev     into $WINX_VAULT/.obsidian/plugins/winx/ (without it: dist/), again on every save
 import esbuild from "esbuild";
+import Vue from "unplugin-vue/esbuild";
 import * as sass from "sass";
 import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -38,7 +39,9 @@ const ctx = await esbuild.context({
   minify: !watch,
   logLevel: "warning",
   loader: { ".md": "text" },   // dashboard/layout.md: the dashboard's layout as text
-  plugins: [extras],
+  // Vue: templates compiled at build time (no compiler in main.js), no Options API, no devtools
+  define: { __VUE_OPTIONS_API__: "false", __VUE_PROD_DEVTOOLS__: "false", __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false" },
+  plugins: [Vue(), extras],
 });
 if (watch) {
   await ctx.watch();

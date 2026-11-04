@@ -1,0 +1,89 @@
+import { test, before } from "node:test";
+import assert from "node:assert/strict";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { setApp } from "../src/core/app.js";
+
+let VueHost, defineComponent, h, nextTick;
+// an app whose events the test fires: on(name, fn) → a ref; fire(name, …args)
+const events = () => {
+  const fns = {};
+  const on = (name, fn) => { (fns[name] ??= new Set()).add(fn); return { off: () => fns[name].delete(fn) }; };
+  return { on, fire: (name, ...args) => [...(fns[name] ?? [])].forEach(fn => fn(...args)) };
+};
+const bus = events();
+before(async () => {
+  GlobalRegistrator.register();
+  // Obsidian's own: shown unless it or a parent is marked hidden here, or has no box (display: contents)
+  HTMLElement.prototype.isShown = function () { return !this.closest("[data-hidden]") && this.style.display !== "contents"; };
+  setApp({ workspace: bus, metadataCache: bus, plugins: { plugins: { dataview: { api: { index: { initialized: true } } } } } });
+  ({ VueHost } = await import("../src/core/vueHost.ts"));
+  ({ defineComponent, h, nextTick } = await import("vue"));
+});
+
+// a view that shows state.data.n, the error, or "…"
+const View = () => defineComponent({
+  props: { state: Object, actions: Object },
+  setup: p => () => h("b", p.state.error ? `err ${p.state.error}` : p.state.data ? String(p.state.data.n) : "…"),
+});
+// a load the test lets go: loads[i].ok(data) / .fail(error)
+const slow = () => {
+  const loads = [];
+  return { loads, load: () => new Promise((ok, fail) => loads.push({ ok, fail })) };
+};
+const mount = (opts, el = document.body.appendChild(document.createElement("div"))) => {
+  const host = new VueHost(el, View(), opts);
+  host.load();
+  return { host, el };
+};
+const settle = async () => { for (let i = 0; i < 3; i++) await nextTick(); };
+
+test("a load overtaken by a newer one doesn't put its old data in", async () => {
+  const s = slow(), { host, el } = mount({ load: s.load });
+  const second = host.refresh();
+  s.loads[1].ok({ n: 2 }); await second;
+  s.loads[0].ok({ n: 1 }); await settle();
+  assert.equal(el.textContent, "2");
+  host.unload();
+});
+
+test("a load that ends after the block went writes nothing, and Vue is unmounted", async () => {
+  const s = slow(), { host, el } = mount({ load: s.load });
+  host.unload();
+  s.loads[0].ok({ n: 1 }); await settle();
+  assert.equal(host.state.data, null);
+  assert.equal(el.innerHTML, "");
+});
+
+test("an error shows, and retry loads again", async () => {
+  const s = slow(), { host, el } = mount({ load: s.load });
+  const quiet = console.error; console.error = () => {};
+  s.loads[0].fail(new Error("Weight.md is broken")); await settle();
+  console.error = quiet;
+  assert.equal(el.textContent, "err Weight.md is broken");
+  host.refresh();   // retry
+  s.loads[1].ok({ n: 3 }); await settle();
+  assert.equal(el.textContent, "3");
+  host.unload();
+});
+
+test("a Dataview change reloads it; a hidden block only once it shows", async () => {
+  const s = slow(), { host, el } = mount({ load: s.load });
+  s.loads[0].ok({ n: 1 }); await settle();
+  el.dataset.hidden = "1";
+  bus.fire("dataview:metadata-change", "update", { path: "x.md" });
+  assert.equal(s.loads.length, 1);
+  delete el.dataset.hidden;
+  bus.fire("active-leaf-change");
+  assert.equal(s.loads.length, 2);
+  host.unload();
+});
+
+test("a card's block without a box of its own (display: contents) counts as shown", async () => {
+  const el = document.body.appendChild(document.createElement("div"));
+  el.style.display = "contents";
+  const s = slow(), { host } = mount({ load: s.load }, el);
+  s.loads[0].ok({ n: 1 }); await settle();
+  bus.fire("dataview:metadata-change", "update", { path: "x.md" });
+  assert.equal(s.loads.length, 2);
+  host.unload();
+});
