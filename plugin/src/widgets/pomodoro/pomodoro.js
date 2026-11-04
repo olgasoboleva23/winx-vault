@@ -52,6 +52,12 @@ export class Pomodoro extends Widget {
     const saved = await load();
     return { saved, current: saved.current?.date === todayYmd() ? saved.current : null };
   }
+  // four stars and the ×N of the full sets (tick() lights them)
+  stars() {
+    const star = html`<div class="winx-pomodoro__star">${raw(ICON.star)}</div>`;
+    return html`${[star, star, star, star]}
+      <span class="winx-pomodoro__multiplier"></span>`;
+  }
   view() {
     return html`<div class="winx-pomodoro">
     <div class="winx-pomodoro__mini">
@@ -60,8 +66,7 @@ export class Pomodoro extends Widget {
         <div class="winx-pomodoro__mini-time"></div>
         <div class="winx-pomodoro__stars">
           <span class="winx-pomodoro__mini-mode"></span>
-          ${[0, 1, 2, 3].map(() => html`<div class="winx-pomodoro__star">${raw(ICON.star)}</div>`)}
-          <span class="winx-pomodoro__multiplier"></span>
+          ${this.stars()}
         </div>
       </div>
       <button class="winx-pomodoro__mini-play" data-action="play">${raw(ICON.play)}</button>
@@ -85,8 +90,7 @@ export class Pomodoro extends Widget {
       </div>
     
       <div class="winx-pomodoro__stars">
-        ${[0, 1, 2, 3].map(() => html`<div class="winx-pomodoro__star">${raw(ICON.star)}</div>`)}
-        <span class="winx-pomodoro__multiplier"></span>
+        ${this.stars()}
       </div>
     
       <div class="winx-pomodoro__bottom">
@@ -135,7 +139,7 @@ export class Pomodoro extends Widget {
   tick() {
     const t = this.timer, rem = t.remaining;
     const set = (sel, fn) => this.box.querySelectorAll(sel).forEach(fn);
-    const time = `${Math.floor(rem / 60_000)}:${String(Math.floor(rem % 60_000 / 1000)).padStart(2, "0")}`;
+    const time = t.clock;
     const mode = t.type === "focus" ? "Focus" : "Break";
     set(".winx-pomodoro__time, .winx-pomodoro__mini-time", el => el.textContent = time);
     set(".winx-pomodoro__ring, .winx-pomodoro__mini-ring", el => el.style.setProperty("--p", 1 - rem / t.duration));
@@ -146,8 +150,7 @@ export class Pomodoro extends Widget {
       this.box.dataset.running = t.running;
       set("[data-action=play]", el => el.replaceChildren(sanitizeHTMLToDom(t.running ? ICON.pause : ICON.play)));
     }
-    // stars cycle every 4 sessions, ×N counts the full sets: 4 → 4 stars; 5 → 1 star ×1; 13 → 1 star ×3
-    const sets = t.sessions === 0 ? 0 : Math.floor((t.sessions - 1) / 4), filled = t.sessions - sets * 4;
+    const { filled, sets } = t.stars;
     this.box.querySelectorAll(".winx-pomodoro__star")
       .forEach((el, i) => el.classList.toggle("winx-pomodoro__star--on", i % 4 < filled));
     set(".winx-pomodoro__multiplier", el => el.textContent = sets > 0 ? `×${sets}` : "");

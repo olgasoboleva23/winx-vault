@@ -32,38 +32,49 @@ export class CelestialMarket extends Widget {
     const page = this.dv.page(MARKET);
     if (!page) return { missing: true };
     const mkt = marketState(this.dv);
-    const items = page.file.tasks.where(t => !t.completed).array();
+    const tasks = page.file.tasks.where(t => !t.completed).array();
+    // a row: its line (to find it again), its name (to check it's the same item), its label
+    const row = t => {
+      const item = MarketItem.of(t);
+      return { line: t.line, name: item.name, label: item.label };
+    };
+    const n = tasks.length;
     return {
-      items,
-      groups: marketCats.map(cat => ({ cat, items: items.filter(t => catOf(t) === cat.tag) }))
-        .filter(g => g.items.length),
-      soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.name)).map(s => s.name),
+      empty: !n,
+      left: `${n} item${n === 1 ? "" : "s"} left`,
+      groups: marketCats
+        .map(cat => ({ cat, rows: tasks.filter(t => catOf(t) === cat.tag).map(row) }))
+        .filter(g => g.rows.length),
+      soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.name))
+        .map(s => s.name).join(", "),
     };
   }
   cardButton() {
     return new Button({ icon: "+", title: "add item", action: "add", kind: "text", cls: "winx-widget__add" });
   }
-  view({ missing, items, groups, soon }) {
+  // one item of the list, its ✓ with what finds its line again
+  item({ line, name, label }) {
+    const ids = html` data-action="buy" data-line="${line}" data-name="${name}"`;
+    return html`<div class="winx-market__item">
+      <span class="winx-market__text">${label}</span>
+      <button class="winx-market__buy" aria-label="bought" title="bought"${ids}></button>
+    </div>`;
+  }
+  link(text, path) { return new NoteLink({ text, path, kind: "text", cls: "winx-market__link" }); }
+  view({ missing, empty, left, groups, soon }) {
     if (missing) return new Missing({ path: MARKET });
-    const ids = t => html` data-line="${t.line}" data-name="${MarketItem.of(t).name}"`;
-    const buy = t =>
-      html`<button class="winx-market__buy" aria-label="bought" title="bought" data-action="buy"${ids(t)}></button>`;
-    const link = (text, path) => new NoteLink({ text, path, kind: "text", cls: "winx-market__link" });
     return html`<div class="winx-market">
       <div class="winx-market__list">
-        ${items.length ? "" : new Empty({ text: "Merchant inventory cleared" })}
-        ${groups.map(({ cat, items }) => html`
-          ${new GroupHeader({ label: cat.label, count: items.length })}
-          ${items.map(t => html`<div class="winx-market__item">
-            <span class="winx-market__text">${t.text.replace(/#[\w/]+/g, "").trim()}</span>
-            ${buy(t)}
-          </div>`)}`)}
+        ${empty ? new Empty({ text: "Merchant inventory cleared" }) : ""}
+        ${groups.map(({ cat, rows }) => html`
+          ${new GroupHeader({ label: cat.label, count: rows.length })}
+          ${rows.map(r => this.item(r))}`)}
       </div>
-      ${soon.length ? html`<div class="winx-market__soon">⏳ running low soon: ${soon.join(", ")}</div>` : ""}
+      ${soon ? html`<div class="winx-market__soon">⏳ running low soon: ${soon}</div>` : ""}
       <div class="winx-market__footer">
-        <span>${items.length} item${items.length === 1 ? "" : "s"} left</span>
-        ${link("✦ open market", "00 System/Data/Celestial Market")}
-        ${link("✦ supplies", "00 System/Data/Supplies")}
+        <span>${left}</span>
+        ${this.link("✦ open market", "00 System/Data/Celestial Market")}
+        ${this.link("✦ supplies", "00 System/Data/Supplies")}
       </div>
     </div>`;
   }

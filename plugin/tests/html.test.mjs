@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { html, raw } from "../src/core/html.js";
+import { bem, html, raw } from "../src/core/html.js";
 
 test("put-in text is escaped", () => {
   assert.equal(html`<b>${"a < b & c"}</b>`.html, "<b>a &lt; b &amp; c</b>");
@@ -25,4 +25,10 @@ test("a template across lines: whitespace with a line break in it goes (as in JS
       <b>${name}</b> <i>x</i>
       ${name}
     </div>`.html, '<div class="a"><b>tea</b> <i>x</i>tea</div>');
+});
+
+test("bem: the class with a --modifier for each one that holds", () => {
+  assert.equal(bem("winx-cal__day", { today: true, picked: false }), "winx-cal__day winx-cal__day--today");
+  assert.equal(bem("winx-goal__dot", { done: 1, sel: 0 }), "winx-goal__dot winx-goal__dot--done");
+  assert.equal(bem("winx-btn"), "winx-btn");
 });

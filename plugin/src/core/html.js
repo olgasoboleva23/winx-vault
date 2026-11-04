@@ -15,3 +15,7 @@ export const raw  = s => ({ html: String(s) });
 const tight = s => s.replace(/\s*\n\s*/g, "");
 export const html = (strings, ...values) =>
   ({ html: strings.reduce((out, s, i) => out + tight(s) + (i < values.length ? part(values[i]) : ""), "") });
+
+// a BEM class with its modifiers: bem("winx-cal__day", { today: d === today }) → "winx-cal__day winx-cal__day--today"
+export const bem = (base, mods = {}) =>
+  [base, ...Object.entries(mods).filter(([, on]) => on).map(([m]) => `${base}--${m}`)].join(" ");

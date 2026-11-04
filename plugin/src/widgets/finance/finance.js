@@ -2,7 +2,7 @@
 // categories against their budgets, a 6-month trend and the latest operations; ◀ ▶ step through the months.
 // The data (00 System/Data/Finance) stays in the vault; styles in styles/widgets/_finance.scss
 // (blocks winx-fin, winx-fin-month).
-import { html } from "../../core/html.js";
+import { bem, html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import { dm } from "../../core/dates.js";
 import { NoteLink } from "../../uikit/noteLink.js";
@@ -38,7 +38,8 @@ export class Finance extends Widget {
     return months;
   }
 
-  async data() {
+  // the ledger, the budgets and the shown month (this month, else the latest)
+  async ledgerState() {
     const [ledger, rules] = await Promise.all([this.loadLedger(), this.loadRules()]);
     this.months = Object.keys(ledger).sort();
     if (!this.months.includes(this.current)) {
@@ -48,85 +49,127 @@ export class Finance extends Widget {
     return { ledger, budgets: rules.budgets ?? {}, months: this.months, current: this.current };
   }
 
-  view({ ledger, budgets, months, current }) {
-    if (!months.length) {
+  async data() {
+    const { ledger, budgets, months, current } = await this.ledgerState();
+    if (!months.length) return { empty: true };
+    const report = monthReport(ledger, months, current);
+    const { totals, index, net, categories, trend, peak, latest } = report;
+    const [year, month] = current.split("-");
+    return {
+      title: `${MONTHS[Number(month) - 1]} ${year}`,
+      prev: index > 0, next: index < months.length - 1,
+      totals: [
+        { label: "Spent", value: money(totals.spent), sign: "neg" },
+        { label: "Received", value: money(totals.income), sign: "pos" },
+        { label: "Net", value: money(net), sign: net < 0 ? "neg" : "pos" },
+      ],
+      transfers: totals.transfers > 0 ? money(totals.transfers) : null,
+      categories: categories.map(([name, value], i) =>
+        category(name, value, categories[0][1], PALETTE[i % PALETTE.length], budgets[name])),
+      // a month's bar: % of the biggest
+      trend: trend.length < 2 ? [] : trend.map(({ month: m, spent }) => ({
+        current: m === current, height: Math.max(spent / peak * 100, 3), sum: money(spent),
+        label: MONTHS_SHORT[Number(m.split("-")[1]) - 1],
+      })),
+      latest: latest.map(r => ({
+        date: dm(r.date), text: `${r.category} · ${r.description}`, sum: money(r.amount),
+      })),
+    };
+  }
+
+  // ◀ ▶: a step to a month there is, else disabled
+  step(on, action) { return on ? html` data-action="${action}"` : html` disabled="true"`; }
+  bar(c) {
+    return html`<div class="winx-fin__row">
+      <span>${c.name}</span>
+      <span class="${bem("winx-fin__amt", { over: c.over })}">${c.amount}</span>
+      <div class="winx-fin__track">
+        <div class="winx-fin__fill" style="width: ${c.width}%; background: ${c.fill};"></div>
+      </div>
+    </div>`;
+  }
+  total(t) {
+    return html`<div class="winx-fin__total winx-fin__total--${t.sign}">
+      <span class="winx-fin__total-label">${t.label}</span>
+      <b class="winx-fin__total-value">${t.value}</b>
+    </div>`;
+  }
+  month(m) {
+    return html`<div class="${bem("winx-fin__bar", { current: m.current })}">
+      <div class="winx-fin__col" style="height: ${m.height}%;" aria-label="${m.sum}"></div>
+      <small class="winx-fin__bar-label">${m.label}</small>
+    </div>`;
+  }
+  item(r) {
+    return html`<div class="winx-fin__item">
+      <span class="winx-fin__item-date">${r.date}</span>
+      <span class="winx-fin__item-text">${r.text}</span>
+      <span class="winx-fin__item-sum">${r.sum}</span>
+    </div>`;
+  }
+
+  view({ empty, title, prev, next, totals, transfers, categories, trend, latest }) {
+    if (empty) {
       return html`<div class="winx-fin">
         <div class="winx-fin__empty">The ledger is empty: a note per month goes to ${LEDGER}</div>
       </div>`;
     }
-    const { totals, index, net, categories, trend, peak, latest } = monthReport(ledger, months, current);
-    const height = spent => Math.max(spent / peak * 100, 3);   // a month's bar, % of the biggest
-    const [year, month] = current.split("-");
-    const bar = (name, value, max, color, budget) => {
-      const ratio = budget ? Math.min(value / budget, 1) : value / (max || 1);
-      const fill = budget && value > budget ? "var(--winx-pink-deep)" : `var(${color})`;
-      const over = budget && value > budget ? " winx-fin__amt--over" : "";
-      const share = budget && Math.round(value / budget * 100);
-      return html`<div class="winx-fin__row">
-        <span>${name}</span>
-        ${budget
-          ? html`<span class="winx-fin__amt${over}">${money(value)} / ${money(budget)} · ${share}%</span>`
-          : html`<span class="winx-fin__amt">${money(value)}</span>`}
-        <div class="winx-fin__track">
-          <div class="winx-fin__fill" style="width: ${Math.max(ratio * 100, 1.5)}%; background: ${fill};"></div>
-        </div>
-      </div>`;
-    };
-    const totalsRow = [
-      ["Spent", totals.spent, "neg"], ["Received", totals.income, "pos"], ["Net", net, net < 0 ? "neg" : "pos"],
-    ];
-    const step = (on, action) => on ? html` data-action="${action}"` : html` disabled="true"`;
     return html`<div class="winx-fin">
       <div class="winx-fin__head">
-        <div class="winx-fin__title">${MONTHS[Number(month) - 1]} ${year}</div>
+        <div class="winx-fin__title">${title}</div>
         <div class="winx-fin__nav">
-          <button class="winx-fin__nav-btn"${step(index > 0, "prev")}>◀</button>
-          <button class="winx-fin__nav-btn"${step(index < months.length - 1, "next")}>▶</button>
+          <button class="winx-fin__nav-btn"${this.step(prev, "prev")}>◀</button>
+          <button class="winx-fin__nav-btn"${this.step(next, "next")}>▶</button>
         </div>
       </div>
-      <div class="winx-fin__totals">${totalsRow.map(([label, value, sign]) => html`
-        <div class="winx-fin__total winx-fin__total--${sign}">
-          <span class="winx-fin__total-label">${label}</span>
-          <b class="winx-fin__total-value">${money(value)}</b>
-        </div>`)}
-      </div>
-      ${totals.transfers > 0
-        ? html`<div class="winx-fin__section">transfers ${money(totals.transfers)} — not counted as spending</div>`
+      <div class="winx-fin__totals">${totals.map(t => this.total(t))}</div>
+      ${transfers
+        ? html`<div class="winx-fin__section">
+          transfers ${transfers} — not counted as spending
+        </div>`
         : ""}
       ${categories.length ? html`
         <div class="winx-fin__section">Categories</div>
-        <div class="winx-fin__rows">${categories.map(([name, value], i) =>
-          bar(name, value, categories[0][1], PALETTE[i % PALETTE.length], budgets[name]))}</div>` : ""}
-      ${trend.length > 1 ? html`
+        <div class="winx-fin__rows">${categories.map(c => this.bar(c))}</div>` : ""}
+      ${trend.length ? html`
         <div class="winx-fin__section">Spending by month</div>
-        <div class="winx-fin__trend">${trend.map(({ month: m, spent }) => html`
-          <div class="winx-fin__bar${m === current ? " winx-fin__bar--current" : ""}">
-            <div class="winx-fin__col" style="height: ${height(spent)}%;" aria-label="${money(spent)}"></div>
-            <small class="winx-fin__bar-label">${MONTHS_SHORT[Number(m.split("-")[1]) - 1]}</small>
-          </div>`)}
-        </div>` : ""}
+        <div class="winx-fin__trend">${trend.map(m => this.month(m))}</div>` : ""}
       ${latest.length ? html`
         <div class="winx-fin__section">Recent transactions</div>
-        <div class="winx-fin__list">${latest.map(r => html`
-          <div class="winx-fin__item">
-            <span class="winx-fin__item-date">${dm(r.date)}</span>
-            <span class="winx-fin__item-text">${r.category} · ${r.description}</span>
-            <span class="winx-fin__item-sum">${money(r.amount)}</span>
-          </div>`)}
-        </div>` : ""}
+        <div class="winx-fin__list">${latest.map(r => this.item(r))}</div>` : ""}
     </div>`;
   }
 }
 
+// a category's bar: against its budget (over it in pink, "spent / budget · %"), else against the
+// biggest category
+function category(name, value, max, color, budget) {
+  const over = !!budget && value > budget;
+  return {
+    name, over,
+    amount: budget
+      ? `${money(value)} / ${money(budget)} · ${Math.round(value / budget * 100)}%`
+      : money(value),
+    width: Math.max((budget ? Math.min(value / budget, 1) : value / (max || 1)) * 100, 1.5),
+    fill: over ? "var(--winx-pink-deep)" : `var(${color})`,
+  };
+}
+
 // The dashboard's Finance card: this month's spent and income on one line, the full Finance note a tap away.
 export class FinanceMonth extends Finance {
-  view({ ledger, months, current }) {
-    const link = new NoteLink({ text: "💰 open finance", path: "Finance", kind: "text" });
-    if (!months.length) return html`<div class="winx-fin-month">${link}</div>`;
+  async data() {
+    const { ledger, months, current } = await this.ledgerState();
+    if (!months.length) return { empty: true };
     const { spent, income } = summarize(ledger[current]);
-    const sum = n => html`<b class="winx-fin-month__sum">${money(n)}</b>`;
+    const month = MONTHS[Number(current.split("-")[1]) - 1];
+    return { month, spent: money(spent), income: money(income) };
+  }
+  sum(text) { return html`<b class="winx-fin-month__sum">${text}</b>`; }
+  view({ empty, month, spent, income }) {
+    const link = new NoteLink({ text: "💰 open finance", path: "Finance", kind: "text" });
+    if (empty) return html`<div class="winx-fin-month">${link}</div>`;
     return html`<div class="winx-fin-month">
-      <div>${MONTHS[Number(current.split("-")[1]) - 1]}: spent ${sum(spent)} · income ${sum(income)}</div>
+      <div>${month}: spent ${this.sum(spent)} · income ${this.sum(income)}</div>
       ${link}
     </div>`;
   }

@@ -19,28 +19,40 @@ export class LevelToday extends Widget {
       .reduce((sum, t) => sum + taskXp(t, xpMap), 0);
     const all = tasks.map(t => Task.of(t));
     const v = vitals({ missed: all.filter(t => t.isOverdue(today)), doneToday: all.filter(t => t.doneOn === today) });
-    return { total, ...levelInfo(total), v, mp: mana(cycleLog(this.dv)?.on(today)) };
+    const { level, progress, cost } = levelInfo(total), mp = mana(cycleLog(this.dv)?.on(today));
+    const vital = (name, value, max, title) =>
+      ({ name, mod: name.toLowerCase(), value, max, width: value / max * 100, title });
+    return {
+      total, level, progress, cost, fill: (progress / cost * 100).toFixed(1),
+      vitals: [
+        vital("HP", v.hp, v.hpMax, `missed tasks −${v.damage}, done today +${v.heal}`),
+        mp && vital("MP", mp.value, mp.max,
+          `${mpLine(mp)} (day ${mp.day} of the cycle)\n\n${mpTable(mp)}`),
+      ].filter(Boolean),
+    };
   }
-  view({ total, level, progress, cost, v, mp }) {
-    const bar = (name, value, max, title) => html`
-      <div class="winx-level__vital winx-level__vital--${name.toLowerCase()}" title="${title}">
+  // HP or MP: its bar and value/max, the reasons in its tooltip
+  vital({ name, mod, value, max, width, title }) {
+    return html`
+      <div class="winx-level__vital winx-level__vital--${mod}" title="${title}">
         <b class="winx-level__vital-name">${name}</b>
         <div class="winx-level__vital-bar">
-          <i class="winx-level__vital-fill" style="width: ${value / max * 100}%"></i>
+          <i class="winx-level__vital-fill" style="width: ${width}%"></i>
         </div>
         <span class="winx-level__vital-value">${value}/${max}</span>
       </div>`;
+  }
+  view({ total, level, progress, cost, fill, vitals }) {
     return html`<div class="winx-level">
       <div class="winx-level__icon"></div>
       <div class="winx-level__body">
         <div class="winx-level__text">Level: ${level} | Total XP: ${total}</div>
         <div class="winx-level__text">Progress: ${progress}/${cost}</div>
         <div class="winx-level__progress">
-          <div class="winx-level__progress-fill" style="width:${(progress / cost * 100).toFixed(1)}%"></div>
+          <div class="winx-level__progress-fill" style="width:${fill}%"></div>
         </div>
         <div class="winx-level__vitals">
-          ${bar("HP", v.hp, v.hpMax, `missed tasks −${v.damage}, done today +${v.heal}`)}
-          ${mp ? bar("MP", mp.value, mp.max, `${mpLine(mp)} (day ${mp.day} of the cycle)\n\n${mpTable(mp)}`) : ""}
+          ${vitals.map(x => this.vital(x))}
         </div>
       </div>
     </div>`;

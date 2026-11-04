@@ -53,52 +53,56 @@ export class Weight extends Widget {
     if (this.mode === "log" && log) {
       const byDay = new Map(log.entries.map(e => [e.date, e])), cycle = cycleLog(this.dv);
       return {
-        log, days, today, entries: days.map(d => byDay.get(d) ?? null),
+        log, days, logName: String(log.name ?? "log"), reasons: (log.reasons ?? []).map(String),
+        now: byDay.get(today) ?? null,   // today's entry
+        entries: days.map(d => byDay.get(d) ?? null),
         period: days.map(d => !!cycle?.on(d)?.isPeriod),
       };
     }
     const file = this.app.vault.getAbstractFileByPath(PATH);
-    if (!file) return { missing: true, log };
+    if (!file) return { missing: true, log, logName: log && String(log.name ?? "log") };
     const ws = new WeightLog(await this.app.vault.cachedRead(file)).entries;
     const last = ws.at(-1);
     const ref = last && [...ws].reverse().find(w => w.date <= addDays(last.date, -7));
     const byDay = new Map(ws.map(w => [w.date, w.kg]));
     const delta = ref ? +(last.kg - ref.kg).toFixed(1) : null;
-    return { log, last, delta, days, vals: days.map(d => byDay.get(d) ?? null) };
+    return {
+      log, logName: log && String(log.name ?? "log"), last, days,
+      vals: days.map(d => byDay.get(d) ?? null),
+      change: delta === null ? null : `${delta > 0 ? "+" : ""}${delta}`,   // vs a week ago
+    };
   }
+  // a toggle button: the weight / log modes, the log's levels and reasons
+  toggle(text, on, action, data) { return new Button({ text, kind: "toggle", on, action, data }); }
   view(d) {
-    const modeBtn = (text, mode) =>
-      new Button({ text, kind: "toggle", on: this.mode === mode, action: "mode", data: { mode } });
-    const toggle = d.log ? html`<div class="winx-weight__modes">
-      ${modeBtn("⚖️ weight", "weight")}
-      ${modeBtn(String(d.log.name ?? "log"), "log")}
-    </div>` : "";
+    const mode = (text, m) => this.toggle(text, this.mode === m, "mode", { mode: m });
     return html`<div class="winx-weight">
-      ${toggle}
+      ${d.log ? html`<div class="winx-weight__modes">
+        ${mode("⚖️ weight", "weight")}
+        ${mode(d.logName, "log")}
+      </div>` : ""}
       ${this.mode === "log" && d.log ? this.logView(d) : this.weightView(d)}
     </div>`;
   }
-  weightView({ missing, last, delta }) {
+  weightView({ missing, last, change }) {
     if (missing) return new Missing({ path: PATH });
     const input = { name: "kg", type: "number", step: "0.1", inputmode: "decimal", placeholder: "today, kg" };
     return html`<div class="winx-weight__head">${last
         ? html`<span class="winx-weight__now">${last.kg} kg</span>
-          ${delta !== null
-            ? html`<span class="winx-weight__delta">${delta > 0 ? "+" : ""}${delta} vs week ago</span>`
+          ${change !== null
+            ? html`<span class="winx-weight__delta">${change} vs week ago</span>`
             : ""}`
         : html`<span class="winx-weight__delta">no entries yet</span>`}</div>
       ${new AddForm({ action: "save", input, submit: "Save" })}
       ${new NoteLink({ text: "✦ list", path: PATH, cls: "winx-weight__list" })}`;
   }
-  logView({ log, today, entries }) {
-    const now = entries.at(-1)?.date === today ? entries.at(-1) : null, reasons = (log.reasons ?? []).map(String);
-    const toggle = (text, on, action, data) => new Button({ text, kind: "toggle", on, action, data });
+  logView({ now, reasons }) {
     return html`<div class="winx-weight__log">
         <div class="winx-weight__log-row">
-          ${[0, 1, 2, 3].map(n => toggle(String(n), now?.level === n, "level", { level: n }))}
+          ${[0, 1, 2, 3].map(n => this.toggle(String(n), now?.level === n, "level", { level: n }))}
         </div>
         <div class="winx-weight__log-row">
-          ${reasons.map(r => toggle(r, !!now?.reasons.includes(r), "reason", { reason: r }))}
+          ${reasons.map(r => this.toggle(r, !!now?.reasons.includes(r), "reason", { reason: r }))}
         </div>
         ${new Button({ text: now ? "Update today" : "Save today", kind: "pill", action: "logSave" })}
       </div>

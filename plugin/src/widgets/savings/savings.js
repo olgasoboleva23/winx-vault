@@ -1,7 +1,7 @@
 // Savings: a jar per note in the Savings folder (a goal: its picture, saved so far, a ✦ stamp per deposit). On a
 // payday "put in N" until the deposit is in; with a price the picture fills with colour from the bottom and, past
 // halfway, "saved" turns into "left".
-import { html } from "../../core/html.js";
+import { bem, html } from "../../core/html.js";
 import { Widget } from "../widget.js";
 import { dm, todayYmd, weekday } from "../../core/dates.js";
 import { edit } from "../../core/files.js";
@@ -34,43 +34,60 @@ export class Savings extends Widget {
       const jar = new SavingsJar(await this.app.vault.cachedRead(f), props);
       const img = props.image && this.app.metadataCache.getFirstLinkpathDest(String(props.image), f.path);
       return { path: f.path, name: props.goal ?? f.basename, img: img && this.app.vault.getResourcePath(img),
-        saved: jar.saved, count: jar.deposits.length, pct: jar.pct, left: jar.left, price: jar.price,
-        due: jar.due(today), next: jar.next(today, 2), today };
+        ...shown(jar, today) };
     }));
     return { jars };
   }
+  jar(j) {
+    return html`<div class="winx-jar">
+      <div class="winx-jar__goal">
+        <div class="winx-jar__pic">${j.img ? html`
+          <img class="winx-jar__img" src="${j.img}" alt="">
+          <img class="winx-jar__img winx-jar__img--grey" src="${j.img}" alt="" style="${j.greyed}">`
+          : ""}</div>
+        <div>
+          <div class="winx-jar__name">✦ ${j.name}</div>
+          <div class="winx-jar__big">${j.big}</div>
+          <div class="winx-jar__note">${j.note}</div>
+        </div>
+      </div>
+      ${j.fill !== null ? html`<div class="winx-jar__bar">
+        <i class="winx-jar__fill" style="width: ${j.fill}%"></i>
+      </div>` : ""}
+      <div class="winx-jar__stamps">${j.stamps.map(on =>
+        html`<span class="${bem("winx-jar__stamp", { on })}">✦</span>`)}</div>
+      ${j.due ? html`<div class="winx-jar__due">
+        <span>${j.due.when}: <b class="winx-jar__due-sum">put in ${j.due.sum}</b></span>
+        ${new Button({ text: "✓ done", kind: "pill", action: "deposit", data: { path: j.path } })}
+      </div>` : ""}
+      <div class="winx-jar__next">next payday: ${j.next}</div>
+    </div>`;
+  }
   view({ jars }) {
     if (!jars.length) return new Empty({ text: `A goal: a note in ${FOLDER}` });
-    return html`<div class="winx-savings">${jars.map(j => {
-      const slots = Math.max(8, Math.ceil((j.count + 1) / 8) * 8);
-      const grey = j.pct === null ? 100 : Math.max(0, 100 - j.pct);
-      const pastHalf = j.pct !== null && j.pct >= 50;
-      const greyed = `clip-path: inset(0 0 ${100 - grey}% 0)`;
-      const when = j.due && (j.due.payday === j.today ? "payday today" : `payday ${day(j.due.payday)}`);
-      return html`<div class="winx-jar">
-        <div class="winx-jar__goal">
-          <div class="winx-jar__pic">${j.img ? html`
-            <img class="winx-jar__img" src="${j.img}" alt="">
-            <img class="winx-jar__img winx-jar__img--grey" src="${j.img}" alt="" style="${greyed}">` : ""}</div>
-          <div>
-            <div class="winx-jar__name">✦ ${j.name}</div>
-            <div class="winx-jar__big">${pastHalf ? `left ${money(j.left)}` : money(j.saved)}</div>
-            <div class="winx-jar__note">${j.pct === null
-              ? `saved · ${j.count} deposit${j.count === 1 ? "" : "s"}`
-              : `${j.pct}% of ${money(j.price)}`}</div>
-          </div>
-        </div>
-        ${j.pct !== null ? html`<div class="winx-jar__bar">
-          <i class="winx-jar__fill" style="width: ${Math.min(100, j.pct)}%"></i>
-        </div>` : ""}
-        <div class="winx-jar__stamps">${Array.from({ length: slots }, (_, i) =>
-          html`<span class="winx-jar__stamp${i < j.count ? " winx-jar__stamp--on" : ""}">✦</span>`)}</div>
-        ${j.due ? html`<div class="winx-jar__due">
-          <span>${when}: <b class="winx-jar__due-sum">put in ${j.due.sum ? money(j.due.sum) : "your part"}</b></span>
-          ${new Button({ text: "✓ done", kind: "pill", action: "deposit", data: { path: j.path } })}
-        </div>` : ""}
-        <div class="winx-jar__next">next payday: ${j.next.map(day).join(" · ")}</div>
-      </div>`;
-    })}</div>`;
+    return html`<div class="winx-savings">${jars.map(j => this.jar(j))}</div>`;
   }
 }
+
+// a jar as the card shows it: the picture greyed above what's saved, past halfway "left" instead
+// of "saved", a ✦ stamp per deposit (rows of 8, one free), the payday's "put in" until it's in
+function shown(jar, today) {
+  const pct = jar.pct, count = jar.deposits.length, due = jar.due(today);
+  const grey = pct === null ? 100 : Math.max(0, 100 - pct);
+  return {
+    greyed: `clip-path: inset(0 0 ${100 - grey}% 0)`,
+    big: pct !== null && pct >= 50 ? `left ${money(jar.left)}` : money(jar.saved),
+    note: pct === null
+      ? `saved · ${count} deposit${count === 1 ? "" : "s"}`
+      : `${pct}% of ${money(jar.price)}`,
+    fill: pct === null ? null : Math.min(100, pct),
+    stamps: Array.from({ length: Math.max(8, Math.ceil((count + 1) / 8) * 8) }, (_, i) =>
+      i < count),
+    due: due && {
+      when: due.payday === today ? "payday today" : `payday ${day(due.payday)}`,
+      sum: due.sum ? money(due.sum) : "your part",
+    },
+    next: jar.next(today, 2).map(day).join(" · "),
+  };
+}
+

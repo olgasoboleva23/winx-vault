@@ -1,4 +1,4 @@
-import { html } from "../core/html.js";
+import { bem, html } from "../core/html.js";
 import { Component } from "./component.js";
 
 // A button (block winx-btn): its look is its kind, a modifier (winx-btn--round…), one block of styles each
@@ -14,7 +14,7 @@ export class Button extends Component {
   view({ icon, text, title, action, kind = "round", on = false, cls, data = {} }) {
     const label = title ? html` title="${title}" aria-label="${title}"` : "";
     const extra = Object.entries(data).map(([k, v]) => html` data-${k}="${v}"`);
-    const classes = `winx-btn winx-btn--${kind}${on ? " winx-btn--on" : ""}${cls ? " " + cls : ""}`;
+    const classes = `${bem("winx-btn", { [kind]: true, on })}${cls ? " " + cls : ""}`;
     const act = action ? html` data-action="${action}"` : "";
     return html`<button class="${classes}"${act}${extra}${label}>${icon ?? text}</button>`;
   }

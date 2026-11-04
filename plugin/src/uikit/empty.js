@@ -1,4 +1,4 @@
-import { html } from "../core/html.js";
+import { bem, html } from "../core/html.js";
 import { Component } from "./component.js";
 import { Button } from "./button.js";
 
@@ -6,7 +6,7 @@ import { Button } from "./button.js";
 // mod: a modifier (winx-empty--error), icon instead of ✦, slot: markup after the text (a button)
 export class Empty extends Component {
   view({ text = "Nothing here yet", mod, icon = "✦", slot = "" }) {
-    return html`<div class="winx-empty${mod ? ` winx-empty--${mod}` : ""}">${icon} ${text}${slot}</div>`;
+    return html`<div class="${bem("winx-empty", { [mod]: mod })}">${icon} ${text}${slot}</div>`;
   }
 }
 

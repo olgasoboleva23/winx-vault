@@ -2,7 +2,7 @@
 // the 3 before it as rows of day pills (the period, the fertile window and the ovulation marked), or the last 10
 // cycles' lengths and period lengths as columns with their average; "started / ended today", the dates.
 // Folded (the default; a click on the head toggles it, kept per device): only the head and the buttons.
-import { html } from "../../core/html.js";
+import { bem, html } from "../../core/html.js";
 import { Button } from "../../uikit/button.js";
 import { Widget } from "../widget.js";
 import { CycleLog } from "./cycleLog.js";
@@ -49,56 +49,80 @@ export class Cycle extends Widget {
     // the current cycle with no end yet: its days so far are the period while it lasts
     const cycles = log.recent(4, day)
       .map(c => c.current && c.period === null && info?.isPeriod ? { ...c, period: c.days } : c);
-    return { day, page: true, info, cycles, stats: log.last(10) };
+    const stats = log.last(10), m = info && mana(info);
+    return {
+      day, page: true, info, ending: info?.isPeriod && !info.ended,
+      head: info && {
+        day: info.day, period: info.isPeriod, phase: m.phase,
+        title: `${mpLine(m)}\n\n${mpTable(m)}`,
+        next: dm(info.nextStart),
+        when: info.daysUntil >= 0 ? `in ${info.daysUntil} d` : `${-info.daysUntil} d late`,
+      },
+      rows: cycles.map(c => ({
+        when: `${dm(c.start)} – ${c.current ? "now" : dm(c.end)}`,
+        length: `${c.period ? `${c.period} d period · ` : ""}${c.days} d`
+          + (c.current ? " so far" : ""),
+        pills: Array.from({ length: c.days }, (_, i) => pill(c, i + 1)),
+      })),
+      lengths: stats.map(c => c.length), periods: stats.filter(c => c.period).map(c => c.period),
+    };
   }
   // columns of `values` against their largest, a line at their average labelled on the right
   columns(title, values, kind) {
     const max = Math.max(...values), avg = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+    const line = avg / max * 100, cols = values.map(v => ({ v, height: v / max * 100 }));
     return html`<div class="winx-cycle__chart winx-cycle__chart--${kind}">
       <div class="winx-cycle__chart-title">${title}<span class="winx-cycle__chart-avg">avg ${avg} d</span></div>
       <div class="winx-cycle__cols">
-        <b class="winx-cycle__avg-line" style="bottom: ${avg / max * 100}%"></b>
-        ${values.map(v => html`<i class="winx-cycle__col" style="height: ${v / max * 100}%">
+        <b class="winx-cycle__avg-line" style="bottom: ${line}%"></b>
+        ${cols.map(({ v, height }) => html`<i class="winx-cycle__col" style="height: ${height}%">
           <span class="winx-cycle__col-value">${v}</span>
         </i>`)}
       </div>
     </div>`;
   }
-  view({ day, page, info, cycles = [], stats = [] }) {
-    const ending = info?.isPeriod && !info.ended;
-    const when = info && (info.daysUntil >= 0 ? `in ${info.daysUntil} d` : `${-info.daysUntil} d late`);
-    const tabBtn = tab => new Button({ text: tab, kind: "toggle", on: this.tab === tab, action: "tab", data: { tab } });
-    const periods = stats.filter(c => c.period).map(c => c.period);
-    const mpTitle = info && `${mpLine(mana(info))}\n\n${mpTable(mana(info))}`;
-    return html`<div class="winx-cycle${this.folded && info ? " winx-cycle--folded" : ""}">
+  // the day, its phase and the next start; a click folds the card
+  head(h) {
+    const title = this.folded ? "show the cycles" : "fold";
+    return html`<div class="winx-cycle__head" data-action="fold" title="${title}">
+      <div class="${bem("winx-cycle__day", { period: h.period })}" title="${h.title}">
+        day ${h.day}<span class="winx-cycle__phase"> · ${h.phase}</span>
+      </div>
+      <div class="winx-cycle__next">next ~${h.next}, ${h.when}</div>
+    </div>`;
+  }
+  tabBtn(tab) {
+    const on = this.tab === tab;
+    return new Button({ text: tab, kind: "toggle", on, action: "tab", data: { tab } });
+  }
+  row(r) {
+    return html`<div class="winx-cycle__row">
+      <div class="winx-cycle__when"><span>${r.when}</span><span>${r.length}</span></div>
+      <div class="winx-cycle__pills">${r.pills.map(p =>
+        html`<i class="winx-cycle__pill winx-cycle__pill--${p}"></i>`)}</div>
+    </div>`;
+  }
+  // the tabs, then the rows of pills or the columns
+  cycles({ rows = [], lengths, periods }) {
+    if (!rows.length) return "";
+    return html`<div class="winx-cycle__tabs">${this.tabBtn("days")}${this.tabBtn("stats")}</div>
+      ${this.tab === "stats"
+        ? html`${lengths.length ? this.columns("cycle", lengths, "len") : ""}
+          ${periods.length ? this.columns("period", periods, "per") : ""}`
+        : html`<div class="winx-cycle__rows">${rows.map(r => this.row(r))}</div>`}`;
+  }
+  view(d) {
+    const { day, page, info, head, ending } = d;
+    const mark = ending
+      ? { text: "ended today", data: { kind: "end", day } }
+      : { text: "started today", data: { kind: "start", day } };
+    return html`<div class="${bem("winx-cycle", { folded: this.folded && info })}">
       ${!page ? new Missing({ path: CYCLE_PATH })
         : !info ? new Empty({ text: "No data yet" })
-        : html`<div class="winx-cycle__head" data-action="fold" title="${this.folded ? "show the cycles" : "fold"}">
-          <div class="winx-cycle__day${info.isPeriod ? " winx-cycle__day--period" : ""}" title="${mpTitle}">
-            day ${info.day}<span class="winx-cycle__phase"> · ${mana(info).phase}</span>
-          </div>
-          <div class="winx-cycle__next">next ~${dm(info.nextStart)}, ${when}</div>
-        </div>`}
-      ${this.folded && info ? "" : html`${cycles.length ? html`<div class="winx-cycle__tabs">
-        ${tabBtn("days")}
-        ${tabBtn("stats")}
-      </div>` : ""}
-      ${!cycles.length ? "" : this.tab === "stats"
-        ? html`${stats.length ? this.columns("cycle", stats.map(c => c.length), "len") : ""}
-          ${periods.length ? this.columns("period", periods, "per") : ""}`
-        : html`<div class="winx-cycle__rows">${cycles.map(c => html`<div class="winx-cycle__row">
-        <div class="winx-cycle__when">
-          <span>${dm(c.start)} – ${c.current ? "now" : dm(c.end)}</span>
-          <span>${c.period ? `${c.period} d period · ` : ""}${c.days} d${c.current ? " so far" : ""}</span>
-        </div>
-        <div class="winx-cycle__pills">${Array.from({ length: c.days }, (_, i) =>
-          html`<i class="winx-cycle__pill winx-cycle__pill--${pill(c, i + 1)}"></i>`)}</div>
-      </div>`)}</div>`}`}
+        : this.head(head)}
+      ${this.folded && info ? "" : this.cycles(d)}
       <div class="winx-cycle__btns">
-        ${new Button({
-          text: ending ? "ended today" : "started today", action: "mark", kind: "pill",
-          data: { kind: ending ? "end" : "start", day },
-        })}
+        ${new Button({ ...mark, action: "mark", kind: "pill" })}
         ${new NoteLink({ text: "dates", path: CYCLE_PATH })}
       </div>
     </div>`;

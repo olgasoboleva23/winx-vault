@@ -23,6 +23,18 @@ export class Timer {
   get duration()  { return (this.type === "focus" ? this.settings.focusMin : this.settings.breakMin) * 60_000; }
   get remaining() { return Math.max(0, this.duration - this.elapsed - (this.running ? this.now() - this.start : 0)); }
   get other()     { return this.type === "focus" ? "break" : "focus"; }
+  // what's left as m:ss
+  get clock() {
+    const rem = this.remaining;
+    const sec = Math.floor(rem % 60_000 / 1000);
+    return `${Math.floor(rem / 60_000)}:${String(sec).padStart(2, "0")}`;
+  }
+  // stars cycle every 4 sessions, ×N counts the full sets: 4 → 4 stars; 5 → 1 star ×1;
+  // 13 → 1 star ×3
+  get stars() {
+    const sets = this.sessions === 0 ? 0 : Math.floor((this.sessions - 1) / 4);
+    return { filled: this.sessions - sets * 4, sets };
+  }
   play() {
     if (this.running) return;
     this.start = this.now();
