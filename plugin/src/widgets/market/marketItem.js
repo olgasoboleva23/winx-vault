@@ -4,13 +4,11 @@ export class MarketItem {
   constructor(line) { this.line = line; }
   static of(t) { return new MarketItem(`- [${t.status}] ${t.text}`); }   // a Dataview task
   get isBought() { return /^\s*- \[x\]/i.test(this.line); }
-  // the words: no checkbox, tags or date fields
+  // the words, as the list shows them: no checkbox, tags or date fields
   get name() {
     return this.line.replace(/^\s*- \[.\]\s*/, "").replace(/#[\w/]+/g, "")
       .replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
   }
-  // as the list shows it: the text without its checkbox and tags
-  get label() { return this.line.replace(/^\s*- \[.\]\s*/, "").replace(/#[\w/]+/g, "").trim(); }
   // its category: the first tag that isn't nested
   get tag() { return (this.line.match(/#[^\s#]+/gu) ?? []).find(tag => !tag.includes("/")) ?? "#other"; }
   // bought on `date`, the way the Tasks plugin marks it; a line that isn't open comes back as it is

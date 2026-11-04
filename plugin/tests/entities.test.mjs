@@ -89,9 +89,9 @@ test("WeightLog: entries by date, the last one, a day set", () => {
   assert.equal(new WeightLog("").set("2026-10-23", 70.5), "- 2026-10-23 70.5\n");
 });
 
-test("MarketItem: its label on the list is the text without its checkbox and tags (dates stay)", () => {
-  assert.equal(new MarketItem("- [ ] green tea #food ➕ 2026-10-01").label, "green tea  ➕ 2026-10-01");
-  assert.equal(MarketItem.of({ status: " ", text: "  #pet/cat cat food #pet " }).label, "cat food");
+test("MarketItem: its name, as the list shows it: no checkbox, tags or dates", () => {
+  assert.equal(new MarketItem("- [ ] green tea #food ➕ 2026-10-01").name, "green tea");
+  assert.equal(MarketItem.of({ status: " ", text: "  #pet/cat cat food #pet " }).name, "cat food");
 });
 
 test("MarketItem: bought / unbought, the way the Tasks plugin marks a line", () => {

@@ -33,11 +33,8 @@ export class CelestialMarket extends Widget {
     if (!page) return { missing: true };
     const mkt = marketState(this.dv);
     const tasks = page.file.tasks.where(t => !t.completed).array();
-    // a row: its line (to find it again), its name (to check it's the same item), its label
-    const row = t => {
-      const item = MarketItem.of(t);
-      return { line: t.line, name: item.name, label: item.label };
-    };
+    // a row: its line (to find it again) and its name (shown, and to check it's the same item)
+    const row = t => ({ line: t.line, name: MarketItem.of(t).name });
     const n = tasks.length;
     return {
       empty: !n,
@@ -53,10 +50,10 @@ export class CelestialMarket extends Widget {
     return new Button({ icon: "+", title: "add item", action: "add", kind: "text", cls: "winx-widget__add" });
   }
   // one item of the list, its ✓ with what finds its line again
-  item({ line, name, label }) {
+  item({ line, name }) {
     const ids = html` data-action="buy" data-line="${line}" data-name="${name}"`;
     return html`<div class="winx-market__item">
-      <span class="winx-market__text">${label}</span>
+      <span class="winx-market__text">${name}</span>
       <button class="winx-market__buy" aria-label="bought" title="bought"${ids}></button>
     </div>`;
   }
