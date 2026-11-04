@@ -7,8 +7,6 @@ import { Finance, FinanceMonth } from "./finance/finance.js";
 import { Goals } from "./goals/goals.js";
 import { Savings } from "./savings/savings.js";
 import { Pomodoro } from "./pomodoro/pomodoro.js";
-import { Shop } from "./shop/shop.js";
-import { Supplies } from "./market/supplies.js";
 import { Weight } from "./body/weight.js";
 import { loadXpToday } from "./xp/xpToday.js";
 import XpToday from "./xp/XpToday.vue";
@@ -16,6 +14,10 @@ import { loadLevelToday } from "./xp/levelToday.js";
 import LevelToday from "./xp/LevelToday.vue";
 import { loadLifeAreas } from "./xp/lifeAreas.js";
 import LifeAreas from "./xp/LifeAreas.vue";
+import { loadShop, shopActions } from "./shop/shop.js";
+import ShopWidget from "./shop/ShopWidget.vue";
+import { loadSupplies, suppliesActions } from "./market/supplies.js";
+import SuppliesWidget from "./market/SuppliesWidget.vue";
 import { MarkdownRenderChild } from "obsidian";
 import { VueHost } from "../core/vueHost.ts";
 import { blockDv } from "../core/plugins.js";
@@ -24,7 +26,7 @@ import { app } from "../core/app.js";
 // name → class
 export const blocks = {
   celestialMarket: CelestialMarket, cycle: Cycle, dailyNote: DailyNote, finance: Finance, financeMonth: FinanceMonth,
-  goals: Goals, pomodoro: Pomodoro, savings: Savings, shop: Shop, supplies: Supplies, weight: Weight,
+  goals: Goals, pomodoro: Pomodoro, savings: Savings, weight: Weight,
 };
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
@@ -34,6 +36,8 @@ export const vueBlocks = {
   xpToday: { view: XpToday, load: loadXpToday },
   levelToday: { view: LevelToday, load: loadLevelToday },
   lifeAreas: { view: LifeAreas, load: loadLifeAreas },
+  shop: { view: ShopWidget, load: loadShop, actions: shopActions, bodyClass: "winx-shop" },
+  supplies: { view: SuppliesWidget, load: loadSupplies, actions: suppliesActions },
 };
 
 // a Vue widget on its block: a VueHost (with the card when the block has a "card:" line) owned by the block
