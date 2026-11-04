@@ -26,7 +26,8 @@ export const blocks = {
   supplies: Supplies, weight: Weight,
 };
 
-// the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes }, where ctx is
+// the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes, cardButton:
+// a .vue next to the card's title, bodyClass: a class on the card's body }, where ctx is
 // { dv, app, args, sourcePath } (dv: blockDv)
 export const vueBlocks = {
   xpToday: { view: XpToday, load: loadXpToday },
@@ -36,10 +37,11 @@ export const vueBlocks = {
 function vueBlock(def, el, sourcePath, args) {
   const ctx = { get dv() { return blockDv(sourcePath, el); }, app, args, sourcePath };
   const meta = args.meta ? String(args.meta).split(/\s+/) : [];
-  const card = args.card ? { title: String(args.card), meta } : undefined;
+  const card = args.card ? { title: String(args.card), meta, bodyClass: def.bodyClass } : undefined;
+  if (!card && def.bodyClass) el.addClass(def.bodyClass);   // no card: the class goes on the block itself
   const block = new MarkdownRenderChild(el);
   const load = () => def.load(ctx), actions = def.actions?.(ctx);
-  block.addChild(new VueHost(el, def.view, { load, actions, note: sourcePath, card }));
+  block.addChild(new VueHost(el, def.view, { load, actions, note: sourcePath, card, cardButton: def.cardButton }));
   return block;
 }
 

@@ -1,6 +1,11 @@
-<!-- a dashboard card: the markup Obsidian draws for a "> [!card] Title" callout (as uikit/card.js), with a slot -->
+<!-- a dashboard card: the markup Obsidian draws for a "> [!card] Title" callout (as uikit/card.js), with a slot; the
+     button slot: one next to the title -->
 <script setup>
-defineProps({ title: { type: String, default: "" }, meta: { type: Array, default: () => [] } });
+defineProps({
+  title: { type: String, default: "" },
+  meta: { type: Array, default: () => [] },
+  bodyClass: { type: String, default: null },   // the widget's own class on the body (the shop's winx-shop)
+});
 </script>
 
 <template>
@@ -13,7 +18,8 @@ defineProps({ title: { type: String, default: "" }, meta: { type: Array, default
     <div class="callout-title winx-widget__title" dir="auto">
       <div class="callout-icon" />
       <div class="callout-title-inner">{{ title }}</div>
+      <slot name="button" />
     </div>
-    <div class="callout-content winx-widget__body"><slot /></div>
+    <div :class="['callout-content winx-widget__body', bodyClass]"><slot /></div>
   </div>
 </template>

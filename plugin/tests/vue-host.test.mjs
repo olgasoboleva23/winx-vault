@@ -111,3 +111,14 @@ test("a view that takes no actions gets none (no actions attribute on its root)"
   assert.equal(el.innerHTML, "<b>ok</b>");
   host.unload();
 });
+
+test("a card's button goes next to its title and gets the actions", async () => {
+  let added = 0;
+  const Plus = defineComponent({ props: { actions: Object }, setup: p => () => h("button", { onClick: p.actions.add }, "+") });
+  const s = slow(), el = document.body.appendChild(document.createElement("div"));
+  const host = new VueHost(el, View(), { load: s.load, card: { title: "Market" }, cardButton: Plus, actions: { add: () => added++ } });
+  host.load(); await settle();
+  el.querySelector(".callout-title-inner + button").click();
+  assert.equal(added, 1);
+  host.unload();
+});

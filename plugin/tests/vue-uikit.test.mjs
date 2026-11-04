@@ -55,6 +55,11 @@ test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAdd
       new Card({ title: "Weight", meta: ["scroll"], body: html`<b>40 kg</b>` }));
   });
 
+test("WinxCard puts a widget's own class on its body (the shop's winx-shop)", () => {
+  const card = mount(ui.WinxCard, { props: { title: "Shop", bodyClass: "winx-shop" } });
+  assert.equal(card.find(".winx-widget__body").classes().join(" "), "callout-content winx-widget__body winx-shop");
+});
+
 test("WinxFailed's retry and WinxAddForm's submit reach the parent", async () => {
   const failed = mount(ui.WinxFailed, { props: { text: "x" } });
   await failed.find("button").trigger("click");

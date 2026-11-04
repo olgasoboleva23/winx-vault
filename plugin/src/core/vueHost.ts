@@ -16,7 +16,8 @@ export interface HostOptions<D> {
   load: () => Promise<D>;
   actions?: Record<string, (...args: any[]) => unknown>;
   note?: string;                               // the block's own note: its changes count too
-  card?: { title: string; meta?: string[] };   // drawn inside a dashboard card
+  card?: { title: string; meta?: string[]; bodyClass?: string };   // drawn inside a dashboard card
+  cardButton?: VueComponent;                   // a button next to the card's title (gets actions)
 }
 
 export class VueHost<D = unknown> extends Component {
@@ -45,7 +46,9 @@ export class VueHost<D = unknown> extends Component {
     const body = () => state.error ? h(WinxFailed, { text: state.error, onRetry: retry })
       : state.data === null ? (card ? h("div", { class: "winx-widget__skeleton" }) : null)
       : h(view, props);
-    this.vue = createApp({ render: () => card ? h(WinxCard, card, body) : body() });
+    const button = this.opts.cardButton, actions = { ...this.opts.actions, retry };
+    const slots = { default: body, ...(button ? { button: () => h(button, { actions }) } : {}) };
+    this.vue = createApp({ render: () => card ? h(WinxCard, card, slots) : body() });
     this.vue.provide("sourcePath", this.opts.note ?? "");   // where a NoteLink opens a note from
     this.vue.mount(this.el);
     const { redraw } = useRedraw(this, () => this.shown, () => void this.refresh());
