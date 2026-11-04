@@ -2,12 +2,12 @@
      Tasks) or ☀️ (moved to today) takes it off at once, the write follows -->
 <script setup>
 import { computed, inject, reactive, watch } from "vue";
-import WinxButton from "../vue/WinxButton.vue";
+import WinxButton from "../uikit/WinxButton.vue";
 import TaskText from "./TaskText.vue";
 import TaskButtons from "./TaskButtons.vue";
-import { T } from "./data.js";
-import { dm } from "../core/dates.js";
-import { AudioEngine } from "../core/sounds.js";
+import { T } from "../../calendar/data.js";
+import { dm } from "../../core/dates.js";
+import { AudioEngine } from "../../core/sounds.js";
 
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);

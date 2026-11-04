@@ -3,12 +3,12 @@
 <script setup>
 import { computed, inject, ref } from "vue";
 import { Platform } from "obsidian";
-import WinxButton from "../vue/WinxButton.vue";
-import { T } from "./data.js";
-import { dateFor } from "./state.js";
-import { addDays, addMonths } from "../core/dates.js";
-import { isMuted, toggleMute } from "../core/sounds.js";
-import { app } from "../core/app.js";
+import WinxButton from "../uikit/WinxButton.vue";
+import { T } from "../../calendar/data.js";
+import { dateFor } from "../../calendar/state.js";
+import { addDays, addMonths } from "../../core/dates.js";
+import { isMuted, toggleMute } from "../../core/sounds.js";
+import { app } from "../../core/app.js";
 
 const M = d => window.moment(d);
 const view = inject("calendar");

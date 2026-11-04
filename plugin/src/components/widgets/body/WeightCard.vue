@@ -2,12 +2,12 @@
      a toggle switches to that log: a level 0–3 and today's reasons, bars over the cycle's period days -->
 <script setup>
 import { computed, ref, watch } from "vue";
-import WinxAddForm from "../../vue/WinxAddForm.vue";
-import WinxButton from "../../vue/WinxButton.vue";
-import WinxChart from "../../vue/WinxChart.vue";
-import WinxMissing from "../../vue/WinxMissing.vue";
-import WinxNoteLink from "../../vue/WinxNoteLink.vue";
-import { LOG_PATH, PATH } from "./weight.js";
+import WinxAddForm from "../../uikit/WinxAddForm.vue";
+import WinxButton from "../../uikit/WinxButton.vue";
+import WinxChart from "../../uikit/WinxChart.vue";
+import WinxMissing from "../../uikit/WinxMissing.vue";
+import WinxNoteLink from "../../uikit/WinxNoteLink.vue";
+import { LOG_PATH, PATH } from "../../../widgets/body/weight.js";
 
 const props = defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 const w = computed(() => props.state.data.weight), log = computed(() => props.state.data.log);

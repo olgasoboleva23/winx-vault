@@ -6,7 +6,7 @@ let mount, DashboardDate;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  DashboardDate = (await import("../src/dashboard/DashboardDate.vue")).default;
+  DashboardDate = (await import("../src/components/dashboard/DashboardDate.vue")).default;
 });
 
 test("the date row: ‹ › step a day, today shows only on another day, an emptied field means today", async () => {

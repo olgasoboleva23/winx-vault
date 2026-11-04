@@ -4,13 +4,13 @@
 // or the dashboard's date); a hidden block once it shows. A load overtaken by a newer one, or ending after the
 // block went, writes nothing; an error is shown with retry. On unload: Vue is unmounted.
 // The .vue component gets `state` and `actions` (the screen's writes, and retry) as props; with `card` it is
-// drawn inside a dashboard card (vue/WinxCard.vue).
+// drawn inside a dashboard card (components/uikit/WinxCard.vue).
 import { Component } from "obsidian";
 import { createApp, h, nextTick, reactive, type App, type Component as VueComponent } from "vue";
 import { useDataviewChanges, useRedraw, useTabDate, useWhenIndexed } from "./use.js";
 import { app } from "./app.js";
-import WinxCard from "../vue/WinxCard.vue";
-import WinxFailed from "../vue/WinxFailed.vue";
+import WinxCard from "../components/uikit/WinxCard.vue";
+import WinxFailed from "../components/uikit/WinxFailed.vue";
 
 export interface HostOptions<D> {
   load: () => Promise<D>;

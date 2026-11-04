@@ -2,8 +2,8 @@
      day shows, and 📅 to the calendar on the phone only (its tabs are out of sight). @go(date): another day
      (null: today), @calendar: open the calendar -->
 <script setup>
-import { addDays } from "../core/dates.js";
-import WinxButton from "../vue/WinxButton.vue";
+import { addDays } from "../../core/dates.js";
+import WinxButton from "../uikit/WinxButton.vue";
 const props = defineProps({
   date: { type: String, required: true },    // the day it shows
   today: { type: String, required: true },

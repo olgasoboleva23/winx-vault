@@ -2,12 +2,12 @@
      the date off. Only it shows the tab and the backlog's cut, so switching them redraws only it -->
 <script setup>
 import { computed, inject, reactive, watch } from "vue";
-import WinxButton from "../vue/WinxButton.vue";
-import WinxEmpty from "../vue/WinxEmpty.vue";
+import WinxButton from "../uikit/WinxButton.vue";
+import WinxEmpty from "../uikit/WinxEmpty.vue";
 import TaskCard from "./TaskCard.vue";
-import { T } from "./data.js";
-import { diffDays, dm } from "../core/dates.js";
-import { ruleText } from "../tasks/repeats.js";
+import { T } from "../../calendar/data.js";
+import { diffDays, dm } from "../../core/dates.js";
+import { ruleText } from "../../tasks/repeats.js";
 
 const SHOWN = 8;
 const EMPTY_POOL = "New task with «To pool» adds one here";

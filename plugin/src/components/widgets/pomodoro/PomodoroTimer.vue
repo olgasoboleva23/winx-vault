@@ -3,8 +3,8 @@
      the window is back (a background window's timers run late); the end of a running session starts the next. -->
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { Timer } from "./timer.js";
-import { ICON } from "./pomodoro.js";
+import { Timer } from "../../../widgets/pomodoro/timer.js";
+import { ICON } from "../../../widgets/pomodoro/pomodoro.js";
 
 const props = defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 const { saved, current } = props.state.data;

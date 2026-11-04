@@ -11,7 +11,7 @@ import { SAVED, baseDate, readState, shownDays } from "./state.js";
 import { makeActions } from "./actions.js";
 import { useDrag } from "./drag.js";
 import { useSwipe } from "./swipe.js";
-import CalendarTab from "./CalendarTab.vue";
+import CalendarTab from "../components/calendar/CalendarTab.vue";
 
 // The calendar tab: the week (7 day columns) or the month around a date, the tasks of 00 System/Data/Tasks on
 // their days, "Missed?" above, and the No date | Ahead | Regulars | Pool panel below, drawn by Vue

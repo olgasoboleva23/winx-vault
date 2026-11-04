@@ -1,8 +1,8 @@
 <!-- Supplies: by category, each with how long since the last time (or that it's listed) and "running low" -->
 <script setup>
-import WinxButton from "../../vue/WinxButton.vue";
-import WinxEmpty from "../../vue/WinxEmpty.vue";
-import WinxGroupHeader from "../../vue/WinxGroupHeader.vue";
+import WinxButton from "../../uikit/WinxButton.vue";
+import WinxEmpty from "../../uikit/WinxEmpty.vue";
+import WinxGroupHeader from "../../uikit/WinxGroupHeader.vue";
 defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 </script>
 

@@ -6,7 +6,7 @@ let mount, View;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  View = (await import("../src/widgets/market/CelestialMarket.vue")).default;
+  View = (await import("../src/components/widgets/market/CelestialMarket.vue")).default;
 });
 const data = {
   empty: false, left: "2 items left", soon: "salt",

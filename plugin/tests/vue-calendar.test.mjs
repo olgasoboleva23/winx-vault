@@ -20,7 +20,7 @@ before(async () => {
     loadLocalStorage: () => null, saveLocalStorage() {}, commands: { executeCommandById() {} },
   });
   vue = await import("vue");
-  Tab = (await import("../src/calendar/CalendarTab.vue")).default;
+  Tab = (await import("../src/components/calendar/CalendarTab.vue")).default;
   data = await import("../src/calendar/data.js");
   actions = await import("../src/calendar/actions.js");
   state = await import("../src/calendar/state.js");

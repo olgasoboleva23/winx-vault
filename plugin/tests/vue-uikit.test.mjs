@@ -8,7 +8,7 @@ let mount, ui;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  const load = async n => (await import(`../src/vue/${n}.vue`)).default;
+  const load = async n => (await import(`../src/components/uikit/${n}.vue`)).default;
   ui = Object.fromEntries(await Promise.all(["WinxButton", "WinxNoteLink", "WinxEmpty", "WinxMissing", "WinxFailed",
     "WinxGroupHeader", "WinxAddForm", "WinxCard"].map(async n => [n, await load(n)])));
 });

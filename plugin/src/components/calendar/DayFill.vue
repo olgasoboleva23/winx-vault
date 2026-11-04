@@ -4,7 +4,7 @@
 import { computed, inject } from "vue";
 import TaskRow from "./TaskRow.vue";
 import DoneMarks from "./DoneMarks.vue";
-import { T } from "./data.js";
+import { T } from "../../calendar/data.js";
 
 const TIMES = [["morning", "🌅 morning"], ["evening", "🌙 evening"], [null, "🔁 other"]];
 const EDGE = ".winx-cal__routine, .winx-cal__routine-pill, .winx-cal__routine-pill *, .winx-cal__routine-time";

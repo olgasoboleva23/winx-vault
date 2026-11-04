@@ -6,7 +6,7 @@ let mount, DailyNoteOpen;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  DailyNoteOpen = (await import("../src/widgets/DailyNoteOpen.vue")).default;
+  DailyNoteOpen = (await import("../src/components/widgets/DailyNoteOpen.vue")).default;
 });
 
 test("Daily note: ✦ Open for the page's date opens it; no date, no button", async () => {

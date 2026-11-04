@@ -7,7 +7,7 @@ import { Platform } from "obsidian";
 import CalendarDay from "./CalendarDay.vue";
 import DayFill from "./DayFill.vue";
 import DayZones from "./DayZones.vue";
-import { dateFor } from "./state.js";
+import { dateFor } from "../../calendar/state.js";
 
 const EMPTY = ".winx-cal__num, .winx-cal__marks, .winx-cal__marks *, .winx-cal__dots, .winx-cal__dots *";
 const sameMonth = (a, b) => a.slice(0, 7) === b.slice(0, 7);

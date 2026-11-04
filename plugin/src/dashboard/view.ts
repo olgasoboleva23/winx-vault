@@ -4,7 +4,7 @@ import layout from "./layout.md";
 import { todayYmd } from "../core/dates.js";
 import { useBusy, useNewDay, useNoteLinks } from "../core/use.js";
 import { DATA } from "../core/paths.js";
-import DashboardDate from "./DashboardDate.vue";
+import DashboardDate from "../components/dashboard/DashboardDate.vue";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn by Obsidian's
 // markdown renderer, as a note in reading view would be, for the tab's date. The date is the tab's own (no date:

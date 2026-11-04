@@ -8,14 +8,15 @@
 ├── 📁 plugin — the Winx plugin
 │   ├── 📁 src
 │   │   ├── main.ts               — loads everything; the ```winx block, the dashboard and calendar tabs, ✨, the commands
+│   │   ├── 📁 components         — every .vue: uikit/ (the shared parts: WinxButton (round, nav, pill, chip, toggle,
+│   │   │                           text), WinxCard, WinxChart, WinxNoteLink, WinxEmpty / WinxMissing / WinxFailed,
+│   │   │                           WinxGroupHeader, WinxAddForm), widgets/<topic>/ (a widget's markup), calendar/
+│   │   │                           (CalendarTab and its parts and tasks), dashboard/ (DashboardDate: the date row)
 │   │   ├── 📁 calendar           — the calendar tab: view.ts (an ItemView: the state, saved with the layout; the model;
-│   │   │                           the listeners), CalendarTab.vue and its parts (CalendarHeader, CalendarMissed,
-│   │   │                           CalendarGrid, CalendarPanel, CalendarDay, DayFill, DayZones, DoneMarks) and tasks
-│   │   │                           (TaskRow, TaskText, TaskButtons, TaskCard); data.js (CalendarData, the model,
-│   │   │                           taskInfo), state.js (the saved and data keys), actions.js (what it writes),
-│   │   │                           drag.js / swipe.js (the tab's drag and swipe listeners)
-│   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), DashboardDate.vue (the date row),
-│   │   │                           layout.md (its cards)
+│   │   │                           the listeners) mounting components/calendar/CalendarTab.vue; data.js (CalendarData,
+│   │   │                           the model, taskInfo), state.js (the saved and data keys), actions.js (what it
+│   │   │                           writes), drag.js / swipe.js (the tab's drag and swipe listeners)
+│   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
 │   │   ├── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
 │   │   ├── 📁 notes              — note.js (Note: a new note from data), kinds.js (watch / read / game / recipe / work task)
 │   │   ├── 📁 services           — no markup: notify.js (desktop reminders), mobileConfig.js (obsidian-mobile/ → .obsidian-mobile)
@@ -26,12 +27,9 @@
 │   │   │                           (composables: useRedraw, useDataviewChanges, useWhenIndexed, useNewDay, useBusy…)
 │   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
 │   │   │                           taskEdit.js (rewrite a line with undo, the task window), taskSearch.js (New task: a past task)
-│   │   ├── 📁 vue                — the interface parts, as .vue: WinxButton (round, nav, pill, chip, toggle, text),
-│   │   │                           WinxCard, WinxChart, WinxNoteLink, WinxEmpty / WinxMissing / WinxFailed,
-│   │   │                           WinxGroupHeader, WinxAddForm
 │   │   ├── 📁 uikit              — Obsidian's windows: Form (one window of fields), Search (a search window over a list)
 │   │   └── 📁 widgets            — blocks.js (names → { view, load, actions }); per widget its load / actions in a .js
-│   │                               and its markup in a .vue; a topic's own logic next to them: market/ (MarketItem, the
+│   │                               (its markup: components/widgets/); a topic's own logic next to them: market/ (MarketItem, the
 │   │                               search), goals/ (Goal), body/ (CycleLog, WeightLog, BodyLog), savings/ (SavingsJar,
 │   │                               paydays), xp/ (HP / MP: vitals.js), shop/ (gold), finance/ (ledger.js: rows, totals,
 │   │                               the report), pomodoro/ (timer.js: the clock)
@@ -94,7 +92,7 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
   after Dataview's index or the block's own note changes (a hidden block when it shows), drops a stale result,
   shows an error with retry, a card's placeholder until the first data, and the card itself (`card:` in the
   block). `follows: false` loads once (the pomodoro); `cardButton` puts a button by the card's title.
-- The parts in `plugin/src/vue/` are reusable: `WinxButton` with a kind (`round`, `nav`, `pill`, `chip`,
+- The parts in `plugin/src/components/uikit/` are reusable: `WinxButton` with a kind (`round`, `nav`, `pill`, `chip`,
   `toggle`, `text`), `WinxCard`, `WinxChart` (a Charts plugin chart, destroyed with it), `WinxEmpty` /
   `WinxMissing` / `WinxFailed`, `WinxNoteLink`, `WinxGroupHeader`, `WinxAddForm`.
 - The data comes ready from `load` (labels, sums, dates); the template has values, `v-for` with a `:key` and
@@ -105,7 +103,7 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
 
 ## The calendar
 
-The calendar tab is an ItemView (`plugin/src/calendar/view.ts`) that mounts `CalendarTab.vue`: its state (date,
+The calendar tab is an ItemView (`plugin/src/calendar/view.ts`) that mounts `components/calendar/CalendarTab.vue`: its state (date,
 view, tab, folds) is Vue's `reactive`, saved with the layout; the model (`CalendarData`, `data.js`) is recomputed
 when the date, the view or a filter changes, or when Dataview has a change; the parts (`CalendarHeader`,
 `CalendarMissed`, `CalendarGrid`, `CalendarPanel`) and the tasks (`TaskRow`, `TaskCard`…) are `.vue` files.

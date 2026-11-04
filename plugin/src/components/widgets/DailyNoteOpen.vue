@@ -1,6 +1,6 @@
 <!-- "✦ Open": the day's note (made if it's missing) -->
 <script setup>
-import WinxButton from "../vue/WinxButton.vue";
+import WinxButton from "../uikit/WinxButton.vue";
 defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 </script>
 

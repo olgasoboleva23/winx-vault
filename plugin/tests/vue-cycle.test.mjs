@@ -9,7 +9,7 @@ before(async () => {
   GlobalRegistrator.register();
   setApp({ loadLocalStorage: k => store[k] ?? null, saveLocalStorage: (k, v) => { store[k] = v; } });
   ({ mount } = await import("@vue/test-utils"));
-  CycleWidget = (await import("../src/widgets/body/CycleWidget.vue")).default;
+  CycleWidget = (await import("../src/components/widgets/body/CycleWidget.vue")).default;
 });
 
 const data = {

@@ -1,12 +1,12 @@
 <!-- Cycle: the day and the next start; unfolded, the cycles as rows of day pills or their lengths as columns -->
 <script setup>
 import { computed, ref } from "vue";
-import { app } from "../../core/app.js";
-import WinxButton from "../../vue/WinxButton.vue";
-import WinxEmpty from "../../vue/WinxEmpty.vue";
-import WinxMissing from "../../vue/WinxMissing.vue";
-import WinxNoteLink from "../../vue/WinxNoteLink.vue";
-import { CYCLE_PATH } from "./cycle.js";
+import { app } from "../../../core/app.js";
+import WinxButton from "../../uikit/WinxButton.vue";
+import WinxEmpty from "../../uikit/WinxEmpty.vue";
+import WinxMissing from "../../uikit/WinxMissing.vue";
+import WinxNoteLink from "../../uikit/WinxNoteLink.vue";
+import { CYCLE_PATH } from "../../../widgets/body/cycle.js";
 
 const props = defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 const d = computed(() => props.state.data);

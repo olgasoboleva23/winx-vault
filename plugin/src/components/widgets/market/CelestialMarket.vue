@@ -2,10 +2,10 @@
      what runs low soon, and links to the market and the supplies -->
 <script setup>
 import { reactive } from "vue";
-import WinxEmpty from "../../vue/WinxEmpty.vue";
-import WinxMissing from "../../vue/WinxMissing.vue";
-import WinxGroupHeader from "../../vue/WinxGroupHeader.vue";
-import WinxNoteLink from "../../vue/WinxNoteLink.vue";
+import WinxEmpty from "../../uikit/WinxEmpty.vue";
+import WinxMissing from "../../uikit/WinxMissing.vue";
+import WinxGroupHeader from "../../uikit/WinxGroupHeader.vue";
+import WinxNoteLink from "../../uikit/WinxNoteLink.vue";
 
 const props = defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 const LINKS = [

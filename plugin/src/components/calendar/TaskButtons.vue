@@ -2,7 +2,7 @@
      the first arms it for 3 s); @gone when the task leaves (skipped, deleted) so its row goes at once -->
 <script setup>
 import { computed, inject, ref } from "vue";
-import WinxButton from "../vue/WinxButton.vue";
+import WinxButton from "../uikit/WinxButton.vue";
 const props = defineProps({
   task: { type: Object, required: true },
   editTitle: { type: String, default: "edit: difficulty, area, time, sticker, then text and dates" },
