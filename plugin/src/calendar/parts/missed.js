@@ -24,24 +24,29 @@ export class Missed extends Part {
     sound.play({ gain: 0.25 });
     await write(t);
   }
+  // a missed task: its text, the hover buttons, its day, ✓ done that day (with Tasks), ☀️ today
+  row(t) {
+    const task = this.view.info(t), day = T(t).date, shortDay = dm(day);
+    const area = task.area ? html` data-area="${task.area}"` : "";
+    const keys = html`data-task="${task.key}" draggable="true" data-drag="${task.key}"`;
+    const repeats = T(t).isRecurring ? "🔁 " : "";
+    const done = this.ctx.TASKS
+      ? new Button({ icon: "✓", title: `done on ${day}`, action: "missedDone" })
+      : "";
+    return html`<div class="winx-missed__row"${area} ${keys} data-swipeable="${task.key}">
+      <span class="winx-missed__text">${repeats}${new TaskText({ task })}</span>
+      <div class="winx-task-btns">${new TaskButtons({ task })}</div>
+      <em class="winx-missed__date">${shortDay}</em>
+      ${done}
+      ${new Button({ icon: "☀️", title: "move to today", action: "missedToday" })}
+    </div>`;
+  }
   render() {
     const { days, today, model: { missed } } = this.ctx;
     if (!days.includes(today) || !missed.length) return html``;
-    const row = t => {
-      const task = this.view.info(t);
-      const area = task.area ? html` data-area="${task.area}"` : "";
-      const keys = html`data-task="${task.key}" draggable="true" data-drag="${task.key}" data-swipeable="${task.key}"`;
-      return html`<div class="winx-missed__row"${area} ${keys}>
-        <span class="winx-missed__text">${T(t).isRecurring ? "🔁 " : ""}${new TaskText({ task })}</span>
-        <div class="winx-task-btns">${new TaskButtons({ task })}</div>
-        <em class="winx-missed__date">${dm(T(t).date)}</em>
-        ${this.ctx.TASKS ? new Button({ icon: "✓", title: `done on ${T(t).date}`, action: "missedDone" }) : ""}
-        ${new Button({ icon: "☀️", title: "move to today", action: "missedToday" })}
-      </div>`;
-    };
     return html`<div class="winx-missed"${PART("missed")}>
       <div class="winx-missed__head">Missed?</div>
-      ${missed.map(row)}
+      ${missed.map(t => this.row(t))}
     </div>`;
   }
 }

@@ -15,7 +15,8 @@ export class TaskText extends Component {
       ? html`<span class="tag" data-tag-name="${task.difficulty}" title="difficulty"></span>`
       : "";
     const stickers = task.stickers.map(src => html`<img class="winx-cal__sticker" src="${src}" alt="">`);
-    return html`${stars} ${withIcon ? task.label : task.text} ${stickers}`;
+    const text = withIcon ? task.label : task.text;
+    return html`${stars} ${text} ${stickers}`;
   }
 }
 
@@ -46,10 +47,11 @@ export class TaskRow extends Component {
     const check = kind === "done"
       ? html`<input type="checkbox" class="task-list-item-checkbox" aria-label="done" checked disabled>`
       : html`<input type="checkbox" class="task-list-item-checkbox" aria-label="done" data-action="tick">`;
+    const repeat = kind === "ghost" ? "🔁 " : "";
     return html`<div class="winx-cal__task winx-cal__task--${kind}"${attrs}>
       ${after ? html`<span class="winx-cal__after">↳</span>` : ""}
       ${box ? check : ""}
-      ${kind === "ghost" ? "🔁 " : ""}
+      ${repeat}
       ${new TaskText({ task })}
       ${live ? html`<div class="winx-task-btns">${new TaskButtons({ task })}</div>` : ""}
     </div>`;
@@ -67,7 +69,8 @@ export class TaskCard extends Component {
       : new TaskButtons({ task });
     const area = task.area ? html` data-area="${task.area}"` : "";
     const keys = html`data-task="${task.key}" data-drag="${task.key}" data-swipeable="${task.key}"`;
-    return html`<div class="winx-task-card${cls ? " " + cls : ""}"${area} draggable="true" ${keys}>
+    const classes = cls ? `winx-task-card ${cls}` : "winx-task-card";
+    return html`<div class="${classes}"${area} draggable="true" ${keys}>
       <div class="winx-task-card__text">${new TaskText({ task })}</div>
       <div class="winx-task-card__meta">${meta}</div>
       <div class="winx-task-btns">${extra}${btns}</div>

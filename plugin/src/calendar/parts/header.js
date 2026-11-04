@@ -1,5 +1,5 @@
 import { Platform } from "obsidian";
-import { html } from "../../core/html.js";
+import { bem, html } from "../../core/html.js";
 import { busyPill } from "../../uikit/busy.js";
 import { Button } from "../../uikit/button.js";
 import { T } from "../data.js";
@@ -38,55 +38,72 @@ export class Header extends Part {
   go(date) { this.store.set({ date: dateFor(date, this.ctx.view, this.ctx.today) }); }
   step(n) { const { view, base } = this.ctx; this.go(view === "week" ? addDays(base, 7 * n) : addMonths(base, n)); }
   // one bar of the week's tasks split by area (the six of the areas list), each piece labelled with its icon and
-  // done / all, the done part brighter;
-  // an area with none this week a grey icon after it
-  balance() {
+  // done / all, the done part brighter; an area with none this week a grey icon after it
+  balanceModel() {
     const { areas } = this.ctx.config, picked = this.ctx.state.area;
     const b = (this.ctx.everything ?? this.ctx.model).balance(areas.map(a => a.tag));
     const name = tag => areas.find(a => a.tag === tag).label;
-    const has = b.filter(x => x.planned), none = b.filter(x => !x.planned);
-    const icon = x => name(x.area).split(" ")[0];
-    const piece = x => {
-      const cls = `winx-cal__area${x.area === picked ? " winx-cal__area--on" : ""}`;
-      const title = `${name(x.area)}: ${x.done} of ${x.planned} done`;
-      const attrs = html`data-area="${x.area.slice(6)}" data-action="area" style="flex: ${x.planned}" title="${title}"`;
-      const fill = `width: ${Math.round(x.done / x.planned * 100)}%`;
-      return html`<div class="${cls}" ${attrs}>
-        <span class="winx-cal__area-label">${icon(x)} ${x.done}/${x.planned}</span>
-        <b class="winx-cal__area-track"><i class="winx-cal__area-fill" style="${fill}"></i></b>
-      </div>`;
+    const icon = tag => name(tag).split(" ")[0];
+    return {
+      picked: !!picked,
+      pieces: b.filter(x => x.planned).map(x => ({
+        on: x.area === picked, area: x.area.slice(6), flex: x.planned, icon: icon(x.area),
+        title: `${name(x.area)}: ${x.done} of ${x.planned} done`, count: `${x.done}/${x.planned}`,
+        fill: `width: ${Math.round(x.done / x.planned * 100)}%`,
+      })),
+      none: b.filter(x => !x.planned)
+        .map(x => ({ icon: icon(x.area), title: `${name(x.area)}: nothing this week` })),
     };
-    const nothing = html`<div class="winx-cal__balance-none" title="nothing this week">
-      ${none.map(x => html`<span title="${name(x.area)}: nothing this week">${icon(x)}</span>`)}
+  }
+  piece(p) {
+    const cls = bem("winx-cal__area", { on: p.on });
+    const attrs = html`data-area="${p.area}" data-action="area" style="flex: ${p.flex}"`;
+    return html`<div class="${cls}" ${attrs} title="${p.title}">
+      <span class="winx-cal__area-label">${p.icon} ${p.count}</span>
+      <b class="winx-cal__area-track"><i class="winx-cal__area-fill" style="${p.fill}"></i></b>
     </div>`;
+  }
+  nothing(none) {
+    return html`<div class="winx-cal__balance-none" title="nothing this week">
+      ${none.map(x => html`<span title="${x.title}">${x.icon}</span>`)}
+    </div>`;
+  }
+  balance() {
+    const { picked, pieces, none } = this.balanceModel();
+    const bar = bem("winx-cal__balance-bar", { picked });
     return html`<div class="winx-cal__balance"${PART("header")}>
-      <div class="winx-cal__balance-bar${picked ? " winx-cal__balance-bar--picked" : ""}">${has.map(piece)}</div>
-      ${none.length ? nothing : ""}
+      <div class="${bar}">${pieces.map(p => this.piece(p))}</div>
+      ${none.length ? this.nothing(none) : ""}
     </div>`;
   }
   routineDays() { return this.ctx.days.filter(d => this.ctx.model.byDay[d].some(e => T(e.t).isRecurring)); }
+  // a day of the drop bar
+  chip(d) {
+    const label = M(d).format("ddd D"), cls = bem("winx-cal__chip", { today: d === this.ctx.today });
+    return html`<div class="${cls}" data-drop="${d}">
+      ${label}
+    </div>`;
+  }
   render() {
     const { state, days, today, base, view } = this.ctx;
     // while dragging, a bar of 7 days sticks to the top: the shown week, or in the month view the next 7 days
     const chips = view === "week" ? days : Array.from({ length: 7 }, (_, i) => addDays(today, i));
     const other = view === "week" ? "month" : "week";
-    const chip = d => html`<div class="winx-cal__chip${d === today ? " winx-cal__chip--today" : ""}" data-drop="${d}">
-      ${M(d).format("ddd D")}
-    </div>`;
     const title = view === "week"
       ? `${M(days[0]).format("D MMM")} – ${M(days.at(-1)).format("D MMM YYYY")}`
       : M(base).format("MMMM YYYY");
+    const mute = isMuted() ? "🔇" : "🔊";
     const toToday = days.includes(today)
       ? ""
       : new Button({ text: Platform.isMobile ? "☀️" : "today", title: "today", kind: "chip", action: "today" });
     return html`<div class="winx-cal__dropbar"${PART("header")}>
-      <div class="winx-cal__dropbar-in">${chips.map(chip)}</div>
+      <div class="winx-cal__dropbar-in">${chips.map(d => this.chip(d))}</div>
     </div>
     ${busyPill(PART("header"))}
     <div class="winx-cal__top"${PART("header")}>
       <div class="mb-input-type-date"><input type="date" value="${base}" data-action="date"></div>
       <button class="winx-cal__mute" title="sounds on/off" aria-label="sounds on/off" data-action="mute">
-        ${isMuted() ? "🔇" : "🔊"}
+        ${mute}
       </button>
       ${new Button({ text: "＋ task", kind: "chip", title: "new task (Winx: New task)", action: "newTask" })}
       ${new Button({

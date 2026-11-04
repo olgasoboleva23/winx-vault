@@ -1,4 +1,4 @@
-import { html } from "../../core/html.js";
+import { bem, html } from "../../core/html.js";
 import { Button } from "../../uikit/button.js";
 import { Empty } from "../../uikit/empty.js";
 import { TaskCard } from "../components.js";
@@ -9,6 +9,8 @@ import { M, PART, Part } from "./part.js";
 
 // ── the bottom panel: No date | Regulars | Pool, one card per area; a drop here takes the date off ──
 const SHOWN = 8;
+const EMPTY_POOL = "New task with «To pool» adds one here";
+const RESUME = "resume: from today, on the first day its rule allows";
 export class Panel extends Part {
   static watches = ["tab", "backlogOpen"];
   on = {
@@ -26,81 +28,114 @@ export class Panel extends Part {
       this.view.actions.pauseOrResume(t);
     },
   };
-  render() {
-    const { state, today, model } = this.ctx;
+  // a group card's title, as on the Life Areas chart
+  areaTitle(g) {
     const { areaIcons, areaMap } = this.ctx.config;
-    const { backlog, regulars, pool } = model;
-    const info = t => this.view.info(t);
-    // as on the Life Areas chart
-    const areaTitle = g => {
-      const name = areaMap[g] ?? (g ? g.slice(6) : "other");
-      return `${areaIcons[g] ?? "✦"} ${name[0].toUpperCase()}${name.slice(1)}`;
-    };
-    const group = (title, cards) =>
-      html`<div class="winx-cal__group-card"><div class="winx-cal__group">${title}</div>${cards}</div>`;
-    // the cards of `items`, one group card per run of the same area
-    const byArea = (items, card) => {
-      const runs = [];
-      for (const t of items) {
-        const a = T(t).area;
-        if (!runs.length || runs.at(-1).a !== a) runs.push({ a, items: [] });
-        runs.at(-1).items.push(t);
-      }
-      return runs.map(r => group(areaTitle(r.a), r.items.map(card)));
-    };
-    let list = "", after = "";
-    if (state.tab === "nodate") {
-      // longest-waiting first (➕ created)
-      const cut = backlog.length > SHOWN && !state.backlogOpen;
-      list = byArea(cut ? backlog.slice(0, SHOWN) : backlog,
-        t => new TaskCard({ task: info(t), meta: model.backlogMeta(t) }));
-      if (backlog.length > SHOWN) after = html`<button class="winx-cal__more" data-action="more">
-        ${cut ? `show all ${backlog.length}` : "show less"}
-      </button>`;
-    } else if (state.tab === "ahead") {
-      // after this week: a card per month, the tasks under their dates (the old Kanban's month / year / future)
-      const year = today.slice(0, 4);
-      const meta = t => `${T(t).isBirthday ? "🎂 Birthday" : areaTitle(T(t).area)} · in ${diffDays(T(t).date, today)} d`;
-      const month = ({ month, items }) => {
-        const title = M(month + "-01").format(month.startsWith(year) ? "MMMM" : "MMMM YYYY");
-        const date = t => html`<div class="winx-cal__date">📅 ${M(T(t).date).format("D MMM · ddd")}</div>`;
-        const card = t => new TaskCard({ task: info(t), meta: meta(t) });
-        const days = items.map((t, i) => html`${i && T(items[i - 1]).date === T(t).date ? "" : date(t)}${card(t)}`);
-        return group(`${title} · ${items.length}`, days);
-      };
-      list = model.ahead.length ? model.ahead.map(month) : new Empty();
-    } else if (state.tab === "pool") {
-      // by area, the longest since last done first (never done at the top)
-      const plus = t => new Button({ icon: "+📅", title: "add to today", action: "toToday" });
-      list = pool.length
-        ? byArea(pool, t => new TaskCard({ task: info(t), meta: model.poolMeta(t), extra: plus(t) }))
-        : new Empty({ text: "New task with «To pool» adds one here" });
-    } else {
-      // by area, the most neglected first; paused last
-      const next = t => T(t).date;
-      const when = t => next(t)
-        ? html`<span${next(t) < today ? html` class="winx-cal__late"` : ""}>next ${dm(next(t))}</span>`
-        : html`<span>⏸ paused</span>`;
-      const meta = t => html`${ruleText(T(t).rule)}  ·  ${when(t)}  ·  ${model.regularHistory(t)}`;
-      const pause = t => next(t)
-        ? new Button({ icon: "⏸", title: "pause: drop its dates", action: "pause" })
-        : new Button({ icon: "▶", title: "resume: from today, on the first day its rule allows", action: "pause" });
-      list = byArea(regulars, t => new TaskCard({
-        task: info(t), meta: meta(t), extra: pause(t), cls: next(t) ? "" : "winx-task-card--paused",
-      }));
+    const name = areaMap[g] ?? (g ? g.slice(6) : "other");
+    return `${areaIcons[g] ?? "✦"} ${name[0].toUpperCase()}${name.slice(1)}`;
+  }
+  group(title, cards) {
+    return html`<div class="winx-cal__group-card">
+      <div class="winx-cal__group">${title}</div>${cards}
+    </div>`;
+  }
+  // the cards of `items`, one group card per run of the same area
+  byArea(items, card) {
+    const runs = [];
+    for (const t of items) {
+      const a = T(t).area;
+      if (!runs.length || runs.at(-1).a !== a) runs.push({ a, items: [] });
+      runs.at(-1).items.push(t);
     }
+    return runs.map(r => this.group(this.areaTitle(r.a), r.items.map(card)));
+  }
+  info(t) { return this.view.info(t); }
+
+  // No date: longest-waiting first (➕ created); 8 of them until "show all"
+  noDateTab() {
+    const { state, model } = this.ctx, { backlog } = model;
+    const cut = backlog.length > SHOWN && !state.backlogOpen;
+    const list = this.byArea(cut ? backlog.slice(0, SHOWN) : backlog,
+      t => new TaskCard({ task: this.info(t), meta: model.backlogMeta(t) }));
+    const more = cut ? `show all ${backlog.length}` : "show less";
+    const after = backlog.length > SHOWN
+      ? html`<button class="winx-cal__more" data-action="more">${more}</button>`
+      : "";
+    return { list, after };
+  }
+  // Ahead: after this week, a card per month, the tasks under their dates (the old Kanban's
+  // month / year / future)
+  aheadTab() {
+    const { model } = this.ctx;
+    if (!model.ahead.length) return { list: new Empty() };
+    return { list: model.ahead.map(m => this.month(m)) };
+  }
+  month({ month, items }) {
+    const { today } = this.ctx;
+    const format = month.startsWith(today.slice(0, 4)) ? "MMMM" : "MMMM YYYY";
+    const title = M(month + "-01").format(format);
+    // a date heading over the first task of each day
+    const heading = (t, i) => i && T(items[i - 1]).date === T(t).date ? "" : this.date(t);
+    const day = (t, i) => html`${heading(t, i)}${this.aheadCard(t)}`;
+    return this.group(`${title} · ${items.length}`, items.map(day));
+  }
+  date(t) {
+    const day = M(T(t).date).format("D MMM · ddd");
+    return html`<div class="winx-cal__date">📅 ${day}</div>`;
+  }
+  aheadCard(t) {
+    const { today } = this.ctx;
+    const what = T(t).isBirthday ? "🎂 Birthday" : this.areaTitle(T(t).area);
+    const meta = `${what} · in ${diffDays(T(t).date, today)} d`;
+    return new TaskCard({ task: this.info(t), meta });
+  }
+  // Pool: by area, the longest since last done first (never done at the top)
+  poolTab() {
+    const { model } = this.ctx;
+    const plus = new Button({ icon: "+📅", title: "add to today", action: "toToday" });
+    if (!model.pool.length) return { list: new Empty({ text: EMPTY_POOL }) };
+    const card = t => new TaskCard({ task: this.info(t), meta: model.poolMeta(t), extra: plus });
+    return { list: this.byArea(model.pool, card) };
+  }
+  // Regulars: by area, the most neglected first; paused last
+  regularsTab() {
+    return { list: this.byArea(this.ctx.model.regulars, t => this.regular(t)) };
+  }
+  regular(t) {
+    const next = T(t).date;
+    const pause = next
+      ? new Button({ icon: "⏸", title: "pause: drop its dates", action: "pause" })
+      : new Button({ icon: "▶", title: RESUME, action: "pause" });
+    const rule = ruleText(T(t).rule), history = this.ctx.model.regularHistory(t);
+    const meta = html`${rule}  ·  ${this.when(next)}  ·  ${history}`;
+    const cls = next ? "" : "winx-task-card--paused";
+    return new TaskCard({ task: this.info(t), meta, extra: pause, cls });
+  }
+  // a regular's next day (late: in red), or ⏸ paused
+  when(next) {
+    if (!next) return html`<span>⏸ paused</span>`;
+    const late = next < this.ctx.today ? html` class="winx-cal__late"` : "", day = dm(next);
+    return html`<span${late}>next ${day}</span>`;
+  }
+  tab([key, text]) {
+    const cls = bem("winx-cal__tab", { on: key === this.ctx.state.tab });
+    return html`<button class="${cls}" data-action="tab" data-tab="${key}">${text}</button>`;
+  }
+  render() {
+    const { state, model } = this.ctx;
+    const { backlog, regulars, pool } = model;
+    const { list, after = "" } = state.tab === "nodate" ? this.noDateTab()
+      : state.tab === "ahead" ? this.aheadTab()
+      : state.tab === "pool" ? this.poolTab()
+      : this.regularsTab();
     const tabs = [
       ["nodate", `No date · ${backlog.length}`],
       ["ahead", `Ahead · ${model.ahead.flatMap(g => g.items).length}`],
       ["regulars", `Regulars · ${regulars.length}`],
       ["pool", `Pool · ${pool.length}`],
     ];
-    const tab = ([key, text]) => {
-      const cls = `winx-cal__tab${key === state.tab ? " winx-cal__tab--on" : ""}`;
-      return html`<button class="${cls}" data-action="tab" data-tab="${key}">${text}</button>`;
-    };
     return html`<div class="winx-cal__backlog winx-board-backlog" data-drop=""${PART("panel")}>
-      <div class="winx-cal__tabs">${tabs.map(tab)}</div>
+      <div class="winx-cal__tabs">${tabs.map(t => this.tab(t))}</div>
       <div class="winx-cal__backlog-grid">${list}</div>
       ${after}
     </div>`;
