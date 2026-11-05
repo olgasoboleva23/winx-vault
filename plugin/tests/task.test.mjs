@@ -43,16 +43,13 @@ test("Task.of wraps a Dataview task", () => {
   assert.equal(t.text, "walk");
 });
 
-test("key and history", () => {
+test("key", () => {
   assert.equal(T("#⭐easy #area/base Water plants 📅 2026-10-01 ✅ 2026-10-02").key, "water plants");
   // a raw file line and the task text must give the same key
   assert.equal(T("- [ ] #⭐easy water plants ⏳ 2026-10-26").key, T("#⭐easy water plants").key);
   assert.equal(T("  - [x] Water plants ✅ 2026-10-02").key, "water plants");
   assert.equal(T("- [ ] #goal/x workout ![[mikasa.png|28]] 🔁 every day 📅 2026-10-28").key, "workout");
   assert.equal(Task.keyOf("- [-] workout 🔁 every day 📅 2026-10-28 ❌ 2026-10-28"), "workout");
-  const done = [T("- [x] #⭐easy water plants ✅ 2026-09-01"), T("- [x] Water plants 📅 2026-10-01 ✅ 2026-10-02"), T("- [x] call bank ✅ 2026-08-01")];
-  assert.deepEqual(T("water plants ⏳ 2026-10-26").history(done), { count: 2, last: "2026-10-02" });
-  assert.equal(T("new thing").history(done), null);
 });
 
 test("setDue", () => {

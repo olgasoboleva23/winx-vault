@@ -73,14 +73,6 @@ export class Task {
     return this.key === other.key && this.status === other.status && this.date === other.date;
   }
 
-  // { count, last } over `list` (Tasks) with the same key, by ✅ date (❌ for skipped ones), or null
-  history(list) {
-    const hits = list.filter(t => t.key === this.key);
-
-    if (!hits.length) return null;
-    return { count: hits.length, last: hits.map(t => t.doneOn ?? t.skippedOn ?? "").sort().at(-1) };
-  }
-
   // ── edits: each returns the new line ──
   // set or clear the date of an open task: one date, 📅 (an old ⏳ goes)
   setDue(date) {

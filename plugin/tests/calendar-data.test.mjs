@@ -28,8 +28,8 @@ test("days: open on their date, done on their ✅ date, 🔁 repeats faded in th
   assert.ok(!Object.values(m.byDay).flat().some(e => T(e.t).text === "call bank"));
   assert.deepEqual(texts(m.backlog), ["plan trip"]);
   assert.deepEqual(texts(m.regulars), ["stretch", "mask"]);
-  assert.deepEqual(m.done.map(t => t.text), ["read"]);
-  assert.deepEqual(m.skips.map(t => t.text), ["stretch"]);
+  assert.deepEqual([...m.doneBy.keys()], ["read"]);
+  assert.deepEqual([...m.skipsBy.keys()], ["stretch"]);
 });
 
 test("a day lists open, then repeats, then done", () => {

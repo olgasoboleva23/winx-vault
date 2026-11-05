@@ -36,6 +36,19 @@ const chain = list => {
 
 const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 
+// { count, last } by task key over `list` (Tasks): done copies by their ✅ date, skipped by ❌
+const historyOf = list => {
+  const by = new Map();
+
+  for (const t of list) {
+    const h = by.get(t.key) ?? { count: 0, last: "" }, on = t.doneOn ?? t.skippedOn ?? "";
+
+    by.set(t.key, { count: h.count + 1, last: on > h.last ? on : h.last });
+  }
+
+  return by;
+};
+
 // What the calendar shows, worked out once per draw from the tasks, Pool.md's lines, the shown
 // days, today and the areas' order (tags; unknown areas last):
 //   byDay    day → entries { t, kind: open | ghost | done }: open ones on their date (today and
@@ -97,8 +110,8 @@ export class CalendarData {
     }
 
     for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
-    this.done = tasks.map(T).filter(t => t.isDone && t.doneOn);
-    this.skips = tasks.map(T).filter(t => t.isSkipped);
+    this.doneBy = historyOf(tasks.map(T).filter(t => t.isDone && t.doneOn));
+    this.skipsBy = historyOf(tasks.map(T).filter(t => t.isSkipped));
     this.missed = tasks.filter(t => T(t).isOverdue(today))
       .sort((a, b) => T(b).date.localeCompare(T(a).date));
     const pool = poolLines.map(l => {
@@ -147,7 +160,7 @@ export class CalendarData {
     return i < 0 ? this.areaOrder.length : i;
   }
 
-  lastDone(t) { return T(t).history(this.done)?.last ?? "0000"; }
+  lastDone(t) { return this.doneBy.get(T(t).key)?.last ?? "0000"; }
   sortRegulars(list) {
     const next = t => T(t).date, today = this.today;
     const late = t => next(t) && next(t) < today ? diffDays(today, next(t)) : -1;
@@ -158,18 +171,18 @@ export class CalendarData {
   }
 
   backlogMeta(t) {
-    const created = T(t).created, h = T(t).history(this.done);
+    const created = T(t).created, h = this.doneBy.get(T(t).key);
 
     return [created && `waiting ${diffDays(this.today, created)} d`, h && doneText(h)]
       .filter(Boolean).join("  ·  ");
   }
   poolMeta(t) {
-    const h = T(t).history(this.done);
+    const h = this.doneBy.get(T(t).key);
 
     return h ? `${doneText(h)} · ${diffDays(this.today, h.last)} d ago` : "never done";
   }
   regularHistory(t) {
-    const h = T(t).history(this.done), s = T(t).history(this.skips);
+    const h = this.doneBy.get(T(t).key), s = this.skipsBy.get(T(t).key);
 
     return [h ? doneText(h) : "never done", s && `skipped ${s.count}×`].filter(Boolean).join(" · ");
   }
