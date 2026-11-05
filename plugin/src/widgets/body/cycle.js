@@ -1,6 +1,6 @@
 // Cycle: the day of the cycle on the page's date, the next start forecast, then one of two tabs: the current cycle and
 // the 3 before it as rows of day pills (the period, the fertile window and the ovulation marked), or the last 10
-// cycles' lengths and period lengths as columns with their average; "started / ended today", the dates.
+// cycles' lengths and period lengths as columns with their average; "started today / ended yesterday", the dates.
 // Folded (the default; a click on the head toggles it, kept per device): only the head and the buttons.
 import { bem, html } from "../../core/html.js";
 import { Button } from "../../uikit/button.js";
@@ -118,7 +118,7 @@ export class Cycle extends Widget {
   view(d) {
     const { day, page, info, head, ending } = d;
     const mark = ending
-      ? { text: "ended today", data: { kind: "end", day } }
+      ? { text: "ended yesterday", data: { kind: "end", day } }
       : { text: "started today", data: { kind: "start", day } };
     return html`<div class="${bem("winx-cycle", { folded: this.folded && info })}">
       ${!page ? new Missing({ path: CYCLE_PATH })
