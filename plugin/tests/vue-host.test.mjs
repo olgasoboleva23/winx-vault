@@ -130,3 +130,20 @@ test("follows: false loads once: a Dataview change doesn't reload it", async () 
   assert.equal(s.loads.length, 1);
   host.unload();
 });
+
+test("an error inside the view (a chart that fails to draw, async) shows the error with retry", async () => {
+  const { onMounted } = await import("vue");
+  const Broken = defineComponent({
+    props: { state: Object },
+    setup() { onMounted(async () => { await Promise.resolve(); throw new Error("no chart"); }); return () => h("i"); },
+  });
+  const s = slow(), el = document.body.appendChild(document.createElement("div"));
+  const host = new VueHost(el, Broken, { load: s.load });
+  const quiet = console.error; console.error = () => {};
+  host.load();
+  s.loads[0].ok({ n: 1 }); await settle(); await new Promise(r => setTimeout(r)); await settle();
+  console.error = quiet;
+  assert.equal(host.state.error, "no chart");
+  assert.match(el.textContent, /couldn't draw: no chart/);
+  host.unload();
+});

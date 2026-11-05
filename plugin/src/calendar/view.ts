@@ -1,10 +1,9 @@
 import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
-import {
-  computed, createApp, markRaw, nextTick, reactive, ref, watch, type App as VueApp,
-} from "vue";
+import { computed, markRaw, nextTick, reactive, ref, watch } from "vue";
 import { POOL, TASKS } from "../core/paths.js";
 import { useBusy, useDataviewChanges, useIndexReady, useNewDay, useRedraw } from "../core/use.js";
 import { app } from "../core/app.js";
+import { useVueApp } from "../core/vueApp.ts";
 import { dataview, tasksApi } from "../core/plugins.js";
 import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
@@ -35,7 +34,7 @@ export class CalendarView extends ItemView {
   });
   private version = ref(0);   // bumped when the tasks change: the data is worked out again
   private data = computed(() => { void this.version.value; return markRaw(this.build()); });
-  private vue: VueApp | null = null;
+  private unmount = () => {};   // the calendar's Vue app (useVueApp), gone on close
   private catchUp = () => {};   // a hidden tab that missed changes, drawn when it shows (useRedraw)
 
   constructor(leaf: WorkspaceLeaf) {
@@ -61,8 +60,13 @@ export class CalendarView extends ItemView {
     // a note in reading view (fonts, margins), with the dashboard pages' background and fonts on
     // top
     this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
-    this.vue = createApp(CalendarTab).provide("calendar", this);
-    this.vue.mount(this.contentEl.createDiv());
+    ({ unmount: this.unmount } = useVueApp(this, this.contentEl.createDiv(), CalendarTab, {
+      provide: { calendar: this },
+      onError: e => {
+        console.error(e);
+        new Notice(`Calendar: couldn't draw: ${e.message}`);
+      },
+    }));
     useSwipe(this, useDrag(this));
     const reload = () => { this.version.value++; };
 
@@ -82,7 +86,7 @@ export class CalendarView extends ItemView {
     useNewDay(this, redraw);
   }
   onResize() { this.catchUp(); }
-  async onClose() { this.vue?.unmount(); this.vue = null; this.contentEl.empty(); }
+  async onClose() { this.unmount(); this.contentEl.empty(); }
 
   info(t: any) { return taskInfo(t, this.ctx, app); }
   // the task a key (data-task) stands for, in this data; a task that's gone or changed meanwhile:

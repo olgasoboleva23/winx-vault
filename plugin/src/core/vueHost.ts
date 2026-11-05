@@ -7,7 +7,8 @@
 // `actions` (the block's writes, and retry) as props; with `card` it is drawn inside a dashboard
 // card (components/uikit/WinxCard.vue).
 import { MarkdownRenderChild } from "obsidian";
-import { createApp, h, nextTick, reactive, type App, type Component as VueComponent } from "vue";
+import { h, nextTick, reactive, type Component as VueComponent } from "vue";
+import { useVueApp } from "./vueApp.ts";
 import { useDataviewChanges, useRedraw, useTabDate, useWhenIndexed } from "./use.js";
 import { app } from "./app.js";
 import WinxCard from "../components/uikit/WinxCard.vue";
@@ -28,7 +29,6 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
   private el: HTMLElement;
   private view: VueComponent;
   private opts: HostOptions<D>;
-  private vue: App | null = null;
   private runs = 0;
   private gone = false;
 
@@ -51,9 +51,15 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
       : h(view, props);
     const button = this.opts.cardButton, actions = { ...this.opts.actions, retry };
     const slots = { default: body, ...(button ? { button: () => h(button, { actions }) } : {}) };
-    this.vue = createApp({ render: () => card ? h(WinxCard, card, slots) : body() });
-    this.vue.provide("sourcePath", this.opts.note ?? "");   // where a NoteLink opens a note from
-    this.vue.mount(this.el);
+    const root = { render: () => card ? h(WinxCard, card, slots) : body() };
+    // where a NoteLink opens a note from; any error inside (a chart that fails): said, with retry
+    useVueApp(this, this.el, root, {
+      provide: { sourcePath: this.opts.note ?? "" },
+      onError: e => {
+        console.error(e);
+        if (!this.gone) state.error = e.message;
+      },
+    });
     if (this.opts.follows === false) return void this.refresh();
     const { redraw } = useRedraw(this, () => this.shown, () => void this.refresh());
     useDataviewChanges(this, redraw, { note: this.opts.note, delay: 1000 });
@@ -82,9 +88,5 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
     }
   }
 
-  onunload() {
-    this.gone = true;
-    this.vue?.unmount();
-    this.vue = null;
-  }
+  onunload() { this.gone = true; }   // the app itself goes with this component (useVueApp)
 }

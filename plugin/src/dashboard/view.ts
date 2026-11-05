@@ -1,5 +1,6 @@
 import { Component, ItemView, MarkdownRenderer, Platform, WorkspaceLeaf } from "obsidian";
-import { createApp, h, reactive, type App } from "vue";
+import { h, reactive } from "vue";
+import { useVueApp } from "../core/vueApp.ts";
 import layout from "./layout.md";
 import { todayYmd } from "../core/dates.js";
 import { useBusy, useNewDay, useNoteLinks } from "../core/use.js";
@@ -23,7 +24,6 @@ export class DashboardView extends ItemView {
   private page: Component | null = null;
   private shownDate = "";
   private body: HTMLElement | null = null;
-  private dateApp: App | null = null;   // the date row (DashboardDate.vue) in the layout's slot
   private shown = reactive({ date: "", today: "" });
 
   constructor(leaf: WorkspaceLeaf) { super(leaf); }
@@ -45,7 +45,7 @@ export class DashboardView extends ItemView {
     this.listen();
     this.render();
   }
-  async onClose() { this.unmountDate(); this.page?.unload(); this.page = null; }
+  async onClose() { this.page?.unload(); this.page = null; }
 
   // another day: the cards draw again in place (the pomodoro isn't touched), the date row and
   // Quests anew
@@ -65,7 +65,6 @@ export class DashboardView extends ItemView {
 
     if (this.page) this.removeChild(this.page);
     const page = this.page = this.addChild(new Component());
-    this.unmountDate();
     this.contentEl.empty();
     this.contentEl.removeClass("winx-dash--busy");
     // the ✦ pill, as the calendar's (CalendarHeader/index.vue), shown by the tab's --busy
@@ -94,15 +93,14 @@ export class DashboardView extends ItemView {
     const { shown } = this, phone = Platform.isMobile;
     const go = (date: string | null) => this.go(date || null);
     const calendar = () => (this.app as any).commands.executeCommandById("winx:open-calendar");
-    // a render function, so the row follows shown.date (props given to createApp are read once)
-    this.dateApp = createApp({
+    // a render function, so the row follows shown.date (props given to an app are read once)
+    // owned by the page: gone with it when the dashboard draws again or closes
+    useVueApp(this.page!, slot as HTMLElement, {
       render: () => h(DashboardDate, {
         date: shown.date, today: shown.today, phone, onGo: go, onCalendar: calendar,
       }),
     });
-    this.dateApp.mount(slot);
   }
-  private unmountDate() { this.dateApp?.unmount(); this.dateApp = null; }
 
   // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day
   // redraws only it)
