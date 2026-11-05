@@ -4,7 +4,7 @@
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxChart from "#/components/uikit/WinxChart.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
-import { LOG_PATH } from "#/controllers/widgets/weight.js";
+import { BODY_LOG } from "#/helpers/paths.js";
 
 defineProps({ log: { type: Object, required: true } });
 defineEmits(["save"]);
@@ -42,5 +42,5 @@ const pick = r => {
       log.now ? "Update today" : "Save today" }}</WinxButton>
   </div>
   <WinxChart :config="log.chart" />
-  <WinxNoteLink :path="LOG_PATH" class="winx-weight__list">✦ list</WinxNoteLink>
+  <WinxNoteLink :path="BODY_LOG" class="winx-weight__list">✦ list</WinxNoteLink>
 </template>

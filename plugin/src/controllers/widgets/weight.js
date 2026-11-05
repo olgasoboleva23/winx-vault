@@ -1,5 +1,5 @@
 // The weight card's controller: what it shows and its writes. Weight: a line chart of the last 30
-// days, the last value, the change vs a week ago; with a body log note (LOG_PATH: its `name` and
+// days, the last value, the change vs a week ago; with a body log note (BODY_LOG: its `name` and
 // `reasons` are the vault's own) the log's mode: a level 0–3 and today's reasons, bars for 30 days
 // (the reasons in the tooltip) over the cycle's period days. Writes: today's weight in Weight.md,
 // today's level and reasons in the body log. The markup: widgets/body/WeightCard.
@@ -10,10 +10,8 @@ import { cycleLog } from "./cycle.js";
 import { chartColor } from "#/helpers/chart.js";
 import { edit } from "#/helpers/files.js";
 import { amount } from "#/helpers/format.js";
+import { BODY_LOG, WEIGHT } from "#/helpers/paths.js";
 
-export const PATH = "00 System/Data/Weight.md";
-
-export const LOG_PATH = "00 System/Data/Body log.md";
 const DAYS = 30;
 
 const read = async (app, path) => {
@@ -77,7 +75,7 @@ function logChart(days, entries, period) {
 export async function loadWeight({ dv, app }) {
   const today = todayYmd();
   const days = Array.from({ length: DAYS }, (_, i) => addDays(today, i - DAYS + 1));
-  const [weightText, logText] = await Promise.all([read(app, PATH), read(app, LOG_PATH)]);
+  const [weightText, logText] = await Promise.all([read(app, WEIGHT), read(app, BODY_LOG)]);
   let weight = { missing: true };
 
   if (weightText !== null) {
@@ -95,7 +93,7 @@ export async function loadWeight({ dv, app }) {
   let log = null;
 
   if (logText !== null) {
-    const props = app.metadataCache.getCache(LOG_PATH)?.frontmatter ?? {};
+    const props = app.metadataCache.getCache(BODY_LOG)?.frontmatter ?? {};
     const byDay = new Map(new BodyLog(logText).entries.map(e => [e.date, e])), cycle = cycleLog(dv);
     const entries = days.map(d => byDay.get(d) ?? null);
     log = {
@@ -114,8 +112,8 @@ export const weightActions = () => ({
     const kg = amount(typed);
 
     if (!kg || kg <= 0) return false;
-    await edit(PATH, c => new WeightLog(c).set(todayYmd(), kg));
+    await edit(WEIGHT, c => new WeightLog(c).set(todayYmd(), kg));
     return true;
   },
-  logBody: (level, reasons) => edit(LOG_PATH, c => new BodyLog(c).set(todayYmd(), level, reasons)),
+  logBody: (level, reasons) => edit(BODY_LOG, c => new BodyLog(c).set(todayYmd(), level, reasons)),
 });

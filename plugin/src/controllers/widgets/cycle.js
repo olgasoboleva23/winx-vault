@@ -7,13 +7,12 @@ import { CycleLog } from "#/models/cycleLog.js";
 import { dm, pageDay, ymd } from "#/helpers/dates.js";
 import { mana, mpLine, mpTable } from "#/models/vitals.js";
 import { appendLine } from "#/helpers/files.js";
-
-export const CYCLE_PATH = "00 System/Data/Cycle.md";
+import { CYCLE } from "#/helpers/paths.js";
 
 // the log of Cycle.md (null without the note): also the period days shaded under the Weight
 // widget's log
 export function cycleLog(dv) {
-  const page = dv.page(CYCLE_PATH);
+  const page = dv.page(CYCLE);
 
   if (!page) return null;
   const pick = key => page.file.lists
@@ -86,6 +85,6 @@ export const cycleActions = ({ dv }) => ({
 
     const line = `- ${kind}:: ${date}`;
 
-    return appendLine(CYCLE_PATH, line, { header: "period:: 8\n\n", unique: true });
+    return appendLine(CYCLE, line, { header: "period:: 8\n\n", unique: true });
   },
 });

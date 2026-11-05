@@ -4,7 +4,7 @@
 import WinxAddForm from "#/components/uikit/WinxAddForm/index.vue";
 import WinxChart from "#/components/uikit/WinxChart.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
-import { PATH } from "#/controllers/widgets/weight.js";
+import { WEIGHT } from "#/helpers/paths.js";
 
 defineProps({ weight: { type: Object, required: true } });
 defineEmits(["save"]);
@@ -33,5 +33,5 @@ const INPUT = {
     @submit="$emit('save')"
   />
   <WinxChart v-if="weight.chart" :config="weight.chart" />
-  <WinxNoteLink :path="PATH" class="winx-weight__list">✦ list</WinxNoteLink>
+  <WinxNoteLink :path="WEIGHT" class="winx-weight__list">✦ list</WinxNoteLink>
 </template>

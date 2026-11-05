@@ -8,8 +8,7 @@ import { AudioEngine } from "#/helpers/sounds.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { app } from "#/helpers/app.js";
 import { addStats } from "#/models/timer.js";
-
-export const PATH = "00 System/Data/pomodoro.json";
+import { ASSETS, POMODORO } from "#/helpers/paths.js";
 
 export const ICON = {
   play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
@@ -23,7 +22,7 @@ export const ICON = {
   skip: `<svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-3.5 6L4 6v12z"/></svg>`,
 };
 
-export const load = () => readJson(PATH, {});
+export const load = () => readJson(POMODORO, {});
 
 // the saved settings, mini and stats, and today's session (another day's starts over)
 export async function loadPomodoro() {
@@ -35,7 +34,7 @@ export async function loadPomodoro() {
 // the block's sound (one per block), the lengths' window, and the save: settings, the current
 // session, mini and today's stats (a finished focus session adds its minutes)
 export function pomodoroActions() {
-  const sound = new AudioEngine("00 System/Assets/sparkle.wav");
+  const sound = new AudioEngine(`${ASSETS}/sparkle.wav`);
 
   return {
     ding: rate => sound.play({ rate }),
@@ -59,7 +58,7 @@ export function pomodoroActions() {
           const data = addStats(await load(), 0, todayYmd());
           Object.assign(data, { settings, current, mini });
           for (const min of sessions) addStats(data, min, todayYmd());
-          await app.vault.adapter.write(PATH, JSON.stringify(data, null, 2));
+          await app.vault.adapter.write(POMODORO, JSON.stringify(data, null, 2));
         } catch (e) {
           unsaved.unshift(...sessions);
           throw e;

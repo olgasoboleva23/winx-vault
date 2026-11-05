@@ -2,6 +2,7 @@
 // the tick sounds. Every sound keeps quiet while muted (the calendar's 🔊 button), the timer's and
 // the shop's too.
 import { app } from "./app.js";
+import { SOUNDS } from "./paths.js";
 
 const _audio = { ctx: null, buffers: new Map() };
 const _ctx   = () => _audio.ctx ??= new (window.AudioContext || window.webkitAudioContext)();
@@ -54,7 +55,7 @@ export const toggleMute = () => app.saveLocalStorage("winx-mute", isMuted() ? nu
 export function installSounds(plugin) {
   const gems   = [1, 2, 3, 4, 5, 6]
     .map(n => new AudioEngine(`00 System/Assets/winx music/snd_pickup_gem0${n}.wav`));
-  const flower = new AudioEngine("00 System/Assets/winx music/snd_pickup_dragon_flower.wav");
+  const flower = new AudioEngine(`${SOUNDS}/snd_pickup_dragon_flower.wav`);
   // capture phase: the checkbox already shows its new state, before Tasks re-renders it
   plugin.registerDomEvent(document, "click", e => {
     const box = e.target.closest?.("input.task-list-item-checkbox");

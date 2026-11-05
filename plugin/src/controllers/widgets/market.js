@@ -4,7 +4,7 @@
 // search of everything bought before, the most bought first, or a new one typed), an item bought
 // (✓), an item running low back on the list. The markup: widgets/market/.
 import { dm, todayYmd, ymd } from "#/helpers/dates.js";
-import { catOf, MARKET, marketCats, marketChoices, supplyStats } from "#/models/market.js";
+import { catOf, marketCats, marketChoices, supplyStats } from "#/models/market.js";
 import { MarketItem } from "#/models/marketItem.js";
 import { Notice } from "obsidian";
 import { Search } from "#/components/uikit/Search/index.ts";
@@ -13,6 +13,9 @@ import { appendLine, editLine } from "#/helpers/files.js";
 import { findChoices } from "#/helpers/find.js";
 import { dataview } from "#/helpers/plugins.js";
 import { app } from "#/helpers/app.js";
+import { MARKET } from "#/helpers/paths.js";
+
+const MARKET_NOTE = `${MARKET}.md`;
 
 // { history: [{name, tag, date}] of bought items, open: Set of lowercased names still on the list }
 function marketState(dv) {
@@ -32,7 +35,7 @@ function marketState(dv) {
 export async function loadCelestialMarket({ dv }) {
   const page = dv.page(MARKET);
 
-  if (!page) return { missing: true, path: MARKET };
+  if (!page) return { missing: true, path: MARKET_NOTE };
   const mkt = marketState(dv);
   const tasks = page.file.tasks.where(t => !t.completed).array();
   // a row: its line (to find it again) and its name (shown, and to check it's the same item)
@@ -101,7 +104,7 @@ export async function addMarketItem() {
   if (tag) await addToMarket(pick.name, tag);
 }
 
-const addToMarket = (name, tag) => appendLine(MARKET, `- [ ] ${name} ${tag}`);
+const addToMarket = (name, tag) => appendLine(MARKET_NOTE, `- [ ] ${name} ${tag}`);
 
 export const celestialMarketActions = () => ({
   add: () => addMarketItem(),
@@ -114,7 +117,7 @@ export const celestialMarketActions = () => ({
       return !item.isBought && item.name === name;
     };
 
-    return editLine(MARKET, line, same, l => new MarketItem(l).bought(todayYmd()));
+    return editLine(MARKET_NOTE, line, same, l => new MarketItem(l).bought(todayYmd()));
   },
 });
 

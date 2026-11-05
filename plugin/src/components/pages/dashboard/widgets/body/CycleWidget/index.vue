@@ -8,7 +8,7 @@ import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
-import { CYCLE_PATH } from "#/controllers/widgets/cycle.js";
+import { CYCLE } from "#/helpers/paths.js";
 import CycleHead from "./CycleHead.vue";
 import CycleRows from "./CycleRows.vue";
 import CycleStats from "./CycleStats.vue";
@@ -33,7 +33,7 @@ const folded = computed(() => !open.value && d.value.info);
 
 <template>
   <div :class="['winx-cycle', { 'winx-cycle--folded': folded }]">
-    <WinxMissing v-if="!d.page" :path="CYCLE_PATH" />
+    <WinxMissing v-if="!d.page" :path="CYCLE" />
     <WinxEmpty v-else-if="!d.info" text="No data yet" />
     <CycleHead
       v-else
@@ -54,7 +54,7 @@ const folded = computed(() => !open.value && d.value.info);
         kind="pill"
         @click="actions.mark(d.mark.kind, d.day)"
       >{{ d.mark.text }}</WinxButton>
-      <WinxNoteLink :path="CYCLE_PATH">dates</WinxNoteLink>
+      <WinxNoteLink :path="CYCLE">dates</WinxNoteLink>
     </div>
   </div>
 </template>

@@ -7,14 +7,14 @@ import { money } from "#/helpers/format.js";
 import { SavingsJar } from "#/models/savingsJar.js";
 import { edit } from "#/helpers/files.js";
 import { Form } from "#/components/uikit/Form/index.ts";
+import { SAVINGS } from "#/helpers/paths.js";
 
-const FOLDER = "00 System/Data/Savings";
 const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const day = d => `${DAYS[weekday(d)]} ${dm(d)}`;
 
 export async function loadSavings({ app }) {
   const today = todayYmd();
-  const files = (app.vault.getFolderByPath(FOLDER)?.children ?? [])
+  const files = (app.vault.getFolderByPath(SAVINGS)?.children ?? [])
     .filter(f => f.extension === "md");
   const jars = await Promise.all(files.map(async f => {
     const props = app.metadataCache.getFileCache(f)?.frontmatter ?? {};
@@ -29,7 +29,7 @@ export async function loadSavings({ app }) {
     };
   }));
 
-  return { jars, empty: `A goal: a note in ${FOLDER}` };
+  return { jars, empty: `A goal: a note in ${SAVINGS}` };
 }
 
 // a jar as the card shows it: the picture greyed above what's saved, past halfway "left" instead

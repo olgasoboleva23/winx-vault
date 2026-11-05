@@ -4,8 +4,6 @@
 import config from "#/helpers/config.js";
 import { diffDays } from "#/helpers/dates.js";
 
-export const MARKET = "00 System/Data/Celestial Market.md";
-
 // the categories, and "✦ Other" for an item without one
 export const marketCats = [...config.marketCategories, { label: "✦ Other", tag: "#other" }];
 

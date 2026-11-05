@@ -3,6 +3,7 @@
 // (the New task command).
 import config from "#/helpers/config.js";
 import { app } from "#/helpers/app.js";
+import { STICKERS } from "#/helpers/paths.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 
 // What the Tasks modal doesn't ask: difficulty, area, time of day, sticker (from 00
@@ -11,7 +12,7 @@ import { Form } from "#/components/uikit/Form/index.ts";
 // pick.pool). Resolves to the picks, null when closed.
 export const taskWindow = async (preset = {}, required = false) => {
   const { difficulties, areas } = config;
-  const stickers = (app.vault.getFolderByPath("00 System/Assets/stickers")?.children ?? [])
+  const stickers = (app.vault.getFolderByPath(STICKERS)?.children ?? [])
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return Form.ask(app, required ? "✦ New task" : "✦ Edit task", [

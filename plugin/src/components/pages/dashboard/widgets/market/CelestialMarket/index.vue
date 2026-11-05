@@ -6,14 +6,15 @@ import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import WinxGroupHeader from "#/components/uikit/WinxGroupHeader.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
+import { MARKET, SUPPLIES } from "#/helpers/paths.js";
 
 const props = defineProps({
   state: { type: Object, required: true },
   actions: { type: Object, required: true },
 });
 const LINKS = [
-  { text: "✦ open market", path: "00 System/Data/Celestial Market" },
-  { text: "✦ supplies", path: "00 System/Data/Supplies" },
+  { text: "✦ open market", path: MARKET },
+  { text: "✦ supplies", path: SUPPLIES },
 ];
 // rows being bought: sparkling from the click until the list no longer has them (written), or the
 // write didn't happen (the line moved meanwhile)

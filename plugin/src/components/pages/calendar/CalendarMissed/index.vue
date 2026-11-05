@@ -8,12 +8,13 @@ import TaskButtons from "#/components/pages/calendar/TaskButtons.vue";
 import { T } from "#/models/calendarData.js";
 import { dm } from "#/helpers/dates.js";
 import { AudioEngine } from "#/helpers/sounds.js";
+import { ASSETS, SOUNDS } from "#/helpers/paths.js";
 
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);
 const sounds = {
-  done: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem02.wav"),
-  today: new AudioEngine("00 System/Assets/star.wav"),
+  done: new AudioEngine(`${SOUNDS}/snd_pickup_gem02.wav`),
+  today: new AudioEngine(`${ASSETS}/star.wav`),
 };
 const gone = reactive(new Set());   // rows taken off until the new data comes
 watch(ctx, () => gone.clear());

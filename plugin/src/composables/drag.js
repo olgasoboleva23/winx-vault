@@ -4,13 +4,14 @@
 // Returns { on }: true from a dragstart until the next touch, so a drag's finger moves don't count
 // as a swipe (swipe.js).
 import { AudioEngine } from "#/helpers/sounds.js";
+import { SOUNDS } from "#/helpers/paths.js";
 import { canReorder, findTask } from "#/models/calendarData.js";
 
 export function useDrag(view) {
   const el = view.contentEl, drag = { on: false };
   const sounds = {
-    move: new AudioEngine("00 System/Assets/winx music/snd_scroll_menu.wav"),
-    gem: new AudioEngine("00 System/Assets/winx music/snd_pickup_gem01.wav"),
+    move: new AudioEngine(`${SOUNDS}/snd_scroll_menu.wav`),
+    gem: new AudioEngine(`${SOUNDS}/snd_pickup_gem01.wav`),
   };
   let dragged = null, source = null, targets = new Map(), mark = null;
   const zone = e => e.target.closest?.("[data-drop]") ?? null;

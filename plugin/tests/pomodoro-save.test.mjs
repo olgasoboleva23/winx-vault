@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { setApp } from "#/helpers/app.js";
-import { PATH, pomodoroActions } from "#/controllers/widgets/pomodoro.js";
+import { pomodoroActions } from "#/controllers/widgets/pomodoro.js";
+import { POMODORO as PATH } from "#/helpers/paths.js";
 
 globalThis.window ??= {};
 window.moment ??= () => ({ format: () => "2027-01-15" });   // today

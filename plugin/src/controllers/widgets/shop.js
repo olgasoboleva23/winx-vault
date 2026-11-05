@@ -5,7 +5,7 @@
 // The markup: widgets/shop/ShopWidget.
 import config from "#/helpers/config.js";
 import { amount, AMOUNT } from "#/helpers/format.js";
-import { TASKS } from "#/helpers/paths.js";
+import { ASSETS, PURCHASES, SHOP, TASKS } from "#/helpers/paths.js";
 import { Notice } from "obsidian";
 import { todayYmd } from "#/helpers/dates.js";
 import { appendLine } from "#/helpers/files.js";
@@ -29,12 +29,12 @@ const cost = text => amount(text.split("|").at(-1)) ?? 0;
 export const spent = lines => [...lines].reduce((a, l) => a + cost(l), 0);
 
 export const balance = dv =>
-  earned(dv) - spent([...dv.pages('"00 System/Data/Purchases"').file.lists].map(l => l.text));
+  earned(dv) - spent([...dv.pages(`"${PURCHASES}"`).file.lists].map(l => l.text));
 
 export async function loadShop({ dv }) {
   const gold = balance(dv), items = [];
 
-  for (const list of dv.pages('"00 System/Data/Shop"').file.lists) {
+  for (const list of dv.pages(`"${SHOP}"`).file.lists) {
     const name = list.text.match(/name::\s*(.+)/);
     const cost = list.text.match(new RegExp(`cost::\\s*(${AMOUNT.source})`));
 
@@ -44,7 +44,7 @@ export async function loadShop({ dv }) {
   return { balance: gold, items: items.map(i => ({ ...i, affordable: gold >= i.cost })) };
 }
 
-const PURCHASES = "00 System/Data/Purchases.md";
+const PURCHASES_NOTE = `${PURCHASES}.md`;
 
 // a purchase, only when the gold covers it (the Shop card and the Buy reward command): false when
 // it doesn't. One at a time, the spent gold read from the file itself: Dataview sees a purchase a
@@ -53,12 +53,12 @@ let queue = Promise.resolve();
 
 export function logPurchase(name, price) {
   const buy = queue.then(async () => {
-    const file = app.vault.getFileByPath(PURCHASES);
+    const file = app.vault.getFileByPath(PURCHASES_NOTE);
     const text = file ? await app.vault.read(file) : "";
     const lines = text.split("\n").filter(l => l.startsWith("- "));
 
     if (earned(dataview()) - spent(lines) < price) return false;
-    await appendLine(PURCHASES, `- ${todayYmd()} | ${name} | ${price}`,
+    await appendLine(PURCHASES_NOTE, `- ${todayYmd()} | ${name} | ${price}`,
       { header: "# Purchases\n\n" });
     return true;
   });
@@ -69,7 +69,7 @@ export function logPurchase(name, price) {
 // buy(name, cost): the star sound, the purchase if the gold covers it, a notice either way; true
 // when bought
 export function shopActions() {
-  const sound = new AudioEngine("00 System/Assets/star.wav");
+  const sound = new AudioEngine(`${ASSETS}/star.wav`);
 
   return {
     buy: async (name, cost) => {

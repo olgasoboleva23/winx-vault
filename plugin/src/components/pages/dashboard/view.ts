@@ -4,7 +4,7 @@ import { useVueApp } from "#/composables/vueApp.ts";
 import layout from "./layout.md";
 import { todayYmd } from "#/helpers/dates.js";
 import { useBusy, useNewDay, useNoteLinks } from "#/composables/use.js";
-import { DATA } from "#/helpers/paths.js";
+import { DATA, POMODORO } from "#/helpers/paths.js";
 import DashboardDate from "./DashboardDate.vue";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn
@@ -14,7 +14,7 @@ import DashboardDate from "./DashboardDate.vue";
 // widget has drawn again (5 s at most).
 export const DASHBOARD_VIEW = "winx-dashboard";
 const WATCHED = [`${DATA}/`];
-const QUIET = "00 System/Data/pomodoro.json";   // the timer saves itself all the time
+const QUIET = POMODORO;   // the timer saves itself all the time
 // layout.md: the grid, then the Quests card's Tasks query (drawn into the card on its own: a new
 // day redraws only it)
 const [GRID, QUESTS] = layout.split(/\n%%.*%%\n/);

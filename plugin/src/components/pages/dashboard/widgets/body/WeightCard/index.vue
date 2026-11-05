@@ -6,7 +6,7 @@
 import { computed, ref, watch } from "vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
-import { PATH } from "#/controllers/widgets/weight.js";
+import { WEIGHT } from "#/helpers/paths.js";
 import WeightMode from "./WeightMode.vue";
 import BodyLogMode from "./BodyLogMode.vue";
 
@@ -68,7 +68,7 @@ const saveLog = async () => {
       :log="log"
       @save="saveLog"
     />
-    <WinxMissing v-else-if="w.missing" :path="PATH" />
+    <WinxMissing v-else-if="w.missing" :path="WEIGHT" />
     <WeightMode
       v-else
       v-model="kg"
