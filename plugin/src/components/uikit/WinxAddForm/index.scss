@@ -5,8 +5,8 @@
   &#{&} &__input, &#{&} &__submit {
     min-height: $tap;
     border-radius: $radius-l;
-    border: 1px solid var(--winx-border);
-    background: rgb(255 255 255 / 65%);
+    border: $border;
+    background: white(65%);
     color: var(--winx-text-dark);
     box-shadow: none;
   }
@@ -15,7 +15,7 @@
     &::placeholder { color: var(--winx-purple); }
   }
   &#{&} &__submit {
-    padding: 0 18px;
+    padding: 0 $space-3xl;
     font-weight: 600;
     color: #fff;
     border-color: transparent;

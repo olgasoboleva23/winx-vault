@@ -62,13 +62,13 @@
     > .callout-content {
       display: flex !important;
       flex-direction: column !important;
-      gap: 15px;
+      gap: $space-3xl;
     }
   }
 
   .callout[data-callout="grid"] > .callout-content {
     display: flex;
-    gap: 15px;
+    gap: $space-3xl;
     align-items: flex-start;
 
     > .callout[data-callout="col"] {
@@ -96,7 +96,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 1fr;
-  gap: 15px;
+  gap: $space-3xl;
 
   @container (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
@@ -173,7 +173,7 @@
       &::after {
         content: "";
         position: absolute;
-        z-index: 2 !important;
+        z-index: $z-raised !important;
         width: $deco;
         height: $deco;
         translate: -16px -16px;          /* wider canvas for sparkles, star stays put */

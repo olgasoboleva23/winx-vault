@@ -39,7 +39,7 @@
     border-radius: $round;
     border: 2px solid var(--winx-border);
     cursor: pointer;
-    transition: --p 1s linear;
+    transition: --p $tick linear;
     background:
       radial-gradient(circle, var(--winx-pink-light) 15px, var(--winx-border) 16px, transparent 17px),
       conic-gradient(var(--winx-pink-deep) calc(var(--p) * 360deg), var(--winx-purple-light) 0);
@@ -52,7 +52,7 @@
   &__mini-info &__stars { align-items: center; }
 
   &__mini-time {
-    font-size: 30px;
+    font-size: $text-6xl;
     font-weight: 700;
     line-height: 1.1;
     color: var(--winx-text-dark);
@@ -77,7 +77,7 @@
     display: grid;
     place-items: center;
     cursor: pointer;
-    transition: transform 0.15s ease;
+    transition: transform $fast ease;
     &:hover { transform: scale(1.05); }
     svg { width: 20px; height: 20px; fill: var(--winx-text-dark); }
   }
@@ -97,7 +97,7 @@
     display: grid;
     place-items: center;
     border: 2px solid var(--winx-border);
-    transition: --p 1s linear;
+    transition: --p $tick linear;
     background: conic-gradient(
       var(--winx-pink-deep) calc(var(--p) * 360deg),
       var(--winx-purple-light) 0
@@ -148,15 +148,15 @@
   &__time {
     position: relative;
     cursor: pointer;
-    font-size: 30px;
+    font-size: $text-6xl;
     color: var(--winx-text-dark);
-    z-index: 2;
+    z-index: $z-raised;
   }
 
   &__controls {
     position: absolute;
     bottom: -20px;
-    margin-top: -10px;   /* with bottom: -20px it still lifts the row: keep */
+    margin-top: -$space-l;   /* with bottom: -20px it still lifts the row: keep */
   }
 
   &#{&} &__btn {
@@ -167,7 +167,7 @@
     place-items: center;
     cursor: pointer;
     padding: 0;
-    transition: transform 0.15s ease;   /* both ways: grows on hover, shrinks back */
+    transition: transform $fast ease;   /* both ways: grows on hover, shrinks back */
 
     &:hover {
       transform: scale(1.05);
@@ -254,14 +254,14 @@
     min-width: 22px;
     height: 22px;
     border-radius: $round;
-    border: 1px solid var(--winx-border);
+    border: $border;
     background: transparent;
     display: grid;
     place-items: center;
     cursor: pointer;
     opacity: 0.5;
     padding: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity $fast ease;
 
     svg {
       width: 12px;

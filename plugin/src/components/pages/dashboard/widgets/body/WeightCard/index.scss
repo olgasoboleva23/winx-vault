@@ -3,7 +3,7 @@
 .winx-weight {
   display: grid; gap: $space-m;
   &__head { display: flex; align-items: baseline; gap: $space-l; }
-  &__now { font-family: Cinzel, serif; font-size: 22px; color: var(--winx-text-dark); }
+  &__now { font-family: $font-deco; font-size: $text-4xl; color: var(--winx-text-dark); }
   &__delta { font-size: $text-m; color: var(--winx-purple-deep); }
   &__list { justify-self: start; }
   /* weight ↔ the body log, and the log's form: a level 0–3, the reasons, save */

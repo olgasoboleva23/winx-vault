@@ -1,28 +1,29 @@
 /* ── Missed: open tasks whose day has passed, a strip at the top of the calendar ── */
 
 @use "mixins" as *;
+$wing: 40px;   // the corner wings' size
 .winx-missed {
   position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  column-gap: 18px;
+  column-gap: $space-3xl;
   margin-bottom: $space-xl;
   padding: $space-s $space-l;
   border-radius: $radius-l;
   /* the Kanban card's blue */
-  border: 1px solid rgb(168 200 240);
-  background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240), rgb(232 213 245));
-  box-shadow: 0 0 16px rgb(168 200 240 / 60%);
+  border: 1px solid var(--winx-blue);
+  background: var(--winx-sky);
+  box-shadow: 0 0 16px rgb(168 200 240 / 60%);   /* --winx-blue at 60%; alpha() would serialize it as color(srgb …) */
   /* the card's fairy wings in two corners */
-  @include wings(40px, 3px);
-  > * { position: relative; z-index: 1; }
+  @include wings($wing, 3px);
+  > * { position: relative; z-index: $z-over; }
 
-  &__head { grid-column: 1 / -1; padding-left: 34px; font-family: Cinzel, serif; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
+  &__head { grid-column: 1 / -1; padding-left: $wing - $space-s;   /* clear of the corner wing */ font-family: $font-deco; font-size: $text-l; color: var(--winx-purple-deep); margin-bottom: $space-2xs; }
   /* rounded coloured rows like the day entries; ✏️ 🗑 sit in the row, before the date */
   &__row {
     position: relative;
     margin: $space-2xs $space-xs $space-2xs 0;
-    padding: 3px $space-s;
+    padding: $space-xs $space-s;
     border-radius: $radius-m;
     font-size: $text-l;
     color: var(--winx-text-dark);

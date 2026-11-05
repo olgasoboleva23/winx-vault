@@ -5,7 +5,7 @@
   .markdown-preview-section > :first-child { margin-top: 0; }   /* as the note's first block */
   &--busy {
     .winx-busy__pill { display: flex; }
-    .markdown-preview-section { opacity: 0.55; transition: opacity 0.2s; pointer-events: none; }
+    .markdown-preview-section { opacity: 0.55; transition: opacity $medium; pointer-events: none; }
   }
   &__quests { display: contents; }
 }   /* the Tasks query sits in the card as it did in the note */

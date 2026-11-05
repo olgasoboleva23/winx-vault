@@ -21,7 +21,7 @@
     margin-top: $space-s;
     height: 10px;
     border-radius: $radius-s;
-    background: rgb(255 255 255 / 40%);
+    background: white(40%);
     position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
   }
 
@@ -44,7 +44,7 @@
   &__vital {
     font-size: $text-s;
     color: var(--winx-purple-deep);
-    &-name { width: 1.8em; font-family: Cinzel, serif; letter-spacing: 1px; }
+    &-name { width: 1.8em; font-family: $font-deco; letter-spacing: 1px; }
     &-value { min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; }   /* 50/50 and 0/4: bars of one length */
     &-bar {
       height: $space-m;
@@ -52,7 +52,7 @@
       border-radius: $pill;
       background: alpha(--winx-purple, 20%);
     }
-    &-fill { display: block; height: 100%; border-radius: $pill; transition: width 0.3s; }
+    &-fill { display: block; height: 100%; border-radius: $pill; transition: width $slow; }
     &--hp &-fill { background: linear-gradient(90deg, #c2304a, #ff6b81); box-shadow: 0 0 6px rgb(255 107 129 / 70%); }
     &--mp &-fill { background: linear-gradient(90deg, #2f5fc4, #6fa8ff); box-shadow: 0 0 6px rgb(111 168 255 / 70%); }
   }

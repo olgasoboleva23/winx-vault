@@ -14,5 +14,11 @@ export default {
     "at-rule-empty-line-before": null,
     "scss/dollar-variable-empty-line-before": null,
     "scss/double-slash-comment-empty-line-before": null,
+    // spacing and type from the scale ($space-*, $text-*): no px of 2 and more in them; a size tied to
+    // something else (the wings, an arrow) is written from that size, or disabled with the reason
+    "declaration-property-value-disallowed-list": [
+      { "/^(gap|row-gap|column-gap|padding|margin|font-size)/": ["/(^|[^\\w.$])([2-9]|\\d{2,})(\\.\\d+)?px/"] },
+      { message: (p, v) => `"${p}: ${v}": use the scale ($space-*, $text-*) or a size it's tied to` },
+    ],
   },
 };

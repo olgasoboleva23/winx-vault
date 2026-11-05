@@ -19,7 +19,7 @@
     &--grey { position: absolute; inset: 0; filter: grayscale(1) brightness(1.08); }
   }
   &__name { font-size: $text-xl; font-weight: 600; }
-  &__big { font-size: 22px; font-weight: 700; }
+  &__big { font-size: $text-4xl; font-weight: 700; }
   &__note,
   &__next { font-size: $text-s; color: alpha(--winx-purple-deep, 65%); }
   &__bar {
@@ -48,7 +48,7 @@
     padding: $space-m $space-xl;
     border: 2px solid var(--winx-pink-deep);
     border-radius: $radius-xl;
-    background: rgb(255 255 255 / 60%);
+    background: white(60%);
     &-sum { color: var(--winx-pink-deep); white-space: nowrap; }
   }
 }

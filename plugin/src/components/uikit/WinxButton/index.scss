@@ -9,14 +9,14 @@ button.winx-btn {
     height: $btn-s;
     padding: 0;
     border-radius: $round;
-    border: 1px solid var(--winx-border);
-    background: rgb(255 255 255 / 85%);
+    border: $border;
+    background: white(85%);
     color: var(--winx-purple-deep);
     box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
     font-size: $text-l;
     line-height: 1;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform $fast ease, box-shadow $fast ease;
 
     &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
     body.is-mobile & { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
@@ -27,8 +27,8 @@ button.winx-btn {
     height: $btn-l;
     padding: 0 $space-xl;
     border-radius: $pill;
-    border: 1px solid var(--winx-border);
-    background: rgb(255 255 255 / 75%);
+    border: $border;
+    background: white(75%);
     color: var(--winx-purple-deep);
     box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
     font-size: $text-m;
@@ -91,7 +91,7 @@ button.winx-btn {
     border-radius: $radius-m !important;
     padding: $space-s $space-2xl !important;
     color: var(--winx-gold-deep) !important;
-    font-family: Cinzel, serif !important;
+    font-family: $font-deco !important;
     font-size: $text-xl !important;
     letter-spacing: 1px !important;
     box-shadow: 0 0 8px alpha(--winx-gold, 40%) !important;
@@ -108,7 +108,7 @@ button.winx-btn {
 
   .winx-btn.winx-btn--pill {
     cursor: pointer;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow $medium ease;
 
     &:hover {
       box-shadow:

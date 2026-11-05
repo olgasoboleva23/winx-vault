@@ -14,22 +14,22 @@
       var(--winx-pink-light),
       var(--winx-pink)
     ) !important;
-    border: 1px solid var(--winx-border) !important;
+    border: $border !important;
     border-radius: $radius-xl !important;
     overflow: visible !important;
     padding: $space-xl;
     transition:
-      border-color 0.3s ease,
-      box-shadow 0.3s ease;
+      border-color $slow ease,
+      box-shadow $slow ease;
 
     /* Wings sit behind all card content */
     &::before,
     &::after {
-      z-index: 0;
+      z-index: $z-base;
     }
     > * {
       position: relative;
-      z-index: 1;
+      z-index: $z-over;
     }
 
     /* Wing pseudo-elements */
@@ -56,12 +56,12 @@
     /* Title */
     > .callout-title {
       justify-content: center !important;
-      font-family: Cinzel, serif !important;
+      font-family: $font-deco !important;
       color: var(--winx-purple-deep) !important;
       letter-spacing: 2px !important;
       text-transform: uppercase !important;
       font-size: $text-2xl !important;
-      padding-inline: 64px !important; /* room for wings */
+      padding-inline: $deco + $space-m !important; /* room for the wings */
     }
     /* a widget's button next to the title (the market's +): the pink glowing circle of the market's ✓ */
     > .callout-title .winx-btn.winx-widget__add {
@@ -115,7 +115,7 @@
           var(--winx-pink-deep)
         );
         border-radius: 99px;
-        border: 1px solid rgb(255 255 255 / 30%);
+        border: 1px solid white(30%);
       }
     }
   }
@@ -135,7 +135,7 @@
   &__skeleton {
     height: 72px;
     border-radius: $radius-l;
-    background: linear-gradient(90deg, rgb(255 255 255 / 25%) 25%, rgb(255 255 255 / 60%) 50%, rgb(255 255 255 / 25%) 75%);
+    background: linear-gradient(90deg, white(25%) 25%, white(60%) 50%, white(25%) 75%);
     background-size: 200% 100%;
     animation: winx-shimmer 1.6s linear infinite;
   }

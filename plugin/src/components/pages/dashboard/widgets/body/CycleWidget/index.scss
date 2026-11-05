@@ -5,15 +5,15 @@
   flex-direction: column;
   align-items: flex-start;
   gap: $space-s;
-  transition: gap 0.2s ease;
+  transition: gap $medium ease;
   /* folded: hovering the head parts it from the buttons a little, a hint that it opens */
   &--folded:has(.winx-cycle__head:hover) { gap: $space-2xl; }
 
 
   &__day {
     cursor: help;
-    font-family: Cinzel, serif;
-    font-size: 26px;
+    font-family: $font-deco;
+    font-size: $text-5xl;
     color: var(--winx-text-dark);
 
     &--period { color: var(--winx-pink-deep); text-shadow: 0 0 8px var(--winx-pink); }
@@ -55,7 +55,7 @@
     position: relative; border-radius: $radius-s $radius-s 2px 2px; background: alpha(--winx-purple, 35%);
     &-value { position: absolute; top: 100%; left: 0; right: 0; font-size: $text-2xs; font-style: normal; color: alpha(--winx-purple-deep, 70%); }
   }
-  &__avg-line { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--winx-pink-deep); z-index: 1; }
+  &__avg-line { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--winx-pink-deep); z-index: $z-over; }
   /* the period lengths: pink columns, a purple line */
   &__chart--per &__col { background: alpha(--winx-pink-deep, 55%); }
   &__chart--per &__avg-line { border-color: var(--winx-purple-deep); }

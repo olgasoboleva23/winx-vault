@@ -29,6 +29,29 @@ $text-l: 13px;
 $text-xl: 14px;
 $text-2xl: 16px;
 $text-3xl: 18px;
+$text-4xl: 22px;     // display numbers: the weight, a jar's sum, the drop zone's ✓
+$text-5xl: 26px;     // the cycle's day
+$text-6xl: 30px;     // the pomodoro's time
+
+// stylelint-disable-next-line value-keyword-case -- a font's name, not a keyword
+$font-deco: Cinzel, serif;   // titles, dates, the big numbers
+$border: 1px solid var(--winx-border);
+
+// what sits over what (low to high): under -1 < base 0 < over 1 < raised 2 < scroll 3 < dropbar 5 < busy 6 < sticker 20
+$z-under: -1;     // the leaf's photo, below its content
+$z-base: 0;       // a new stacking context; the card's wings behind its content
+$z-over: 1;       // content over its own decoration (a card's, a day's, Missed's)
+$z-raised: 2;     // the drop zones over a day's tasks, the pomodoro's time, the grid's stars
+$z-scroll: 3;     // the scroll arrows over the cards
+$z-dropbar: 5;    // the calendar's drop bar while dragging
+$z-busy: 6;       // the ✦ busy pill over everything on the page
+$z-sticker: 20;   // a hovered sticker, over its neighbours
+
+// transition durations
+$fast: 0.15s;
+$medium: 0.2s;
+$slow: 0.3s;
+$tick: 1s;        // the pomodoro ring, once a second
 
 $deco: 56px;        // the fairy wings, the stars, the round icon
 $pill-w: 56px;      // the scroll arrows and the busy ✦ pill
@@ -67,3 +90,7 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
   &::before { top: $inset; left: $inset; }
   &::after  { bottom: $inset; right: $inset; transform: scale(-1, -1); }
 }
+
+// white and black at some opacity: white(40%) → rgb(255 255 255 / 40%)
+@function white($opacity) { @return rgba(255, 255, 255, $opacity); }
+@function black($opacity) { @return rgba(0, 0, 0, $opacity); }

@@ -33,7 +33,7 @@
     /* hover: the piece glows in its area's colour (a click filters by the area) */
     &:hover &-label { text-shadow: 0 0 6px var(--area); }
     &:hover &-track { box-shadow: 0 0 10px var(--area), 0 0 4px var(--area); }
-    &-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); transition: box-shadow 0.15s ease; }
+    &-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); transition: box-shadow $fast ease; }
     &-fill { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
   }
   &__balance-none { filter: grayscale(1); opacity: 0.6; font-size: $text-l; }
@@ -46,14 +46,14 @@
   &__day,
   &__cell {
     border-radius: $radius-xl;
-    border: 1px solid var(--winx-border);
+    border: $border;
     background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
-    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    transition: box-shadow $fast ease, border-color $fast ease;
     position: relative;
   }
   /* the Missed strip's blue */
   &__day--today,
-  &__cell--today { border-color: rgb(168 200 240); background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240) 60%, rgb(232 213 245)); }
+  &__cell--today { border-color: var(--winx-blue); background: linear-gradient(135deg, rgb(200 224 245), rgb(216 208 240) 60%, var(--winx-purple-light)); }
   &__day { min-height: 220px; padding: $space-m $space-s; }
   /* the phone: the week's days one under another, each as tall as its tasks */
   body.is-mobile & {
@@ -63,7 +63,7 @@
 }
 /* while dragging, today and past days split into ✓ done / ⏳ plan halves */
 .winx-cal {
-  &__zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
+  &__zones { display: none; position: absolute; inset: 0; z-index: $z-raised; gap: $space-xs; padding: $space-xs; }
   &--dragging &__zones { display: flex; flex-direction: column; }
   /* the dragged task's own day: no 📅 (it's on it already), ✓ a strip at the bottom, its tasks
      open to a drop (drag.js: before / after one of its group, the line shows where) */
@@ -78,15 +78,15 @@
     border: 1px dashed var(--winx-border);
     border-radius: $radius-m;
     background: rgb(255 248 252 / 90%);
-    font-size: 22px;
+    font-size: $text-4xl;
     color: var(--winx-purple-deep);
-    transition: background 0.15s ease, box-shadow 0.15s ease;
+    transition: background $fast ease, box-shadow $fast ease;
 
     &--over { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
   }
   /* drop bar: sticky at the top while dragging (zero height, so nothing below jumps) */
   &__dropbar {
-    position: sticky; top: $space-m; z-index: 5; height: 0;
+    position: sticky; top: $space-m; z-index: $z-dropbar; height: 0;
     &-in {
       display: none;
       grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -103,24 +103,24 @@
     padding: $space-l $space-xs;
     border-radius: $radius-m;
     border: 1px dashed var(--winx-border);
-    font-family: Cinzel, serif;
+    font-family: $font-deco;
     font-size: $text-l;
     color: var(--winx-purple-deep);
-    transition: background 0.15s ease, box-shadow 0.15s ease;
+    transition: background $fast ease, box-shadow $fast ease;
 
-    &--today { border-color: rgb(168 200 240); }
+    &--today { border-color: var(--winx-blue); }
     &--over  { border-style: solid; border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
   }
   &__backlog {
     margin-top: $space-2xl;
     padding: $space-m $space-l;
     border-radius: $radius-xl;
-    border: 1px solid var(--winx-border);
+    border: $border;
     background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
-    transition: box-shadow 0.15s ease;
+    transition: box-shadow $fast ease;
 
     &--over { border-color: var(--winx-gold-deep); box-shadow: 0 0 14px alpha(--winx-gold, 90%); }
-    button.winx-cal__more { margin-top: $space-s; padding: $space-2xs $space-xl; border-radius: $pill; border: 1px solid var(--winx-border); background: rgb(255 255 255 / 75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer; }
+    button.winx-cal__more { margin-top: $space-s; padding: $space-2xs $space-xl; border-radius: $pill; border: $border; background: white(75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer; }
     &-grid { columns: 260px; column-gap: $space-xl; }
   }   /* masonry: area cards fill the columns top to bottom */
   &__group-card {
@@ -133,12 +133,12 @@
   }
   &__head {
     margin-bottom: $space-xs;
-    font-family: Cinzel, serif;
+    font-family: $font-deco;
     color: var(--winx-purple-deep);
   }
   &__task {
     position: relative;
-    padding: $space-xs 5px;
+    padding: $space-xs;
     border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
     font-size: $text-l;
     line-height: 1.3;
@@ -149,6 +149,8 @@
     &[draggable="true"]:hover { background: fade(white, 35%); border-radius: 8px; }
     &--ghost   { opacity: 0.5; }
     &--done    { opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
+    // room for the checkbox (left: $space-xs, ~16px wide, then a gap)
+    // stylelint-disable-next-line declaration-property-value-disallowed-list
     &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
     > input.task-list-item-checkbox { position: absolute; left: $space-xs; top: 5px; margin: 0; }
   }
@@ -159,8 +161,8 @@
   &__month &__sticker { height: 14px; }
   /* hover: the sticker grows to its full 84px over the card */
   &__sticker {
-    position: relative; transition: transform 0.15s;
-    &:hover { z-index: 20; transform: scale(3.5); border-radius: $radius-s; box-shadow: 0 2px 10px rgb(0 0 0 / 35%); }
+    position: relative; transition: transform $fast;
+    &:hover { z-index: $z-sticker; transform: scale(3.5); border-radius: $radius-s; box-shadow: 0 2px 10px black(35%); }
   }
   &__month &__sticker:hover { transform: scale(6); }
   &__task:has(.winx-cal__sticker:hover) { overflow: visible; }
@@ -185,17 +187,17 @@
   /* today's column gets the card's fairy wings in two corners */
   &__day--today {
     @include wings(30px, 3px);
-    > :not(.winx-cal__zones) { position: relative; z-index: 1; }
+    > :not(.winx-cal__zones) { position: relative; z-index: $z-over; }
   }
   &__month {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: $space-s;
   }
-  &__weekday { font-family: Cinzel, serif; font-size: $text-m; color: var(--winx-lavender); }
+  &__weekday { font-family: $font-deco; font-size: $text-m; color: var(--winx-lavender); }
   &__cell {
     min-height: 92px;
-    padding: $space-xs 5px;
+    padding: $space-xs;
     cursor: pointer;
 
     &--outside { opacity: 0.5; }
@@ -215,7 +217,7 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 3px;
+    gap: $space-2xs;
     margin-top: $space-2xs;
   }
   &__dot {
@@ -236,7 +238,7 @@
 .winx-cal {
   &--busy {
     .winx-busy__pill { display: flex; }
-    :is(.winx-cal__week, .winx-cal__month, .winx-cal__backlog-grid) { opacity: 0.55; transition: opacity 0.2s; pointer-events: none; }
+    :is(.winx-cal__week, .winx-cal__month, .winx-cal__backlog-grid) { opacity: 0.55; transition: opacity $medium; pointer-events: none; }
   }
 }
 @keyframes winx-spin { to { transform: rotate(360deg); } }
@@ -255,11 +257,11 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
 
   /* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
   &__routine {
-    margin: 3px 0;
+    margin: $space-xs 0;
     border-radius: $radius-xl;
     border: 1px dashed alpha(--winx-purple-deep, 35%);
-    background: rgb(255 255 255 / 40%);
-    &--open { padding: 0 3px 3px; }
+    background: white(40%);
+    &--open { padding: 0 $space-2xs $space-xs; }
     &-time {
       margin: $space-xs 0 1px $space-s;
       cursor: pointer;
@@ -272,7 +274,7 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
       flex-wrap: wrap;
       gap: $space-2xs $space-l;
       span { white-space: nowrap; }
-      padding: 3px $space-l;
+      padding: $space-xs $space-l;
       font-size: $text-m;
       color: var(--winx-purple-deep);
       cursor: pointer;
@@ -293,11 +295,11 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
     flex-wrap: wrap;
     gap: $space-xs $space-2xl;
     margin-bottom: $space-xs;
-    button.winx-cal__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: Cinzel, serif; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
+    button.winx-cal__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: $font-deco; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
     button.winx-cal__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
   }
   &__late { color: #b0306a; font-weight: 600; }
   &__after { margin-right: $space-2xs; color: var(--winx-purple-deep); opacity: 0.6; }   /* ↳ a task after the one above */
-  &__zone--plan { font-family: Cinzel, serif; font-size: $text-2xl; text-align: center; }
+  &__zone--plan { font-family: $font-deco; font-size: $text-2xl; text-align: center; }
   &__month &__zone { font-size: $text-m; }
 }

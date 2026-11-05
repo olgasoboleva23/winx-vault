@@ -20,7 +20,7 @@
     height: 14px;
     border-radius: $round;
     border: 1.5px solid var(--winx-border);
-    background: rgb(255 255 255 / 40%);
+    background: white(40%);
 
     &--done    { background: var(--winx-gold); border-color: var(--winx-gold-deep); }
     &--missed  { border-color: var(--winx-pink-deep); border-style: dashed; }

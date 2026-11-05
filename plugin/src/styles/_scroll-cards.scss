@@ -35,7 +35,7 @@
 ) > .callout-content::after {
   content: "";
   position: sticky;
-  z-index: 3;
+  z-index: $z-scroll;
   display: block;
   width: $pill-w;
   height: $pill-h;
@@ -46,13 +46,13 @@
   pointer-events: none;
 }
 
-/* bottom arrow: points down; top arrow: same art turned up. Negative margins = zero height */
+/* bottom arrow: points down; top arrow: same art turned up. A margin of minus its height = zero height */
 :is(
   .dashboard .callout[data-callout="card"][data-callout-metadata~="scroll"],
   .kanban-board .callout[data-callout="card"]
 ) > .callout-content {
-  &::after  { bottom: $space-xs; margin: -30px auto 0; opacity: var(--winx-more); animation: winx-bounce-up 1.4s ease-in-out infinite; }
-  &::before { top: $space-xs; margin: 0 auto -30px; opacity: var(--winx-less); rotate: 180deg; animation: winx-bounce-down 1.4s ease-in-out infinite; }
+  &::after  { bottom: $space-xs; margin: (-$pill-h) auto 0; opacity: var(--winx-more); animation: winx-bounce-up 1.4s ease-in-out infinite; }
+  &::before { top: $space-xs; margin: 0 auto (-$pill-h); opacity: var(--winx-less); rotate: 180deg; animation: winx-bounce-down 1.4s ease-in-out infinite; }
 }
 
 :is(

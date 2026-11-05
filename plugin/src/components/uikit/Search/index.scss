@@ -3,7 +3,7 @@
 .winx-search {
   &__group {
     margin: (-$space-xs) 0 $space-xs;
-    font-family: Cinzel, serif;
+    font-family: $font-deco;
     font-size: $text-s;
     color: var(--winx-gold-deep);
   }
