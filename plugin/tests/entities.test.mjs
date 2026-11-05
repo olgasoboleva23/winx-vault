@@ -145,7 +145,7 @@ test("SavingsJar: saved, deposits, the payday's deposit until it's in, the halfw
   assert.equal(new SavingsJar("- 2026-10-16 10000", { price: 60000 }).pct, 17);
 });
 
-test("CycleLog.endFor: 'ended today' marks yesterday as the last day, not before the start", () => {
+test("CycleLog.endFor: 'ended yesterday' marks yesterday as the last day, not before the start", () => {
   const log = new CycleLog(["2026-09-12", "2026-10-11"]);
   assert.equal(log.endFor("2026-10-18"), "2026-10-17");
   assert.equal(log.endFor("2026-10-11"), "2026-10-11");   // ended on the day it started

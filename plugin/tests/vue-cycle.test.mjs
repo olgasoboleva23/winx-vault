@@ -13,7 +13,7 @@ before(async () => {
 });
 
 const data = {
-  day: "2026-11-04", page: true, info: true, mark: { kind: "end", text: "ended today" },
+  day: "2026-11-04", page: true, info: true, mark: { kind: "end", text: "ended yesterday" },
   head: { day: 3, period: true, phase: "period", title: "MP 1/4\n\nday 1–5 · period", next: "02.12", when: "in 28 d" },
   rows: [{ start: "2026-11-02", when: "02.11 – now", length: "3 d period · 3 d so far", pills: ["period", "period", "period"] }],
   charts: [{ title: "cycle", kind: "len", avg: "avg 29 d", line: 96, cols: [{ v: 28, height: 93 }, { v: 30, height: 100 }] }],

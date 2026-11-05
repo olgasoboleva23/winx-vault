@@ -1,8 +1,8 @@
 // Cycle: the day of the cycle on the page's date, the next start forecast, then one of two tabs:
 // the current cycle and the 3 before it as rows of day pills (the period, the fertile window and
 // the ovulation marked), or the last 10 cycles' lengths and period lengths as columns with their
-// average; "started / ended today", the dates. Folded (the default; a click on the head toggles it,
-// kept per device): only the head and the buttons. The markup: CycleWidget.vue, the
+// average; "started today / ended yesterday", the dates. Folded (the default; a click on the head
+// toggles it, kept per device): only the head and the buttons. The markup: CycleWidget.vue, the
 // writes: controllers/cycle.js.
 import { CycleLog } from "../../models/cycleLog.js";
 import { dm, pageDay, ymd } from "../../core/dates.js";
@@ -56,7 +56,7 @@ export async function loadCycle({ dv }) {
 
   return {
     day, page: true, info: !!info,
-    mark: info?.isPeriod && !info.ended ? { kind: "end", text: "ended today" } : mark,
+    mark: info?.isPeriod && !info.ended ? { kind: "end", text: "ended yesterday" } : mark,
     head: info && {
       day: info.day, period: info.isPeriod, phase: m.phase,
       title: `${mpLine(m)}\n\n${mpTable(m)}`,
