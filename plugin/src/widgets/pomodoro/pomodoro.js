@@ -1,15 +1,12 @@
 // Pomodoro: a 25/5 focus timer, a small row that opens into a ring (click the time), session stars,
 // and its settings; state in 00 System/Data/pomodoro.json (settings, the current session, today's
 // stats). The markup and the ticking: PomodoroTimer.vue (a running session lives on in timer.js
-// through a remount; the ticking stops when the block goes).
+// through a remount; the ticking stops when the block goes); the sound, the lengths' window and the
+// save: controllers/pomodoro.js.
 import { todayYmd } from "../../core/dates.js";
 import { readJson } from "../../core/files.js";
-import { AudioEngine } from "../../core/sounds.js";
-import { Form } from "../../uikit/form.ts";
-import { app } from "../../core/app.js";
-import { addStats } from "./timer.js";
 
-const PATH = "00 System/Data/pomodoro.json";
+export const PATH = "00 System/Data/pomodoro.json";
 
 export const ICON = {
   play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
@@ -23,38 +20,11 @@ export const ICON = {
   skip: `<svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-3.5 6L4 6v12z"/></svg>`,
 };
 
-const load = () => readJson(PATH, {});
+export const load = () => readJson(PATH, {});
 
 // the saved settings, mini and stats, and today's session (another day's starts over)
 export async function loadPomodoro() {
   const saved = await load();
 
   return { saved, current: saved.current?.date === todayYmd() ? saved.current : null };
-}
-
-// the block's sound (one per block), the lengths' window, and the save: settings, the current
-// session, mini and today's stats (a finished focus session adds its minutes)
-export function pomodoroActions() {
-  const sound = new AudioEngine("00 System/Assets/sparkle.wav");
-
-  return {
-    ding: rate => sound.play({ rate }),
-    // ⚙: the session lengths in the shared window; null when closed or not both set
-    lengths: async settings => {
-      const v = await Form.ask(app, "✦ Pomodoro", [
-        { name: "Focus", key: "focusMin", text: "minutes", number: true },
-        { name: "Break", key: "breakMin", text: "minutes", number: true },
-      ], { values: settings, required: ["focusMin", "breakMin"], submit: "Save" });
-
-      const ok = v?.focusMin > 0 && v.breakMin > 0;
-
-      return ok ? { focusMin: v.focusMin, breakMin: v.breakMin } : null;
-    },
-    save: async ({ settings, current, mini }, focusMin = 0) => {
-      const data = await load();
-      Object.assign(data, { settings, current, mini });
-      addStats(data, focusMin, todayYmd());
-      await app.vault.adapter.write(PATH, JSON.stringify(data, null, 2));
-    },
-  };
 }

@@ -2,10 +2,10 @@
 // the current cycle and the 3 before it as rows of day pills (the period, the fertile window and
 // the ovulation marked), or the last 10 cycles' lengths and period lengths as columns with their
 // average; "started / ended today", the dates. Folded (the default; a click on the head toggles it,
-// kept per device): only the head and the buttons. The markup: CycleWidget.vue.
+// kept per device): only the head and the buttons. The markup: CycleWidget.vue, the
+// writes: controllers/cycle.js.
 import { CycleLog } from "../../models/cycleLog.js";
 import { dm, pageDay, ymd } from "../../core/dates.js";
-import { appendLine } from "../../core/files.js";
 import { mana, mpLine, mpTable } from "../xp/vitals.js";
 
 export const CYCLE_PATH = "00 System/Data/Cycle.md";
@@ -76,9 +76,3 @@ export async function loadCycle({ dv }) {
     ].filter(Boolean),
   };
 }
-
-// "started / ended today": a line in Cycle.md (once)
-export const cycleActions = () => ({
-  mark: (kind, day) =>
-    appendLine(CYCLE_PATH, `- ${kind}:: ${day}`, { header: "period:: 8\n\n", unique: true }),
-});

@@ -4,7 +4,6 @@
 import config from "../../core/config.js";
 import { diffDays, ymd } from "../../core/dates.js";
 import { MarketItem } from "../../models/marketItem.js";
-import { appendLine } from "../../core/files.js";
 
 export const MARKET = "00 System/Data/Celestial Market.md";
 
@@ -76,5 +75,3 @@ export function marketState(dv) {
     open: new Set(tasks.filter(t => !t.completed).map(t => MarketItem.of(t).name.toLowerCase())),
   };
 }
-
-export const addToMarket = (name, tag) => appendLine(MARKET, `- [ ] ${name} ${tag}`);

@@ -2,11 +2,9 @@
 // today's weight, a button to the list. With a body log note (LOG_PATH: its `name` and `reasons`
 // are the vault's own), a toggle switches the card to that log: a level 0–3 and the reasons for
 // today, bars for 30 days (the reasons in the tooltip) over the cycle's period days. The markup:
-// WeightCard.vue.
+// WeightCard.vue; the writes: controllers/weight.js.
 import { addDays, dm, todayYmd } from "../../core/dates.js";
-import { edit } from "../../core/files.js";
 import { WeightLog } from "../../models/weightLog.js";
-import { amount } from "../../core/format.js";
 import { BodyLog } from "../../models/bodyLog.js";
 import { cycleLog } from "./cycle.js";
 import { chartColor } from "../../core/chart.js";
@@ -107,15 +105,3 @@ export async function loadWeight({ dv, app }) {
 
   return { weight, log };
 }
-
-export const weightActions = () => ({
-  // today's weight from what was typed; false when it isn't a weight
-  async logWeight(typed) {
-    const kg = amount(typed);
-
-    if (!kg || kg <= 0) return false;
-    await edit(PATH, c => new WeightLog(c).set(todayYmd(), kg));
-    return true;
-  },
-  logBody: (level, reasons) => edit(LOG_PATH, c => new BodyLog(c).set(todayYmd(), level, reasons)),
-});

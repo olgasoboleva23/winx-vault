@@ -14,10 +14,16 @@
 │   │   │                           (CalendarTab and its parts and tasks), dashboard/ (DashboardDate: the date row)
 │   │   ├── 📁 calendar           — the calendar tab: view.ts (an ItemView: the state, saved with the layout; the model;
 │   │   │                           the listeners) mounting components/calendar/CalendarTab.vue; data.js (CalendarData,
-│   │   │                           the model, taskInfo), state.js (the saved and data keys), actions.js (what it
-│   │   │                           writes), drag.js / swipe.js (the tab's drag and swipe listeners)
+│   │   │                           the model, taskInfo), state.js (the saved and data keys), drag.js / swipe.js (the
+│   │   │                           tab's drag and swipe listeners)
 │   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
 │   │   ├── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
+│   │   ├── 📁 controllers        — what changes the models and writes them: tasks.js (a task's line rewritten with
+│   │   │                           undo, deleted, the task window, the Tasks dialog; a new task, a new pool line),
+│   │   │                           calendar.js (the calendar's writes), shop.js (a purchase), market.js (an item
+│   │   │                           added through the search, bought, back on the list), savings.js, cycle.js,
+│   │   │                           weight.js, dailyNote.js, pomodoro.js (the widgets' actions), notes.js (a new
+│   │   │                           note of a kind)
 │   │   ├── 📁 models             — the things themselves, as classes, no Obsidian in them: task.js (Task: one task
 │   │   │                           line, what it is and how to change it), note.js (Note: a new note from data),
 │   │   │                           goal.js, marketItem.js, savingsJar.js (and the paydays), weightLog.js,
@@ -29,13 +35,13 @@
 │   │   │                           only while the line is the same / appendLine a note), config, format (money, amount),
 │   │   │                           sounds (and 🔇), chart.js, plugins.js (Dataview, Tasks, blockDv), use.js
 │   │   │                           (composables: useRedraw, useDataviewChanges, useWhenIndexed, useNewDay, useBusy…)
-│   │   ├── 📁 tasks              — repeats.js (🔁 rules), master.js (new tasks and pool lines),
-│   │   │                           taskEdit.js (rewrite a line with undo, the task window), taskSearch.js (New task: a past task)
+│   │   ├── 📁 tasks              — repeats.js (🔁 rules), taskSearch.js (New task: a past task)
 │   │   ├── 📁 uikit              — Obsidian's windows: Form (one window of fields), Search (a search window over a list)
-│   │   └── 📁 widgets            — blocks.js (names → { view, load, actions }); per widget its load / actions in a .js
-│   │                               (its markup: components/widgets/); a topic's own logic next to them: market/ (the list, the
-│   │                               search), xp/ (HP / MP: vitals.js), shop/ (gold), finance/ (ledger.js: rows, totals,
-│   │                               the report), pomodoro/ (timer.js: the clock)
+│   │   └── 📁 widgets            — blocks.js (names → { view, load, actions }); per widget its load (the reads)
+│   │                               in a .js (its markup: components/widgets/, its writes: controllers/); a topic's own
+│   │                               reads next to them: market/ (the list, the supplies), xp/ (HP / MP: vitals.js),
+│   │                               shop/ (gold), finance/ (ledger.js: rows, totals, the report), pomodoro/ (timer.js:
+│   │                               the clock)
 │   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; uikit/ the parts' looks;
 │   │                               _mixins.scss has the shared sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
@@ -66,12 +72,13 @@ After a rebuild run **Winx: Reload** (Cmd+P) and reopen the open notes (widgets 
 
 ## A widget
 
-A widget is a `.vue` file for its markup and, next to it, the functions that load its data and do its writes,
-registered by name in `plugin/src/widgets/blocks.js`:
+A widget is a `.vue` file for its markup, a function that loads its data (`widgets/`) and its writes
+(`controllers/`), registered by name in `plugin/src/widgets/blocks.js`:
 
 ```js
-// weight.js
+// widgets/body/weight.js
 export async function loadWeight({ dv, app, args }) { … }     // what it shows (dv: Dataview for the block's note)
+// controllers/weight.js
 export const weightActions = () => ({ logWeight: async typed => { … }, logBody: … });
 // blocks.js
 weight: { view: WeightCard, load: loadWeight, actions: weightActions },

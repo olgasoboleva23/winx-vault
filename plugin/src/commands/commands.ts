@@ -1,17 +1,16 @@
 import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
 import { Task } from "../models/task.js";
 import { KINDS } from "../notes/kinds.js";
-import { Note, notePath } from "../models/note.js";
 import { mirrorMobileConfig } from "../services/mobileConfig.js";
 import { Form } from "../uikit/form.ts";
 import { todayYmd } from "../core/dates.js";
-import { taskWindow } from "../tasks/taskEdit.js";
+import { addPoolLine, addTask, taskWindow } from "../controllers/tasks.js";
 import { pickTask } from "../tasks/taskSearch.js";
-import { addMarketItem } from "../widgets/market/marketSearch.js";
-import { logPurchase } from "../widgets/shop/wallet.js";
+import { addMarketItem } from "../controllers/market.js";
+import { logPurchase } from "../controllers/shop.js";
+import { createNote } from "../controllers/notes.js";
 import { tasksApi } from "../core/plugins.js";
 import { MASTER } from "../core/paths.js";
-import { addPoolLine, addTask } from "../tasks/master.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
@@ -56,10 +55,8 @@ export function registerCommands(plugin: Plugin) {
 
       if (!v) return;
       const dir = (kind.setting && (await plugin.loadData())?.[kind.setting]) || kind.folder;
-      const path = notePath(dir, v.title, (p: string) => !!app.vault.getAbstractFileByPath(p));
+      const file = await createNote(kind, v, dir);
 
-      if (!app.vault.getFolderByPath(dir)) await app.vault.createFolder(dir);
-      const file = await app.vault.create(path, new Note(kind.note(v, todayYmd())).text);
       await app.workspace.getLeaf("tab").openFile(file);
     });
   }

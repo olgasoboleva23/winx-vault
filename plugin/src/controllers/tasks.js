@@ -1,12 +1,14 @@
-// Task lines: rewrite one where it is (found again by its words), with an undo notice; the task
-// window (difficulty, area, time, sticker) and the Tasks plugin's edit dialog.
+// The writes of tasks: a task's line rewritten where it is (found again by its words), with an undo
+// notice; the task window (difficulty, area, time, sticker) and the Tasks plugin's edit dialog; a
+// new task on top of Master.md, a new pool line at the end of Pool.md.
 import { Notice } from "obsidian";
 import config from "../core/config.js";
-import { editLine, undoLines } from "../core/files.js";
+import { appendLine, edit, editLine, undoLines } from "../core/files.js";
 import { tasksApi } from "../core/plugins.js";
 import { Task } from "../models/task.js";
 import { Form } from "../uikit/form.ts";
 import { app } from "../core/app.js";
+import { MASTER, POOL } from "../core/paths.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
 // only if that line is still the same copy of the task.
@@ -94,3 +96,17 @@ export const editTaskLineWithUndo = async (t, fn, mark) => {
 };
 
 export const deleteTaskLine = t => editTaskLineWithUndo(t, () => null, "🗑");
+
+// a new task: the line on top of Master.md (false when Master.md is missing: nothing written); one
+// place for the New task command and the calendar's pool drop
+export async function addTask(line) {
+  if (!app.vault.getFileByPath(MASTER)) return false;
+  await edit(MASTER, c => line + "\n" + c);
+  return true;
+}
+
+// a pool line (no checkbox, no dates) at the end of Pool.md, made on first use
+export const addPoolLine = line =>
+  appendLine(POOL, line, {
+    header: "Tasks to pick when it's time: drag one from the calendar's Pool tab onto a day.\n\n",
+  });

@@ -1,11 +1,10 @@
 // Celestial Market: the shopping list by category, a round ✓ per item (a sparkle, then it's written
 // as bought), what is running low soon and links to the market and the supplies; ＋ by the card's
-// title opens the search. The markup: CelestialMarket.vue, the ＋: CelestialMarketAdd.vue.
+// title opens the search. The markup: CelestialMarket.vue, the ＋: CelestialMarketAdd.vue; the
+// writes: controllers/market.js.
 import { todayYmd } from "../../core/dates.js";
-import { editLine } from "../../core/files.js";
 import { MARKET, catOf, marketCats, marketState, supplyStats } from "./market.js";
 import { MarketItem } from "../../models/marketItem.js";
-import { addMarketItem } from "./marketSearch.js";
 
 export async function loadCelestialMarket({ dv }) {
   const page = dv.page(MARKET);
@@ -27,17 +26,3 @@ export async function loadCelestialMarket({ dv }) {
       .map(s => s.name).join(", "),
   };
 }
-
-export const celestialMarketActions = () => ({
-  add: () => addMarketItem(),
-  // a row as bought, if its line is still that item
-  buy: ({ line, name }) => {
-    const same = l => {
-      const item = new MarketItem(l);
-
-      return !item.isBought && item.name === name;
-    };
-
-    return editLine(MARKET, line, same, l => new MarketItem(l).bought(todayYmd()));
-  },
-});

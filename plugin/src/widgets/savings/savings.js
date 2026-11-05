@@ -1,11 +1,10 @@
 // Savings: a jar per note in the Savings folder (a goal: its picture, saved so far, a ✦ stamp per
 // deposit). On a payday "put in N" until the deposit is in; with a price the picture fills with
-// colour from the bottom and, past halfway, "saved" turns into "left". The markup: SavingsJars.vue.
+// colour from the bottom and, past halfway, "saved" turns into "left". The markup: SavingsJars.vue,
+// the deposit: controllers/savings.js.
 import { dm, todayYmd, weekday } from "../../core/dates.js";
-import { edit } from "../../core/files.js";
 import { money } from "../../core/format.js";
 import { SavingsJar } from "../../models/savingsJar.js";
-import { Form } from "../../uikit/form.ts";
 
 const FOLDER = "00 System/Data/Savings";
 const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -29,21 +28,6 @@ export async function loadSavings({ app }) {
   }));
 
   return { jars, empty: `A goal: a note in ${FOLDER}` };
-}
-
-// deposit(path): the payday's deposit into that jar's note; no per_payday ("your part"): it asks
-// how much
-export function savingsActions({ app }) {
-  return {
-    deposit: async path => {
-      const props = app.metadataCache.getCache(path)?.frontmatter ?? {};
-      const sum = props.per_payday ?? (await Form.ask(app, "✦ Deposit",
-        [{ name: "Sum", key: "sum", text: "how much", number: true }],
-        { values: { sum: null }, required: ["sum"], submit: "Put in" }))?.sum;
-
-      if (sum > 0) await edit(path, c => new SavingsJar(c, props).deposit(todayYmd(), sum));
-    },
-  };
 }
 
 // a jar as the card shows it: the picture greyed above what's saved, past halfway "left" instead

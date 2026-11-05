@@ -9,7 +9,7 @@ before(async () => {
   globalThis.window.moment = () => ({ format: () => "2026-10-30" });
   ({ mount } = await import("@vue/test-utils"));
   SavingsJars = (await import("../src/components/widgets/savings/SavingsJars.vue")).default;
-  ({ savingsActions } = await import("../src/widgets/savings/savings.js"));
+  ({ savingsActions } = await import("../src/controllers/savings.js"));
   ({ Form } = await import("../src/uikit/form.ts"));
 });
 const jar = {

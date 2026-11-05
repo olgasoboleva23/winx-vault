@@ -22,7 +22,7 @@ before(async () => {
   vue = await import("vue");
   Tab = (await import("../src/components/calendar/CalendarTab.vue")).default;
   data = await import("../src/calendar/data.js");
-  actions = await import("../src/calendar/actions.js");
+  actions = await import("../src/controllers/calendar.js");
   state = await import("../src/calendar/state.js");
   ({ CalendarView } = await import("../src/calendar/view.ts"));
 });

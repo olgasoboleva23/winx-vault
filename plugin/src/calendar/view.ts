@@ -10,7 +10,7 @@ import config from "../core/config.js";
 import { todayYmd } from "../core/dates.js";
 import { CalendarData, T, findTask, taskInfo } from "./data.js";
 import { SAVED, baseDate, readState, shownDays } from "./state.js";
-import { makeActions } from "./actions.js";
+import { makeActions } from "../controllers/calendar.js";
 import { useDrag } from "./drag.js";
 import { useSwipe } from "./swipe.js";
 import CalendarTab from "../components/calendar/CalendarTab.vue";
