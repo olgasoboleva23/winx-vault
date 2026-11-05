@@ -40,3 +40,26 @@ test("Weight: the log mode, a level and a reason picked, saved with them", async
   await w.find(".winx-weight__log > .winx-btn--pill").trigger("click");
   assert.deepEqual(saved, [[2, ["😴 sleep"]]]);
 });
+
+test("Weight: the log's picks stay through a reload of the same data, follow it after a save and on a new day", async () => {
+  const { reactive } = await import("vue");
+  const entry = { date: "2026-11-05", level: 1, reasons: [] };
+  const state = reactive({ data: { ...data, log: { ...data.log, day: "2026-11-05", now: { ...entry } } } });
+  const saved = [];
+  const w = mount(WeightCard, { props: { state, actions: { logBody: async (l, r) => saved.push([l, r]) } } });
+  await w.findAll(".winx-weight__modes button")[1].trigger("click");
+  const on = () => w.findAll(".winx-weight__log-row")[0].findAll("button").findIndex(b => b.classes().includes("winx-btn--on"));
+  assert.equal(on(), 1);
+  await w.findAll(".winx-weight__log-row")[0].findAll("button")[2].trigger("click");
+  // a reload of the same file: new objects, same content — the pick stays
+  state.data = { ...data, log: { ...data.log, day: "2026-11-05", now: { ...entry } } }; await nextTick();
+  assert.equal(on(), 2);
+  // saved, then the file has it: the picks follow the data again
+  await w.find(".winx-weight__log > .winx-btn--pill").trigger("click");
+  state.data = { ...data, log: { ...data.log, day: "2026-11-05", now: { ...entry, level: 3 } } }; await nextTick();
+  assert.equal(on(), 3);
+  // a new day: today's (empty) entry
+  await w.findAll(".winx-weight__log-row")[0].findAll("button")[0].trigger("click");
+  state.data = { ...data, log: { ...data.log, day: "2026-11-06", now: null } }; await nextTick();
+  assert.equal(on(), -1);
+});

@@ -20,6 +20,8 @@ export interface HostOptions<D> {
   note?: string;                               // the block's own note: its changes count too
   card?: { title: string; meta?: string[]; bodyClass?: string };   // drawn inside a dashboard card
   cardButton?: VueComponent;                   // a button next to the card's title (gets actions)
+  // its files (a folder: ending in /): only their changes reload it; none given: any file's
+  watches?: string[];
   follows?: boolean;   // false: loaded once (no vault data, like the pomodoro)
 }
 
@@ -62,7 +64,11 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
     });
     if (this.opts.follows === false) return void this.refresh();
     const { redraw } = useRedraw(this, () => this.shown, () => void this.refresh());
-    useDataviewChanges(this, redraw, { note: this.opts.note, delay: 1000 });
+    const { watches } = this.opts;
+    const watched = watches && ((path: string) =>
+      watches.some(w => w.endsWith("/") ? path.startsWith(w) : path === w));
+
+    useDataviewChanges(this, redraw, { watched, note: this.opts.note, delay: 1000 });
     useTabDate(this, this.el, () => void this.refresh());
     useWhenIndexed(this, () => void this.refresh());
   }

@@ -98,7 +98,7 @@ export async function loadWeight({ dv, app }) {
     const entries = days.map(d => byDay.get(d) ?? null);
     log = {
       name: String(props.name ?? "log"), reasons: (props.reasons ?? []).map(String),
-      now: byDay.get(today) ?? null,   // today's entry
+      day: today, now: byDay.get(today) ?? null,   // today's entry
       chart: logChart(days, entries, days.map(d => !!cycle?.on(d)?.isPeriod)),
     };
   }

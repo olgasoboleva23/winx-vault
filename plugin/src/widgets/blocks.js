@@ -21,13 +21,13 @@ import GoalsWidget from "../components/widgets/goals/GoalsWidget.vue";
 import { loadSavings } from "./savings/savings.js";
 import { savingsActions } from "../controllers/savings.js";
 import SavingsJars from "../components/widgets/savings/SavingsJars.vue";
-import { loadCycle } from "./body/cycle.js";
+import { CYCLE_PATH, loadCycle } from "./body/cycle.js";
 import { cycleActions } from "../controllers/cycle.js";
 import CycleWidget from "../components/widgets/body/CycleWidget/index.vue";
 import { loadFinance, loadFinanceLine } from "./finance/finance.js";
 import FinanceMonths from "../components/widgets/finance/FinanceMonths/index.vue";
 import FinanceLine from "../components/widgets/finance/FinanceLine.vue";
-import { loadWeight } from "./body/weight.js";
+import { LOG_PATH as BODY_LOG, PATH as WEIGHT, loadWeight } from "./body/weight.js";
 import { weightActions } from "../controllers/weight.js";
 import WeightCard from "../components/widgets/body/WeightCard/index.vue";
 import { loadDailyNote } from "./dailyNote.js";
@@ -55,7 +55,10 @@ const vueBlocks = {
   cycle: { view: CycleWidget, load: loadCycle, actions: cycleActions },
   finance: { view: FinanceMonths, load: loadFinance },
   financeMonth: { view: FinanceLine, load: loadFinanceLine },
-  weight: { view: WeightCard, load: loadWeight, actions: weightActions },
+  weight: {
+    view: WeightCard, load: loadWeight, actions: weightActions,
+    watches: [WEIGHT, BODY_LOG, CYCLE_PATH],   // not every file's change: typed picks stay
+  },
   dailyNote: { view: DailyNoteOpen, load: loadDailyNote, actions: dailyNoteActions },
   pomodoro: { view: PomodoroTimer, load: loadPomodoro, actions: pomodoroActions, follows: false },
   celestialMarket: {
@@ -75,8 +78,8 @@ function vueBlock(def, el, sourcePath, args) {
   // no card: the class goes on the block itself
   if (!card && def.bodyClass) el.addClass(def.bodyClass);
   const load = () => def.load(ctx), actions = def.actions?.(ctx);
-  const { cardButton, follows } = def;
-  const opts = { load, actions, note: sourcePath, card, cardButton, follows };
+  const { cardButton, follows, watches } = def;
+  const opts = { load, actions, note: sourcePath, card, cardButton, follows, watches };
 
   return new VueHost(el, def.view, opts);
 }

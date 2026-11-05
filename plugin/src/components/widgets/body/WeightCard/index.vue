@@ -22,14 +22,29 @@ const logging = computed(() => mode.value === "log" && !!log.value);
 const kg = ref("");
 const save = async () => { if (await props.actions.logWeight(kg.value)) kg.value = ""; };
 
-// the log's picks: today's entry until changed
+// the log's picks: today's entry until you change them (a reload of the same data keeps them);
+// again after a save or on another day
 const level = ref(null), reasons = ref([]);
-watch(() => log.value?.now, now => {
+let touched = false, applying = false, day = null;
+
+watch(() => log.value && `${log.value.day}|${JSON.stringify(log.value.now)}`, key => {
+  if (!key || (touched && log.value.day === day)) return;
+  const now = log.value.now;
+
+  applying = true;
   level.value = now?.level ?? null;
   reasons.value = [...(now?.reasons ?? [])];
+  touched = false;
+  day = log.value.day;
+  applying = false;
 }, { immediate: true });
+watch([level, reasons], () => { if (!applying) touched = true; }, { flush: "sync" });
 
-const saveLog = () => level.value !== null && props.actions.logBody(level.value, reasons.value);
+const saveLog = async () => {
+  if (level.value === null) return;
+  await props.actions.logBody(level.value, reasons.value);
+  touched = false;   // the file has them now: follow it
+};
 </script>
 
 <template>

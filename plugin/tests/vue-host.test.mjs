@@ -147,3 +147,15 @@ test("an error inside the view (a chart that fails to draw, async) shows the err
   assert.match(el.textContent, /couldn't draw: no chart/);
   host.unload();
 });
+
+test("watches: a widget reloads for a change in its own files only", async () => {
+  const s = slow(), el = document.body.appendChild(document.createElement("div"));
+  const host = new VueHost(el, View(), { load: s.load, watches: ["00 System/Data/Weight.md"] });
+  host.load();
+  s.loads[0].ok({ n: 1 }); await settle();
+  bus.fire("dataview:metadata-change", "update", { path: "00 System/Data/Tasks/Master.md" });
+  assert.equal(s.loads.length, 1);
+  bus.fire("dataview:metadata-change", "update", { path: "00 System/Data/Weight.md" });
+  assert.equal(s.loads.length, 2);
+  host.unload();
+});
