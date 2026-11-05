@@ -5,6 +5,7 @@
      PomodoroMini and PomodoroRing draw what `shown` says. -->
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { Notice } from "obsidian";
 import { Timer } from "#/models/timer.js";
 import PomodoroMini from "./PomodoroMini.vue";
 import PomodoroRing from "./PomodoroRing.vue";
@@ -53,7 +54,11 @@ async function finish() {
   const focusMin = timer.settings.focusMin, wasFocus = timer.next();
   props.actions.ding(timer.type === "focus" ? 1.0 : 0.8);
   timer.play(); arm(); tick();
-  await save(wasFocus ? focusMin : 0);
+  // no click to hand the error to: said here (the minutes go with the next save)
+  await save(wasFocus ? focusMin : 0).catch(e => {
+    console.error(e);
+    new Notice("Pomodoro: not saved, the next save will try again");
+  });
 }
 
 async function act(change) { change(timer); arm(); tick(); await save(); }
@@ -63,7 +68,7 @@ const reset = () => act(t => t.reset());
 const skip = () => act(t => t.reset(t.other));   // to the next session, this one not counted
 
 // the small row ⇄ the full ring; kept in the json
-const toggle = () => { mini.value = !mini.value; void save(); };
+const toggle = () => { mini.value = !mini.value; return save(); };
 
 async function gear() {
   const lengths = await props.actions.lengths(timer.settings);

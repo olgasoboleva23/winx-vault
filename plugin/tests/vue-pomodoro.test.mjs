@@ -62,3 +62,24 @@ test("unmounted: the clock stops ticking (no more timers)", async () => {
   assert.equal(spy.mock.callCount(), 1);
   spy.mock.restore();
 });
+
+test("a save that fails: a finished session says its minutes weren't saved; a click's goes to the app", async () => {
+  const { Notice } = await import("obsidian");
+  const quiet = mock.method(console, "error", () => {});
+  new Timer().stop();
+  const errors = [];
+  const actions = { save: async () => { throw new Error("disk"); }, ding: () => {}, lengths: async () => null };
+  const w = mount(PomodoroTimer, {
+    props: { state: { data: { saved: { settings: { focusMin: 25, breakMin: 5 } }, current: null } }, actions },
+    global: { config: { errorHandler: e => errors.push(e) } },
+  });
+  await w.find(".winx-pomodoro__mini-time").trigger("click");
+  await nextTick(); await nextTick();
+  assert.equal(errors.length, 1);
+  Notice.last = null;
+  await w.find(".winx-pomodoro__mini-play").trigger("click");
+  mock.timers.tick(25 * 60_000); await nextTick(); await nextTick();
+  assert.match(String(Notice.last), /not saved/);
+  quiet.mock.restore();
+  w.unmount();
+});
