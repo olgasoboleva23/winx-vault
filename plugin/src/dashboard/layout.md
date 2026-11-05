@@ -65,10 +65,10 @@
 > > > savings
 > > > ```
 
-%% the Quests card's Tasks query, for the tab's day (the dashboard draws it into the card) %%
+%% Quests, for the tab's day (drawn into its card): what's left of the day's plan, and what was done that day %%
 
 ```tasks
-due on {{date}}
+((due on {{date}}) AND (not done)) OR (done on {{date}})
 path includes 00 System/Data/Tasks
 short mode
 sort by status
