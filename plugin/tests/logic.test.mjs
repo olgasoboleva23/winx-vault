@@ -6,7 +6,7 @@ import { findChoices } from "../src/core/find.js";
 import { projectRepeats, ruleText } from "../src/tasks/repeats.js";
 import { levelInfo } from "../src/widgets/xp/xp.js";
 import { vitals, mana, mpPhases, mpLine, mpTable } from "../src/widgets/xp/vitals.js";
-import { Task } from "../src/tasks/task.js";
+import { Task } from "../src/models/task.js";
 
 // 2026-10-19 is a Monday
 test("weeks", () => {

@@ -1,7 +1,7 @@
 import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
-import { Task } from "../tasks/task.js";
+import { Task } from "../models/task.js";
 import { KINDS } from "../notes/kinds.js";
-import { Note, notePath } from "../notes/note.js";
+import { Note, notePath } from "../models/note.js";
 import { mirrorMobileConfig } from "../services/mobileConfig.js";
 import { Form } from "../uikit/form.ts";
 import { todayYmd } from "../core/dates.js";

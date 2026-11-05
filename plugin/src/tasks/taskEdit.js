@@ -4,7 +4,7 @@ import { Notice } from "obsidian";
 import config from "../core/config.js";
 import { editLine, undoLines } from "../core/files.js";
 import { tasksApi } from "../core/plugins.js";
-import { Task } from "./task.js";
+import { Task } from "../models/task.js";
 import { Form } from "../uikit/form.ts";
 import { app } from "../core/app.js";
 

@@ -3,7 +3,7 @@
 // cycle), rules in vitals.js. The markup: LevelToday.vue.
 import config from "../../core/config.js";
 import { pageDay, todayYmd, ymd } from "../../core/dates.js";
-import { Task } from "../../tasks/task.js";
+import { Task } from "../../models/task.js";
 import { levelInfo, taskXp } from "./xp.js";
 import { vitals, mana, mpLine, mpTable } from "./vitals.js";
 import { cycleLog } from "../body/cycle.js";

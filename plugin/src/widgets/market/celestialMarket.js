@@ -4,7 +4,7 @@
 import { todayYmd } from "../../core/dates.js";
 import { editLine } from "../../core/files.js";
 import { MARKET, catOf, marketCats, marketState, supplyStats } from "./market.js";
-import { MarketItem } from "./marketItem.js";
+import { MarketItem } from "../../models/marketItem.js";
 import { addMarketItem } from "./marketSearch.js";
 
 export async function loadCelestialMarket({ dv }) {

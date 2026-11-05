@@ -2,7 +2,7 @@
 // A missed goal task stays on its day (the calendar's Missed? lists it). The markup:
 // GoalsWidget.vue.
 import { dm, pageDay, todayYmd, weekOf, ymd } from "../../core/dates.js";
-import { Goal } from "./goal.js";
+import { Goal } from "../../models/goal.js";
 import { GOALS, TASKS } from "../../core/paths.js";
 
 export async function loadGoals({ dv, app }) {

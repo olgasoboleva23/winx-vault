@@ -1,6 +1,6 @@
 // The calendar's model, no DOM (CalendarData), and the keys that name a task in its markup.
 // Tasks are Dataview tasks ({ status, text, path, line }), each with its Task.
-import { Task } from "../tasks/task.js";
+import { Task } from "../models/task.js";
 import { addDays, diffDays, dm, weekday } from "../core/dates.js";
 import { projectRepeats } from "../tasks/repeats.js";
 

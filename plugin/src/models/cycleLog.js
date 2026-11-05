@@ -1,6 +1,6 @@
 // The cycle: its day on a date, the next start forecast, whether it's a period day (tested by
 // tests/entities.test.mjs).
-import { addDays, diffDays } from "../../core/dates.js";
+import { addDays, diffDays } from "../core/dates.js";
 
 // The log of Cycle.md: the start dates, the recorded last days of a period (ends) and the usual
 // period length. on(date): the day of the cycle, its usual length, the next start and how far, a

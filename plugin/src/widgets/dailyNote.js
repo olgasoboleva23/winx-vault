@@ -3,7 +3,7 @@
 import { Platform } from "obsidian";
 import { ymd } from "../core/dates.js";
 import { dailyFolder } from "../core/paths.js";
-import { Note } from "../notes/note.js";
+import { Note } from "../models/note.js";
 import { daily } from "../notes/kinds.js";
 
 // the page's date (none: nothing shown) and the button's text: on the phone only the ✦ (the word

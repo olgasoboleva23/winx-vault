@@ -11,7 +11,7 @@
 // same without checkbox, rule or dates; its copies on the days are ordinary tasks with the same
 // text.
 import { addDays, diffDays } from "../core/dates.js";
-import { projectRepeats } from "./repeats.js";
+import { projectRepeats } from "../tasks/repeats.js";
 
 const DATE   = "\\d{4}-\\d{2}-\\d{2}";
 // a date field starts with one of these; a 🔁 rule runs up to the next one

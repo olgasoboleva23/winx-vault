@@ -5,7 +5,7 @@ import config from "../core/config.js";
 import { dm } from "../core/dates.js";
 import { findChoices } from "../core/find.js";
 import { dataview } from "../core/plugins.js";
-import { taskChoices } from "./task.js";
+import { taskChoices } from "../models/task.js";
 import { TASKS } from "../core/paths.js";
 import { app } from "../core/app.js";
 

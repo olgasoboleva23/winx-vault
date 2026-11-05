@@ -5,9 +5,9 @@
 // WeightCard.vue.
 import { addDays, dm, todayYmd } from "../../core/dates.js";
 import { edit } from "../../core/files.js";
-import { WeightLog } from "./weightLog.js";
+import { WeightLog } from "../../models/weightLog.js";
 import { amount } from "../../core/format.js";
-import { BodyLog } from "./bodyLog.js";
+import { BodyLog } from "../../models/bodyLog.js";
 import { cycleLog } from "./cycle.js";
 import { chartColor } from "../../core/chart.js";
 

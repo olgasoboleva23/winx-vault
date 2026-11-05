@@ -3,7 +3,7 @@
 // the ovulation marked), or the last 10 cycles' lengths and period lengths as columns with their
 // average; "started / ended today", the dates. Folded (the default; a click on the head toggles it,
 // kept per device): only the head and the buttons. The markup: CycleWidget.vue.
-import { CycleLog } from "./cycleLog.js";
+import { CycleLog } from "../../models/cycleLog.js";
 import { dm, pageDay, ymd } from "../../core/dates.js";
 import { appendLine } from "../../core/files.js";
 import { mana, mpLine, mpTable } from "../xp/vitals.js";

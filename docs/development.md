@@ -18,20 +18,23 @@
 │   │   │                           writes), drag.js / swipe.js (the tab's drag and swipe listeners)
 │   │   ├── 📁 dashboard          — the dashboard tab: view.ts (its date, the ✦ pill), layout.md (its cards)
 │   │   ├── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
-│   │   ├── 📁 notes              — note.js (Note: a new note from data), kinds.js (watch / read / game / recipe / work task)
+│   │   ├── 📁 models             — the things themselves, as classes, no Obsidian in them: task.js (Task: one task
+│   │   │                           line, what it is and how to change it), note.js (Note: a new note from data),
+│   │   │                           goal.js, marketItem.js, savingsJar.js (and the paydays), weightLog.js,
+│   │   │                           bodyLog.js, cycleLog.js
+│   │   ├── 📁 notes              — kinds.js (watch / read / game / recipe / work task: their windows and notes)
 │   │   ├── 📁 services           — no markup: notify.js (desktop reminders), mobileConfig.js (obsidian-mobile/ → .obsidian-mobile)
 │   │   ├── 📁 core               — paths.js (where the data lives), app.js (Obsidian's app for modules), vueHost.ts
 │   │   │                           (VueHost: a Vue app owned by an Obsidian component), dates, files (edit / editLine,
 │   │   │                           only while the line is the same / appendLine a note), config, format (money, amount),
 │   │   │                           sounds (and 🔇), chart.js, plugins.js (Dataview, Tasks, blockDv), use.js
 │   │   │                           (composables: useRedraw, useDataviewChanges, useWhenIndexed, useNewDay, useBusy…)
-│   │   ├── 📁 tasks              — task.js (one task line: what it is, how to change it), repeats.js (🔁 rules),
+│   │   ├── 📁 tasks              — repeats.js (🔁 rules), master.js (new tasks and pool lines),
 │   │   │                           taskEdit.js (rewrite a line with undo, the task window), taskSearch.js (New task: a past task)
 │   │   ├── 📁 uikit              — Obsidian's windows: Form (one window of fields), Search (a search window over a list)
 │   │   └── 📁 widgets            — blocks.js (names → { view, load, actions }); per widget its load / actions in a .js
-│   │                               (its markup: components/widgets/); a topic's own logic next to them: market/ (MarketItem, the
-│   │                               search), goals/ (Goal), body/ (CycleLog, WeightLog, BodyLog), savings/ (SavingsJar,
-│   │                               paydays), xp/ (HP / MP: vitals.js), shop/ (gold), finance/ (ledger.js: rows, totals,
+│   │                               (its markup: components/widgets/); a topic's own logic next to them: market/ (the list, the
+│   │                               search), xp/ (HP / MP: vitals.js), shop/ (gold), finance/ (ledger.js: rows, totals,
 │   │                               the report), pomodoro/ (timer.js: the clock)
 │   ├── 📁 styles                 — Sass partials, built into the plugin's styles.css; uikit/ the parts' looks;
 │   │                               _mixins.scss has the shared sizes ($space-*, $text-*, $radius-*, $btn-*, $deco, $tap …) and the row / center mixins

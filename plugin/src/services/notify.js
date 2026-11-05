@@ -2,7 +2,7 @@ import { Platform } from "obsidian";
 import { dataview } from "../core/plugins.js";
 import { useDataviewChanges, useNewDay, useWhenIndexed } from "../core/use.js";
 import { todayYmd } from "../core/dates.js";
-import { Goal, reminders } from "../widgets/goals/goal.js";
+import { Goal, reminders } from "../models/goal.js";
 import { GOALS, TASKS } from "../core/paths.js";
 
 // by name at run time, desktop only: a require("electron") in main.js would stop the phone loading
