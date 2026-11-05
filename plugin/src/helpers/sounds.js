@@ -8,24 +8,26 @@ const _audio = { ctx: null, buffers: new Map() };
 const _ctx   = () => _audio.ctx ??= new (window.AudioContext || window.webkitAudioContext)();
 
 export class AudioEngine {
-  constructor(path) {
-    this.path = path;
-    if (!_audio.buffers.has(path)) {
-      _audio.buffers.set(path, this.#load(path));
+  constructor(path) { this.path = path; }
+
+  // the file decoded once, at the first play: at the plugin's load (an Obsidian start) the vault's
+  // files aren't indexed yet, so a lookup then finds nothing; a file not found isn't remembered
+  #buffer() {
+    if (!_audio.buffers.has(this.path)) {
+      const file = app.metadataCache.getFirstLinkpathDest(this.path, "");
+
+      if (!file) { console.warn(`AudioEngine: ${this.path} not found`); return null; }
+
+      _audio.buffers.set(this.path,
+        app.vault.adapter.readBinary(file.path).then(b => _ctx().decodeAudioData(b)));
     }
-  }
 
-  async #load(path) {
-    const file = app.metadataCache.getFirstLinkpathDest(path, "");
-
-    if (!file) { console.warn(`AudioEngine: ${path} not found`); return null; }
-
-    return _ctx().decodeAudioData(await app.vault.adapter.readBinary(file.path));
+    return _audio.buffers.get(this.path);
   }
 
   async play({ rate = 1.0, gain = 0.3, duration = 1.2 } = {}) {
     if (isMuted()) return;
-    const buffer = await _audio.buffers.get(this.path);
+    const buffer = await this.#buffer();
 
     if (!buffer) return;
 
