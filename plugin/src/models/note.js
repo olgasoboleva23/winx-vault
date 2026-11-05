@@ -1,6 +1,7 @@
-// A note Winx makes, from plain data: its properties (YAML), its # title and its ## sections.
-//   new Note({ props: { type: "recipe", tags: [] }, title: "Soup",
-//     sections: { Steps: "", Notes: "" } }).text
+// A note Winx makes, from plain data: its properties (YAML), a # title (only the daily note has
+// one: its name is the date; the rest are named by their file, shown by Obsidian's inline title),
+// a body and its ## sections.
+//   new Note({ props: { type: "recipe", tags: [] }, sections: { Steps: "", Notes: "" } }).text
 // written as is; anything else in "quotes"
 const PLAIN = /^[\p{L}\p{N}][\p{L}\p{N} _.,!?()&'-]*$/u;
 // bare only when YAML can read it as nothing but text: a word first (not true / no / null…),
@@ -15,15 +16,20 @@ const prop = (k, v) =>
   : `${k}: ${value(v)}`;
 
 export class Note {
-  constructor({ props = {}, title, sections = {} }) {
-    Object.assign(this, { props, title, sections });
+  constructor({ props = {}, title = null, body = "", sections = {} }) {
+    Object.assign(this, { props, title, body, sections });
   }
   get text() {
     const props = Object.entries(this.props).map(([k, v]) => prop(k, v)).join("\n");
     const sections = Object.entries(this.sections)
       .map(([h, body]) => `## ${h}\n${body ? body + "\n" : ""}`).join("\n");
 
-    return `---\n${props}\n---\n\n# ${this.title}\n\n${sections}`;
+    const rest = [this.body, sections].filter(Boolean).join("\n\n");
+
+    const text = sections ? rest : rest + "\n";
+    const head = this.title ? `# ${this.title}\n\n` : "";
+
+    return `---\n${props}\n---\n\n${head}${text}`;
   }
 }
 
