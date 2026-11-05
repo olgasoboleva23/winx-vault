@@ -16,8 +16,9 @@ export default defineConfig([
     "no-unsafe-argument", "no-unsafe-return"].map(r => [`@typescript-eslint/${r}`, "off"])) },
   // sentence case, but the plugins' names keep their capital ("Tasks plugin is off")
   { rules: { "obsidianmd/ui/sentence-case": ["warn", { brands: [...DEFAULT_BRANDS, "Tasks", "Dataview"] }] } },
-  // lines up to 100 characters: a template breaks by element / attribute, a call by argument
-  { rules: { "max-len": ["error", { code: 100, ignoreUrls: true }] } },
+  // lines up to 100 characters: a template breaks by element / attribute, a call by argument; a
+  // default import of a deep path (a page's component) can't break
+  { rules: { "max-len": ["error", { code: 100, ignoreUrls: true, ignorePattern: "^import \\w+ from \"[^\"]+\";$" }] } },
   // a blank line between logical blocks: after the imports and declarations, around functions and blocks
   { rules: { "padding-line-between-statements": ["error",
     { blankLine: "always", prev: "import", next: "*" },
@@ -44,5 +45,5 @@ export default defineConfig([
     "vue/max-attributes-per-line": ["warn", { singleline: { max: 3 } }],
   } },
   // a 🔁 rule is read by `(m = rule.match(…)) ? … :` chains, on purpose
-  { files: ["src/tasks/repeats.js"], rules: { "no-cond-assign": "off" } },
+  { files: ["src/models/repeats.js"], rules: { "no-cond-assign": "off" } },
 ]);

@@ -1,7 +1,7 @@
 import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { setApp } from "../src/core/app.js";
+import { setApp } from "../src/helpers/app.js";
 
 let VueHost, defineComponent, h, nextTick;
 // an app whose events the test fires: on(name, fn) → a ref; fire(name, …args)
@@ -16,7 +16,7 @@ before(async () => {
   // Obsidian's own: shown unless it or a parent is marked hidden here, or has no box (display: contents)
   HTMLElement.prototype.isShown = function () { return !this.closest("[data-hidden]") && this.style.display !== "contents"; };
   setApp({ workspace: bus, metadataCache: bus, plugins: { plugins: { dataview: { api: { index: { initialized: true } } } } } });
-  ({ VueHost } = await import("../src/core/vueHost.ts"));
+  ({ VueHost } = await import("../src/composables/vueHost.ts"));
   ({ defineComponent, h, nextTick } = await import("vue"));
 });
 

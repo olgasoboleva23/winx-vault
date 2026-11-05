@@ -1,21 +1,22 @@
 import { Platform, Plugin } from "obsidian";
-import { CalendarView, VIEW_TYPE } from "./calendar/view.ts";
-import { DashboardView, DASHBOARD_VIEW } from "./dashboard/view.ts";
+import { CalendarView, VIEW_TYPE } from "./components/pages/calendar/view.ts";
+import { DashboardView, DASHBOARD_VIEW } from "./components/pages/dashboard/view.ts";
 import { registerCommands } from "./commands/commands.ts";
-import { drawBlock } from "./widgets/blocks.js";
-import { useNotify } from "./services/notify.js";
-import { setApp } from "./core/app.js";
-import { installSounds } from "./core/sounds.js";
+import { drawBlock } from "./controllers/blocks.js";
+import { useNotify } from "./composables/notify.js";
+import { setApp } from "./helpers/app.js";
+import { installSounds } from "./helpers/sounds.js";
 
 // The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the
-// commands, and the styles (styles.css, built from styles/*.scss).
+// commands, and the styles (styles.css, built from src/styles/main.scss and the components'
+// index.scss).
 
 export default class WinxPlugin extends Plugin {
   async onload() {
     setApp(this.app);
     installSounds(this);
     registerCommands(this);
-    // a ```winx block in a note: a widget class by name (widgets/blocks.js)
+    // a ```winx block in a note: a widget by name (controllers/blocks.js)
     this.registerMarkdownCodeBlockProcessor("winx", drawBlock);
     // the calendar: its own tab; the command opens it, or goes to the one already open.
     // The ✨ ribbon icon opens Winx: the dashboard and the calendar as two pinned tabs (or goes back

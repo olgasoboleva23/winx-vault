@@ -10,8 +10,8 @@
 // A pool line (Pool.md: a task to pick when it's time, "- #⭐easy #area/base take out trash") is the
 // same without checkbox, rule or dates; its copies on the days are ordinary tasks with the same
 // text.
-import { addDays, diffDays } from "../core/dates.js";
-import { projectRepeats } from "../tasks/repeats.js";
+import { addDays, diffDays } from "../helpers/dates.js";
+import { projectRepeats } from "./repeats.js";
 
 const DATE   = "\\d{4}-\\d{2}-\\d{2}";
 // a date field starts with one of these; a 🔁 rule runs up to the next one

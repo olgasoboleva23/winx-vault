@@ -2,8 +2,8 @@
      block is in -->
 <script setup>
 import { inject } from "vue";
-import { app } from "../../core/app.js";
-import WinxButton from "./WinxButton.vue";
+import { app } from "../../helpers/app.js";
+import WinxButton from "./WinxButton/index.vue";
 
 const props = defineProps({
   path: { type: String, required: true },

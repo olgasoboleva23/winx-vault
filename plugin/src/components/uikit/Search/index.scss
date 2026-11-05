@@ -1,0 +1,12 @@
+@use "mixins" as *;
+/* Search (src/uikit/search.ts), block winx-search: a category over its first row, the name, the note on the right */
+.winx-search {
+  &__group {
+    margin: (-$space-xs) 0 $space-xs;
+    font-family: Cinzel, serif;
+    font-size: $text-s;
+    color: var(--winx-gold-deep);
+  }
+  &__row { @include row; justify-content: space-between; gap: $space-l; }
+  &__note { font-size: $text-s; color: var(--text-muted); white-space: nowrap; }
+}

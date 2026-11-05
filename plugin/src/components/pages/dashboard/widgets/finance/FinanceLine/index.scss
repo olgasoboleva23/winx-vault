@@ -1,0 +1,7 @@
+@use "mixins" as *;
+
+/* the dashboard's Finance card (FinanceLine.vue), block winx-fin-month: this month on one line, the link under it */
+.winx-fin-month {
+  display: grid; gap: $space-s; justify-items: start; font-weight: 600; letter-spacing: .02em; color: var(--winx-text-dark);
+  &__sum { color: var(--winx-purple-deep); }
+}

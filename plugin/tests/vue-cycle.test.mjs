@@ -1,7 +1,7 @@
 import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { setApp } from "../src/core/app.js";
+import { setApp } from "../src/helpers/app.js";
 
 let mount, CycleWidget;
 const store = {};
@@ -9,7 +9,7 @@ before(async () => {
   GlobalRegistrator.register();
   setApp({ loadLocalStorage: k => store[k] ?? null, saveLocalStorage: (k, v) => { store[k] = v; } });
   ({ mount } = await import("@vue/test-utils"));
-  CycleWidget = (await import("../src/components/widgets/body/CycleWidget/index.vue")).default;
+  CycleWidget = (await import("../src/components/pages/dashboard/widgets/body/CycleWidget/index.vue")).default;
 });
 
 const data = {

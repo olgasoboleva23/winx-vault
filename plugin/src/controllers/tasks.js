@@ -1,56 +1,18 @@
 // The writes of tasks: a task's line rewritten where it is (found again by its words), with an undo
-// notice; the task window (difficulty, area, time, sticker) and the Tasks plugin's edit dialog; a
+// notice; the task window (components/uikit/TaskWindow) and the Tasks plugin's edit dialog; a
 // new task on top of Master.md, a new pool line at the end of Pool.md.
 import { Notice } from "obsidian";
-import config from "../core/config.js";
-import { appendLine, edit, editLine, undoLines } from "../core/files.js";
-import { tasksApi } from "../core/plugins.js";
+import { appendLine, edit, editLine, undoLines } from "../helpers/files.js";
+import { tasksApi } from "../helpers/plugins.js";
 import { Task } from "../models/task.js";
-import { Form } from "../uikit/form.ts";
-import { app } from "../core/app.js";
-import { MASTER, POOL } from "../core/paths.js";
+import { taskWindow } from "../components/uikit/TaskWindow/index.js";
+import { app } from "../helpers/app.js";
+import { MASTER, POOL } from "../helpers/paths.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
 // only if that line is still the same copy of the task.
 export const editTaskLine = (t, fn) =>
   editLine(t.path, t.line, line => new Task(line).sameAs(Task.of(t)), fn);
-
-// What the Tasks modal doesn't ask: difficulty, area, time of day, sticker (from 00
-// System/Assets/stickers); `preset` (Task#picks) has the current ones. A new task must have a
-// difficulty and an area (`required`) and can go to the pool instead (a "to pool" checkbox:
-// pick.pool). Resolves to the picks, null when closed.
-export const taskWindow = async (preset = {}, required = false) => {
-  const { difficulties, areas } = config;
-  const stickers = (app.vault.getFolderByPath("00 System/Assets/stickers")?.children ?? [])
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  return Form.ask(app, required ? "✦ New task" : "✦ Edit task", [
-    {
-      name: "Difficulty", key: "difficulty",
-      options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.tag })),
-    },
-    { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.tag })) },
-    // a routine's time of day: the calendar groups its 🔁 box by it
-    { name: "Time of day", key: "time", options: [
-      { label: "—", value: null },
-      { label: "🌅 morning", value: "#time/morning" },
-      { label: "🌙 evening", value: "#time/evening" },
-    ] },
-    { name: "Sticker", key: "sticker", options: [
-      { label: "—", value: null },
-      ...stickers.map(f => ({ label: f.name, value: f.name, img: f })),
-    ] },
-    // Pool.md: tasks to pick when it's time (the calendar's Pool tab); no dates
-    ...(required
-      ? [{
-        name: "To pool", key: "pool", check: "pick it from the calendar's Pool tab when it's time",
-      }]
-      : []),
-  ], {
-    values: { difficulty: null, area: null, time: null, sticker: null, ...preset },
-    required: required ? ["difficulty", "area"] : [],
-  });
-};
 
 // Edit a task: the task window, then the Tasks plugin's own edit dialog (text, dates; works on the
 // phone). Cancelling either changes nothing. A pool line (t.pool) goes through the dialog as a task

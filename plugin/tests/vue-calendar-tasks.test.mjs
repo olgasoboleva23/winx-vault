@@ -7,8 +7,9 @@ let mount, TaskText, TaskRow, TaskCard;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  const load = async n => (await import(`../src/components/calendar/${n}.vue`)).default;
-  [TaskText, TaskRow, TaskCard] = await Promise.all(["TaskText", "TaskRow", "TaskCard"].map(load));
+  // a component is <Name>.vue, or <Name>/index.vue when it has its own styles
+  const load = async n => (await import(`../src/components/pages/calendar/${n}`)).default;
+  [TaskText, TaskRow, TaskCard] = await Promise.all(["TaskText.vue", "TaskRow.vue", "TaskCard/index.vue"].map(load));
 });
 const info = over => ({ key: "k7", area: "body", difficulty: "#⭐⭐medium", text: "walk <fast>", label: "🌺 walk <fast>",
   stickers: ["app://x/levi.png"], canSkip: false, ...over });

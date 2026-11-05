@@ -1,16 +1,17 @@
 import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
 import { Task } from "../models/task.js";
-import { KINDS } from "../notes/kinds.js";
-import { mirrorMobileConfig } from "../services/mobileConfig.js";
-import { Form } from "../uikit/form.ts";
-import { todayYmd } from "../core/dates.js";
-import { addPoolLine, addTask, taskWindow } from "../controllers/tasks.js";
-import { pickTask } from "../tasks/taskSearch.js";
+import { KINDS } from "../models/kinds.js";
+import { mirrorMobileConfig } from "../controllers/mobileConfig.js";
+import { Form } from "../components/uikit/Form/index.ts";
+import { todayYmd } from "../helpers/dates.js";
+import { addPoolLine, addTask } from "../controllers/tasks.js";
+import { taskWindow } from "../components/uikit/TaskWindow/index.js";
+import { pickTask } from "../components/uikit/TaskSearch/index.js";
 import { addMarketItem } from "../controllers/market.js";
 import { logPurchase } from "../controllers/shop.js";
 import { createNote } from "../controllers/notes.js";
-import { tasksApi } from "../core/plugins.js";
-import { MASTER } from "../core/paths.js";
+import { tasksApi } from "../helpers/plugins.js";
+import { MASTER } from "../helpers/paths.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
@@ -46,7 +47,7 @@ export function registerCommands(plugin: Plugin) {
     if (!await addTask(line)) new Notice(`✦ ${MASTER} not found — task not saved`);
   });
 
-  // a watch / read / game / recipe / work task note (notes/kinds.js), in its folder, opened in a
+  // a watch / read / game / recipe / work task note (models/kinds.js), in its folder, opened in a
   // new tab
   for (const kind of Object.values(KINDS) as any[]) {
     add(kind.id, kind.name, async () => {

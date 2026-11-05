@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { setApp } from "../src/core/app.js";
+import { setApp } from "../src/helpers/app.js";
 import { logPurchase } from "../src/controllers/shop.js";
 import { addTask, addPoolLine } from "../src/controllers/tasks.js";
 

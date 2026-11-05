@@ -2,7 +2,7 @@
 // text); most come with an undo notice. A 🔁 task ticked goes through the Tasks plugin, so it gets
 // its next copy.
 import { Task } from "../models/task.js";
-import { T } from "../calendar/data.js";
+import { T } from "../models/calendarData.js";
 import {
   addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal,
 } from "./tasks.js";

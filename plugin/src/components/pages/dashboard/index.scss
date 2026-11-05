@@ -1,0 +1,25 @@
+@use "mixins" as *;
+/* the dashboard tab: its date (where the note had the Meta Bind field) and the calendar's ✦ pill after a write */
+.winx-dash {
+  &__date { margin-bottom: 0; }   /* a .winx-nav row, alone in its card */
+  .markdown-preview-section > :first-child { margin-top: 0; }   /* as the note's first block */
+  &--busy {
+    .winx-busy__pill { display: flex; }
+    .markdown-preview-section { opacity: 0.55; transition: opacity 0.2s; pointer-events: none; }
+  }
+  &__quests { display: contents; }
+}   /* the Tasks query sits in the card as it did in the note */
+/* the date row and the ✦ Open button of the daily note side by side in their column */
+.dashboard .callout[data-callout="col"]:has(> .callout-content > .block-language-winx > .winx-btn--pill) > .callout-content {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row !important;
+  gap: $space-m;
+}
+/* two widgets in one card (Finance: the month, then the savings jars): a dashed line between them */
+.callout[data-callout="card"] > .callout-content > .block-language-winx + .block-language-winx {
+  margin-top: $space-l;
+  padding-top: $space-l;
+  border-top: 1px dashed fade(var(--winx-gold-deep), 35%);
+}

@@ -22,9 +22,9 @@ test("a Sass error fails the build", () => {
   // a copy of the plugin with a broken stylesheet, sharing node_modules
   const tmp = mkdtempSync(join(tmpdir(), "winx-build-"));
   const here = fileURLToPath(new URL("..", import.meta.url));
-  for (const f of ["src", "styles", "esbuild.config.mjs", "manifest.json", "package.json"]) cpSync(join(here, f), join(tmp, f), { recursive: true });
+  for (const f of ["src", "esbuild.config.mjs", "manifest.json", "package.json"]) cpSync(join(here, f), join(tmp, f), { recursive: true });
   symlinkSync(join(here, "node_modules"), join(tmp, "node_modules"));
-  writeFileSync(join(tmp, "styles/main.scss"), ".a { color: ");
+  writeFileSync(join(tmp, "src/styles/main.scss"), ".a { color: ");
   try {
     assert.throws(() => execFileSync("node", ["esbuild.config.mjs"], { cwd: tmp, stdio: "pipe" }));
   } finally { rmSync(tmp, { recursive: true, force: true }); }

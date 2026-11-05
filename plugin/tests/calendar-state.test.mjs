@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT, readState, baseDate, shownDays, dateFor } from "../src/calendar/state.js";
+import { DEFAULT, readState, baseDate, shownDays, dateFor } from "../src/store/calendar.js";
 
 test("no or broken saved state gives the defaults", () => {
   assert.deepEqual(readState(undefined), DEFAULT);

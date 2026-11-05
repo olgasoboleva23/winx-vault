@@ -2,15 +2,20 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
-// each component draws the markup the styles expect (styles/uikit/*.scss): the same as the old uikit/*.js did,
+// each component draws the markup the styles expect (the components' index.scss): the same as the old uikit/*.js did,
 // written out here; Vue's <!--v-if--> placeholders left out (no box, no style)
 let mount, ui;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  const load = async n => (await import(`../src/components/uikit/${n}.vue`)).default;
+  // a component is <Name>.vue, or <Name>/index.vue when it has its own styles
+  const load = async n => (await import(`../src/components/uikit/${n}`)).default;
   ui = Object.fromEntries(await Promise.all(["WinxButton", "WinxNoteLink", "WinxEmpty", "WinxMissing", "WinxFailed",
-    "WinxGroupHeader", "WinxAddForm", "WinxCard"].map(async n => [n, await load(n)])));
+    "WinxGroupHeader", "WinxAddForm", "WinxCard"].map(async n => {
+    const styled = ["WinxButton", "WinxEmpty", "WinxAddForm", "WinxCard"].includes(n);
+
+    return [n, await load(styled ? `${n}/index.vue` : `${n}.vue`)];
+  })));
 });
 const draws = (vue, html) => assert.equal(vue.element.outerHTML.replace(/<!--[^]*?-->/g, ""), html);
 

@@ -6,7 +6,7 @@
     "build": "node esbuild.config.mjs",
     "dev": "node esbuild.config.mjs --watch",
     "check": "vue-tsc",
-    "lint": "eslint src && stylelint \"styles/**/*.scss\"",
+    "lint": "eslint src && stylelint \"src/**/*.scss\"",
     "test": "node --test --experimental-strip-types --import ./tests/stubs/register.mjs tests/*.test.mjs"
   },
   "devDependencies": {

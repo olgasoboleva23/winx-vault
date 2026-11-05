@@ -5,7 +5,7 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 let useVueApp, Component, defineComponent, h, onMounted, nextTick;
 before(async () => {
   GlobalRegistrator.register();
-  ({ useVueApp } = await import("../src/core/vueApp.ts"));
+  ({ useVueApp } = await import("../src/composables/vueApp.ts"));
   ({ Component } = await import("obsidian"));
   ({ defineComponent, h, onMounted, nextTick } = await import("vue"));
 });

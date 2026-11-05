@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Note, notePath } from "../src/models/note.js";
-import { KINDS, daily } from "../src/notes/kinds.js";
+import { KINDS, daily } from "../src/models/kinds.js";
 
 const make = (kind, v, today = "2026-10-29") => new Note(KINDS[kind].note(v, today)).text;
 

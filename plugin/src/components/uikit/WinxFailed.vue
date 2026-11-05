@@ -1,8 +1,8 @@
 <!-- a screen that couldn't draw: "⚠ couldn't draw: <why>" and retry (the parent's @retry loads
      again) -->
 <script setup>
-import WinxEmpty from "./WinxEmpty.vue";
-import WinxButton from "./WinxButton.vue";
+import WinxEmpty from "./WinxEmpty/index.vue";
+import WinxButton from "./WinxButton/index.vue";
 
 defineProps({ text: { type: String, required: true } });
 defineEmits(["retry"]);

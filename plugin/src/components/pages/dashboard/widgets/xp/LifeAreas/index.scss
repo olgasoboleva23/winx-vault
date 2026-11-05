@@ -1,0 +1,6 @@
+@use "mixins" as *;
+
+/* Life Areas' caption under its chart (LifeAreas/index.vue) */
+.winx-areas {
+  &__caption { text-align: center; font-size: $text-m; color: var(--winx-purple-deep); }
+}

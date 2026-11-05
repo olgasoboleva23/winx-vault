@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { monthGrid, weekOf } from "../src/core/dates.js";
-import { supplyStats, marketChoices } from "../src/widgets/market/market.js";
-import { findChoices } from "../src/core/find.js";
-import { projectRepeats, ruleText } from "../src/tasks/repeats.js";
-import { levelInfo } from "../src/widgets/xp/xp.js";
-import { vitals, mana, mpPhases, mpLine, mpTable } from "../src/widgets/xp/vitals.js";
+import { monthGrid, weekOf } from "../src/helpers/dates.js";
+import { supplyStats, marketChoices } from "../src/models/market.js";
+import { findChoices } from "../src/helpers/find.js";
+import { projectRepeats, ruleText } from "../src/models/repeats.js";
+import { levelInfo } from "../src/models/xp.js";
+import { vitals, mana, mpPhases, mpLine, mpTable } from "../src/models/vitals.js";
 import { Task } from "../src/models/task.js";
 
 // 2026-10-19 is a Monday

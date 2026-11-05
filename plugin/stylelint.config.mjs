@@ -3,7 +3,7 @@
 const KEBAB = "[a-z0-9]+(?:-[a-z0-9]+)*";
 export default {
   extends: ["stylelint-config-standard-scss"],
-  ignoreFiles: ["dist/**", "styles/_assets.scss"],   // generated: the background picture as a data URI
+  ignoreFiles: ["dist/**", "src/styles/_assets.scss"],   // generated: the background picture as a data URI
   rules: {
     "selector-class-pattern": [`^${KEBAB}(?:__${KEBAB})?(?:--${KEBAB})?$`, { message: s => `Expected "${s}" to be a BEM name: winx-block__element--modifier` }],
     // our layout: a short rule on one line (`&__x { a: 1; b: 2; }`), related rules without blank lines between

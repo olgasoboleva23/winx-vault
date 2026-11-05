@@ -1,6 +1,6 @@
 // The weight log: "- YYYY-MM-DD 70.5" lines in Weight.md, comma decimals accepted (tested by
 // tests/entities.test.mjs).
-import { AMOUNT, amount } from "../core/format.js";
+import { AMOUNT, amount } from "../helpers/format.js";
 
 const WEIGHT_LINE = new RegExp(`^- (\\d{4}-\\d{2}-\\d{2}) (${AMOUNT.source})$`);
 
