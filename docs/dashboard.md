@@ -2,7 +2,7 @@
 
 # 🖥 Dashboard
 
-A tab of its own: the ✨ icon on the left (it opens the dashboard and the calendar, both pinned, or goes back to the one you used last) or **Winx: Open dashboard** (Cmd+P). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/dashboard/layout.md`: the same callouts and `winx` blocks a note would have.
+A tab of its own: the ✨ icon on the left (it opens the dashboard and the calendar, both pinned, or goes back to the one you used last) or **Winx: Open dashboard** (Cmd+P). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/components/pages/dashboard/layout.md`: the same callouts and `winx` blocks a note would have.
 
 ![Dashboard](images/dashboard.webp)
 
@@ -53,7 +53,7 @@ Level `n` costs `100 + (n-1) × 25` XP. Complete a habit **30+ times** in a mont
 | 🌠 Occasions | `#area/occasions` | Memory |
 | 🌙 Rest | `#area/rest` | Serenity |
 
-Tags without a radar row still get an icon: `#area/learning` 📜, `#area/work` 🪄, `#area/personal` 🦋, `#area/health` 🧪. All of it is in `plugin/src/lib/config.js`.
+Tags without a radar row still get an icon: `#area/learning` 📜, `#area/work` 🪄, `#area/personal` 🦋, `#area/health` 🧪. All of it is in `plugin/src/helpers/config.js`.
 
 ---
 
@@ -82,4 +82,4 @@ A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any
 
 ## 📝 Daily Note
 
-Notes (free text) and an XP Log. Made by **✦ Open** on the dashboard for the selected day (its layout: `daily` in `plugin/src/notes/kinds.js`).
+Notes (free text) and an XP Log. Made by **✦ Open** on the dashboard for the selected day (its layout: `daily` in `plugin/src/models/kinds.js`).

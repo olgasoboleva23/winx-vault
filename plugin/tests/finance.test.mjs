@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseLedger, summarize, monthReport } from "../src/widgets/finance/ledger.js";
-import { amount } from "../src/core/format.js";
+import { parseLedger, summarize, monthReport } from "../src/models/ledger.js";
+import { amount } from "../src/helpers/format.js";
 
 const note = `---
 type: finance-ledger

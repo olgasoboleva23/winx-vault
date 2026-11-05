@@ -1,13 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { monthGrid, weekOf } from "../src/core/dates.js";
-import { supplyStats, marketChoices } from "../src/widgets/market/market.js";
-import { findChoices } from "../src/core/find.js";
-import { projectRepeats, ruleText } from "../src/tasks/repeats.js";
-import { todayCount } from "../src/tasks/task.js";
-import { levelInfo } from "../src/widgets/xp/xp.js";
-import { vitals, mana, mpPhases, mpLine, mpTable } from "../src/widgets/xp/vitals.js";
-import { Task } from "../src/tasks/task.js";
+import { monthGrid, weekOf } from "../src/helpers/dates.js";
+import { supplyStats, marketChoices } from "../src/models/market.js";
+import { findChoices } from "../src/helpers/find.js";
+import { projectRepeats, ruleText } from "../src/models/repeats.js";
+import { levelInfo } from "../src/models/xp.js";
+import { vitals, mana, mpPhases, mpLine, mpTable } from "../src/models/vitals.js";
+import { Task } from "../src/models/task.js";
 
 // 2026-10-19 is a Monday
 test("weeks", () => {
@@ -56,21 +55,6 @@ test("supplyStats", () => {
   assert.deepEqual([salt.buys, salt.avg, salt.tag], [2, null, "#home"]); // <3 buys: no forecast; last tag wins
   assert.equal(salt.due, false);
   assert.equal(supplyStats(h, "2026-09-25")[0].due, false);        // 4 of 10 days
-});
-
-test("todayCount", () => {
-  const d = "2026-10-23";
-  const tasks = [
-    { done: false, recurring: false, scheduled: "2026-10-23" },             // today pick
-    { done: false, recurring: false, scheduled: "2026-10-24" },             // future pick
-    { done: false, recurring: true,  due: "2026-10-20" },                   // routine left from earlier
-    { done: false, recurring: true,  due: "2026-10-25" },                   // routine later
-    { done: false, recurring: false, due: "2026-10-23" },                   // deadline today
-    { done: false, recurring: false, due: "2026-10-01" },                   // overdue deadline
-    { done: true,  recurring: false, scheduled: "2026-10-23" },             // done
-    { done: false, recurring: false },                                      // no date
-  ];
-  assert.equal(todayCount(tasks, d), 4);
 });
 
 test("levelInfo", () => {

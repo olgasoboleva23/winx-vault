@@ -3,6 +3,8 @@
 import { defineConfig } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
 import { DEFAULT_BRANDS } from "eslint-plugin-obsidianmd/dist/lib/rules/ui/brands.js";
+import pluginVue from "eslint-plugin-vue";
+import tseslint from "typescript-eslint";
 
 export default defineConfig([
   { ignores: ["dist/", "node_modules/", "tests/", "esbuild.config.mjs", "eslint.config.mjs"] },
@@ -14,8 +16,34 @@ export default defineConfig([
     "no-unsafe-argument", "no-unsafe-return"].map(r => [`@typescript-eslint/${r}`, "off"])) },
   // sentence case, but the plugins' names keep their capital ("Tasks plugin is off")
   { rules: { "obsidianmd/ui/sentence-case": ["warn", { brands: [...DEFAULT_BRANDS, "Tasks", "Dataview"] }] } },
-  // lines up to 120 characters: an html`` template breaks by element, a call by argument
-  { rules: { "max-len": ["error", { code: 120, ignoreUrls: true }] } },
+  // lines up to 100 characters: a template breaks by element / attribute, a call by argument; a
+  // default import of a deep path (a page's component) can't break
+  { rules: { "max-len": ["error", { code: 100, ignoreUrls: true, ignorePattern: "^import \\w+ from \"[^\"]+\";$" }] } },
+  // a blank line between logical blocks: after the imports and declarations, around functions and blocks
+  { rules: { "padding-line-between-statements": ["error",
+    { blankLine: "always", prev: "import", next: "*" },
+    { blankLine: "any", prev: "import", next: "import" },
+    { blankLine: "always", prev: "*", next: ["function", "class", "export"] },
+    { blankLine: "always", prev: ["function", "class"], next: "*" },
+    { blankLine: "always", prev: ["const", "let"], next: ["if", "for", "while", "return", "try"] },
+    { blankLine: "always", prev: ["block-like"], next: "*" },
+  ] } },
+  { files: ["**/*.vue"], rules: { "vue/padding-line-between-blocks": "error" } },
+  // .vue files: Vue's recommended rules; the type-checked ones need a project that knows .vue (vue-tsc checks them)
+  ...pluginVue.configs["flat/recommended"],
+  { files: ["**/*.vue"], languageOptions: { parserOptions: { parser: tseslint.parser, extraFileExtensions: [".vue"] } } },
+  { files: ["**/*.vue"], ...tseslint.configs.disableTypeChecked },
+  // a short element stays on one line: <span class="x">{{ v }}</span>
+  // a short element stays on one line (<span class="x">{{ v }}</span>, up to 3 attributes), a longer one breaks
+  // by attribute
+  { files: ["**/*.vue"], rules: {
+    // a folder's own component is its index.vue: the folder gives the name (CalendarPanel/index.vue)
+    "vue/multi-word-component-names": ["error", { ignores: ["index"] }],
+    "vue/singleline-html-element-content-newline": "off",
+    // its fix puts an element's text on a line of its own, and Vue then draws a space before it (" day 3")
+    "vue/multiline-html-element-content-newline": "off",
+    "vue/max-attributes-per-line": ["warn", { singleline: { max: 3 } }],
+  } },
   // a 🔁 rule is read by `(m = rule.match(…)) ? … :` chains, on purpose
-  { files: ["src/tasks/repeats.js"], rules: { "no-cond-assign": "off" } },
+  { files: ["src/models/repeats.js"], rules: { "no-cond-assign": "off" } },
 ]);

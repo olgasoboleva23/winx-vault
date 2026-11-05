@@ -1,0 +1,41 @@
+// Winx styles. The order is the order Obsidian applied the old snippets (by name), then finance (it
+// used to be injected last). A component's own block is its index.scss next to it (components/…);
+// here, the shared look (tokens, mixins, cards' grid, layout, …). Keep the order: rules of the same
+// weight win by order. Partials @use "mixins" by the load path (esbuild.config.mjs: src/styles).
+@use "utilities";   // layout utilities first: the blocks win over them
+@use "animations";
+@use "assets";
+@use "callout-grid";
+@use "../components/uikit/WinxCard";   // the widget's card, where the card snippet was
+@use "../components/pages/dashboard/widgets/market/CelestialMarket";
+@use "fonts";
+@use "../components/pages/dashboard/widgets/xp/XpToday";
+@use "kanban";
+@use "layout";
+@use "../components/pages/dashboard/widgets/pomodoro/PomodoroTimer";
+@use "../components/pages/dashboard/widgets/shop/ShopWidget";
+@use "tasks-minimal";
+@use "tokens";
+@use "../components/pages/dashboard/widgets/xp/LevelToday";
+@use "../components/pages/dashboard/widgets/goals/GoalsWidget";
+@use "../components/pages/dashboard/widgets/xp/LifeAreas";
+@use "../components/pages/dashboard/widgets/body/CycleWidget";
+@use "../components/pages/dashboard/widgets/market/SuppliesWidget";
+@use "scroll-cards";
+@use "../components/pages/dashboard/widgets/body/WeightCard";
+@use "../components/pages/dashboard/widgets/savings/SavingsJars";
+@use "../components/pages/calendar/TaskCard";
+@use "../components/uikit/WinxButton";
+@use "../components/uikit/WinxEmpty";
+@use "../components/uikit/WinxAddForm";
+@use "../components/uikit/Search";
+@use "syncing";
+@use "nav";
+@use "busy";
+@use "../components/pages/calendar/CalendarTab";
+@use "../components/pages/calendar/CalendarMissed";
+@use "../components/pages/dashboard";
+// was injected by the widget itself, after everything else: last
+@use "../components/pages/dashboard/widgets/finance/FinanceMonths";
+@use "../components/pages/dashboard/widgets/finance/FinanceLine";
+@use "helpers";   // global .winx-is-* helpers, after the blocks

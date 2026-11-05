@@ -1,0 +1,10 @@
+@use "mixins" as *;
+/* ── Supplies (block winx-supplies) ── */
+.winx-supplies {
+  &__row {
+    padding: $space-xs 0;
+    color: var(--winx-text-dark);
+  }
+  &__info { font-size: $text-m; color: var(--winx-purple-deep); }
+  &__row--due &__info { color: var(--winx-pink-deep); font-weight: 600; }
+}

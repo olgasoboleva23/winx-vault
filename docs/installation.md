@@ -27,7 +27,7 @@ Copy the plugin and what it reads:
 | the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
 | `00 System/Data/` (`Tasks/Master.md`, `Tasks/Pool.md`, `Goals.md`, the widgets' notes), `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
 
-The paths the widgets read are in the widget files (`plugin/src/widgets/*.js`, `plugin/src/calendar/view.ts`, constants at the top) and `plugin/src/lib/config.js`.
+The paths the widgets read are in `plugin/src/helpers/paths.js` (and constants at the top of the controllers, `plugin/src/controllers/*.js`); the areas, difficulties and levels in `plugin/src/helpers/config.js`.
 
 ## Keeping your vault in sync with this repo
 

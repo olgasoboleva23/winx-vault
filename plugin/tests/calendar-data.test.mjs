@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { weekOf } from "../src/core/dates.js";
-import { T, CalendarData } from "../src/calendar/data.js";
+import { weekOf } from "../src/helpers/dates.js";
+import { T, CalendarData, canReorder } from "../src/models/calendarData.js";
 
 // Dataview-like tasks: { status, text, path, line }
 let n = 0;
@@ -99,7 +99,7 @@ test("meta lines", () => {
 });
 
 test("a task's key finds the same task again: by its line, after lines moved, never another task", async () => {
-  const { taskKey, findTask } = await import("../src/calendar/data.js");
+  const { taskKey, findTask } = await import("../src/models/calendarData.js");
   const at = (line, status, text) => ({ status, text, path: "Tasks/Master.md", line });
   const workout = at(10, " ", "#area/body workout 📅 2026-10-30"), skipped = at(11, "-", "#area/body workout 📅 2026-10-28 ❌ 2026-10-28");
   const key = taskKey(workout);
@@ -179,7 +179,7 @@ test("a day's parts: a task with #after/id/<id> stands right under the task with
 });
 
 test("taskInfo: what a part shows of a task — its key, area, text, label, stickers as images, whether it can be skipped; once per draw", async () => {
-  const { taskInfo } = await import("../src/calendar/data.js");
+  const { taskInfo } = await import("../src/models/calendarData.js");
   const t = { text: "#⭐easy #area/body stretch ![[fist.webp|28]] 🔁 every day 📅 2026-11-03", status: " ", path: "Tasks/Master.md", line: 4 };
   let lookups = 0;
   const app = {
@@ -191,4 +191,23 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
   assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
+});
+
+test("a day's open task goes before or after another only in its own group and file", () => {
+  const a = task(" ", "a 📅 2026-10-28"), b = task(" ", "b 📅 2026-10-28");
+  const morning = task(" ", "tea #time/morning 🔁 every day 📅 2026-10-28");
+  const morning2 = task(" ", "walk #time/morning 🔁 every day 📅 2026-10-28");
+  const evening = task(" ", "read #time/evening 🔁 every day 📅 2026-10-28");
+  const other = task(" ", "plants 🔁 every week 📅 2026-10-28");
+  const follower = task(" ", "c #after/id/x 📅 2026-10-28");
+  const elsewhere = { ...task(" ", "d 📅 2026-10-28"), path: "Daily Notes/2026-10-28.md" };
+  assert.equal(canReorder(a, b), true);
+  assert.equal(canReorder(morning, morning2), true);
+  assert.equal(canReorder(a, a), false);
+  assert.equal(canReorder(a, morning), false);
+  assert.equal(canReorder(morning, evening), false);
+  assert.equal(canReorder(evening, other), false);
+  assert.equal(canReorder(follower, a), false);
+  assert.equal(canReorder(a, follower), false);
+  assert.equal(canReorder(a, elsewhere), false);
 });

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { appendLine, edit, editLine, readJson, undoLines } from "../src/core/files.js";
-import { setApp } from "../src/core/app.js";
+import { appendLine, edit, editLine, moveLine, readJson, undoLines } from "../src/helpers/files.js";
+import { setApp } from "../src/helpers/app.js";
 import { Notice } from "obsidian";
 
 // a vault in memory: path → text, folders as a set
@@ -89,4 +89,23 @@ test("undoLines leaves lines that changed since", async () => {
   const { files } = vault({ "a.md": "a\nB2\nc" });
   await undoLines("a.md", 1, ["B"], "b")();
   assert.equal(files["a.md"], "a\nB2\nc");
+});
+
+test("moveLine puts a line, with the lines indented under it, before or after another (and its own)", async () => {
+  const { files } = vault({ "a.md": "- [ ] a\n- [ ] b\n  - note\n- [ ] c\n  - c's note\n- [ ] d" });
+  const any = () => true;
+  assert.equal(await moveLine("a.md", 1, any, 3, any, true), true);   // b after c (and c's note)
+  assert.equal(files["a.md"], "- [ ] a\n- [ ] c\n  - c's note\n- [ ] b\n  - note\n- [ ] d");
+  await moveLine("a.md", 5, any, 0, any, false);                          // d before a
+  assert.equal(files["a.md"], "- [ ] d\n- [ ] a\n- [ ] c\n  - c's note\n- [ ] b\n  - note");
+});
+
+test("moveLine writes only when both lines are still the same: else nothing, false and a notice", async () => {
+  const { files } = vault({ "a.md": "- [ ] tea\n- [ ] milk" });
+  const tea = l => l.includes("tea"), bread = l => l.includes("bread");
+  Notice.last = null;
+  assert.equal(await moveLine("a.md", 0, tea, 1, bread, true), false);
+  assert.equal(await moveLine("a.md", 1, tea, 0, tea, false), false);
+  assert.equal(files["a.md"], "- [ ] tea\n- [ ] milk");
+  assert.match(String(Notice.last), /changed/);
 });

@@ -1,0 +1,64 @@
+import { test, before, after, mock } from "node:test";
+import assert from "node:assert/strict";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+
+let mount, nextTick, PomodoroTimer, Timer;
+const NOW = 1_800_000_000_000;
+before(async () => {
+  GlobalRegistrator.register();
+  mock.timers.enable({ apis: ["Date", "setTimeout", "setInterval"], now: NOW });
+  window.moment = () => ({ format: () => "2027-01-15" });
+  ({ mount } = await import("@vue/test-utils"));
+  ({ nextTick } = await import("vue"));
+  PomodoroTimer = (await import("../src/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue")).default;
+  ({ Timer } = await import("../src/models/timer.js"));
+});
+after(() => mock.timers.reset());
+
+// a 25/5 pomodoro with its saves recorded
+const draw = (saved = { settings: { focusMin: 25, breakMin: 5 } }) => {
+  new Timer().stop();   // no running session left over from another test
+  const saves = [];
+  const actions = { save: async (s, focusMin = 0) => { saves.push({ ...s, focusMin }); }, ding: () => {}, lengths: async () => null };
+  return { w: mount(PomodoroTimer, { props: { state: { data: { saved, current: null } }, actions } }), saves };
+};
+
+test("▶ runs the clock, a second later the time moves; ⏸ stops it; ↺ starts over; each is saved", async () => {
+  const { w, saves } = draw();
+  await nextTick();
+  assert.equal(w.find(".winx-pomodoro__time").text(), "25:00");
+  await w.find(".winx-pomodoro__btn--play").trigger("click");
+  mock.timers.tick(61_000); await nextTick();
+  assert.equal(w.find(".winx-pomodoro__time").text(), "23:59");
+  await w.find(".winx-pomodoro__btn--play").trigger("click");   // pause
+  mock.timers.tick(10_000); await nextTick();
+  assert.equal(w.find(".winx-pomodoro__time").text(), "23:59");
+  await w.find(".winx-pomodoro__btn--reset").trigger("click"); await nextTick();
+  assert.equal(w.find(".winx-pomodoro__time").text(), "25:00");
+  assert.equal(saves.length, 3);
+  assert.equal(saves[1].current.elapsed, 61_000);
+  w.unmount();
+});
+
+test("the small row opens into the ring (kept in the json); a finished focus counts its minutes", async () => {
+  const { w, saves } = draw();
+  await nextTick();
+  assert.ok(w.classes().includes("winx-pomodoro--mini"));
+  await w.find(".winx-pomodoro__mini-time").trigger("click"); await nextTick();
+  assert.ok(!w.classes().includes("winx-pomodoro--mini"));
+  assert.equal(saves.at(-1).mini, false);
+  await w.find(".winx-pomodoro__mini-play").trigger("click");
+  mock.timers.tick(25 * 60_000); await nextTick(); await nextTick();
+  assert.equal(w.find(".winx-pomodoro__mode-text").text(), "Break");
+  assert.equal(saves.at(-1).focusMin, 25);
+  w.unmount();
+});
+
+test("unmounted: the clock stops ticking (no more timers)", async () => {
+  const { w } = draw();
+  await w.find(".winx-pomodoro__btn--play").trigger("click");
+  const spy = mock.method(window, "clearInterval");
+  w.unmount();
+  assert.equal(spy.mock.callCount(), 1);
+  spy.mock.restore();
+});
