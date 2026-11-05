@@ -4,14 +4,14 @@
 // chart that fails to draw) — goes to onError, so its owner can say so (a widget's "couldn't draw"
 // with retry).
 import type { Component } from "obsidian";
-import { createApp, type App, type Component as VueComponent } from "vue";
+import { createApp, type Component as VueComponent } from "vue";
 
 interface Options {
   provide?: Record<string, unknown>;   // what the components inject
   onError?: (error: Error) => void;
 }
 
-interface Mounted { app: App; unmount: () => void }
+interface Mounted { unmount: () => void }
 
 export function useVueApp(
   owner: Component, el: HTMLElement, root: VueComponent,
@@ -31,5 +31,5 @@ export function useVueApp(
   };
 
   owner.register(unmount);
-  return { app, unmount };
+  return { unmount };
 }

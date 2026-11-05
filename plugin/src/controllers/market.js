@@ -15,7 +15,7 @@ import { dataview } from "#/helpers/plugins.js";
 import { app } from "#/helpers/app.js";
 
 // { history: [{name, tag, date}] of bought items, open: Set of lowercased names still on the list }
-export function marketState(dv) {
+function marketState(dv) {
   const tasks = dv.page(MARKET)?.file.tasks.array() ?? [];
 
   return {
@@ -101,7 +101,7 @@ export async function addMarketItem() {
   if (tag) await addToMarket(pick.name, tag);
 }
 
-export const addToMarket = (name, tag) => appendLine(MARKET, `- [ ] ${name} ${tag}`);
+const addToMarket = (name, tag) => appendLine(MARKET, `- [ ] ${name} ${tag}`);
 
 export const celestialMarketActions = () => ({
   add: () => addMarketItem(),

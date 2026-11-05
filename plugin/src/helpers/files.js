@@ -21,46 +21,46 @@ export const edit = (path, fn) => {
   return file ? app.vault.process(file, fn) : Promise.resolve();
 };
 
-export async function editLine(path, n, same, fn) {
+// the note's lines through fn(lines): the new lines, or null when a line isn't what it was (then
+// nothing written, a notice, false)
+async function editChecked(path, fn) {
   let done = false;
   await edit(path, c => {
-    const lines = c.split("\n");
+    const lines = fn(c.split("\n"));
 
-    if (lines[n] === undefined || !same(lines[n])) return c;
-    const next = fn(lines[n], lines);
-    next === null ? lines.splice(n, 1) : (lines[n] = next);
-    done = true;
-    return lines.join("\n");
+    done = lines !== null;
+    return done ? lines.join("\n") : c;
   });
   if (!done) new Notice("The line changed meanwhile, nothing written");
   return done;
 }
 
-export async function moveLine(path, n, same, to, sameTo, after) {
-  let done = false;
-  await edit(path, c => {
-    const lines = c.split("\n");
-    const indent = l => l.match(/^\s*/)[0].length;
-    // a line and the lines indented under it: how many
-    const block = i => {
-      let k = i + 1;
+export const editLine = (path, n, same, fn) => editChecked(path, lines => {
+  if (lines[n] === undefined || !same(lines[n])) return null;
+  const next = fn(lines[n], lines);
 
-      while (k < lines.length && lines[k].trim() && indent(lines[k]) > indent(lines[i])) k++;
-      return k - i;
-    };
+  next === null ? lines.splice(n, 1) : (lines[n] = next);
+  return lines;
+});
 
-    if (n === to || lines[n] === undefined || lines[to] === undefined) return c;
-    if (!same(lines[n]) || !sameTo(lines[to])) return c;
-    const moved = lines.splice(n, block(n));
-    const at = to > n ? to - moved.length : to;
+export const moveLine = (path, n, same, to, sameTo, after) => editChecked(path, lines => {
+  const indent = l => l.match(/^\s*/)[0].length;
+  // a line and the lines indented under it: how many
+  const block = i => {
+    let k = i + 1;
 
-    lines.splice(after ? at + block(at) : at, 0, ...moved);
-    done = true;
-    return lines.join("\n");
-  });
-  if (!done) new Notice("The line changed meanwhile, nothing written");
-  return done;
-}
+    while (k < lines.length && lines[k].trim() && indent(lines[k]) > indent(lines[i])) k++;
+    return k - i;
+  };
+
+  if (n === to || lines[n] === undefined || lines[to] === undefined) return null;
+  if (!same(lines[n]) || !sameTo(lines[to])) return null;
+  const moved = lines.splice(n, block(n));
+  const at = to > n ? to - moved.length : to;
+
+  lines.splice(after ? at + block(at) : at, 0, ...moved);
+  return lines;
+});
 
 export function undoLines(path, at, added, before, around = null) {
   let done = false;

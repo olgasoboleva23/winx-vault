@@ -15,7 +15,7 @@ import { chartColor } from "#/helpers/chart.js";
 // Single pass over the daily notes (in `folder`) in [start, end]:
 // { habitName: { area: "#area/x", days: Set<"yyyy-MM-dd"> } }
 // Tag shape is #habit/area/name, or #habit/name (area doubles as name).
-export function collectHabitDays(dv, folder, start, end) {
+function collectHabitDays(dv, folder, start, end) {
   const habits = {};
 
   for (const page of dv.pages(`"${folder}"`)

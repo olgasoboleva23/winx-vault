@@ -46,11 +46,9 @@ export function makeActions(ctx) {
   // a task dropped on another of its day (canReorder): its line before / after that one's
   const same    = t => line => new Task(line).sameAs(Task.of(t));
   const reorder = (t, to, after) => moveLine(t.path, t.line, same(t), to.line, same(to), after);
-  const remove = t => deleteTaskLine(t);
-  const edit   = t => editTaskModal(t);
 
   return {
     canSkip, skip, tick, unplan, fromPool, place, reorder, doneOnItsDay, toToday, pauseOrResume,
-    remove, edit,
+    remove: deleteTaskLine, edit: editTaskModal,
   };
 }

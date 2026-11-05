@@ -1,6 +1,5 @@
 // The ```winx block: the widgets by name (each a .vue on a VueHost) and what the plugin does
 // with a block.
-import { parseBlock } from "#/helpers/parse.js";
 import { blockDv } from "#/helpers/plugins.js";
 import { app } from "#/helpers/app.js";
 import { VueHost } from "#/composables/vueHost.ts";
@@ -33,10 +32,10 @@ import WeightCard from "#/components/pages/dashboard/widgets/body/WeightCard/ind
 import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vue";
 import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue";
 
-// the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes,
+// the widgets: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes,
 // cardButton: a .vue next to the card's title, bodyClass: a class on the card's body, follows:
 // false to load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
-const vueBlocks = {
+const blocks = {
   xpToday: { view: XpToday, load: loadXpToday },
   levelToday: { view: LevelToday, load: loadLevelToday },
   lifeAreas: { view: LifeAreas, load: loadLifeAreas },
@@ -61,8 +60,8 @@ const vueBlocks = {
   },
 };
 
-// a Vue widget on its block: its VueHost, with the card when the block has a "card:" line
-function vueBlock(def, el, sourcePath, args) {
+// a widget on its block: its VueHost, with the card when the block has a "card:" line
+function block(def, el, sourcePath, args) {
   const ctx = { get dv() { return blockDv(sourcePath, el); }, app, args, sourcePath };
   const meta = args.meta ? String(args.meta).split(/\s+/) : [];
   const card = args.card ? { title: String(args.card), meta, bodyClass: def.bodyClass } : undefined;
@@ -76,10 +75,34 @@ function vueBlock(def, el, sourcePath, args) {
   return new VueHost(el, def.view, opts);
 }
 
+// A ```winx block's text: the widget's name on the first line, then "key: value" lines (a JSON
+//   value, else text).
+//   ```winx
+//   weight
+//   input: true
+//   ```
+export function parseBlock(source) {
+  const [name = "", ...rest] = source.split("\n").map(l => l.trim()).filter(Boolean);
+  const args = {};
+
+  for (const line of rest) {
+    const i = line.indexOf(":");
+
+    if (i < 1) continue;
+    const value = line.slice(i + 1).trim();
+
+    const key = line.slice(0, i).trim();
+
+    try { args[key] = JSON.parse(value); } catch { args[key] = value; }
+  }
+
+  return { name, args };
+}
+
 export const drawBlock = (source, el, ctx) => {
   const { name, args } = parseBlock(source);
-  const def = vueBlocks[name];
+  const def = blocks[name];
 
   if (!def) return void el.createDiv({ text: `winx: no widget "${name}"` });
-  ctx.addChild(vueBlock(def, el, ctx.sourcePath, args));
+  ctx.addChild(block(def, el, ctx.sourcePath, args));
 };
