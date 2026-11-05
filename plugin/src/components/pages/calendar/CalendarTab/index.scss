@@ -65,6 +65,15 @@
 .winx-cal {
   &__zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
   &--dragging &__zones { display: flex; flex-direction: column; }
+  /* the dragged task's own day: no 📅 (it's on it already), ✓ a strip at the bottom, its tasks
+     open to a drop (drag.js: before / after one of its group, the line shows where) */
+  &--dragging :is(&__day--source, &__cell--source) { padding-bottom: $tap + $space-s; }
+  &--dragging :is(&__day--source, &__cell--source) &__zones { top: auto; height: $tap; }
+  :is(&__day--source, &__cell--source) :is(&__zone--plan, &__zones:not(:has(.winx-cal__zone--done))) {
+    display: none;
+  }
+  &__task--drop-before { box-shadow: 0 -2px 0 var(--winx-gold-deep); }
+  &__task--drop-after { box-shadow: 0 2px 0 var(--winx-gold-deep); }
   &__zone {
     border: 1px dashed var(--winx-border);
     border-radius: $radius-m;

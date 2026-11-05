@@ -3,6 +3,7 @@
 // its next copy.
 import { Task } from "../models/task.js";
 import { T } from "../models/calendarData.js";
+import { moveLine } from "../helpers/files.js";
 import {
   addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal,
 } from "./tasks.js";
@@ -42,11 +43,14 @@ export function makeActions(ctx) {
   // ⏸ pause: drop its dates; ▶ resume: from today, on the first day its rule allows
   const pauseOrResume = t =>
     editTaskLineWithUndo(t, line => new Task(line).togglePause(today), T(t).isPaused ? "▶" : "⏸");
+  // a task dropped on another of its day (canReorder): its line before / after that one's
+  const same    = t => line => new Task(line).sameAs(Task.of(t));
+  const reorder = (t, to, after) => moveLine(t.path, t.line, same(t), to.line, same(to), after);
   const remove = t => deleteTaskLine(t);
   const edit   = t => editTaskModal(t);
 
   return {
-    canSkip, skip, tick, unplan, fromPool, place, doneOnItsDay, toToday, pauseOrResume, remove,
-    edit,
+    canSkip, skip, tick, unplan, fromPool, place, reorder, doneOnItsDay, toToday, pauseOrResume,
+    remove, edit,
   };
 }

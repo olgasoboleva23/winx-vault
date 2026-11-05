@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { weekOf } from "../src/helpers/dates.js";
-import { T, CalendarData } from "../src/models/calendarData.js";
+import { T, CalendarData, canReorder } from "../src/models/calendarData.js";
 
 // Dataview-like tasks: { status, text, path, line }
 let n = 0;
@@ -191,4 +191,23 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
   assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
+});
+
+test("a day's open task goes before or after another only in its own group and file", () => {
+  const a = task(" ", "a 📅 2026-10-28"), b = task(" ", "b 📅 2026-10-28");
+  const morning = task(" ", "tea #time/morning 🔁 every day 📅 2026-10-28");
+  const morning2 = task(" ", "walk #time/morning 🔁 every day 📅 2026-10-28");
+  const evening = task(" ", "read #time/evening 🔁 every day 📅 2026-10-28");
+  const other = task(" ", "plants 🔁 every week 📅 2026-10-28");
+  const follower = task(" ", "c #after/id/x 📅 2026-10-28");
+  const elsewhere = { ...task(" ", "d 📅 2026-10-28"), path: "Daily Notes/2026-10-28.md" };
+  assert.equal(canReorder(a, b), true);
+  assert.equal(canReorder(morning, morning2), true);
+  assert.equal(canReorder(a, a), false);
+  assert.equal(canReorder(a, morning), false);
+  assert.equal(canReorder(morning, evening), false);
+  assert.equal(canReorder(evening, other), false);
+  assert.equal(canReorder(follower, a), false);
+  assert.equal(canReorder(a, follower), false);
+  assert.equal(canReorder(a, elsewhere), false);
 });

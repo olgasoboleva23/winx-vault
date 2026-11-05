@@ -5,9 +5,9 @@
 import { computed, inject } from "vue";
 import TaskRow from "./TaskRow.vue";
 import DoneMarks from "./DoneMarks.vue";
-import { T } from "../../../models/calendarData.js";
+import { dayGroup } from "../../../models/calendarData.js";
 
-const TIMES = [["morning", "🌅 morning"], ["evening", "🌙 evening"], [null, "🔁 other"]];
+const TIMES = [["morning", "🌅 morning"], ["evening", "🌙 evening"], ["other", "🔁 other"]];
 const EDGE = [
   ".winx-cal__routine", ".winx-cal__routine-pill", ".winx-cal__routine-pill *",
   ".winx-cal__routine-time",
@@ -22,14 +22,12 @@ const state = view.state;
 const row = e => ({
   key: `${view.info(e.t).key}|${e.kind}`, task: view.info(e.t), kind: e.kind, after: !!e.follows,
 });
-// the 🔁 box's groups by time of day: { name, rows }; a task after another goes in its group
-const groups = es => {
-  const time = e => T((e.follows ?? e).t).time;
-  const inGroup = tag => e => time(e) === tag || (!tag && !TIMES.some(([g]) => g && time(e) === g));
-
-  return TIMES.map(([tag, name]) => ({ name, rows: es.filter(inGroup(tag)).map(row) }))
-    .filter(g => g.rows.length);
-};
+// the 🔁 box's groups by time of day (dayGroup): { name, rows }; a task after another goes in its
+// lead's group
+const groups = es => TIMES
+  .map(([tag, name]) => ({ name, rows: es.filter(e => dayGroup((e.follows ?? e).t) === tag) }))
+  .filter(g => g.rows.length)
+  .map(g => ({ ...g, rows: g.rows.map(row) }));
 
 const fill = computed(() => {
   const { rows, routine, routineRows, hidden, routineHidden } =

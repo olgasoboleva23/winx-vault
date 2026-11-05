@@ -5,6 +5,8 @@
 // editLine: line n through fn(line, lines) (null deletes it), only while same(line) holds: it may
 // have moved or
 //   changed since it was read (a line that's gone or isn't the same: nothing, a notice, false).
+// moveLine: line n, with the lines indented under it, before line `to` (after: after it and its
+//   own), only while same(line n) and sameTo(line `to`) hold (else nothing, a notice, false).
 // undoLines: () => put `before` back in place of `added` (a deleted line: []), once, while they're
 //   still there: near line `at`, between its old neighbours when they're given ({ above, below }:
 //   lines above may have come or gone since).
@@ -27,6 +29,32 @@ export async function editLine(path, n, same, fn) {
     if (lines[n] === undefined || !same(lines[n])) return c;
     const next = fn(lines[n], lines);
     next === null ? lines.splice(n, 1) : (lines[n] = next);
+    done = true;
+    return lines.join("\n");
+  });
+  if (!done) new Notice("The line changed meanwhile, nothing written");
+  return done;
+}
+
+export async function moveLine(path, n, same, to, sameTo, after) {
+  let done = false;
+  await edit(path, c => {
+    const lines = c.split("\n");
+    const indent = l => l.match(/^\s*/)[0].length;
+    // a line and the lines indented under it: how many
+    const block = i => {
+      let k = i + 1;
+
+      while (k < lines.length && lines[k].trim() && indent(lines[k]) > indent(lines[i])) k++;
+      return k - i;
+    };
+
+    if (n === to || lines[n] === undefined || lines[to] === undefined) return c;
+    if (!same(lines[n]) || !sameTo(lines[to])) return c;
+    const moved = lines.splice(n, block(n));
+    const at = to > n ? to - moved.length : to;
+
+    lines.splice(after ? at + block(at) : at, 0, ...moved);
     done = true;
     return lines.join("\n");
   });

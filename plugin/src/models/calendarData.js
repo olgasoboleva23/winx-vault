@@ -7,6 +7,15 @@ import { projectRepeats } from "./repeats.js";
 export const T = t => (t.winxTask ??= Task.of(t));   // a Dataview task's Task, made once
 
 const ORDER = { open: 0, ghost: 1, done: 2 };
+
+// a day's group: one-offs, or a 🔁 task by its time of day (morning, evening, other)
+export const dayGroup = t => !T(t).isRecurring ? "one"
+  : ["morning", "evening"].includes(T(t).time) ? T(t).time : "other";
+
+// a task dragged onto another of its day: it moves before or after it only within its group and
+// its file (a line moves), and neither follows a lead (#after: it stays under it)
+export const canReorder = (a, b) => a !== b && a.path === b.path && dayGroup(a) === dayGroup(b)
+  && !T(a).after && !T(b).after;
 // a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its
 // earlier followers), with .follows set to it; the rest in their order
 const chain = list => {
