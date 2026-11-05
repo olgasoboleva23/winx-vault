@@ -7,12 +7,16 @@
 // `actions` (the block's writes, and retry) as props; with `card` it is drawn inside a dashboard
 // card (components/uikit/WinxCard.vue).
 import { MarkdownRenderChild } from "obsidian";
-import { h, nextTick, reactive, type Component as VueComponent } from "vue";
+import { h, nextTick, reactive, watch, type Component as VueComponent } from "vue";
 import { useVueApp } from "./vueApp.ts";
 import { useDataviewChanges, useRedraw, useTabDate, useWhenIndexed } from "./use.js";
 import { app } from "#/helpers/app.js";
+import { taskStore } from "#/store/tasks.js";
+import { TASKS } from "#/helpers/paths.js";
 import WinxCard from "#/components/uikit/WinxCard/index.vue";
 import WinxFailed from "#/components/uikit/WinxFailed.vue";
+
+const TASK_FILES = `${TASKS}/`;
 
 export interface HostOptions<D> {
   load: () => Promise<D>;
@@ -20,7 +24,9 @@ export interface HostOptions<D> {
   note?: string;                               // the block's own note: its changes count too
   card?: { title: string; meta?: string[]; bodyClass?: string };   // drawn inside a dashboard card
   cardButton?: VueComponent;                   // a button next to the card's title (gets actions)
-  // its files (a folder: ending in /): only their changes reload it; none given: any file's
+  // its files (a folder: ending in /): only their changes reload it; none given: any file's. The
+  // task files (`${TASKS}/`) reload it from the plugin's own store, at once; the rest through
+  // Dataview's index
   watches?: string[];
   follows?: boolean;   // false: loaded once (no vault data, like the pomodoro)
 }
@@ -64,10 +70,11 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
     });
     if (this.opts.follows === false) return void this.refresh();
     const { redraw } = useRedraw(this, () => this.shown, () => void this.refresh());
-    const { watches } = this.opts;
-    const watched = watches && ((path: string) =>
-      watches.some(w => w.endsWith("/") ? path.startsWith(w) : path === w));
+    const { watches } = this.opts, others = watches?.filter(w => w !== TASK_FILES);
+    const watched = others && ((path: string) =>
+      others.some(w => w.endsWith("/") ? path.startsWith(w) : path === w));
 
+    if (watches?.includes(TASK_FILES)) this.register(watch(taskStore.version, redraw));
     useDataviewChanges(this, redraw, { watched, note: this.opts.note, delay: 1000 });
     useTabDate(this, this.el, () => void this.refresh());
     useWhenIndexed(this, () => void this.refresh());

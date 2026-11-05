@@ -65,7 +65,7 @@ The plugin works on the phone (no desktop-only code). It only has to get there: 
 | Plugin | Version | Purpose |
 |---|---|---|
 | **Winx** | this repo, `plugin/` | Widgets, task window, commands, all styles |
-| **Dataview** | 0.5.68 | Data for the widgets and the calendar (its index of tasks and pages) |
+| **Dataview** | 0.5.68 | Data for the widgets (its index of pages and lists; the tasks the plugin reads itself) |
 | **Tasks** | 7.23.1 | Task format, the edit dialog, ticking 🔁 tasks |
 | **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
 | **Meta Bind** | 1.4.8 | `INPUT[slider]` in old daily notes (optional) |

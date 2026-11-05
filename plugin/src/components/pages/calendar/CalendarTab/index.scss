@@ -234,13 +234,6 @@
   }
 }
 @keyframes winx-tick-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
-/* after a write, until the redraw (the view adds --busy): the days and the tabs dim, the ✦ pill shows */
-.winx-cal {
-  &--busy {
-    .winx-busy__pill { display: flex; }
-    :is(.winx-cal__week, .winx-cal__month, .winx-cal__backlog-grid) { opacity: 0.55; transition: opacity $medium; pointer-events: none; }
-  }
-}
 @keyframes winx-spin { to { transform: rotate(360deg); } }
 /* phone swipes: right = done (green), left = skip / no date (lilac); the row follows the finger */
 body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-action: pan-y; }

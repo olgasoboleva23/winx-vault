@@ -29,7 +29,7 @@ export function useNewDay(c, fn) {
   }, 60_000));
 }
 
-// a write to a file watched(path) adds `cls` to el() (the tab's --busy: dimmed, the ✦ pill
+// a write to a file watched(path) adds `cls` to el() (the dashboard's --busy: dimmed, the ✦ pill
 // spinning) until the tab draws again and takes it off; 5 s at most
 export function useBusy(c, watched, el, cls) {
   let timer = 0;

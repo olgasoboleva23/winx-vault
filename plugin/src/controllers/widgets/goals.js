@@ -3,7 +3,9 @@
 // markup: widgets/goals/GoalsWidget.
 import { dm, pageDay, todayYmd, weekOf, ymd } from "#/helpers/dates.js";
 import { Goal } from "#/models/goal.js";
-import { GOALS, TASKS } from "#/helpers/paths.js";
+import { GOALS } from "#/helpers/paths.js";
+import { T } from "#/models/calendarData.js";
+import { taskStore } from "#/store/tasks.js";
 
 export async function loadGoals({ dv, app }) {
   const path = `${GOALS}.md`;
@@ -12,12 +14,12 @@ export async function loadGoals({ dv, app }) {
   const selected = ymd(pageDay(dv)), today = todayYmd(), week = weekOf(selected);
   const goals = dv.pages(`"${GOALS}"`).file.lists
     .map(i => Goal.parse(i.text)).where(Boolean).array();
-  const tasks = dv.pages(`"${TASKS}"`).file.tasks;
+  const tasks = taskStore.tasks.map(T);
 
   return {
     goals: goals.map(goal => {
-      const done = tasks.where(t => t.completed && t.completion && t.tags.includes(goal.tag))
-        .map(t => ymd(t.completion)).array();
+      const done = tasks.filter(t => t.isDone && t.doneOn && t.tags.includes(goal.tag))
+        .map(t => t.doneOn);
       const doneSet = new Set(done), last = [...done].sort().at(-1);
       // "I've done this before": total and last time, from the ✅ dates already in the tasks
       const bits = [goal.min && `min: ${goal.min}`,

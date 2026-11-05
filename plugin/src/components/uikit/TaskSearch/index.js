@@ -4,15 +4,14 @@ import { Search } from "#/components/uikit/Search/index.ts";
 import config from "#/helpers/config.js";
 import { dm } from "#/helpers/dates.js";
 import { findChoices } from "#/helpers/find.js";
-import { dataview } from "#/helpers/plugins.js";
 import { taskChoices } from "#/models/task.js";
-import { TASKS } from "#/helpers/paths.js";
+import { taskStore } from "#/store/tasks.js";
 import { app } from "#/helpers/app.js";
 
 export function pickTask() {
-  const lists = dataview().pages(`"${TASKS}"`).file.lists.array();
   const choices = taskChoices(
-    lists.map(l => l.task ? `- [${l.status}] ${l.text}` : `- ${l.text}`),
+    [...taskStore.tasks, ...taskStore.pool]
+      .map(l => l.status !== null ? `- [${l.status}] ${l.text}` : `- ${l.text}`),
     config.areas.map(a => a.tag),
   );
   const label = area => area

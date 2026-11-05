@@ -4,6 +4,8 @@ import { useDataviewChanges, useNewDay, useWhenIndexed } from "./use.js";
 import { todayYmd } from "#/helpers/dates.js";
 import { Goal, reminders } from "#/models/goal.js";
 import { GOALS, TASKS } from "#/helpers/paths.js";
+import { T } from "#/models/calendarData.js";
+import { taskStore } from "#/store/tasks.js";
 
 // by name at run time, desktop only: a require("electron") in main.js would stop the phone loading
 // it
@@ -32,14 +34,12 @@ export function useNotify(plugin, open) {
     };
   };
 
-  const dueTasks = () =>
-    dataview().pages(`"${TASKS}"`).file.tasks.where(t => !t.completed && t.due);
+  const dueTasks = () => taskStore.tasks.map(T).filter(t => !t.isDone && t.date);
 
   const schedule = () => {
     clear();
     const d = todayYmd();
-    const tasks = dueTasks().where(t => t.due.toFormat("yyyy-MM-dd") === d).array()
-      .map(t => ({ text: t.text, tags: t.tags }));
+    const tasks = dueTasks().filter(t => t.date === d).map(t => ({ text: t.text, tags: t.tags }));
     const goals = dataview().pages(`"${GOALS}"`).file.lists
       .map(i => Goal.parse(i.text)).where(Boolean).array();
 
@@ -56,9 +56,9 @@ export function useNotify(plugin, open) {
 
     if (app.loadLocalStorage("winx-notify-summary") === d) return;
     app.saveLocalStorage("winx-notify-summary", d);
-    const due = dueTasks().where(t => t.due.toFormat("yyyy-MM-dd") === d).length;
+    const due = dueTasks().filter(t => t.date === d).length;
     const goal = t => t.tags.some(tag => tag.startsWith("#goal"));
-    const overdue = dueTasks().where(t => t.due.toFormat("yyyy-MM-dd") < d && !goal(t)).length;
+    const overdue = dueTasks().filter(t => t.date < d && !goal(t)).length;
 
     notify(
       `✦ ${due} task${due === 1 ? "" : "s"} today`,

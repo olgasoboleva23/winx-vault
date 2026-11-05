@@ -5,20 +5,19 @@
 // The markup: widgets/xp/.
 import config from "#/helpers/config.js";
 import { pageDay, todayYmd, ymd } from "#/helpers/dates.js";
-import { Task } from "#/models/task.js";
+import { T } from "#/models/calendarData.js";
+import { taskStore } from "#/store/tasks.js";
 import { levelInfo, taskXp } from "#/models/xp.js";
 import { mana, mpLine, mpTable, vitals } from "#/models/vitals.js";
 import { cycleLog } from "./cycle.js";
-import { TASKS } from "#/helpers/paths.js";
 import { chartColor } from "#/helpers/chart.js";
 
 export async function loadLevelToday({ dv }) {
   const { xpMap } = config;
   const day = ymd(pageDay(dv)), today = todayYmd();
-  const tasks = dv.pages(`"${TASKS}"`).file.tasks.array();
-  const total = tasks.filter(t => t.completed && ymd(t.completion) <= day)
+  const all = taskStore.tasks.map(T);
+  const total = all.filter(t => t.isDone && t.doneOn && t.doneOn <= day)
     .reduce((sum, t) => sum + taskXp(t, xpMap), 0);
-  const all = tasks.map(t => Task.of(t));
   const v = vitals({
     missed: all.filter(t => t.isOverdue(today)),
     doneToday: all.filter(t => t.doneOn === today),
@@ -40,12 +39,11 @@ export async function loadLevelToday({ dv }) {
 // { scores: XP by area name, chart: the radar's config for WinxChart }
 export async function loadLifeAreas({ dv }) {
   const { xpMap, areaMap, areas } = config;
-  const sel = pageDay(dv), since = sel.minus({ days: 27 }).startOf("day");
+  const sel = pageDay(dv), since = ymd(sel.minus({ days: 27 })), until = ymd(sel);
   const scores = Object.fromEntries(areas.map(a => [a.name, 0]));
   // task XP per area, last 4 weeks up to the selected date
-  const done = dv.pages(`"${TASKS}"`).file.tasks
-    .where(t => t.completed && t.completion
-      && t.completion.ts >= since.ts && t.completion.ts <= sel.endOf("day").ts);
+  const done = taskStore.tasks.map(T)
+    .filter(t => t.isDone && t.doneOn && t.doneOn >= since && t.doneOn <= until);
 
   for (const t of done) {
     const area = Object.entries(areaMap).find(([tag]) => t.tags.includes(tag))?.[1];
@@ -74,10 +72,8 @@ export async function loadXpToday({ dv }) {
   // task XP by completion day
   const xpByDay = new Map();
 
-  for (const t of dv.pages(`"${TASKS}"`).file.tasks.where(t => t.completed && t.completion)) {
-    const day = ymd(t.completion);
-    xpByDay.set(day, (xpByDay.get(day) ?? 0) + taskXp(t, xpMap));
-  }
+  for (const t of taskStore.tasks.map(T).filter(t => t.isDone && t.doneOn))
+    xpByDay.set(t.doneOn, (xpByDay.get(t.doneOn) ?? 0) + taskXp(t, xpMap));
 
   const days = Array.from({ length: Math.floor(end.diff(start, "days").days) + 1 }, (_, i) =>
     ymd(start.plus({ days: i })));

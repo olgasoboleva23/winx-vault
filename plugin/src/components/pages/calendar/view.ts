@@ -1,12 +1,10 @@
 import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
-import { computed, markRaw, nextTick, reactive, ref, watch } from "vue";
-import { POOL, TASKS } from "#/helpers/paths.js";
-import {
-  useBusy, useDataviewChanges, useIndexReady, useLater, useNewDay, useRedraw,
-} from "#/composables/use.js";
+import { computed, markRaw, reactive, ref, watch } from "vue";
+import { useLater, useNewDay, useRedraw } from "#/composables/use.js";
 import { app } from "#/helpers/app.js";
 import { useVueApp } from "#/composables/vueApp.ts";
-import { dataview, tasksApi } from "#/helpers/plugins.js";
+import { tasksApi } from "#/helpers/plugins.js";
+import { taskStore } from "#/store/tasks.js";
 import config from "#/helpers/config.js";
 import { todayYmd } from "#/helpers/dates.js";
 import { CalendarData, T, findTask, taskInfo } from "#/models/calendarData.js";
@@ -21,12 +19,12 @@ import CalendarTab from "./CalendarTab/index.vue";
 // below, drawn by Vue (CalendarTab.vue and its parts). Its state (date, view, tab, folds) is
 // reactive and saved with the layout, so a pinned calendar comes back as it was. The data (ctx: the
 // model, today, the shown days, the actions) is worked out again when a key it comes from changes
-// (date, view, ✓ done, area) or the tasks do (Dataview's index); the parts read what they show (the
-// panel's tab, the folds, the phone's picked day) from the state, so a change there redraws only
-// them. Drag (drag.js) and swipe (swipe.js) listen on the tab and find the task by the element's
-// data-task key (file, line, status, words: never another one — see data.js).
+// (date, view, ✓ done, area) or the tasks do (store/tasks.js: a task file read again as soon as
+// it's saved); the parts read what they show (the panel's tab, the folds, the phone's picked day)
+// from the state, so a change there redraws only them. Drag (drag.js) and swipe (swipe.js) listen
+// on the tab and find the task by the element's data-task key (file, line, status, words: never
+// another one — see data.js).
 export const VIEW_TYPE = "winx-calendar";
-const TASKS_DIR = `${TASKS}/`;
 
 export class CalendarView extends ItemView {
   // the saved keys (state.js) and the ones that aren't: area (one area's tasks only), picked (the
@@ -74,18 +72,11 @@ export class CalendarView extends ItemView {
     useSwipe(this, useDrag(this));
     const reload = () => { this.version.value++; };
 
-    useIndexReady(this, reload);   // again each time Dataview's index is built
-    // a task file changed in Dataview's index: new data (a hidden tab waits until it shows)
+    // the tasks changed (a task file read again as soon as it's saved): new data (a hidden tab
+    // waits until it shows)
     const { redraw, catchUp } = useRedraw(this, () => this.contentEl.isShown(), reload);
     this.catchUp = catchUp;
-    const tasksFile = (path: string) => path.startsWith(TASKS_DIR);
-
-    useDataviewChanges(this, redraw, { watched: tasksFile, delay: 100 });
-    // a write to a task file: the calendar dims with a spinning ✦ until the new data is drawn
-    useBusy(this, tasksFile, () => this.ctx?.root, "winx-cal--busy");
-    const unbusy = watch(this.data,
-      () => void nextTick(() => this.ctx?.root?.classList.remove("winx-cal--busy")));
-    this.register(unbusy);
+    this.register(watch(taskStore.version, redraw));
     // a new day: following today, the days move on; and "today" in every action is the new one
     useNewDay(this, redraw);
   }
@@ -107,14 +98,9 @@ export class CalendarView extends ItemView {
 
   // the data the calendar shows, from the tasks as they are now
   private build() {
-    const dv: any = dataview();
-
-    if (!dv) return { say: "✦ the calendar needs the Dataview plugin" };
-    // index-ready loads again
-    if (!dv.index?.initialized) return { say: "✦ waiting for Dataview…" };
+    if (!taskStore.ready) return { say: "✦ reading the tasks…" };   // the store's first read draws
     const { state } = this, today = todayYmd(), days = shownDays(state, today);
-    const tasks = dv.pages(`"${TASKS}"`).file.tasks.array();
-    const poolLines = (dv.page(POOL)?.file.lists.array() ?? []).filter((l: any) => !l.task);
+    const { tasks, pool: poolLines } = taskStore;
     // the data, all of it or one area's tasks and pool lines
     const data = (area: string | null) => new CalendarData({
       tasks: area ? tasks.filter((t: any) => T(t).area === area) : tasks,

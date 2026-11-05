@@ -3,17 +3,19 @@ import assert from "node:assert/strict";
 import { setApp } from "#/helpers/app.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
 import { addTask, addPoolLine } from "#/controllers/tasks.js";
+import { taskStore } from "#/store/tasks.js";
 
 const later = () => new Promise(r => setTimeout(r, 5));
-// a vault in memory and a Dataview whose pages are its tasks (done ones earn gold) and Purchases' lines
+// a vault in memory: its task notes in the store (done tasks earn gold) and Purchases' lines through a
+// Dataview
 const vault = (files = {}) => {
   globalThis.window = { moment: () => ({ format: () => "2026-11-02" }) };
-  const lines = (prefix, task) => Object.entries(files).filter(([p]) => p.startsWith(prefix)).flatMap(([, t]) => t.split("\n"))
-    .filter(l => task ? /^- \[.\]/.test(l) : /^- /.test(l))
-    .map(l => ({ text: l.replace(/^- (\[.\] )?/, ""), completed: /^- \[x\]/.test(l), tags: l.match(/#\S+/g) ?? [] }));
+  const lines = prefix => Object.entries(files).filter(([p]) => p.startsWith(prefix)).flatMap(([, t]) => t.split("\n"))
+    .filter(l => /^- /.test(l)).map(l => ({ text: l.replace(/^- /, "") }));
+
+  for (const [p, text] of Object.entries(files)) if (p.startsWith("00 System/Data/Tasks/")) taskStore.put(p, text);
   setApp({
-    plugins: { plugins: { dataview: { api: { pages: src => ({ file: {
-      tasks: lines(src.slice(1, -1), true), lists: lines(src.slice(1, -1), false) } }) } } } },
+    plugins: { plugins: { dataview: { api: { pages: src => ({ file: { lists: lines(src.slice(1, -1)) } }) } } } },
     vault: {
       getFileByPath: p => p in files ? { path: p } : null,
       getFolderByPath: () => ({}),

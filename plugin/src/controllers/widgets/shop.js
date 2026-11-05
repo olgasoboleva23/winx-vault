@@ -5,19 +5,20 @@
 // The markup: widgets/shop/ShopWidget.
 import config from "#/helpers/config.js";
 import { amount, AMOUNT } from "#/helpers/format.js";
-import { ASSETS, PURCHASES, SHOP, TASKS } from "#/helpers/paths.js";
+import { ASSETS, PURCHASES, SHOP } from "#/helpers/paths.js";
 import { Notice } from "obsidian";
 import { todayYmd } from "#/helpers/dates.js";
 import { appendLine } from "#/helpers/files.js";
-import { dataview } from "#/helpers/plugins.js";
+import { T } from "#/models/calendarData.js";
+import { taskStore } from "#/store/tasks.js";
 import { AudioEngine } from "#/helpers/sounds.js";
 import { app } from "#/helpers/app.js";
 
-export function earned(dv) {
+export function earned() {
   let gold = 0;
 
-  for (const t of dv.pages(`"${TASKS}"`).file.tasks) {
-    if (t.completed) gold += config.difficulties.find(d => t.tags.includes(d.tag))?.gold ?? 0;
+  for (const t of taskStore.tasks.map(T)) {
+    if (t.isDone) gold += config.difficulties.find(d => t.tags.includes(d.tag))?.gold ?? 0;
   }
 
   return gold;
@@ -29,7 +30,7 @@ const cost = text => amount(text.split("|").at(-1)) ?? 0;
 export const spent = lines => [...lines].reduce((a, l) => a + cost(l), 0);
 
 export const balance = dv =>
-  earned(dv) - spent([...dv.pages(`"${PURCHASES}"`).file.lists].map(l => l.text));
+  earned() - spent([...dv.pages(`"${PURCHASES}"`).file.lists].map(l => l.text));
 
 export async function loadShop({ dv }) {
   const gold = balance(dv), items = [];
@@ -48,7 +49,7 @@ const PURCHASES_NOTE = `${PURCHASES}.md`;
 
 // a purchase, only when the gold covers it (the Shop card and the Buy reward command): false when
 // it doesn't. One at a time, the spent gold read from the file itself: Dataview sees a purchase a
-// moment later
+// moment later (the gold earned: the plugin's own store, at once)
 let queue = Promise.resolve();
 
 export function logPurchase(name, price) {
@@ -57,7 +58,7 @@ export function logPurchase(name, price) {
     const text = file ? await app.vault.read(file) : "";
     const lines = text.split("\n").filter(l => l.startsWith("- "));
 
-    if (earned(dataview()) - spent(lines) < price) return false;
+    if (earned() - spent(lines) < price) return false;
     await appendLine(PURCHASES_NOTE, `- ${todayYmd()} | ${name} | ${price}`,
       { header: "# Purchases\n\n" });
     return true;

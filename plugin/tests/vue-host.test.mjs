@@ -159,3 +159,16 @@ test("watches: a widget reloads for a change in its own files only", async () =>
   assert.equal(s.loads.length, 2);
   host.unload();
 });
+
+test("watches: the task files reload it from the plugin's store, at once, not through Dataview", async () => {
+  const { taskStore } = await import("#/store/tasks.js");
+  const s = slow(), el = document.body.appendChild(document.createElement("div"));
+  const host = new VueHost(el, View(), { load: s.load, watches: ["00 System/Data/Tasks/"] });
+  host.load();
+  s.loads[0].ok({ n: 1 }); await settle();
+  bus.fire("dataview:metadata-change", "update", { path: "00 System/Data/Tasks/Master.md" });
+  assert.equal(s.loads.length, 1);
+  taskStore.put("00 System/Data/Tasks/Master.md", "- [ ] a"); await settle();
+  assert.equal(s.loads.length, 2);
+  host.unload();
+});

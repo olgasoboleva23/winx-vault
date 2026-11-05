@@ -29,12 +29,15 @@
 │   │   ├── 📁 models             — the things and their rules, no Obsidian in them: Task, Note, Goal,
 │   │   │                           MarketItem, SavingsJar, the weight / body / cycle logs, CalendarData,
 │   │   │                           repeats (🔁 rules), ledger (finance), timer (pomodoro), vitals (HP / MP),
-│   │   │                           xp, market (supply stats), kinds (watch / read / game / recipe notes)
+│   │   │                           xp, market (supply stats), kinds (watch / read / game / recipe notes),
+│   │   │                           taskFile (a task note's lines as tasks and pool lines)
 │   │   ├── 📁 composables        — use.js (useRedraw, useDataviewChanges, useWhenIndexed, useNewDay,
 │   │   │                           useBusy, useLater…), vueApp.ts (useVueApp: a Vue app owned by an Obsidian
 │   │   │                           component), vueHost.ts (VueHost: a widget's), drag.js / swipe.js (the
 │   │   │                           calendar's), notify.js (desktop reminders)
-│   │   ├── 📁 store              — calendar.js (the calendar tab's state: its saved and data keys)
+│   │   ├── 📁 store              — tasks.js (the tasks of 00 System/Data/Tasks, read by the plugin itself and
+│   │   │                           kept up to date on Obsidian's own file events: no Dataview, no wait for its
+│   │   │                           index), calendar.js (the calendar tab's state: its saved and data keys)
 │   │   ├── 📁 helpers            — paths (where the data lives), app, dates, files (edit / editLine /
 │   │   │                           appendLine), config, format (money, amount), sounds, chart, plugins
 │   │   │                           (Dataview, Tasks, blockDv), find, parse (a block's lines), panelGroups
@@ -96,8 +99,9 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
 </template>
 ```
 
-- A `VueHost` (`plugin/src/composables/vueHost.ts`) owns each block's Vue app: it loads the data now and again a moment
-  after Dataview's index or the block's own note changes (a hidden block when it shows), drops a stale result,
+- A `VueHost` (`plugin/src/composables/vueHost.ts`) owns each block's Vue app: it loads the data now and again when
+  a file it names (`watches`) changes: the task files at once, from the plugin's own store, the rest a moment
+  after Dataview's index has them (or the block's own note changes; a hidden block when it shows), drops a stale result,
   shows an error with retry, a card's placeholder until the first data, and the card itself (`card:` in the
   block). `follows: false` loads once (the pomodoro); `cardButton` puts a button by the card's title.
 - The parts in `plugin/src/components/uikit/` are reusable: `WinxButton` with a kind (`round`, `nav`, `pill`, `chip`,
@@ -114,7 +118,8 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
 The calendar tab is an ItemView (`plugin/src/components/pages/calendar/view.ts`) that mounts
 `CalendarTab`: its state (date, view, tab, folds; `store/calendar.js`) is Vue's `reactive`, saved
 with the layout; the model (`models/calendarData.js`) is recomputed
-when the date, the view or a filter changes, or when Dataview has a change; the parts (`CalendarHeader`,
+when the date, the view or a filter changes, or when a task file does (`store/tasks.js` reads it again as soon as
+it's saved; the calendar needs no Dataview); the parts (`CalendarHeader`,
 `CalendarMissed`, `CalendarGrid`, `CalendarPanel`) and the tasks (`TaskRow`, `TaskCard`…) are `.vue` files.
 Elements carry the task's key (`data-task`: file, line, status, words), the `:key` Vue keeps them by, and what
 the tab's drag (`data-drag` → `data-drop`) and swipe (`data-swipeable`) listeners
