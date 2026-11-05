@@ -1,7 +1,7 @@
 <!-- Celestial Market: the list by category, a round ✓ per item (the sparkle plays, then it's
      written as bought), what runs low soon, and links to the market and the supplies -->
 <script setup>
-import { reactive } from "vue";
+import { reactive, watch } from "vue";
 import WinxEmpty from "../../uikit/WinxEmpty.vue";
 import WinxMissing from "../../uikit/WinxMissing.vue";
 import WinxGroupHeader from "../../uikit/WinxGroupHeader.vue";
@@ -15,15 +15,30 @@ const LINKS = [
   { text: "✦ open market", path: "00 System/Data/Celestial Market" },
   { text: "✦ supplies", path: "00 System/Data/Supplies" },
 ];
-const bought = reactive(new Set());   // rows sparkling until the write redraws the list
+// rows being bought: sparkling from the click until the list no longer has them (written), or the
+// write didn't happen (the line moved meanwhile)
+const bought = reactive(new Set());
 const key = r => `${r.line}|${r.name}`;
 
 async function buy(r) {
   if (bought.has(key(r))) return;
   bought.add(key(r));
   await new Promise(done => setTimeout(done, 650));   // the sparkle first
-  await props.actions.buy(r);
+  let written = false;
+
+  try {
+    written = await props.actions.buy(r);
+  } finally {
+    if (!written) bought.delete(key(r));
+  }
 }
+
+// a row gone from the list lets go of its mark: back on the list later, it can be bought again
+watch(() => props.state.data.groups, groups => {
+  const shown = new Set((groups ?? []).flatMap(g => g.rows.map(key)));
+
+  for (const k of bought) if (!shown.has(k)) bought.delete(k);
+});
 </script>
 
 <template>

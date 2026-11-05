@@ -34,3 +34,23 @@ test("Celestial Market's note missing: Create …", () => {
   const w = mount(View, { props: { state: { data: { missing: true, path: "x/Celestial Market.md" } }, actions: {} } });
   assert.equal(w.text(), "✦ Create x/Celestial Market.md");
 });
+
+test("a bought item back on the list can be bought again; a write that fails lets go of the row", async () => {
+  const { reactive, nextTick } = await import("vue");
+  const state = reactive({ data });
+  const bought = [];
+  let answer = true;
+  const w = mount(View, { props: { state, actions: { buy: async r => { bought.push(r.name); return answer; } } } });
+  await w.findAll(".winx-market__item")[0].find("button").trigger("click");
+  await new Promise(r => setTimeout(r, 700));
+  // written: the list comes back without it, then with it again (unticked in the note)
+  state.data = { ...data, groups: [{ label: "🌿 Harvest", rows: [{ line: 5, name: "rice" }] }] }; await nextTick();
+  state.data = data; await nextTick();
+  const tea = () => w.findAll(".winx-market__item")[0];
+  assert.ok(!tea().classes().includes("winx-market__item--bought"));
+  answer = false;   // this time the line moved meanwhile: nothing written
+  await tea().find("button").trigger("click");
+  await new Promise(r => setTimeout(r, 700)); await nextTick();
+  assert.deepEqual(bought, ["green tea", "green tea"]);
+  assert.ok(!tea().classes().includes("winx-market__item--bought"));   // free again
+});
