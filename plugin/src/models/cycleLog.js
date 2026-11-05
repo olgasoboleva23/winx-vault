@@ -5,8 +5,10 @@ import { addDays, diffDays } from "../core/dates.js";
 // The log of Cycle.md: the start dates, the recorded last days of a period (ends) and the usual
 // period length. on(date): the day of the cycle, its usual length, the next start and how far, a
 // period day or not, ended or not (null before the first start). The end of a cycle is the first
-// end between its start and the next start; without one, the period lasts the average of the last 6
-// recorded lengths, or `period` days if none.
+// end between its start and the next start (its last day of the period). Nothing is guessed:
+// without an end the latest cycle's period goes on until one is marked, and a past cycle's days
+// aren't counted as the period. `period` (the usual length: the average of the last 6 recorded, or
+// `period` days if none) is for showing only.
 export class CycleLog {
   constructor(starts, ends = [], period = 8) {
     this.starts = starts;
@@ -35,10 +37,21 @@ export class CycleLog {
 
   return {
     day, length, period: usual, nextStart, daysUntil: diffDays(nextStart, date),
-    isPeriod: end ? date <= end : day <= usual,
+    // no end: ongoing only in the latest cycle
+    isPeriod: end ? date <= end : all.at(-1) === last,
     ended: !!end && end <= date,
   };
   }
+
+  // the end to mark when the period is over on `today`: yesterday was its last day (not before
+  // the start)
+  endFor(today) {
+    const last = [...this.starts].filter(s => s <= today).sort().at(-1);
+    const yesterday = addDays(today, -1);
+
+    return last && yesterday < last ? last : yesterday;
+  }
+
   // the last n finished cycles, oldest first:
   // { start, length (days to the next start), period (days, null without an end) }
   last(n) {
