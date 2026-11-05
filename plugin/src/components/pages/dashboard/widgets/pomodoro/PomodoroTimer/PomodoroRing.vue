@@ -16,7 +16,7 @@ defineEmits(["toggle", "play", "reset", "skip", "gear"]);
       <div class="winx-pomodoro__wing winx-pomodoro__wing--right" />
       <div class="winx-pomodoro__top-star" v-html="ICON.star" />
       <div class="winx-pomodoro__time" @click="$emit('toggle')">{{ shown.time }}</div>
-      <div class="winx-pomodoro__controls">
+      <div class="winx-pomodoro__controls winx-center winx-gap-xl">
         <button
           class="winx-pomodoro__btn winx-pomodoro__btn--reset"
           @click="$emit('reset')"
@@ -39,7 +39,7 @@ defineEmits(["toggle", "play", "reset", "skip", "gear"]);
       <span class="winx-pomodoro__session">{{ shown.session }}</span>
     </div>
     <PomodoroStars :filled="shown.filled" :sets="shown.sets" />
-    <div class="winx-pomodoro__bottom">
+    <div class="winx-pomodoro__bottom winx-center winx-gap-m">
       <span class="winx-pomodoro__settings-info">{{ shown.lengths }}</span>
       <button class="winx-pomodoro__gear" @click="$emit('gear')" v-html="ICON.gear" />
     </div>

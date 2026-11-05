@@ -25,14 +25,12 @@
   &__phase { font-size: $text-l; opacity: 0.7; }
   &__next { font-size: $text-m; color: var(--winx-purple-deep); }
 
-  &__btns { display: flex; gap: $space-m; flex-wrap: wrap; }
-
   /* the tabs: the day pills of the last cycles, or the columns of their lengths */
-  &__tabs { display: flex; gap: $space-s; margin-top: $space-s; }
+  &__tabs { margin-top: $space-s; }
   /* the current cycle and the 3 before it: a pill per day, the period pink, the fertile window and the ovulation lilac */
   &__rows { display: grid; gap: $space-m; align-self: stretch; margin-bottom: $space-s; }
-  &__when { display: flex; justify-content: space-between; gap: $space-s; font-size: $text-s; color: alpha(--winx-purple-deep, 75%); }
-  &__pills { display: flex; gap: 2px; margin-top: $space-2xs; }
+  &__when { font-size: $text-s; color: alpha(--winx-purple-deep, 75%); }
+  &__pills { margin-top: $space-2xs; }
   &__pill {
     flex: 0 1 8px; height: 12px; border-radius: 3px; background: alpha(--winx-purple, 22%);
     &--period { background: var(--winx-pink-deep); }
@@ -42,7 +40,7 @@
   /* the last cycles' lengths and periods: a column each, the average a line across */
   &__chart {
     align-self: stretch; margin-bottom: $space-s;
-    &-title { display: flex; justify-content: space-between; font-size: $text-s; color: var(--winx-purple-deep); }
+    &-title { font-size: $text-s; color: var(--winx-purple-deep); }
     &-avg { color: alpha(--winx-purple-deep, 65%); }
   }
   &__cols {
@@ -54,8 +52,8 @@
     margin: $space-xs 0 $space-xl;
   }
   &__col {
-    position: relative; flex: 1; border-radius: $radius-s $radius-s 2px 2px; background: alpha(--winx-purple, 35%);
-    &-value { position: absolute; top: 100%; left: 0; right: 0; text-align: center; font-size: $text-2xs; font-style: normal; color: alpha(--winx-purple-deep, 70%); }
+    position: relative; border-radius: $radius-s $radius-s 2px 2px; background: alpha(--winx-purple, 35%);
+    &-value { position: absolute; top: 100%; left: 0; right: 0; font-size: $text-2xs; font-style: normal; color: alpha(--winx-purple-deep, 70%); }
   }
   &__avg-line { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--winx-pink-deep); z-index: 1; }
   /* the period lengths: pink columns, a purple line */

@@ -1,0 +1,18 @@
+@use "mixins" as *;
+/* Layout utilities: how an element lays out its children, named in the template (class="winx-row winx-gap-s").
+   First in main.scss, so a block's own rules (a modifier, the phone) win over them at the same weight. A rule
+   these can't say (align-items: baseline, a grid's columns, a gap off the scale) stays in the block. */
+.winx-flex { display: flex; }
+.winx-row { @include row; }
+.winx-col { display: flex; flex-direction: column; }
+.winx-center { @include center; }
+.winx-wrap { flex-wrap: wrap; }
+.winx-between { justify-content: space-between; }
+.winx-grow { flex: 1; }
+.winx-text-center { text-align: center; }
+.winx-nowrap { white-space: nowrap; }
+
+@each $name, $size in (2xs: $space-2xs, xs: $space-xs, s: $space-s, m: $space-m, l: $space-l, xl: $space-xl,
+  2xl: $space-2xl, 3xl: $space-3xl) {
+  .winx-gap-#{$name} { gap: $size; }
+}

@@ -30,17 +30,17 @@ test("WinxButton: kinds, on, title, extra classes", () => {
 
 test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAddForm, WinxCard", () => {
   draws(mount(ui.WinxNoteLink, { props: { path: "x/Cycle.md" }, slots: { default: "dates" } }), '<button class="winx-btn winx-btn--pill">dates</button>');
-  draws(mount(ui.WinxEmpty, { props: { text: "All bought" } }), '<div class="winx-empty">✦ All bought</div>');
-  draws(mount(ui.WinxEmpty), '<div class="winx-empty">✦ Nothing here yet</div>');
-  draws(mount(ui.WinxMissing, { props: { path: "x/Goals.md" } }), '<div class="winx-empty">✦ Create x/Goals.md</div>');
+  draws(mount(ui.WinxEmpty, { props: { text: "All bought" } }), '<div class="winx-empty winx-text-center">✦ All bought</div>');
+  draws(mount(ui.WinxEmpty), '<div class="winx-empty winx-text-center">✦ Nothing here yet</div>');
+  draws(mount(ui.WinxMissing, { props: { path: "x/Goals.md" } }), '<div class="winx-empty winx-text-center">✦ Create x/Goals.md</div>');
   draws(mount(ui.WinxFailed, { props: { text: "Goals.md is broken" } }),
-    '<div class="winx-empty winx-empty--error">⚠ couldn\'t draw: Goals.md is broken<button class="winx-btn winx-btn--chip winx-empty__retry">retry</button></div>');
+    '<div class="winx-empty winx-text-center winx-empty--error">⚠ couldn\'t draw: Goals.md is broken<button class="winx-btn winx-btn--chip winx-empty__retry">retry</button></div>');
   draws(mount(ui.WinxGroupHeader, { props: { label: "🌿 Harvest", count: 3 } }),
     '<div class="winx-group-header"><span>🌿 Harvest</span><span class="winx-group-header__count">3</span></div>');
   draws(mount(ui.WinxGroupHeader, { props: { label: "🌿 Harvest" } }), '<div class="winx-group-header"><span>🌿 Harvest</span></div>');
   const input = { name: "kg", type: "number", placeholder: "today, kg" };
   draws(mount(ui.WinxAddForm, { props: { input, submit: "Save" } }),
-    '<form class="winx-add-form"><input class="winx-add-form__input" name="kg" type="number" placeholder="today, kg"><button class="winx-add-form__submit" type="submit">Save</button></form>');
+    '<form class="winx-add-form winx-flex winx-gap-s"><input class="winx-add-form__input" name="kg" type="number" placeholder="today, kg"><button class="winx-add-form__submit" type="submit">Save</button></form>');
   draws(mount(ui.WinxCard, { props: { title: "Weight", meta: ["scroll"] }, slots: { default: "<b>40 kg</b>" } }),
     '<div class="callout winx-widget" data-callout="card" data-callout-metadata="scroll" data-callout-fold=""><div class="callout-title winx-widget__title" dir="auto"><div class="callout-icon"></div><div class="callout-title-inner">Weight</div></div><div class="callout-content winx-widget__body"><b>40 kg</b></div></div>');
 });

@@ -20,7 +20,7 @@ const pick = r => {
 
 <template>
   <div class="winx-weight__log">
-    <div class="winx-weight__log-row">
+    <div class="winx-weight__log-row winx-flex winx-wrap winx-gap-s">
       <WinxButton
         v-for="n in [0, 1, 2, 3]"
         :key="n"
@@ -29,7 +29,7 @@ const pick = r => {
         @click="level = n"
       >{{ n }}</WinxButton>
     </div>
-    <div class="winx-weight__log-row">
+    <div class="winx-weight__log-row winx-flex winx-wrap winx-gap-s">
       <WinxButton
         v-for="r in log.reasons"
         :key="r"

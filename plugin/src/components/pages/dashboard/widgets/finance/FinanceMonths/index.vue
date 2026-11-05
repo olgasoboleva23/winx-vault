@@ -20,15 +20,15 @@ const m = computed(() => {
 </script>
 
 <template>
-  <div class="winx-fin">
+  <div class="winx-fin winx-col winx-gap-2xl">
     <div
       v-if="state.data.empty"
       class="winx-fin__empty"
     >The ledger is empty: a note per month goes to {{ state.data.path }}</div>
     <template v-else>
-      <div class="winx-fin__head">
+      <div class="winx-fin__head winx-row winx-between winx-gap-m">
         <div class="winx-fin__title">{{ m.title }}</div>
-        <div class="winx-fin__nav">
+        <div class="winx-fin__nav winx-flex winx-gap-xs">
           <button class="winx-fin__nav-btn" :disabled="!m.prev" @click="picked = m.prev">◀</button>
           <button class="winx-fin__nav-btn" :disabled="!m.next" @click="picked = m.next">▶</button>
         </div>

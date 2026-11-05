@@ -19,7 +19,7 @@ const dashboard = () => app.commands.executeCommandById("winx:open-dashboard");
 </script>
 
 <template>
-  <div class="winx-cal__top" data-part="header">
+  <div class="winx-cal__top winx-row winx-gap-s" data-part="header">
     <div class="mb-input-type-date"><input type="date" :value="base" @change="onDate"></div>
     <button
       class="winx-cal__mute"

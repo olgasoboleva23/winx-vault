@@ -11,7 +11,7 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
   <WinxEmpty v-if="!state.data.jars.length" :text="state.data.empty" />
   <div v-else class="winx-savings">
     <div v-for="j in state.data.jars" :key="j.path" class="winx-jar">
-      <div class="winx-jar__goal">
+      <div class="winx-jar__goal winx-row winx-gap-xl">
         <div class="winx-jar__pic">
           <template v-if="j.img">
             <img class="winx-jar__img" :src="j.img" alt="">
@@ -32,18 +32,18 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
       <div v-if="j.fill !== null" class="winx-jar__bar">
         <i class="winx-jar__fill" :style="`width: ${j.fill}%`" />
       </div>
-      <div class="winx-jar__stamps">
+      <div class="winx-jar__stamps winx-flex winx-wrap winx-gap-s">
         <span
           v-for="(on, i) in j.stamps"
           :key="i"
-          :class="['winx-jar__stamp', { 'winx-jar__stamp--on': on }]"
+          :class="['winx-jar__stamp winx-center', { 'winx-jar__stamp--on': on }]"
         >✦</span>
       </div>
-      <div v-if="j.due" class="winx-jar__due">
+      <div v-if="j.due" class="winx-jar__due winx-row winx-between winx-gap-m">
         <span>{{ j.due.when }}: <b class="winx-jar__due-sum">put in {{ j.due.sum }}</b></span>
         <WinxButton kind="pill" @click="actions.deposit(j.path)">✓ done</WinxButton>
       </div>
-      <div class="winx-jar__next">next payday: {{ j.next }}</div>
+      <div class="winx-jar__next winx-text-center">next payday: {{ j.next }}</div>
     </div>
   </div>
 </template>

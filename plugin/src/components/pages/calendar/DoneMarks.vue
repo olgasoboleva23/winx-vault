@@ -8,7 +8,7 @@ const title = computed(() => props.entries.map(e => view.info(e.t).label).join("
 </script>
 
 <template>
-  <div v-if="entries.length" class="winx-cal__marks">
+  <div v-if="entries.length" class="winx-cal__marks winx-flex winx-gap-m">
     <span :title="title">✓{{ entries.length }}</span>
   </div>
 </template>

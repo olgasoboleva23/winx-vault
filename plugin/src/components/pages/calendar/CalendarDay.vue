@@ -16,7 +16,7 @@ const today = computed(() => props.day === view.ctx.today);
 
 <template>
   <div :class="['winx-cal__day', { 'winx-cal__day--today': today }]">
-    <div class="winx-cal__head">{{ head }}</div>
+    <div class="winx-cal__head winx-text-center">{{ head }}</div>
     <DayFill :day="day" />
     <DayZones :day="day" />
   </div>

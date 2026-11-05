@@ -42,14 +42,14 @@ const folded = computed(() => !open.value && d.value.info);
       @fold="fold"
     />
     <template v-if="!folded && d.rows.length">
-      <div class="winx-cycle__tabs">
+      <div class="winx-cycle__tabs winx-flex winx-gap-s">
         <WinxButton kind="toggle" :on="tab === 'days'" @click="tab = 'days'">days</WinxButton>
         <WinxButton kind="toggle" :on="tab === 'stats'" @click="tab = 'stats'">stats</WinxButton>
       </div>
       <CycleStats v-if="tab === 'stats'" :charts="d.charts" />
       <CycleRows v-else :rows="d.rows" />
     </template>
-    <div class="winx-cycle__btns">
+    <div class="winx-cycle__btns winx-flex winx-gap-m winx-wrap">
       <WinxButton
         kind="pill"
         @click="actions.mark(d.mark.kind, d.day)"

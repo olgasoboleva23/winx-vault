@@ -10,12 +10,12 @@ const buy = async i => { if (await props.actions.buy(i.name, i.cost)) props.acti
 </script>
 
 <template>
-  <div class="winx-shop__balance">
+  <div class="winx-shop__balance winx-center winx-gap-l">
     <span class="winx-shop__balance-icon">✨</span>
     <span>Gold</span>
     <span class="winx-shop__balance-amount">{{ state.data.balance }}</span>
   </div>
-  <div class="winx-shop__items">
+  <div class="winx-shop__items winx-col winx-gap-xl">
     <button
       v-for="i in state.data.items"
       :key="i.name"

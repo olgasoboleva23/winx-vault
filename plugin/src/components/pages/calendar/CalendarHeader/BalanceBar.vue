@@ -30,7 +30,10 @@ const pickArea = a => { const tag = `#area/${a}`; state.area = tag === state.are
 
 <template>
   <div class="winx-cal__balance" data-part="header">
-    <div :class="['winx-cal__balance-bar', { 'winx-cal__balance-bar--picked': !!state.area }]">
+    <div
+      class="winx-cal__balance-bar winx-grow winx-flex winx-gap-2xs"
+      :class="{ 'winx-cal__balance-bar--picked': !!state.area }"
+    >
       <div
         v-for="p in balance.pieces"
         :key="p.area"
@@ -44,7 +47,11 @@ const pickArea = a => { const tag = `#area/${a}`; state.area = tag === state.are
         <b class="winx-cal__area-track"><i class="winx-cal__area-fill" :style="p.fill" /></b>
       </div>
     </div>
-    <div v-if="balance.none.length" class="winx-cal__balance-none" title="nothing this week">
+    <div
+      v-if="balance.none.length"
+      class="winx-cal__balance-none winx-flex winx-gap-2xs"
+      title="nothing this week"
+    >
       <span v-for="x in balance.none" :key="x.title" :title="x.title">{{ x.icon }}</span>
     </div>
   </div>

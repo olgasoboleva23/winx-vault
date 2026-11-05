@@ -5,17 +5,18 @@ defineProps({ charts: { type: Array, required: true } });
 
 <template>
   <div v-for="c in charts" :key="c.kind" :class="`winx-cycle__chart winx-cycle__chart--${c.kind}`">
-    <div class="winx-cycle__chart-title">{{ c.title }}<span class="winx-cycle__chart-avg">{{
-      c.avg }}</span></div>
+    <div
+      class="winx-cycle__chart-title winx-flex winx-between"
+    >{{ c.title }}<span class="winx-cycle__chart-avg">{{ c.avg }}</span></div>
     <div class="winx-cycle__cols">
       <b class="winx-cycle__avg-line" :style="`bottom: ${c.line}%`" />
       <i
         v-for="(col, i) in c.cols"
         :key="i"
-        class="winx-cycle__col"
+        class="winx-cycle__col winx-grow"
         :style="`height: ${col.height}%`"
       >
-        <span class="winx-cycle__col-value">{{ col.v }}</span>
+        <span class="winx-cycle__col-value winx-text-center">{{ col.v }}</span>
       </i>
     </div>
   </div>

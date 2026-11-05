@@ -16,6 +16,8 @@ test("build makes a plugin the phone can load", () => {
   assert.equal(manifest.isDesktopOnly, false);
   const main = readFileSync(new URL("main.js", dist), "utf8");
   assert.doesNotMatch(main, /require\(["'](fs|electron|path|child_process)["']\)/);   // Node/Electron only: no phone
+  // Obsidian pastes the CSS in as text: a BOM would stick to the first selector and it would match nothing
+  assert.notEqual(readFileSync(new URL("styles.css", dist), "utf8").charCodeAt(0), 0xfeff);
 });
 
 test("a Sass error fails the build", () => {

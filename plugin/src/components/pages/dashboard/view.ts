@@ -88,7 +88,7 @@ export class DashboardView extends ItemView {
     const slot = this.body?.querySelector(".winx-dash__date");
 
     if (!slot) return;
-    slot.className = "winx-dash__date winx-nav";
+    slot.className = "winx-dash__date winx-nav winx-row winx-gap-l";
     Object.assign(this.shown, { date: this.shownDate, today: todayYmd() });
     const { shown } = this, phone = Platform.isMobile;
     const go = (date: string | null) => this.go(date || null);

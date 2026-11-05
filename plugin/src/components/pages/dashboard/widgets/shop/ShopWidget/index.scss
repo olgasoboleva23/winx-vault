@@ -4,8 +4,6 @@
   padding: $space-m 0;
 
   &__balance {
-    @include center;
-    gap: $space-l;
     padding: $space-4xl;
     margin-bottom: $space-5xl;
     background: var(--winx-twilight);
@@ -26,12 +24,6 @@
       font-weight: 700;
       font-size: 1.2em;
     }
-  }
-
-  &__items {
-    display: flex;
-    flex-direction: column;
-    gap: $space-xl;
   }
 
   /* the items are buttons: the block in front (& &__item) outweighs Obsidian's button styles */

@@ -2,6 +2,7 @@
 // used to be injected last). A component's own block is its index.scss next to it (components/…);
 // here, the shared look (tokens, mixins, cards' grid, layout, …). Keep the order: rules of the same
 // weight win by order. Partials @use "mixins" by the load path (esbuild.config.mjs: src/styles).
+@use "utilities";   // layout utilities first: the blocks win over them
 @use "animations";
 @use "assets";
 @use "callout-grid";

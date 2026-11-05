@@ -51,9 +51,10 @@ watch(() => props.state.data.groups, groups => {
         <div
           v-for="r in g.rows"
           :key="key(r)"
-          :class="['winx-market__item', { 'winx-market__item--bought': bought.has(key(r)) }]"
+          class="winx-market__item winx-row winx-gap-l"
+          :class="{ 'winx-market__item--bought': bought.has(key(r)) }"
         >
-          <span class="winx-market__text">{{ r.name }}</span>
+          <span class="winx-market__text winx-grow">{{ r.name }}</span>
           <button
             class="winx-market__buy"
             aria-label="bought"

@@ -15,9 +15,10 @@ const out   = watch && process.env.WINX_VAULT ? resolve(process.env.WINX_VAULT, 
 mkdirSync(out, { recursive: true });
 
 // a release build is minified (the vault syncs it to the phone); the dev one stays readable, with a source map
-// partials @use "mixins" from anywhere: src/styles is on the load path
+// partials @use "mixins" from anywhere: src/styles is on the load path; no BOM (charset: false): Obsidian
+// pastes the CSS in as text, and the BOM would stick to the first selector, which then matches nothing
 const styles = () => writeFileSync(resolve(out, "styles.css"), sass.compile(resolve(here, "src/styles/main.scss"), {
-  style: watch ? "expanded" : "compressed", loadPaths: [resolve(here, "src/styles")],
+  style: watch ? "expanded" : "compressed", loadPaths: [resolve(here, "src/styles")], charset: false,
 }).css);
 const extras = {
   name: "winx-extras",   // styles and manifest go with every JS build

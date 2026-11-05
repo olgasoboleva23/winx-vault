@@ -7,9 +7,7 @@
   &__delta { font-size: $text-m; color: var(--winx-purple-deep); }
   &__list { justify-self: start; }
   /* weight ↔ the body log, and the log's form: a level 0–3, the reasons, save */
-  &__modes { display: flex; gap: $space-s; }
   &__log {
     display: grid; gap: $space-m; justify-items: start;
-    &-row { display: flex; flex-wrap: wrap; gap: $space-s; }
   }
 }

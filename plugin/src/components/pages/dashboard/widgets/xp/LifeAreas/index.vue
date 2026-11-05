@@ -7,5 +7,5 @@ defineProps({ state: { type: Object, required: true } });
 
 <template>
   <WinxChart :config="state.data.chart" />
-  <div class="winx-areas__caption">last 4 weeks</div>
+  <div class="winx-areas__caption winx-text-center">last 4 weeks</div>
 </template>

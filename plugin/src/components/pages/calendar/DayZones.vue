@@ -13,10 +13,13 @@ const past = computed(() => props.day <= view.ctx.today);
   <div class="winx-cal__zones">
     <div
       v-if="past"
-      class="winx-cal__zone winx-cal__zone--done"
+      class="winx-cal__zone winx-cal__zone--done winx-grow winx-center"
       :data-drop="day"
       data-done="1"
     >✓</div>
-    <div class="winx-cal__zone winx-cal__zone--plan" :data-drop="day">{{ label }}</div>
+    <div
+      class="winx-cal__zone winx-cal__zone--plan winx-grow winx-center"
+      :data-drop="day"
+    >{{ label }}</div>
   </div>
 </template>

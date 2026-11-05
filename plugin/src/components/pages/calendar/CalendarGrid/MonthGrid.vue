@@ -10,7 +10,7 @@ defineEmits(["pick"]);
 
 <template>
   <div class="winx-cal__month" data-part="grid">
-    <div v-for="w in weekdays" :key="w" class="winx-cal__weekday">{{ w }}</div>
+    <div v-for="w in weekdays" :key="w" class="winx-cal__weekday winx-text-center">{{ w }}</div>
     <div
       v-for="c in cells"
       :key="c.d"

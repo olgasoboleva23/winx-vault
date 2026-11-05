@@ -16,9 +16,9 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
       <div
         v-for="r in g.rows"
         :key="r.name"
-        :class="['winx-supplies__row', { 'winx-supplies__row--due': r.due }]"
+        :class="['winx-supplies__row winx-row winx-gap-l', { 'winx-supplies__row--due': r.due }]"
       >
-        <span class="winx-supplies__name">{{ r.name }}</span>
+        <span class="winx-supplies__name winx-grow">{{ r.name }}</span>
         <span class="winx-supplies__info">{{ r.info }}</span>
         <WinxButton
           v-if="!r.listed"

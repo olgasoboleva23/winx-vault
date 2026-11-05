@@ -20,7 +20,7 @@ const chips = computed(() => {
       <div
         v-for="c in chips"
         :key="c.d"
-        :class="['winx-cal__chip', { 'winx-cal__chip--today': c.today }]"
+        :class="['winx-cal__chip', 'winx-text-center', { 'winx-cal__chip--today': c.today }]"
         :data-drop="c.d"
       >{{ c.label }}</div>
     </div>

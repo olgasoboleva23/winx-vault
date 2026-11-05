@@ -49,14 +49,14 @@ const toToday = r => act(r, sounds.today, t => view.actions.toToday(t));
     <div
       v-for="r in rows"
       :key="r.task.key"
-      class="winx-missed__row"
+      class="winx-missed__row winx-row winx-gap-s"
       :data-area="r.task.area ?? undefined"
       :data-task="r.task.key"
       draggable="true"
       :data-drag="r.task.key"
       :data-swipeable="r.task.key"
     >
-      <span class="winx-missed__text">{{ r.repeats }}<TaskText :task="r.task" /></span>
+      <span class="winx-missed__text winx-grow">{{ r.repeats }}<TaskText :task="r.task" /></span>
       <div class="winx-task-btns"><TaskButtons :task="r.task" @gone="gone.add(r.task.key)" /></div>
       <em class="winx-missed__date">{{ r.shortDay }}</em>
       <WinxButton

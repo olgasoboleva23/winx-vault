@@ -9,7 +9,8 @@ defineProps({ trend: { type: Array, required: true } });
     <div
       v-for="b in trend"
       :key="b.month"
-      :class="['winx-fin__bar', { 'winx-fin__bar--current': b.current }]"
+      class="winx-fin__bar winx-grow"
+      :class="{ 'winx-fin__bar--current': b.current }"
     >
       <div class="winx-fin__col" :style="{ height: `${b.height}%` }" :aria-label="b.sum" />
       <small class="winx-fin__bar-label">{{ b.label }}</small>

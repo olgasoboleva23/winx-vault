@@ -49,7 +49,7 @@ const saveLog = async () => {
 
 <template>
   <div class="winx-weight">
-    <div v-if="log" class="winx-weight__modes">
+    <div v-if="log" class="winx-weight__modes winx-flex winx-gap-s">
       <WinxButton
         kind="toggle"
         :on="mode === 'weight'"

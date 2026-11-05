@@ -6,7 +6,7 @@ defineProps({ categories: { type: Array, required: true } });
 
 <template>
   <div class="winx-fin__section">Categories</div>
-  <div class="winx-fin__rows">
+  <div class="winx-fin__rows winx-col winx-gap-s">
     <div v-for="c in categories" :key="c.name" class="winx-fin__row">
       <span>{{ c.name }}</span>
       <span :class="['winx-fin__amt', { 'winx-fin__amt--over': c.over }]">{{ c.amount }}</span>

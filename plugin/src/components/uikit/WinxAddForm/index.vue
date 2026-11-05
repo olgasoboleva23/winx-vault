@@ -12,7 +12,7 @@ const value = defineModel({ type: [String, Number], default: "" });
 </script>
 
 <template>
-  <form class="winx-add-form" @submit.prevent="$emit('submit', value)">
+  <form class="winx-add-form winx-flex winx-gap-s" @submit.prevent="$emit('submit', value)">
     <input v-model="value" class="winx-add-form__input" v-bind="input">
     <button class="winx-add-form__submit" type="submit">{{ submit }}</button>
   </form>

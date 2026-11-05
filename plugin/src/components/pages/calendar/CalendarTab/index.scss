@@ -3,7 +3,7 @@
 @use "mixins" as *;
 .winx-cal {
   &__top {
-    @include row; gap: $space-s; margin-bottom: $space-l;
+    margin-bottom: $space-l;
     & button.winx-cal__mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
   }
   /* the areas' colours: the balance bar's pieces and a stripe before each task */
@@ -22,11 +22,6 @@
      the areas with nothing this week as grey icons after it */
   &__balance {
     display: flex; align-items: flex-end; gap: $space-m; margin: (-$space-s) 0 $space-l;
-    &-bar {
-      flex: 1;
-      display: flex;
-      gap: 2px;
-    }
   }
   /* a picked area (a click shows only its tasks): the others fade */
   &__balance-bar--picked &__area:not(.winx-cal__area--on) { opacity: 0.4; }
@@ -41,7 +36,7 @@
     &-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); transition: box-shadow 0.15s ease; }
     &-fill { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
   }
-  &__balance-none { display: flex; gap: $space-2xs; filter: grayscale(1); opacity: 0.6; font-size: $text-l; }
+  &__balance-none { filter: grayscale(1); opacity: 0.6; font-size: $text-l; }
   &__week {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -71,8 +66,6 @@
   &__zones { display: none; position: absolute; inset: 0; z-index: 2; gap: $space-xs; padding: $space-xs; }
   &--dragging &__zones { display: flex; flex-direction: column; }
   &__zone {
-    flex: 1;
-    @include center;
     border: 1px dashed var(--winx-border);
     border-radius: $radius-m;
     background: rgb(255 248 252 / 90%);
@@ -101,7 +94,6 @@
     padding: $space-l $space-xs;
     border-radius: $radius-m;
     border: 1px dashed var(--winx-border);
-    text-align: center;
     font-family: Cinzel, serif;
     font-size: $text-l;
     color: var(--winx-purple-deep);
@@ -132,7 +124,6 @@
   }
   &__head {
     margin-bottom: $space-xs;
-    text-align: center;
     font-family: Cinzel, serif;
     color: var(--winx-purple-deep);
   }
@@ -192,7 +183,7 @@
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: $space-s;
   }
-  &__weekday { text-align: center; font-family: Cinzel, serif; font-size: $text-m; color: var(--winx-lavender); }
+  &__weekday { font-family: Cinzel, serif; font-size: $text-m; color: var(--winx-lavender); }
   &__cell {
     min-height: 92px;
     padding: $space-xs 5px;
@@ -279,8 +270,6 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
     }
   }
   &__marks {
-    display: flex;
-    gap: $space-m;
     padding: $space-2xs $space-xs;
     font-size: $text-s;
     color: var(--winx-purple-deep);

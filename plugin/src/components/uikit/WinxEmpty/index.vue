@@ -10,5 +10,8 @@ defineProps({
 </script>
 
 <template>
-  <div :class="['winx-empty', mod && `winx-empty--${mod}`]">{{ icon }} {{ text }}<slot /></div>
+  <div
+    class="winx-empty winx-text-center"
+    :class="mod && `winx-empty--${mod}`"
+  >{{ icon }} {{ text }}<slot /></div>
 </template>

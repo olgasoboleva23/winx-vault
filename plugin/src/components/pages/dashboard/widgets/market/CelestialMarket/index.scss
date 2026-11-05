@@ -15,8 +15,6 @@
 
   &__item {
     position: relative;
-    @include row;
-    gap: $space-l;
     padding: $space-s $space-2xs $space-s $space-m;
     border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
     transition: background 0.15s ease;
@@ -26,7 +24,6 @@
   }
 
   &__text {
-    flex: 1;
     color: var(--winx-text-dark);
     font-size: $text-xl;
   }

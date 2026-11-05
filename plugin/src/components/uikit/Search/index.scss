@@ -7,6 +7,5 @@
     font-size: $text-s;
     color: var(--winx-gold-deep);
   }
-  &__row { @include row; justify-content: space-between; gap: $space-l; }
-  &__note { font-size: $text-s; color: var(--text-muted); white-space: nowrap; }
+  &__note { font-size: $text-s; color: var(--text-muted); }
 }

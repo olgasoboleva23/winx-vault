@@ -3,24 +3,13 @@
 @use "mixins" as *;
 
 .winx-level {
-  @include row;
-  gap: $space-3xl;
-
   &__icon {
     flex: 0 0 auto;
     width: $deco;
     height: $deco;
     border-radius: $round;
-    @include center;
     background: var(--winx-star-icon) center / contain no-repeat;
     animation: pulse-glow 2s infinite alternate;
-  }
-
-  &__body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: $space-xs;
   }
 
   &__text {
@@ -53,14 +42,11 @@
   /* HP / MP: red and blue like a game's bars */
   &__vitals { display: grid; gap: $space-xs; margin-top: $space-m; }
   &__vital {
-    @include row;
-    gap: $space-s;
     font-size: $text-s;
     color: var(--winx-purple-deep);
     &-name { width: 1.8em; font-family: Cinzel, serif; letter-spacing: 1px; }
     &-value { min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; }   /* 50/50 and 0/4: bars of one length */
     &-bar {
-      flex: 1;
       height: $space-m;
       overflow: hidden;
       border-radius: $pill;

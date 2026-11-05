@@ -12,7 +12,7 @@ defineEmits(["toggle", "play"]);
   <div class="winx-pomodoro__mini">
     <!-- eslint-disable vue/no-v-html -- the icons are our own constant SVGs (pomodoro.js ICON) -->
     <div class="winx-pomodoro__mini-ring" :style="{ '--p': shown.p }" @click="$emit('toggle')" />
-    <div class="winx-pomodoro__mini-info" @click="$emit('toggle')">
+    <div class="winx-pomodoro__mini-info winx-grow" @click="$emit('toggle')">
       <div class="winx-pomodoro__mini-time">{{ shown.time }}</div>
       <PomodoroStars :filled="shown.filled" :sets="shown.sets">
         <span class="winx-pomodoro__mini-mode">{{ shown.mode }}</span>

@@ -50,9 +50,9 @@ const repeats = () => {
 </script>
 
 <template>
-  <div class="winx-nav" data-part="header">
+  <div class="winx-nav winx-row winx-gap-l" data-part="header">
     <WinxButton kind="nav" title="previous" @click="step(-1)">‹</WinxButton>
-    <span class="winx-nav__title">{{ nav.title }}</span>
+    <span class="winx-nav__title winx-text-center">{{ nav.title }}</span>
     <WinxButton
       kind="nav"
       title="next"

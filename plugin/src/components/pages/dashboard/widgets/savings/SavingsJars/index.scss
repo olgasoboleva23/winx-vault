@@ -3,7 +3,6 @@
 .winx-savings {   display: grid; gap: $space-4xl; }
 .winx-jar {
   display: grid; gap: $space-m; color: var(--winx-purple-deep);
-  &__goal { @include row; gap: $space-xl; }
   /* the goal's picture: grey above the saved share, so the colour rises as the jar fills */
   &__pic {
     position: relative;
@@ -23,7 +22,6 @@
   &__big { font-size: 22px; font-weight: 700; }
   &__note,
   &__next { font-size: $text-s; color: alpha(--winx-purple-deep, 65%); }
-  &__next { text-align: center; }
   &__bar {
     height: $space-l;
     overflow: hidden;
@@ -32,9 +30,7 @@
   }
   &__fill { display: block; height: 100%; background: linear-gradient(90deg, var(--winx-pink-deep), var(--winx-gold)); }
   /* a ✦ stamp per deposit, dashed ones for the next */
-  &__stamps { display: flex; flex-wrap: wrap; gap: $space-s; }
   &__stamp {
-    @include center;
     width: $btn-m;
     height: $btn-m;
     border: 2px dashed alpha(--winx-pink-deep, 50%);
@@ -49,9 +45,6 @@
     }
   }
   &__due {
-    @include row;
-    justify-content: space-between;
-    gap: $space-m;
     padding: $space-m $space-xl;
     border: 2px solid var(--winx-pink-deep);
     border-radius: $radius-xl;

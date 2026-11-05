@@ -82,10 +82,10 @@ export async function addMarketItem() {
     .map((c, i, all) => ({ ...c, header: !c.isNew && c.tag !== all[i - 1]?.tag }));
   const pick = await Search.pick(app, "Find or add an item…", find, (c, el) => {
     if (c.header) el.createDiv({ cls: "winx-search__group", text: catLabel(c.tag) });
-    const row = el.createDiv({ cls: "winx-search__row" });
+    const row = el.createDiv({ cls: "winx-search__row winx-row winx-between winx-gap-l" });
     row.createSpan({ text: c.isNew ? `+ new: ${c.name}` : c.name });
     const note = c.isNew ? "" : c.onList ? "on the list" : `×${c.buys} · ${dm(c.last)}`;
-    row.createSpan({ cls: "winx-search__note", text: note });
+    row.createSpan({ cls: "winx-search__note winx-nowrap", text: note });
   });
 
   if (!pick) return;

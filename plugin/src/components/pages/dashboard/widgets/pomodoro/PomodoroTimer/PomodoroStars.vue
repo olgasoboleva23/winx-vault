@@ -7,7 +7,7 @@ defineProps({ filled: { type: Number, required: true }, sets: { type: String, re
 </script>
 
 <template>
-  <div class="winx-pomodoro__stars">
+  <div class="winx-pomodoro__stars winx-flex winx-gap-m">
     <!-- eslint-disable vue/no-v-html -- the icons are our own constant SVGs (pomodoro.js ICON) -->
     <slot />
     <div
