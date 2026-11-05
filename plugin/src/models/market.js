@@ -1,8 +1,8 @@
 // The Celestial Market (the shopping list, 00 System/Data/Celestial Market.md) and the supplies
 // bought from it, pure (supplyStats: tested by tests/logic.test.mjs); the list read from Dataview:
 // controllers/market.js. One line: models/marketItem.js.
-import config from "../helpers/config.js";
-import { diffDays } from "../helpers/dates.js";
+import config from "#/helpers/config.js";
+import { diffDays } from "#/helpers/dates.js";
 
 export const MARKET = "00 System/Data/Celestial Market.md";
 

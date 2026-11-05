@@ -3,8 +3,8 @@
 // the component's registerDomEvent / registerEvent / registerInterval, so Obsidian drops it all
 // when the component unloads.
 import { Keymap, debounce } from "obsidian";
-import { todayYmd } from "../helpers/dates.js";
-import { dataview } from "../helpers/plugins.js";
+import { todayYmd } from "#/helpers/dates.js";
+import { dataview } from "#/helpers/plugins.js";
 
 // redraw(): drawn now when shown, else once it shows (a leaf or the layout changes) — catchUp()
 // asks again

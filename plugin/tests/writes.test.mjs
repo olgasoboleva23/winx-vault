@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { setApp } from "../src/helpers/app.js";
-import { logPurchase } from "../src/controllers/shop.js";
-import { addTask, addPoolLine } from "../src/controllers/tasks.js";
+import { setApp } from "#/helpers/app.js";
+import { logPurchase } from "#/controllers/shop.js";
+import { addTask, addPoolLine } from "#/controllers/tasks.js";
 
 const later = () => new Promise(r => setTimeout(r, 5));
 // a vault in memory and a Dataview whose pages are its tasks (done ones earn gold) and Purchases' lines

@@ -2,12 +2,12 @@
 // notice; the task window (components/uikit/TaskWindow) and the Tasks plugin's edit dialog; a
 // new task on top of Master.md, a new pool line at the end of Pool.md.
 import { Notice } from "obsidian";
-import { appendLine, edit, editLine, undoLines } from "../helpers/files.js";
-import { tasksApi } from "../helpers/plugins.js";
-import { Task } from "../models/task.js";
-import { taskWindow } from "../components/uikit/TaskWindow/index.js";
-import { app } from "../helpers/app.js";
-import { MASTER, POOL } from "../helpers/paths.js";
+import { appendLine, edit, editLine, undoLines } from "#/helpers/files.js";
+import { tasksApi } from "#/helpers/plugins.js";
+import { Task } from "#/models/task.js";
+import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
+import { app } from "#/helpers/app.js";
+import { MASTER, POOL } from "#/helpers/paths.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
 // only if that line is still the same copy of the task.

@@ -1,5 +1,5 @@
 // The panel's cards grouped by area, shared by its tabs
-import { T } from "../models/calendarData.js";
+import { T } from "#/models/calendarData.js";
 
 export const SHOWN = 8;   // No date: the first 8 until "show all"
 

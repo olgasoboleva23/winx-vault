@@ -6,8 +6,8 @@ let mount, FinanceMonths, FinanceLine;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  FinanceMonths = (await import("../src/components/pages/dashboard/widgets/finance/FinanceMonths/index.vue")).default;
-  FinanceLine = (await import("../src/components/pages/dashboard/widgets/finance/FinanceLine/index.vue")).default;
+  FinanceMonths = (await import("#/components/pages/dashboard/widgets/finance/FinanceMonths/index.vue")).default;
+  FinanceLine = (await import("#/components/pages/dashboard/widgets/finance/FinanceLine/index.vue")).default;
 });
 
 const month = (title, prev, next, over) => ({

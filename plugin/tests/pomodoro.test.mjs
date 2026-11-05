@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Timer, addStats } from "../src/models/timer.js";
+import { Timer, addStats } from "#/models/timer.js";
 
 // a clock the test moves
 const clock = (t = 1_000_000) => Object.assign(() => t, { go: ms => { t += ms; } });

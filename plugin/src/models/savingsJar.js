@@ -1,8 +1,8 @@
 // A savings jar: one note per goal with "- YYYY-MM-DD 12000" deposit lines; per_payday and price
 // (optional) are the note's properties. Paydays: the 16th and the 30th (a short month's last day),
 // a Saturday or Sunday one on the Friday before (tested by tests/entities.test.mjs).
-import { addDays, addMonths, weekday } from "../helpers/dates.js";
-import { AMOUNT, amount } from "../helpers/format.js";
+import { addDays, addMonths, weekday } from "#/helpers/dates.js";
+import { AMOUNT, amount } from "#/helpers/format.js";
 
 const DEPOSIT = new RegExp(`^- (\\d{4}-\\d{2}-\\d{2}) (${AMOUNT.source})$`);
 

@@ -5,7 +5,7 @@
      PomodoroMini and PomodoroRing draw what `shown` says. -->
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { Timer } from "../../../../../../models/timer.js";
+import { Timer } from "#/models/timer.js";
 import PomodoroMini from "./PomodoroMini.vue";
 import PomodoroRing from "./PomodoroRing.vue";
 

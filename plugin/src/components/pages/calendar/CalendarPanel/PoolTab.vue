@@ -2,11 +2,11 @@
      to today -->
 <script setup>
 import { computed, inject } from "vue";
-import WinxButton from "../../../uikit/WinxButton/index.vue";
-import WinxEmpty from "../../../uikit/WinxEmpty/index.vue";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
+import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import GroupCard from "./GroupCard.vue";
-import TaskCard from "../TaskCard/index.vue";
-import { byArea } from "../../../../helpers/panelGroups.js";
+import TaskCard from "#/components/pages/calendar/TaskCard/index.vue";
+import { byArea } from "#/helpers/panelGroups.js";
 
 const EMPTY_POOL = "New task with «To pool» adds one here";
 const view = inject("calendar");

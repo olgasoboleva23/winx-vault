@@ -1,8 +1,8 @@
 <!-- Savings: a jar per goal (its picture greyed above what's saved, the bar, a ✦ stamp per
      deposit), the payday's "put in" with ✓ done until the deposit is in, the next paydays -->
 <script setup>
-import WinxButton from "../../../../../uikit/WinxButton/index.vue";
-import WinxEmpty from "../../../../../uikit/WinxEmpty/index.vue";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
+import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 
 defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
 </script>

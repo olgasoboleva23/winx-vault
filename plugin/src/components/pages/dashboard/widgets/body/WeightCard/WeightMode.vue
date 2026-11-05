@@ -1,10 +1,10 @@
 <!-- the weight: the last value and the change vs a week ago, a field for today (v-model: what's
      typed; @save), the 30-day line, ✦ list -->
 <script setup>
-import WinxAddForm from "../../../../../uikit/WinxAddForm/index.vue";
-import WinxChart from "../../../../../uikit/WinxChart.vue";
-import WinxNoteLink from "../../../../../uikit/WinxNoteLink.vue";
-import { PATH } from "../../../../../../controllers/weight.js";
+import WinxAddForm from "#/components/uikit/WinxAddForm/index.vue";
+import WinxChart from "#/components/uikit/WinxChart.vue";
+import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
+import { PATH } from "#/controllers/weight.js";
 
 defineProps({ weight: { type: Object, required: true } });
 defineEmits(["save"]);

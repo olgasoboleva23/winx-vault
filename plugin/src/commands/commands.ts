@@ -1,17 +1,17 @@
 import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
-import { Task } from "../models/task.js";
-import { KINDS } from "../models/kinds.js";
-import { mirrorMobileConfig } from "../controllers/mobileConfig.js";
-import { Form } from "../components/uikit/Form/index.ts";
-import { todayYmd } from "../helpers/dates.js";
-import { addPoolLine, addTask } from "../controllers/tasks.js";
-import { taskWindow } from "../components/uikit/TaskWindow/index.js";
-import { pickTask } from "../components/uikit/TaskSearch/index.js";
-import { addMarketItem } from "../controllers/market.js";
-import { logPurchase } from "../controllers/shop.js";
-import { createNote } from "../controllers/notes.js";
-import { tasksApi } from "../helpers/plugins.js";
-import { MASTER } from "../helpers/paths.js";
+import { Task } from "#/models/task.js";
+import { KINDS } from "#/models/kinds.js";
+import { mirrorMobileConfig } from "#/controllers/mobileConfig.js";
+import { Form } from "#/components/uikit/Form/index.ts";
+import { todayYmd } from "#/helpers/dates.js";
+import { addPoolLine, addTask } from "#/controllers/tasks.js";
+import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
+import { pickTask } from "#/components/uikit/TaskSearch/index.js";
+import { addMarketItem } from "#/controllers/market.js";
+import { logPurchase } from "#/controllers/shop.js";
+import { createNote } from "#/controllers/notes.js";
+import { tasksApi } from "#/helpers/plugins.js";
+import { MASTER } from "#/helpers/paths.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.

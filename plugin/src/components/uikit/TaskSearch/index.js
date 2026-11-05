@@ -1,13 +1,13 @@
 // "New task", first step: search every task done or planned before (by area, the most done first)
 // or type a new one.
-import { Search } from "../Search/index.ts";
-import config from "../../../helpers/config.js";
-import { dm } from "../../../helpers/dates.js";
-import { findChoices } from "../../../helpers/find.js";
-import { dataview } from "../../../helpers/plugins.js";
-import { taskChoices } from "../../../models/task.js";
-import { TASKS } from "../../../helpers/paths.js";
-import { app } from "../../../helpers/app.js";
+import { Search } from "#/components/uikit/Search/index.ts";
+import config from "#/helpers/config.js";
+import { dm } from "#/helpers/dates.js";
+import { findChoices } from "#/helpers/find.js";
+import { dataview } from "#/helpers/plugins.js";
+import { taskChoices } from "#/models/task.js";
+import { TASKS } from "#/helpers/paths.js";
+import { app } from "#/helpers/app.js";
 
 export function pickTask() {
   const lists = dataview().pages(`"${TASKS}"`).file.lists.array();

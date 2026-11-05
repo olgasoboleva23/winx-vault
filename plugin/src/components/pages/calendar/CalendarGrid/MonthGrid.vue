@@ -1,8 +1,8 @@
 <!-- the month on the desktop: weekday names, then a cell per day with its tasks;
      @pick(event, day): a click on a cell -->
 <script setup>
-import DayFill from "../DayFill.vue";
-import DayZones from "../DayZones.vue";
+import DayFill from "#/components/pages/calendar/DayFill.vue";
+import DayZones from "#/components/pages/calendar/DayZones.vue";
 
 defineProps({ weekdays: { type: Array, required: true }, cells: { type: Array, required: true } });
 defineEmits(["pick"]);

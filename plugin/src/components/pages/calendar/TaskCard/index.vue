@@ -2,8 +2,8 @@
      buttons: the extra slot first, then ⏭ ✏️ 🗑 — or ✏️ 🗑 for a pool item -->
 <script setup>
 import { computed, ref } from "vue";
-import TaskText from "../TaskText.vue";
-import TaskButtons from "../TaskButtons.vue";
+import TaskText from "#/components/pages/calendar/TaskText.vue";
+import TaskButtons from "#/components/pages/calendar/TaskButtons.vue";
 
 const POOL_EDIT = "edit: difficulty, area, time, sticker, then text";
 const props = defineProps({

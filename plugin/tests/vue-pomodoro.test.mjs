@@ -10,8 +10,8 @@ before(async () => {
   window.moment = () => ({ format: () => "2027-01-15" });
   ({ mount } = await import("@vue/test-utils"));
   ({ nextTick } = await import("vue"));
-  PomodoroTimer = (await import("../src/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue")).default;
-  ({ Timer } = await import("../src/models/timer.js"));
+  PomodoroTimer = (await import("#/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue")).default;
+  ({ Timer } = await import("#/models/timer.js"));
 });
 after(() => mock.timers.reset());
 

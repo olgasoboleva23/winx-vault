@@ -7,8 +7,8 @@ before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
   ({ h, defineComponent } = await import("vue"));
-  ShopWidget = (await import("../src/components/pages/dashboard/widgets/shop/ShopWidget/index.vue")).default;
-  SuppliesWidget = (await import("../src/components/pages/dashboard/widgets/market/SuppliesWidget/index.vue")).default;
+  ShopWidget = (await import("#/components/pages/dashboard/widgets/shop/ShopWidget/index.vue")).default;
+  SuppliesWidget = (await import("#/components/pages/dashboard/widgets/market/SuppliesWidget/index.vue")).default;
 });
 // the view inside a stand-in for its card's body
 const inBody = (C, data, actions) =>

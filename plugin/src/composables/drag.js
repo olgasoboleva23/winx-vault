@@ -3,8 +3,8 @@
 // the bottom), onto another open task of its group, before or after it (by the half it's over).
 // Returns { on }: true from a dragstart until the next touch, so a drag's finger moves don't count
 // as a swipe (swipe.js).
-import { AudioEngine } from "../helpers/sounds.js";
-import { canReorder, findTask } from "../models/calendarData.js";
+import { AudioEngine } from "#/helpers/sounds.js";
+import { canReorder, findTask } from "#/models/calendarData.js";
 
 export function useDrag(view) {
   const el = view.contentEl, drag = { on: false };

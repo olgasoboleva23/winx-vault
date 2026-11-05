@@ -3,10 +3,10 @@
 <script setup>
 import { computed, inject } from "vue";
 import { Platform } from "obsidian";
-import WinxButton from "../../../uikit/WinxButton/index.vue";
-import { T } from "../../../../models/calendarData.js";
-import { goTo } from "../../../../store/calendar.js";
-import { addDays, addMonths } from "../../../../helpers/dates.js";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
+import { T } from "#/models/calendarData.js";
+import { goTo } from "#/store/calendar.js";
+import { addDays, addMonths } from "#/helpers/dates.js";
 
 const M = d => window.moment(d);
 const view = inject("calendar");

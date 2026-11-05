@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { weekOf } from "../src/helpers/dates.js";
-import { Goal, reminders } from "../src/models/goal.js";
-import { CycleLog } from "../src/models/cycleLog.js";
-import { WeightLog } from "../src/models/weightLog.js";
-import { BodyLog } from "../src/models/bodyLog.js";
-import { MarketItem } from "../src/models/marketItem.js";
-import { paydays, SavingsJar } from "../src/models/savingsJar.js";
+import { weekOf } from "#/helpers/dates.js";
+import { Goal, reminders } from "#/models/goal.js";
+import { CycleLog } from "#/models/cycleLog.js";
+import { WeightLog } from "#/models/weightLog.js";
+import { BodyLog } from "#/models/bodyLog.js";
+import { MarketItem } from "#/models/marketItem.js";
+import { paydays, SavingsJar } from "#/models/savingsJar.js";
 
 // 2026-10-19 is a Monday
 const w = Goal.parse("name:: Stretching\n  tag:: #goal/stretch\n  days:: пн, ср, пт\n  min:: 10 minutes\n  plan:: if...");

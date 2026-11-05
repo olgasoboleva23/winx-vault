@@ -1,9 +1,9 @@
 // The task window: what the Tasks plugin's dialog doesn't ask (difficulty, area, time of day,
 // sticker), in the shared Form window. Used to edit a task (controllers/tasks.js) and for a new one
 // (the New task command).
-import config from "../../../helpers/config.js";
-import { app } from "../../../helpers/app.js";
-import { Form } from "../Form/index.ts";
+import config from "#/helpers/config.js";
+import { app } from "#/helpers/app.js";
+import { Form } from "#/components/uikit/Form/index.ts";
 
 // What the Tasks modal doesn't ask: difficulty, area, time of day, sticker (from 00
 // System/Assets/stickers); `preset` (Task#picks) has the current ones. A new task must have a

@@ -1,9 +1,9 @@
 // The ```winx block: the widgets by name (each a .vue on a VueHost) and what the plugin does
 // with a block.
-import { parseBlock } from "../helpers/parse.js";
-import { blockDv } from "../helpers/plugins.js";
-import { app } from "../helpers/app.js";
-import { VueHost } from "../composables/vueHost.ts";
+import { parseBlock } from "#/helpers/parse.js";
+import { blockDv } from "#/helpers/plugins.js";
+import { app } from "#/helpers/app.js";
+import { VueHost } from "#/composables/vueHost.ts";
 import { loadLevelToday, loadLifeAreas, loadXpToday } from "./xp.js";
 import { loadShop, shopActions } from "./shop.js";
 import {
@@ -17,21 +17,21 @@ import { LOG_PATH as BODY_LOG, PATH as WEIGHT, loadWeight, weightActions } from 
 import { dailyNoteActions, loadDailyNote } from "./dailyNote.js";
 import { loadPomodoro, pomodoroActions } from "./pomodoro.js";
 // the widgets' markup: components/pages/dashboard/widgets/
-import XpToday from "../components/pages/dashboard/widgets/xp/XpToday/index.vue";
-import LevelToday from "../components/pages/dashboard/widgets/xp/LevelToday/index.vue";
-import LifeAreas from "../components/pages/dashboard/widgets/xp/LifeAreas/index.vue";
-import ShopWidget from "../components/pages/dashboard/widgets/shop/ShopWidget/index.vue";
-import SuppliesWidget from "../components/pages/dashboard/widgets/market/SuppliesWidget/index.vue";
-import CelestialMarket from "../components/pages/dashboard/widgets/market/CelestialMarket/index.vue";
-import CelestialMarketAdd from "../components/pages/dashboard/widgets/market/CelestialMarketAdd.vue";
-import GoalsWidget from "../components/pages/dashboard/widgets/goals/GoalsWidget/index.vue";
-import SavingsJars from "../components/pages/dashboard/widgets/savings/SavingsJars/index.vue";
-import CycleWidget from "../components/pages/dashboard/widgets/body/CycleWidget/index.vue";
-import FinanceMonths from "../components/pages/dashboard/widgets/finance/FinanceMonths/index.vue";
-import FinanceLine from "../components/pages/dashboard/widgets/finance/FinanceLine/index.vue";
-import WeightCard from "../components/pages/dashboard/widgets/body/WeightCard/index.vue";
-import DailyNoteOpen from "../components/pages/dashboard/widgets/DailyNoteOpen.vue";
-import PomodoroTimer from "../components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue";
+import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
+import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";
+import LifeAreas from "#/components/pages/dashboard/widgets/xp/LifeAreas/index.vue";
+import ShopWidget from "#/components/pages/dashboard/widgets/shop/ShopWidget/index.vue";
+import SuppliesWidget from "#/components/pages/dashboard/widgets/market/SuppliesWidget/index.vue";
+import CelestialMarket from "#/components/pages/dashboard/widgets/market/CelestialMarket/index.vue";
+import CelestialMarketAdd from "#/components/pages/dashboard/widgets/market/CelestialMarketAdd.vue";
+import GoalsWidget from "#/components/pages/dashboard/widgets/goals/GoalsWidget/index.vue";
+import SavingsJars from "#/components/pages/dashboard/widgets/savings/SavingsJars/index.vue";
+import CycleWidget from "#/components/pages/dashboard/widgets/body/CycleWidget/index.vue";
+import FinanceMonths from "#/components/pages/dashboard/widgets/finance/FinanceMonths/index.vue";
+import FinanceLine from "#/components/pages/dashboard/widgets/finance/FinanceLine/index.vue";
+import WeightCard from "#/components/pages/dashboard/widgets/body/WeightCard/index.vue";
+import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vue";
+import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue";
 
 // the widgets moved to Vue: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes,
 // cardButton: a .vue next to the card's title, bodyClass: a class on the card's body, follows:

@@ -3,14 +3,14 @@
 // the cycle), rules in models/vitals.js. Life Areas: a radar of XP per area over the last 4 weeks,
 // plus the habit bonus this month. XP Today: the day's XP (with the habit bonus), its aura level,
 // ↑/↓ against the 7-day average, the month as a heatmap. The markup: widgets/xp/.
-import config from "../helpers/config.js";
-import { pageDay, todayYmd, ymd } from "../helpers/dates.js";
-import { Task } from "../models/task.js";
-import { levelInfo, taskXp } from "../models/xp.js";
-import { mana, mpLine, mpTable, vitals } from "../models/vitals.js";
+import config from "#/helpers/config.js";
+import { pageDay, todayYmd, ymd } from "#/helpers/dates.js";
+import { Task } from "#/models/task.js";
+import { levelInfo, taskXp } from "#/models/xp.js";
+import { mana, mpLine, mpTable, vitals } from "#/models/vitals.js";
 import { cycleLog } from "./cycle.js";
-import { dailyFolder, TASKS } from "../helpers/paths.js";
-import { chartColor } from "../helpers/chart.js";
+import { dailyFolder, TASKS } from "#/helpers/paths.js";
+import { chartColor } from "#/helpers/chart.js";
 
 // Single pass over the daily notes (in `folder`) in [start, end]:
 // { habitName: { area: "#area/x", days: Set<"yyyy-MM-dd"> } }

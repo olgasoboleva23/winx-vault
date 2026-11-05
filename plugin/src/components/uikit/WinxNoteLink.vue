@@ -2,7 +2,7 @@
      block is in -->
 <script setup>
 import { inject } from "vue";
-import { app } from "../../helpers/app.js";
+import { app } from "#/helpers/app.js";
 import WinxButton from "./WinxButton/index.vue";
 
 const props = defineProps({

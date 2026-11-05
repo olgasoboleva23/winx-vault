@@ -1,7 +1,7 @@
 <!-- Goals: per goal "X of Y this week", Mon–Sun dots (done, missed, planned or none; the page's day
      ringed), the minimum version and how often it was done -->
 <script setup>
-import WinxMissing from "../../../../../uikit/WinxMissing.vue";
+import WinxMissing from "#/components/uikit/WinxMissing.vue";
 
 defineProps({ state: { type: Object, required: true } });
 </script>

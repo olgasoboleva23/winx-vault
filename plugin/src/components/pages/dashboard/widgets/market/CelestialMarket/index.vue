@@ -2,10 +2,10 @@
      written as bought), what runs low soon, and links to the market and the supplies -->
 <script setup>
 import { reactive, watch } from "vue";
-import WinxEmpty from "../../../../../uikit/WinxEmpty/index.vue";
-import WinxMissing from "../../../../../uikit/WinxMissing.vue";
-import WinxGroupHeader from "../../../../../uikit/WinxGroupHeader.vue";
-import WinxNoteLink from "../../../../../uikit/WinxNoteLink.vue";
+import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
+import WinxMissing from "#/components/uikit/WinxMissing.vue";
+import WinxGroupHeader from "#/components/uikit/WinxGroupHeader.vue";
+import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 
 const props = defineProps({
   state: { type: Object, required: true },

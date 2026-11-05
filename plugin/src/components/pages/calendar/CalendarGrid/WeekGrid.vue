@@ -1,6 +1,6 @@
 <!-- the week: 7 day columns -->
 <script setup>
-import CalendarDay from "../CalendarDay.vue";
+import CalendarDay from "#/components/pages/calendar/CalendarDay.vue";
 
 defineProps({ days: { type: Array, required: true } });
 </script>

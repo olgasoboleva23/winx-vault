@@ -3,12 +3,12 @@
      CycleRows, CycleStats draw. -->
 <script setup>
 import { computed, ref } from "vue";
-import { app } from "../../../../../../helpers/app.js";
-import WinxButton from "../../../../../uikit/WinxButton/index.vue";
-import WinxEmpty from "../../../../../uikit/WinxEmpty/index.vue";
-import WinxMissing from "../../../../../uikit/WinxMissing.vue";
-import WinxNoteLink from "../../../../../uikit/WinxNoteLink.vue";
-import { CYCLE_PATH } from "../../../../../../controllers/cycle.js";
+import { app } from "#/helpers/app.js";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
+import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
+import WinxMissing from "#/components/uikit/WinxMissing.vue";
+import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
+import { CYCLE_PATH } from "#/controllers/cycle.js";
 import CycleHead from "./CycleHead.vue";
 import CycleRows from "./CycleRows.vue";
 import CycleStats from "./CycleStats.vue";

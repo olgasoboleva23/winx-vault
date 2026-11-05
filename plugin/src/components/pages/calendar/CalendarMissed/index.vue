@@ -2,12 +2,12 @@
      its day, with Tasks) or ☀️ (moved to today) takes it off at once, the write follows -->
 <script setup>
 import { computed, inject, reactive, watch } from "vue";
-import WinxButton from "../../../uikit/WinxButton/index.vue";
-import TaskText from "../TaskText.vue";
-import TaskButtons from "../TaskButtons.vue";
-import { T } from "../../../../models/calendarData.js";
-import { dm } from "../../../../helpers/dates.js";
-import { AudioEngine } from "../../../../helpers/sounds.js";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
+import TaskText from "#/components/pages/calendar/TaskText.vue";
+import TaskButtons from "#/components/pages/calendar/TaskButtons.vue";
+import { T } from "#/models/calendarData.js";
+import { dm } from "#/helpers/dates.js";
+import { AudioEngine } from "#/helpers/sounds.js";
 
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);

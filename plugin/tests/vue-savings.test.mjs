@@ -1,16 +1,16 @@
 import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { setApp } from "../src/helpers/app.js";
+import { setApp } from "#/helpers/app.js";
 
 let mount, SavingsJars, savingsActions, Form;
 before(async () => {
   GlobalRegistrator.register();
   globalThis.window.moment = () => ({ format: () => "2026-10-30" });
   ({ mount } = await import("@vue/test-utils"));
-  SavingsJars = (await import("../src/components/pages/dashboard/widgets/savings/SavingsJars/index.vue")).default;
-  ({ savingsActions } = await import("../src/controllers/savings.js"));
-  ({ Form } = await import("../src/components/uikit/Form/index.ts"));
+  SavingsJars = (await import("#/components/pages/dashboard/widgets/savings/SavingsJars/index.vue")).default;
+  ({ savingsActions } = await import("#/controllers/savings.js"));
+  ({ Form } = await import("#/components/uikit/Form/index.ts"));
 });
 const jar = {
   path: "S/Bike.md", name: "New bike", img: "app://bike.webp", greyed: "clip-path: inset(0 0 25% 0)",

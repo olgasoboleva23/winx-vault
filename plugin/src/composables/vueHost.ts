@@ -10,9 +10,9 @@ import { MarkdownRenderChild } from "obsidian";
 import { h, nextTick, reactive, type Component as VueComponent } from "vue";
 import { useVueApp } from "./vueApp.ts";
 import { useDataviewChanges, useRedraw, useTabDate, useWhenIndexed } from "./use.js";
-import { app } from "../helpers/app.js";
-import WinxCard from "../components/uikit/WinxCard/index.vue";
-import WinxFailed from "../components/uikit/WinxFailed.vue";
+import { app } from "#/helpers/app.js";
+import WinxCard from "#/components/uikit/WinxCard/index.vue";
+import WinxFailed from "#/components/uikit/WinxFailed.vue";
 
 export interface HostOptions<D> {
   load: () => Promise<D>;

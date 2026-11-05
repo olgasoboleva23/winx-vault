@@ -2,12 +2,12 @@
 // session, the mini row, today's stats); the end-of-session sound, the lengths' window and the
 // save. The markup and the ticking: widgets/pomodoro/PomodoroTimer (a running session lives on in
 // models/timer.js through a remount; the ticking stops when the block goes).
-import { todayYmd } from "../helpers/dates.js";
-import { readJson } from "../helpers/files.js";
-import { AudioEngine } from "../helpers/sounds.js";
-import { Form } from "../components/uikit/Form/index.ts";
-import { app } from "../helpers/app.js";
-import { addStats } from "../models/timer.js";
+import { todayYmd } from "#/helpers/dates.js";
+import { readJson } from "#/helpers/files.js";
+import { AudioEngine } from "#/helpers/sounds.js";
+import { Form } from "#/components/uikit/Form/index.ts";
+import { app } from "#/helpers/app.js";
+import { addStats } from "#/models/timer.js";
 
 export const PATH = "00 System/Data/pomodoro.json";
 

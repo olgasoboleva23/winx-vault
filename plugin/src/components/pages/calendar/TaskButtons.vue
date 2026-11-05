@@ -3,7 +3,7 @@
      its row goes at once -->
 <script setup>
 import { computed, inject, ref } from "vue";
-import WinxButton from "../../uikit/WinxButton/index.vue";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
 
 const props = defineProps({
   task: { type: Object, required: true },

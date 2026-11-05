@@ -2,11 +2,11 @@
 // far, a ✦ stamp per deposit); on a payday "put in N" until the deposit is in; with a price the
 // picture fills with colour from the bottom and, past halfway, "saved" turns into "left". Writes: a
 // payday's deposit into a jar's note. The markup: widgets/savings/SavingsJars.
-import { dm, todayYmd, weekday } from "../helpers/dates.js";
-import { money } from "../helpers/format.js";
-import { SavingsJar } from "../models/savingsJar.js";
-import { edit } from "../helpers/files.js";
-import { Form } from "../components/uikit/Form/index.ts";
+import { dm, todayYmd, weekday } from "#/helpers/dates.js";
+import { money } from "#/helpers/format.js";
+import { SavingsJar } from "#/models/savingsJar.js";
+import { edit } from "#/helpers/files.js";
+import { Form } from "#/components/uikit/Form/index.ts";
 
 const FOLDER = "00 System/Data/Savings";
 const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

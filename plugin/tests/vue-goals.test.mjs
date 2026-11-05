@@ -6,7 +6,7 @@ let mount, GoalsWidget;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  GoalsWidget = (await import("../src/components/pages/dashboard/widgets/goals/GoalsWidget/index.vue")).default;
+  GoalsWidget = (await import("#/components/pages/dashboard/widgets/goals/GoalsWidget/index.vue")).default;
 });
 
 test("Goals: a goal's count, its dots (the page's day ringed), its plan as the tooltip and its minimum line", () => {

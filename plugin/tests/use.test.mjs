@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { useRedraw, useNewDay, useBusy, useDataviewChanges, useWhenIndexed, useTabDate, useNoteLinks } from "../src/composables/use.js";
-import { setApp } from "../src/helpers/app.js";
+import { useRedraw, useNewDay, useBusy, useDataviewChanges, useWhenIndexed, useTabDate, useNoteLinks } from "#/composables/use.js";
+import { setApp } from "#/helpers/app.js";
 
 // a component that keeps what it's given: DOM listeners by type, workspace / vault events by name, intervals
 const component = () => {

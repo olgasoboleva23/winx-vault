@@ -1,7 +1,7 @@
 // The ledger's numbers, without markup (tested by tests/finance.test.mjs): a month note's rows, a
 // month's totals, the Finance page's report. A row: { date, time, amount, category, description };
 // spending is negative.
-import { amount as toAmount } from "../helpers/format.js";
+import { amount as toAmount } from "#/helpers/format.js";
 
 // transfers move money between your own accounts or split bills: not spending or income
 const TRANSFER = "Переводы";

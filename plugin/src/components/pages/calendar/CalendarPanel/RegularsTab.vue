@@ -2,13 +2,13 @@
      ▶ resume: from today -->
 <script setup>
 import { computed, inject } from "vue";
-import WinxButton from "../../../uikit/WinxButton/index.vue";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import GroupCard from "./GroupCard.vue";
-import TaskCard from "../TaskCard/index.vue";
-import { T } from "../../../../models/calendarData.js";
-import { dm } from "../../../../helpers/dates.js";
-import { ruleText } from "../../../../models/repeats.js";
-import { byArea } from "../../../../helpers/panelGroups.js";
+import TaskCard from "#/components/pages/calendar/TaskCard/index.vue";
+import { T } from "#/models/calendarData.js";
+import { dm } from "#/helpers/dates.js";
+import { ruleText } from "#/models/repeats.js";
+import { byArea } from "#/helpers/panelGroups.js";
 
 const RESUME = "resume: from today, on the first day its rule allows";
 const view = inject("calendar");

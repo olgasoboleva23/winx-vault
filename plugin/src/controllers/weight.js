@@ -3,13 +3,13 @@
 // `reasons` are the vault's own) the log's mode: a level 0–3 and today's reasons, bars for 30 days
 // (the reasons in the tooltip) over the cycle's period days. Writes: today's weight in Weight.md,
 // today's level and reasons in the body log. The markup: widgets/body/WeightCard.
-import { addDays, dm, todayYmd } from "../helpers/dates.js";
-import { WeightLog } from "../models/weightLog.js";
-import { BodyLog } from "../models/bodyLog.js";
+import { addDays, dm, todayYmd } from "#/helpers/dates.js";
+import { WeightLog } from "#/models/weightLog.js";
+import { BodyLog } from "#/models/bodyLog.js";
 import { cycleLog } from "./cycle.js";
-import { chartColor } from "../helpers/chart.js";
-import { edit } from "../helpers/files.js";
-import { amount } from "../helpers/format.js";
+import { chartColor } from "#/helpers/chart.js";
+import { edit } from "#/helpers/files.js";
+import { amount } from "#/helpers/format.js";
 
 export const PATH = "00 System/Data/Weight.md";
 

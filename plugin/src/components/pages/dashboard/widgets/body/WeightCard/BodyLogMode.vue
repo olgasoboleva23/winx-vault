@@ -1,10 +1,10 @@
 <!-- the body log: a level 0–3 and today's reasons (v-model:level, v-model:reasons), Save / Update
      today (@save), the 30 days' bars, ✦ list -->
 <script setup>
-import WinxButton from "../../../../../uikit/WinxButton/index.vue";
-import WinxChart from "../../../../../uikit/WinxChart.vue";
-import WinxNoteLink from "../../../../../uikit/WinxNoteLink.vue";
-import { LOG_PATH } from "../../../../../../controllers/weight.js";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
+import WinxChart from "#/components/uikit/WinxChart.vue";
+import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
+import { LOG_PATH } from "#/controllers/weight.js";
 
 defineProps({ log: { type: Object, required: true } });
 defineEmits(["save"]);

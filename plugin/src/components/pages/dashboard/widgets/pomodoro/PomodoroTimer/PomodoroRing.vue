@@ -1,7 +1,7 @@
 <!-- the full ring: ↺ ▶ ⏭ around the time (a click on it folds back to the small row), the mode and
      session, the stars, the lengths and ⚙ -->
 <script setup>
-import { ICON } from "../../../../../../controllers/pomodoro.js";
+import { ICON } from "#/controllers/pomodoro.js";
 import PomodoroStars from "./PomodoroStars.vue";
 
 defineProps({ shown: { type: Object, required: true } });

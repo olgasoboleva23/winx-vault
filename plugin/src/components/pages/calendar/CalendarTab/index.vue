@@ -2,10 +2,10 @@
      panel; the words while there's nothing to draw ("waiting for Dataview…") -->
 <script setup>
 import { computed, inject } from "vue";
-import CalendarHeader from "../CalendarHeader/index.vue";
-import CalendarMissed from "../CalendarMissed/index.vue";
-import CalendarGrid from "../CalendarGrid/index.vue";
-import CalendarPanel from "../CalendarPanel/index.vue";
+import CalendarHeader from "#/components/pages/calendar/CalendarHeader/index.vue";
+import CalendarMissed from "#/components/pages/calendar/CalendarMissed/index.vue";
+import CalendarGrid from "#/components/pages/calendar/CalendarGrid/index.vue";
+import CalendarPanel from "#/components/pages/calendar/CalendarPanel/index.vue";
 
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);

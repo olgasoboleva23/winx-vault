@@ -8,7 +8,7 @@ import NoDateTab from "./NoDateTab.vue";
 import AheadTab from "./AheadTab.vue";
 import PoolTab from "./PoolTab.vue";
 import RegularsTab from "./RegularsTab.vue";
-import { SHOWN } from "../../../../helpers/panelGroups.js";
+import { SHOWN } from "#/helpers/panelGroups.js";
 
 const view = inject("calendar");
 const state = view.state;

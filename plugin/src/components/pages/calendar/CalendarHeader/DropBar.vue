@@ -2,7 +2,7 @@
      next 7 days -->
 <script setup>
 import { computed, inject } from "vue";
-import { addDays } from "../../../../helpers/dates.js";
+import { addDays } from "#/helpers/dates.js";
 
 const view = inject("calendar");
 

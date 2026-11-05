@@ -1,10 +1,10 @@
 import { Component, ItemView, MarkdownRenderer, Platform, WorkspaceLeaf } from "obsidian";
 import { h, reactive } from "vue";
-import { useVueApp } from "../../../composables/vueApp.ts";
+import { useVueApp } from "#/composables/vueApp.ts";
 import layout from "./layout.md";
-import { todayYmd } from "../../../helpers/dates.js";
-import { useBusy, useNewDay, useNoteLinks } from "../../../composables/use.js";
-import { DATA } from "../../../helpers/paths.js";
+import { todayYmd } from "#/helpers/dates.js";
+import { useBusy, useNewDay, useNoteLinks } from "#/composables/use.js";
+import { DATA } from "#/helpers/paths.js";
 import DashboardDate from "./DashboardDate.vue";
 
 // The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn

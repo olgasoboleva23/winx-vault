@@ -1,6 +1,6 @@
 // The pomodoro's clock, without markup (tested by tests/pomodoro.test.mjs). `now` is the clock
 // (Date.now; a test's own).
-import { todayYmd } from "../helpers/dates.js";
+import { todayYmd } from "#/helpers/dates.js";
 
 const DEFAULTS = { focusMin: 25, breakMin: 5 };
 

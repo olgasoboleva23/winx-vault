@@ -7,7 +7,7 @@ import { Platform } from "obsidian";
 import WeekGrid from "./WeekGrid.vue";
 import MonthGrid from "./MonthGrid.vue";
 import PhoneMonth from "./PhoneMonth.vue";
-import { dateFor } from "../../../../store/calendar.js";
+import { dateFor } from "#/store/calendar.js";
 
 const EMPTY = [".winx-cal__num", ".winx-cal__marks", ".winx-cal__marks *", ".winx-cal__dots",
   ".winx-cal__dots *"].join(", ");

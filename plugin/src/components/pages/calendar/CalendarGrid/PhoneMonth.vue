@@ -1,8 +1,8 @@
 <!-- the month on the phone: a cell per day with a dot per task, and the picked day as a day card
      under it; @pick(event, day): a click on a cell -->
 <script setup>
-import CalendarDay from "../CalendarDay.vue";
-import DayZones from "../DayZones.vue";
+import CalendarDay from "#/components/pages/calendar/CalendarDay.vue";
+import DayZones from "#/components/pages/calendar/DayZones.vue";
 
 defineProps({
   weekdays: { type: Array, required: true },

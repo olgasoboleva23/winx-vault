@@ -2,12 +2,12 @@
      each day's first) -->
 <script setup>
 import { computed, inject } from "vue";
-import WinxEmpty from "../../../uikit/WinxEmpty/index.vue";
+import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import GroupCard from "./GroupCard.vue";
-import TaskCard from "../TaskCard/index.vue";
-import { T } from "../../../../models/calendarData.js";
-import { diffDays } from "../../../../helpers/dates.js";
-import { areaTitle } from "../../../../helpers/panelGroups.js";
+import TaskCard from "#/components/pages/calendar/TaskCard/index.vue";
+import { T } from "#/models/calendarData.js";
+import { diffDays } from "#/helpers/dates.js";
+import { areaTitle } from "#/helpers/panelGroups.js";
 
 const M = d => window.moment(d);
 const view = inject("calendar");

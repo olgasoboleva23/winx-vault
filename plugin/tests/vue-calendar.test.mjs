@@ -2,7 +2,7 @@ import { test, before, mock } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { createRequire } from "node:module";
-import { setApp } from "../src/helpers/app.js";
+import { setApp } from "#/helpers/app.js";
 
 // The calendar tab on Vue: its state through Obsidian's layout, a tick's 2 s, the folds, the panel's tab
 const require = createRequire(import.meta.url);
@@ -20,12 +20,12 @@ before(async () => {
     loadLocalStorage: () => null, saveLocalStorage() {}, commands: { executeCommandById() {} },
   });
   vue = await import("vue");
-  Tab = (await import("../src/components/pages/calendar/CalendarTab/index.vue")).default;
-  data = await import("../src/models/calendarData.js");
-  actions = await import("../src/controllers/calendar.js");
-  state = await import("../src/store/calendar.js");
-  ({ CalendarView } = await import("../src/components/pages/calendar/view.ts"));
-  ({ useLater } = await import("../src/composables/use.js"));
+  Tab = (await import("#/components/pages/calendar/CalendarTab/index.vue")).default;
+  data = await import("#/models/calendarData.js");
+  actions = await import("#/controllers/calendar.js");
+  state = await import("#/store/calendar.js");
+  ({ CalendarView } = await import("#/components/pages/calendar/view.ts"));
+  ({ useLater } = await import("#/composables/use.js"));
   ({ Component } = await import("obsidian"));
 });
 

@@ -3,10 +3,10 @@
 // period, the fertile window, the ovulation), or the last 10 cycles' lengths and period lengths as
 // columns with their average. Writes: "started today / ended yesterday" in Cycle.md. The markup:
 // widgets/body/CycleWidget (folded by default: a click on the head toggles it, kept per device).
-import { CycleLog } from "../models/cycleLog.js";
-import { dm, pageDay, ymd } from "../helpers/dates.js";
-import { mana, mpLine, mpTable } from "../models/vitals.js";
-import { appendLine } from "../helpers/files.js";
+import { CycleLog } from "#/models/cycleLog.js";
+import { dm, pageDay, ymd } from "#/helpers/dates.js";
+import { mana, mpLine, mpTable } from "#/models/vitals.js";
+import { appendLine } from "#/helpers/files.js";
 
 export const CYCLE_PATH = "00 System/Data/Cycle.md";
 

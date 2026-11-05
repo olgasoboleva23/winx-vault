@@ -1,10 +1,10 @@
 <!-- the top row: the date field, sounds on/off, ＋ task, ✦ to the dashboard (the phone) -->
 <script setup>
 import { computed, inject, ref } from "vue";
-import WinxButton from "../../../uikit/WinxButton/index.vue";
-import { goTo } from "../../../../store/calendar.js";
-import { isMuted, toggleMute } from "../../../../helpers/sounds.js";
-import { app } from "../../../../helpers/app.js";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
+import { goTo } from "#/store/calendar.js";
+import { isMuted, toggleMute } from "#/helpers/sounds.js";
+import { app } from "#/helpers/app.js";
 
 const view = inject("calendar");
 const base = computed(() => view.ctx.base);

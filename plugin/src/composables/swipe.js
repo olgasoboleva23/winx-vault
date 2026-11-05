@@ -3,7 +3,7 @@
 // Only a mostly-sideways swipe counts, so scrolling still works (touch-action: pan-y in the
 // styles); a swipe stops its touches at the row, so Obsidian doesn't take a sideways one for
 // opening a sidebar. `drag.on` (drag.js): a drag, not a swipe.
-import { T, findTask } from "../models/calendarData.js";
+import { T, findTask } from "#/models/calendarData.js";
 
 export function useSwipe(view, drag) {
   const el = view.contentEl;

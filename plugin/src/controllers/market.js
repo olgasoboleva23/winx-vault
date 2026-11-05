@@ -3,16 +3,16 @@
 // again, how long since the last time against the usual gap. Writes: an item on the list (＋: a
 // search of everything bought before, the most bought first, or a new one typed), an item bought
 // (✓), an item running low back on the list. The markup: widgets/market/.
-import { dm, todayYmd, ymd } from "../helpers/dates.js";
-import { catOf, MARKET, marketCats, marketChoices, supplyStats } from "../models/market.js";
-import { MarketItem } from "../models/marketItem.js";
+import { dm, todayYmd, ymd } from "#/helpers/dates.js";
+import { catOf, MARKET, marketCats, marketChoices, supplyStats } from "#/models/market.js";
+import { MarketItem } from "#/models/marketItem.js";
 import { Notice } from "obsidian";
-import { Search } from "../components/uikit/Search/index.ts";
-import { Form } from "../components/uikit/Form/index.ts";
-import { appendLine, editLine } from "../helpers/files.js";
-import { findChoices } from "../helpers/find.js";
-import { dataview } from "../helpers/plugins.js";
-import { app } from "../helpers/app.js";
+import { Search } from "#/components/uikit/Search/index.ts";
+import { Form } from "#/components/uikit/Form/index.ts";
+import { appendLine, editLine } from "#/helpers/files.js";
+import { findChoices } from "#/helpers/find.js";
+import { dataview } from "#/helpers/plugins.js";
+import { app } from "#/helpers/app.js";
 
 // { history: [{name, tag, date}] of bought items, open: Set of lowercased names still on the list }
 export function marketState(dv) {

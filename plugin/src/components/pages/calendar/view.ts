@@ -1,19 +1,19 @@
 import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
 import { computed, markRaw, nextTick, reactive, ref, watch } from "vue";
-import { POOL, TASKS } from "../../../helpers/paths.js";
+import { POOL, TASKS } from "#/helpers/paths.js";
 import {
   useBusy, useDataviewChanges, useIndexReady, useLater, useNewDay, useRedraw,
-} from "../../../composables/use.js";
-import { app } from "../../../helpers/app.js";
-import { useVueApp } from "../../../composables/vueApp.ts";
-import { dataview, tasksApi } from "../../../helpers/plugins.js";
-import config from "../../../helpers/config.js";
-import { todayYmd } from "../../../helpers/dates.js";
-import { CalendarData, T, findTask, taskInfo } from "../../../models/calendarData.js";
-import { SAVED, baseDate, readState, shownDays } from "../../../store/calendar.js";
-import { makeActions } from "../../../controllers/calendar.js";
-import { useDrag } from "../../../composables/drag.js";
-import { useSwipe } from "../../../composables/swipe.js";
+} from "#/composables/use.js";
+import { app } from "#/helpers/app.js";
+import { useVueApp } from "#/composables/vueApp.ts";
+import { dataview, tasksApi } from "#/helpers/plugins.js";
+import config from "#/helpers/config.js";
+import { todayYmd } from "#/helpers/dates.js";
+import { CalendarData, T, findTask, taskInfo } from "#/models/calendarData.js";
+import { SAVED, baseDate, readState, shownDays } from "#/store/calendar.js";
+import { makeActions } from "#/controllers/calendar.js";
+import { useDrag } from "#/composables/drag.js";
+import { useSwipe } from "#/composables/swipe.js";
 import CalendarTab from "./CalendarTab/index.vue";
 
 // The calendar tab: the week (7 day columns) or the month around a date, the tasks of 00

@@ -1,9 +1,9 @@
 // The goals' controller: per goal "X of Y this week", Mon–Sun dots, the minimum version, and how
 // often it was done. A missed goal task stays on its day (the calendar's Missed? lists it). The
 // markup: widgets/goals/GoalsWidget.
-import { dm, pageDay, todayYmd, weekOf, ymd } from "../helpers/dates.js";
-import { Goal } from "../models/goal.js";
-import { GOALS, TASKS } from "../helpers/paths.js";
+import { dm, pageDay, todayYmd, weekOf, ymd } from "#/helpers/dates.js";
+import { Goal } from "#/models/goal.js";
+import { GOALS, TASKS } from "#/helpers/paths.js";
 
 export async function loadGoals({ dv, app }) {
   const path = `${GOALS}.md`;

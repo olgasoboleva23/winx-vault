@@ -3,11 +3,11 @@
 // ◀ ▶ step through the months. The data (00 System/Data/Finance) stays in the vault. The markup:
 // widgets/finance/FinanceMonths (the Finance page; its styles also hold the dashboard card's
 // winx-fin-month block), widgets/finance/FinanceLine/index.vue (the dashboard's card).
-import { dm } from "../helpers/dates.js";
-import { money } from "../helpers/format.js";
-import { readJson } from "../helpers/files.js";
-import { LEDGER, RULES } from "../helpers/paths.js";
-import { monthReport, parseLedger, summarize } from "../models/ledger.js";
+import { dm } from "#/helpers/dates.js";
+import { money } from "#/helpers/format.js";
+import { readJson } from "#/helpers/files.js";
+import { LEDGER, RULES } from "#/helpers/paths.js";
+import { monthReport, parseLedger, summarize } from "#/models/ledger.js";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
   "September", "October", "November", "December"];

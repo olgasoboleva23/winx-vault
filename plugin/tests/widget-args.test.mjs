@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseBlock } from "../src/helpers/parse.js";
+import { parseBlock } from "#/helpers/parse.js";
 
 test("a ```winx block: the widget's name, then key: value lines", () => {
   assert.deepEqual(parseBlock("weight"), { name: "weight", args: {} });

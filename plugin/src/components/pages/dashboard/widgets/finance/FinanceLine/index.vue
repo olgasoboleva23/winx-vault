@@ -1,7 +1,7 @@
 <!-- the dashboard's Finance card: this month's spent and income on one line, the Finance note a tap
      away -->
 <script setup>
-import WinxNoteLink from "../../../../../uikit/WinxNoteLink.vue";
+import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 
 defineProps({ state: { type: Object, required: true } });
 </script>
