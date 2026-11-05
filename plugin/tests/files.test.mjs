@@ -100,6 +100,16 @@ test("moveLine puts a line, with the lines indented under it, before or after an
   assert.equal(files["a.md"], "- [ ] d\n- [ ] a\n- [ ] c\n  - c's note\n- [ ] b\n  - note");
 });
 
+test("moveLine moves a line only among lines of its own indent: not into its own block, not out of it", async () => {
+  const { files } = vault({ "a.md": "- [ ] a\n  - [ ] a1\n  - [ ] a2\n- [ ] b" });
+  const any = () => true;
+  assert.equal(await moveLine("a.md", 0, any, 1, any, true), false);    // a after its own a1
+  assert.equal(await moveLine("a.md", 2, any, 3, any, true), false);    // a2 out, after b
+  assert.equal(files["a.md"], "- [ ] a\n  - [ ] a1\n  - [ ] a2\n- [ ] b");
+  assert.equal(await moveLine("a.md", 2, any, 1, any, false), true);    // a2 before a1
+  assert.equal(files["a.md"], "- [ ] a\n  - [ ] a2\n  - [ ] a1\n- [ ] b");
+});
+
 test("moveLine writes only when both lines are still the same: else nothing, false and a notice", async () => {
   const { files } = vault({ "a.md": "- [ ] tea\n- [ ] milk" });
   const tea = l => l.includes("tea"), bread = l => l.includes("bread");

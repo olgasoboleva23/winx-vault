@@ -13,9 +13,10 @@ export const dayGroup = t => !T(t).isRecurring ? "one"
   : ["morning", "evening"].includes(T(t).time) ? T(t).time : "other";
 
 // a task dragged onto another of its day: it moves before or after it only within its group and
-// its file (a line moves), and neither follows a lead (#after: it stays under it)
-export const canReorder = (a, b) => a !== b && a.path === b.path && dayGroup(a) === dayGroup(b)
-  && !T(a).after && !T(b).after;
+// its file (a line moves), among its siblings (a subtask under its parent), and neither follows a
+// lead (#after: it stays under it)
+export const canReorder = (a, b) => a !== b && a.path === b.path && a.parent === b.parent
+  && dayGroup(a) === dayGroup(b) && !T(a).after && !T(b).after;
 // a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its
 // earlier followers), with .follows set to it; the rest in their order
 const chain = list => {

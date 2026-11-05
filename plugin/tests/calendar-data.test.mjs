@@ -211,3 +211,11 @@ test("a day's open task goes before or after another only in its own group and f
   assert.equal(canReorder(a, follower), false);
   assert.equal(canReorder(a, elsewhere), false);
 });
+
+test("canReorder: a subtask only among its siblings (same parent)", () => {
+  const parent = task(" ", "plan");
+  const sub = { ...task(" ", "step"), parent: parent.line }, sub2 = { ...task(" ", "step 2"), parent: parent.line };
+  assert.equal(canReorder(sub, sub2), true);
+  assert.equal(canReorder(parent, sub), false);
+  assert.equal(canReorder(sub, parent), false);
+});
