@@ -13,7 +13,7 @@ views:
       and:
         - type == "game"
     order:
-      - title
+      - file.name
       - formula.stars
       - status
       - genre
@@ -25,7 +25,7 @@ views:
       and:
         - type == "game"
     order:
-      - title
+      - file.name
       - status
       - genre
       - hours

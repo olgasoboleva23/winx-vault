@@ -13,7 +13,7 @@ views:
       and:
         - type == "read"
     order:
-      - title
+      - file.name
       - formula.stars
       - media_type
       - status
@@ -24,7 +24,7 @@ views:
       and:
         - type == "read"
     order:
-      - title
+      - file.name
       - status
       - media_type
       - rating

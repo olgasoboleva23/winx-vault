@@ -13,13 +13,13 @@ views:
       and:
         - type == "recipe"
     order:
-      - name
+      - file.name
       - formula.stars
       - time
       - difficulty
       - tags
     sort:
-      - property: name
+      - property: file.name
         direction: ASC
     image: formula.coverImageFormula
   - type: table
@@ -28,7 +28,7 @@ views:
       and:
         - type == "recipe"
     order:
-      - name
+      - file.name
       - time
       - difficulty
       - rating
