@@ -17,8 +17,8 @@ button.winx-btn.winx-btn--round {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 
   &:hover { transform: scale(1.12); box-shadow: 0 0 10px alpha(--winx-gold, 90%); }
+  body.is-mobile & { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
 }
-body.is-mobile button.winx-btn.winx-btn--round { width: $btn-touch; height: $btn-touch; font-size: $text-2xl; }
 
 // nav ‹ ›, chip (＋ task, today, week), toggle (✓ done, 🔁 repeats): white on the calendar's and dashboard's rows
 button.winx-btn:is(.winx-btn--nav, .winx-btn--chip, .winx-btn--toggle) {
@@ -57,8 +57,8 @@ button.winx-btn.winx-btn--toggle {
   opacity: 0.55;
   box-shadow: none;
   &.winx-btn--on { opacity: 1; border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
+  button:not(.winx-btn--toggle) + & { margin-left: auto; }
 }
-button:not(.winx-btn--toggle) + button.winx-btn.winx-btn--toggle { margin-left: auto; }
 
 // text: a word in the text's colour, no frame (the market's ✦ open market)
 button.winx-btn.winx-btn--text {
