@@ -18,18 +18,22 @@ const props = defineProps({
 });
 const view = inject("calendar");
 const ticking = ref(false), done = ref(false), gone = ref(false);
-let timer = 0;
 const box = computed(() => !props.compact && props.tick && props.kind !== "ghost");
 const live = computed(() => !props.compact && props.kind === "open");
 const drags = computed(() => props.kind !== "ghost");   // a ghost (a 🔁 day ahead) isn't dragged
 const repeat = computed(() => props.kind === "ghost" ? "🔁 " : "");
 
+// ticked: written 2 s later (unticked in time: nothing); the wait is the tab's (view.waits), so a
+// redraw doesn't drop it, and a closed tab does
 function onTick(e) {
   ticking.value = e.target.checked;
-  window.clearTimeout(timer);
   const t = e.target.checked && view.task(props.task.key);
 
-  if (t) timer = window.setTimeout(() => { done.value = true; view.actions.tick(t); }, 2000);
+  if (!t) return view.waits.cancel(props.task.key);
+  view.waits.later(props.task.key, () => {
+    done.value = true;
+    view.actions.tick(t);
+  }, 2000);
 }
 </script>
 

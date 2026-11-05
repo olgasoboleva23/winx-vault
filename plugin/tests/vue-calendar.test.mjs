@@ -7,7 +7,7 @@ import { setApp } from "../src/core/app.js";
 // The calendar tab on Vue: its state through Obsidian's layout, a tick's 2 s, the folds, the panel's tab
 const require = createRequire(import.meta.url);
 const TODAY = "2026-11-04";   // a Wednesday
-let vue, Tab, data, actions, state, CalendarView, saves = 0;
+let vue, Tab, data, actions, state, CalendarView, useLater, Component, saves = 0;
 before(async () => {
   GlobalRegistrator.register();
   window.moment = require("moment");
@@ -25,6 +25,8 @@ before(async () => {
   actions = await import("../src/controllers/calendar.js");
   state = await import("../src/calendar/state.js");
   ({ CalendarView } = await import("../src/calendar/view.ts"));
+  ({ useLater } = await import("../src/core/use.js"));
+  ({ Component } = await import("obsidian"));
 });
 
 let n = 0;
@@ -47,11 +49,14 @@ function mount(over = {}) {
     config: { areas: [{ tag: "#area/body", label: "🌺 Body" }], areaIcons: {}, areaMap: {} },
   });
   ctx.actions = { ...actions.makeActions(ctx), tick: t => ticked.push(t) };
-  const view = { state: st, ctx, actions: ctx.actions, info: t => data.taskInfo(t, ctx, { metadataCache:
+  const tab = new Component();   // the tab: owns the ticks waiting their 2 s
+
+  tab.load();
+  const view = { state: st, ctx, actions: ctx.actions, waits: useLater(tab), info: t => data.taskInfo(t, ctx, { metadataCache:
     { getFirstLinkpathDest: () => null }, vault: {} }), task: k => data.findTask(k, ctx.model.all) };
   const el = document.body.appendChild(document.createElement("div"));
   createApp(Tab).provide("calendar", view).mount(el);
-  return { el, st, ticked };
+  return { el, st, ticked, tab };
 }
 const box = (el, text) => [...el.querySelectorAll(".winx-cal__task--open")].find(r => r.textContent.includes(text))
   .querySelector("input[data-action=tick]");
@@ -89,6 +94,19 @@ test("a tick is written 2 s later; unticked in time, nothing", async () => {
     stretch.checked = false; stretch.dispatchEvent(new Event("change"));
     mock.timers.tick(3000);
     assert.equal(ticked.length, 1);
+  } finally { mock.timers.reset(); }
+});
+
+test("a tick waiting its 2 s outlives the row, not the tab: closed meanwhile, nothing is written", async () => {
+  mock.timers.enable({ apis: ["setTimeout"] });
+  try {
+    const { el, ticked, tab } = mount();
+    const walk = box(el, "walk");
+
+    walk.checked = true; walk.dispatchEvent(new Event("change"));
+    tab.unload();   // the tab closed (or the plugin off) within the 2 s
+    mock.timers.tick(3000);
+    assert.equal(ticked.length, 0);
   } finally { mock.timers.reset(); }
 });
 

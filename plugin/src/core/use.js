@@ -89,3 +89,24 @@ export function useNoteLinks(c, el, isMod = Keymap.isModEvent) {
     void c.app.workspace.openLinkText(link.dataset.href, "", isMod(e));
   });
 }
+
+// delayed calls by key, owned by `c`: later(key, fn, ms) (the same key again: the old one is
+// dropped), cancel(key); all dropped when c unloads (a tab closed, the plugin off)
+export function useLater(c) {
+  const waiting = new Map();
+  const cancel = key => {
+    window.clearTimeout(waiting.get(key));
+    waiting.delete(key);
+  };
+
+  c.register(() => { for (const key of [...waiting.keys()]) cancel(key); });
+  const later = (key, fn, ms) => {
+    cancel(key);
+    waiting.set(key, window.setTimeout(() => {
+      waiting.delete(key);
+      fn();
+    }, ms));
+  };
+
+  return { later, cancel };
+}

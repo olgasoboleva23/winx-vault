@@ -1,7 +1,9 @@
 import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
 import { computed, markRaw, nextTick, reactive, ref, watch } from "vue";
 import { POOL, TASKS } from "../core/paths.js";
-import { useBusy, useDataviewChanges, useIndexReady, useNewDay, useRedraw } from "../core/use.js";
+import {
+  useBusy, useDataviewChanges, useIndexReady, useLater, useNewDay, useRedraw,
+} from "../core/use.js";
 import { app } from "../core/app.js";
 import { useVueApp } from "../core/vueApp.ts";
 import { dataview, tasksApi } from "../core/plugins.js";
@@ -35,6 +37,8 @@ export class CalendarView extends ItemView {
   private version = ref(0);   // bumped when the tasks change: the data is worked out again
   private data = computed(() => { void this.version.value; return markRaw(this.build()); });
   private unmount = () => {};   // the calendar's Vue app (useVueApp), gone on close
+  // the ticks waiting their 2 s (TaskRow): they outlive a redraw, not the tab
+  waits = useLater(this);
   private catchUp = () => {};   // a hidden tab that missed changes, drawn when it shows (useRedraw)
 
   constructor(leaf: WorkspaceLeaf) {
