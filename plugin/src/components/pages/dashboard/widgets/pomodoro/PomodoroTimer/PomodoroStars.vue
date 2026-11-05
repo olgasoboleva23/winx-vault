@@ -1,7 +1,7 @@
 <!-- the four stars of the sessions done (a full set: ×N); the slot goes first (the small row's
      mode) -->
 <script setup>
-import { ICON } from "#/controllers/pomodoro.js";
+import { ICON } from "#/controllers/widgets/pomodoro.js";
 
 defineProps({ filled: { type: Number, required: true }, sets: { type: String, required: true } });
 </script>

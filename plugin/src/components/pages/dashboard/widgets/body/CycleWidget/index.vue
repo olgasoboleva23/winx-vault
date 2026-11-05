@@ -8,7 +8,7 @@ import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
-import { CYCLE_PATH } from "#/controllers/cycle.js";
+import { CYCLE_PATH } from "#/controllers/widgets/cycle.js";
 import CycleHead from "./CycleHead.vue";
 import CycleRows from "./CycleRows.vue";
 import CycleStats from "./CycleStats.vue";

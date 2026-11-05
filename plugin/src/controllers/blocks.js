@@ -3,18 +3,20 @@
 import { blockDv } from "#/helpers/plugins.js";
 import { app } from "#/helpers/app.js";
 import { VueHost } from "#/composables/vueHost.ts";
-import { loadLevelToday, loadLifeAreas, loadXpToday } from "./xp.js";
-import { loadShop, shopActions } from "./shop.js";
+import { loadLevelToday, loadLifeAreas, loadXpToday } from "#/controllers/widgets/xp.js";
+import { loadShop, shopActions } from "#/controllers/widgets/shop.js";
 import {
   celestialMarketActions, loadCelestialMarket, loadSupplies, suppliesActions,
-} from "./market.js";
-import { loadGoals } from "./goals.js";
-import { loadSavings, savingsActions } from "./savings.js";
-import { CYCLE_PATH, cycleActions, loadCycle } from "./cycle.js";
-import { loadFinance, loadFinanceLine } from "./finance.js";
-import { LOG_PATH as BODY_LOG, PATH as WEIGHT, loadWeight, weightActions } from "./weight.js";
-import { dailyNoteActions, loadDailyNote } from "./dailyNote.js";
-import { loadPomodoro, pomodoroActions } from "./pomodoro.js";
+} from "#/controllers/widgets/market.js";
+import { loadGoals } from "#/controllers/widgets/goals.js";
+import { loadSavings, savingsActions } from "#/controllers/widgets/savings.js";
+import { CYCLE_PATH, cycleActions, loadCycle } from "#/controllers/widgets/cycle.js";
+import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
+import {
+  LOG_PATH as BODY_LOG, PATH as WEIGHT, loadWeight, weightActions,
+} from "#/controllers/widgets/weight.js";
+import { dailyNoteActions, loadDailyNote } from "#/controllers/widgets/dailyNote.js";
+import { loadPomodoro, pomodoroActions } from "#/controllers/widgets/pomodoro.js";
 // the widgets' markup: components/pages/dashboard/widgets/
 import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
 import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";

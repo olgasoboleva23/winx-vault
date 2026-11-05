@@ -1,7 +1,7 @@
 <!-- the small row: a ring, the time, the mode and stars, ▶; a click on the ring or the time opens
      the full ring -->
 <script setup>
-import { ICON } from "#/controllers/pomodoro.js";
+import { ICON } from "#/controllers/widgets/pomodoro.js";
 import PomodoroStars from "./PomodoroStars.vue";
 
 defineProps({ shown: { type: Object, required: true } });

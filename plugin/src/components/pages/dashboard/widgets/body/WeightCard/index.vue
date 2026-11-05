@@ -6,7 +6,7 @@
 import { computed, ref, watch } from "vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
-import { PATH } from "#/controllers/weight.js";
+import { PATH } from "#/controllers/widgets/weight.js";
 import WeightMode from "./WeightMode.vue";
 import BodyLogMode from "./BodyLogMode.vue";
 

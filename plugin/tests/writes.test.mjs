@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { setApp } from "#/helpers/app.js";
-import { logPurchase } from "#/controllers/shop.js";
+import { logPurchase } from "#/controllers/widgets/shop.js";
 import { addTask, addPoolLine } from "#/controllers/tasks.js";
 
 const later = () => new Promise(r => setTimeout(r, 5));

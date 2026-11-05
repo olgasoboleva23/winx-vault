@@ -4,7 +4,7 @@
 import WinxAddForm from "#/components/uikit/WinxAddForm/index.vue";
 import WinxChart from "#/components/uikit/WinxChart.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
-import { PATH } from "#/controllers/weight.js";
+import { PATH } from "#/controllers/widgets/weight.js";
 
 defineProps({ weight: { type: Object, required: true } });
 defineEmits(["save"]);

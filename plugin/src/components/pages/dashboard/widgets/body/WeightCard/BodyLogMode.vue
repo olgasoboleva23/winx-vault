@@ -4,7 +4,7 @@
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxChart from "#/components/uikit/WinxChart.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
-import { LOG_PATH } from "#/controllers/weight.js";
+import { LOG_PATH } from "#/controllers/widgets/weight.js";
 
 defineProps({ log: { type: Object, required: true } });
 defineEmits(["save"]);
