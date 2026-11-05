@@ -10,11 +10,12 @@ import {
 } from "#/controllers/widgets/market.js";
 import { loadGoals } from "#/controllers/widgets/goals.js";
 import { loadSavings, savingsActions } from "#/controllers/widgets/savings.js";
-import { CYCLE_PATH, cycleActions, loadCycle } from "#/controllers/widgets/cycle.js";
+import { cycleActions, loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
+import { loadWeight, weightActions } from "#/controllers/widgets/weight.js";
 import {
-  LOG_PATH as BODY_LOG, PATH as WEIGHT, loadWeight, weightActions,
-} from "#/controllers/widgets/weight.js";
+  BODY_LOG, CYCLE, GOALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS, WEIGHT,
+} from "#/helpers/paths.js";
 import { dailyNoteActions, loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro, pomodoroActions } from "#/controllers/widgets/pomodoro.js";
 // the widgets' markup: components/pages/dashboard/widgets/
@@ -35,30 +36,42 @@ import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vu
 import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue";
 
 // the widgets: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes,
-// cardButton: a .vue next to the card's title, bodyClass: a class on the card's body, follows:
-// false to load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
-const blocks = {
-  xpToday: { view: XpToday, load: loadXpToday },
-  levelToday: { view: LevelToday, load: loadLevelToday },
-  lifeAreas: { view: LifeAreas, load: loadLifeAreas },
-  shop: { view: ShopWidget, load: loadShop, actions: shopActions, bodyClass: "winx-shop" },
-  supplies: { view: SuppliesWidget, load: loadSupplies, actions: suppliesActions },
-  goals: { view: GoalsWidget, load: loadGoals },
-  savings: { view: SavingsJars, load: loadSavings, actions: savingsActions },
-  cycle: { view: CycleWidget, load: loadCycle, actions: cycleActions },
-  finance: { view: FinanceMonths, load: loadFinance },
-  financeMonth: { view: FinanceLine, load: loadFinanceLine },
+// cardButton: a .vue next to the card's title, bodyClass: a class on the card's body, watches: the
+// files it reads (a folder: ending in /): only their changes load it again (any other note's
+// doesn't), follows: false to load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
+const TASK_FILES = `${TASKS}/`, MARKET_NOTE = `${MARKET}.md`, LEDGER_FILES = `${LEDGER}/`;
+
+export const blocks = {
+  xpToday: { view: XpToday, load: loadXpToday, watches: [TASK_FILES] },
+  levelToday: { view: LevelToday, load: loadLevelToday, watches: [TASK_FILES, CYCLE] },
+  lifeAreas: { view: LifeAreas, load: loadLifeAreas, watches: [TASK_FILES] },
+  shop: {
+    view: ShopWidget, load: loadShop, actions: shopActions, bodyClass: "winx-shop",
+    watches: [TASK_FILES, `${SHOP}.md`, `${PURCHASES}.md`],
+  },
+  supplies: {
+    view: SuppliesWidget, load: loadSupplies, actions: suppliesActions, watches: [MARKET_NOTE],
+  },
+  goals: { view: GoalsWidget, load: loadGoals, watches: [`${GOALS}.md`, TASK_FILES] },
+  savings: {
+    view: SavingsJars, load: loadSavings, actions: savingsActions, watches: [`${SAVINGS}/`],
+  },
+  cycle: { view: CycleWidget, load: loadCycle, actions: cycleActions, watches: [CYCLE] },
+  finance: { view: FinanceMonths, load: loadFinance, watches: [LEDGER_FILES, RULES] },
+  financeMonth: { view: FinanceLine, load: loadFinanceLine, watches: [LEDGER_FILES, RULES] },
   weight: {
     view: WeightCard, load: loadWeight, actions: weightActions,
-    watches: [WEIGHT, BODY_LOG, CYCLE_PATH],   // not every file's change: typed picks stay
+    watches: [WEIGHT, BODY_LOG, CYCLE],   // typed picks stay
   },
-  dailyNote: { view: DailyNoteOpen, load: loadDailyNote, actions: dailyNoteActions },
+  // the tab's date only (useTabDate)
+  dailyNote: { view: DailyNoteOpen, load: loadDailyNote, actions: dailyNoteActions, watches: [] },
   pomodoro: { view: PomodoroTimer, load: loadPomodoro, actions: pomodoroActions, follows: false },
   celestialMarket: {
     view: CelestialMarket,
     load: loadCelestialMarket,
     actions: celestialMarketActions,
     cardButton: CelestialMarketAdd,
+    watches: [MARKET_NOTE],
   },
 };
 
