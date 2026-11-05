@@ -1,5 +1,4 @@
-<!-- XP Today: the day's XP and aura, ↑/↓ against the 7-day average, the habit bonus, the month as a
-     heatmap -->
+<!-- XP Today: the day's XP and aura, ↑/↓ against the 7-day average, the month as a heatmap -->
 <script setup>
 defineProps({ state: { type: Object, required: true } });
 </script>
@@ -10,10 +9,6 @@ defineProps({ state: { type: Object, required: true } });
       <div class="winx-xp__aura">🔮 {{ state.data.aura }} • {{ state.data.todayXP }} XP</div>
       <div>{{ state.data.trend }} 7d</div>
     </div>
-    <div
-      v-if="state.data.habitBonus > 0"
-      class="winx-xp__bonus"
-    >🏅 +{{ state.data.habitBonus }} habit bonus</div>
     <div class="winx-xp__grid">
       <div
         v-for="(v, i) in state.data.vals"

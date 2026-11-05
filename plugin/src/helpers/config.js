@@ -38,9 +38,6 @@ export default {
     { name: "TRANSFORMATION", max: Infinity, cls: "v4" },
   ],
 
-  HABIT_BONUS_XP: 100,
-  HABIT_BONUS_THRESHOLD: 30,
-
   marketCategories: [
     { label: "🌿 Harvest", tag: "#food" },
     { label: "🌸 Bloom", tag: "#care" },

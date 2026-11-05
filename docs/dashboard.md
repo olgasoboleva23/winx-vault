@@ -40,7 +40,7 @@ Completing a task awards XP and gold by its difficulty:
 | `#⭐⭐⭐hard` | 20 | 10 |
 | `#⭐⭐⭐⭐epic` | 50 | 25 |
 
-Level `n` costs `100 + (n-1) × 25` XP. Complete a habit **30+ times** in a month → **+100 XP** per habit.
+Level `n` costs `100 + (n-1) × 25` XP.
 
 ## Life areas
 
