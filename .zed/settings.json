@@ -1,0 +1,12 @@
+// Zed for this repo: vtsls takes the plugin's TypeScript (6.x). Its own (5.9) rejects imports like
+// "#/helpers/plugins.js" (package.json "imports"), so "go to definition" found nothing.
+{
+  "lsp": {
+    "vtsls": {
+      "settings": {
+        "typescript": { "tsdk": "plugin/node_modules/typescript/lib" },
+        "vtsls": { "autoUseWorkspaceTsdk": true }
+      }
+    }
+  }
+}
