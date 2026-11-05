@@ -39,8 +39,12 @@ export class Cycle extends Widget {
       this.draw();
     },
     tab: (e, el) => { this.tab = el.dataset.tab; this.draw(); },
-    mark: (e, el) =>
-      appendLine(CYCLE_PATH, `- ${el.dataset.kind}:: ${el.dataset.day}`, { header: "period:: 8\n\n", unique: true }),
+    // started: today; ended: yesterday was the last day of the period (CycleLog.endFor)
+    mark: (e, el) => {
+      const { kind, day } = el.dataset, log = cycleLog(this.dv);
+      const date = kind === "end" && log ? log.endFor(day) : day;
+      return appendLine(CYCLE_PATH, `- ${kind}:: ${date}`, { header: "period:: 8\n\n", unique: true });
+    },
   };
   async data() {
     const day = ymd(pageDay(this.dv)), log = cycleLog(this.dv);

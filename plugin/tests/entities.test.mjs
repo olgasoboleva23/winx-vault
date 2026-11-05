@@ -52,7 +52,8 @@ test("reminders", () => {
 
 test("CycleLog: the day of the cycle on a date", () => {
   assert.equal(new CycleLog(["2026-10-05"]).on("2026-10-01"), null);
-  assert.deepEqual(new CycleLog(["2026-10-05"]).on("2026-10-22"), { day: 18, length: 30, period: 8, nextStart: "2026-11-04", daysUntil: 13, isPeriod: false, ended: false });
+  // no end marked yet: still the period, however long (nothing is guessed)
+  assert.deepEqual(new CycleLog(["2026-10-05"]).on("2026-10-22"), { day: 18, length: 30, period: 8, nextStart: "2026-11-04", daysUntil: 13, isPeriod: true, ended: false });
   const c = new CycleLog(["2026-08-01", "2026-08-29", "2026-09-28", "2026-10-27"]).on("2026-10-30");
   assert.equal(c.length, 29); assert.equal(c.day, 4); assert.equal(c.isPeriod, true);
 });
@@ -60,8 +61,9 @@ test("CycleLog: the day of the cycle on a date", () => {
 test("CycleLog with end dates", () => {
   const s = ["2026-09-12", "2026-10-11"];
   const one = ends => new CycleLog(["2026-10-11"], ends, 8);
-  // no end yet for the current cycle: falls back to period length
+  // no end yet for the current cycle: the period goes on until one is marked
   assert.equal(one([]).on("2026-10-15").isPeriod, true);
+  assert.equal(one([]).on("2026-10-30").isPeriod, true);
   assert.equal(one([]).on("2026-10-15").ended, false);
   // end recorded: period lasts exactly to it
   assert.equal(one(["2026-10-16"]).on("2026-10-16").isPeriod, true);
@@ -73,9 +75,10 @@ test("CycleLog with end dates", () => {
   // previous cycle's end does not end the current one
   const c = new CycleLog(s, ["2026-09-17"], 8).on("2026-10-12");
   assert.deepEqual([c.isPeriod, c.ended], [true, false]);
-  // recorded lengths replace the default: last time 6 days, so day 7 is not period
-  assert.equal(new CycleLog(s, ["2026-09-17"], 8).on("2026-10-17").isPeriod, false);
-  assert.equal(new CycleLog(s, ["2026-09-17"], 8).on("2026-10-16").isPeriod, true);
+  // the usual length isn't used to end the current one: day 7 is still the period
+  assert.equal(new CycleLog(s, ["2026-09-17"], 8).on("2026-10-17").isPeriod, true);
+  // a past cycle with no end marked: its days aren't counted as the period (unknown, not guessed)
+  assert.equal(new CycleLog(s, [], 8).on("2026-09-13").isPeriod, false);
 });
 
 test("WeightLog: entries by date, the last one, a day set", () => {
@@ -140,6 +143,12 @@ test("SavingsJar: saved, deposits, the payday's deposit until it's in, the halfw
   assert.equal(priced.pct, 53);
   assert.equal(priced.left, 28000);
   assert.equal(new SavingsJar("- 2026-10-16 10000", { price: 60000 }).pct, 17);
+});
+
+test("CycleLog.endFor: 'ended today' marks yesterday as the last day, not before the start", () => {
+  const log = new CycleLog(["2026-09-12", "2026-10-11"]);
+  assert.equal(log.endFor("2026-10-18"), "2026-10-17");
+  assert.equal(log.endFor("2026-10-11"), "2026-10-11");   // ended on the day it started
 });
 
 test("CycleLog.last: the latest finished cycles, their length and period length", () => {
