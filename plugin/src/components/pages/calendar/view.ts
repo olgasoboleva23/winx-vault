@@ -10,8 +10,7 @@ import { todayYmd } from "#/helpers/dates.js";
 import { CalendarData, T, findTask, taskInfo } from "#/models/calendarData.js";
 import { SAVED, baseDate, readState, shownDays } from "#/store/calendar.js";
 import { makeActions } from "#/controllers/calendar.js";
-import { useDrag } from "#/composables/drag.js";
-import { useSwipe } from "#/composables/swipe.js";
+import { dragState } from "#/composables/drag.js";
 import CalendarTab from "./CalendarTab/index.vue";
 
 // The calendar tab: the week (7 day columns) or the month around a date, the tasks of 00
@@ -21,9 +20,9 @@ import CalendarTab from "./CalendarTab/index.vue";
 // model, today, the shown days, the actions) is worked out again when a key it comes from changes
 // (date, view, ✓ done, area) or the tasks do (store/tasks.js: a task file read again as soon as
 // it's saved); the parts read what they show (the panel's tab, the folds, the phone's picked day)
-// from the state, so a change there redraws only them. Drag (drag.js) and swipe (swipe.js) listen
-// on the tab and find the task by the element's data-task key (file, line, status, words: never
-// another one — see data.js).
+// from the state, so a change there redraws only them. A row handles its own drags (drag.js) and
+// swipes (swipe.js) and names its task by its key (file, line, status, words: never another one —
+// see calendarData.js).
 export const VIEW_TYPE = "winx-calendar";
 
 export class CalendarView extends ItemView {
@@ -37,6 +36,7 @@ export class CalendarView extends ItemView {
   private unmount = () => {};   // the calendar's Vue app (useVueApp), gone on close
   // the ticks waiting their 2 s (TaskRow): they outlive a redraw, not the tab
   waits = useLater(this);
+  drag = dragState();   // what is dragged, from which day (drag.js): the rows and zones read it
   private catchUp = () => {};   // a hidden tab that missed changes, drawn when it shows (useRedraw)
 
   constructor(leaf: WorkspaceLeaf) {
@@ -69,7 +69,6 @@ export class CalendarView extends ItemView {
         new Notice(`Calendar: couldn't draw: ${e.message}`);
       },
     }));
-    useSwipe(this, useDrag(this));
     const reload = () => { this.version.value++; };
 
     // the tasks changed (a task file read again as soon as it's saved): new data (a hidden tab
@@ -84,16 +83,13 @@ export class CalendarView extends ItemView {
   async onClose() { this.unmount(); this.contentEl.empty(); }
 
   info(t: any) { return taskInfo(t, this.ctx, app); }
-  // the task a key (data-task) stands for, in this data; a task that's gone or changed meanwhile:
+  // the task a row's key stands for, in this data; a task that's gone or changed meanwhile:
   // none (a notice)
   task(key: string | undefined) {
     const t = this.ctx?.model && findTask(key, this.ctx.model.all);
 
     if (!t) new Notice("✦ task changed, try again");
     return t;
-  }
-  taskOf(el: Element) {
-    return this.task((el.closest("[data-task]") as HTMLElement)?.dataset.task);
   }
 
   // the data the calendar shows, from the tasks as they are now
@@ -107,14 +103,12 @@ export class CalendarView extends ItemView {
       poolLines: area ? poolLines.filter((l: any) => l.text.includes(area)) : poolLines,
       days, today, areaOrder: Object.keys(config.areaIcons),
     });
-    const contentEl = this.contentEl;
     const ctx: any = {
       state, today, days, base: baseDate(state, today), view: state.view,
       shown: { open: true, ghost: true, done: state.showDone },
       model: data(state.area),
       everything: state.area ? data(null) : null,   // the tabs' counts, whatever tab is picked
       config, TASKS: tasksApi(), infos: new Map(),
-      get root() { return contentEl.querySelector(".winx-cal"); },
     };
     ctx.actions = makeActions(ctx);
     return ctx;

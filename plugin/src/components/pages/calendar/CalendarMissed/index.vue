@@ -1,5 +1,6 @@
 <!-- "Missed?": open tasks whose day has passed, only while today is on screen; a row's ✓ (done on
-     its day, with Tasks) or ☀️ (moved to today) takes it off at once, the write follows -->
+     its day, with Tasks) or ☀️ (moved to today) takes it off at once, the write follows. A row is
+     dragged onto a day (drag.js); swiped right on the phone (swipe.js): its ✓ -->
 <script setup>
 import { computed, inject, reactive, watch } from "vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
@@ -9,6 +10,8 @@ import { T } from "#/models/calendarData.js";
 import { dm } from "#/helpers/dates.js";
 import { AudioEngine } from "#/helpers/sounds.js";
 import { ASSETS, SOUNDS } from "#/helpers/paths.js";
+import { useDragSource } from "#/composables/drag.js";
+import { useSwipe } from "#/composables/swipe.js";
 
 const view = inject("calendar");
 const ctx = computed(() => view.ctx);
@@ -23,11 +26,14 @@ const rows = computed(() => {
 
   if (!days.includes(today)) return [];
   return missed.map(t => {
-    const task = view.info(t), day = T(t).date;
-
-    return {
+    const task = view.info(t), day = T(t).date, key = () => task.key;
+    const r = {
       t, task, day, shortDay: dm(day), repeats: T(t).isRecurring ? "🔁 " : "", done: !!TASKS,
+      drag: useDragSource(view, key),
     };
+
+    r.sw = useSwipe(view, key, () => r.done && doneOnItsDay(r));
+    return r;
   }).filter(r => !gone.has(r.task.key));
 });
 
@@ -51,21 +57,20 @@ const toToday = r => act(r, sounds.today, t => view.actions.toToday(t));
       v-for="r in rows"
       :key="r.task.key"
       class="winx-missed__row winx-row winx-gap-s"
+      :style="r.sw.swipe.dx ? { '--winx-swipe': `${r.sw.swipe.dx}px` } : null"
       :data-area="r.task.area ?? undefined"
-      :data-task="r.task.key"
+      :data-swipe="r.sw.swipe.kind"
       draggable="true"
-      :data-drag="r.task.key"
-      :data-swipeable="r.task.key"
+      @dragstart="r.drag.start"
+      @dragend="r.drag.end"
+      @touchstart.passive="r.sw.start"
+      @touchmove.passive="r.sw.move"
+      @touchend="r.sw.end"
     >
       <span class="winx-missed__text winx-grow">{{ r.repeats }}<TaskText :task="r.task" /></span>
       <div class="winx-task-btns"><TaskButtons :task="r.task" @gone="gone.add(r.task.key)" /></div>
       <em class="winx-missed__date">{{ r.shortDay }}</em>
-      <WinxButton
-        v-if="r.done"
-        :title="`done on ${r.day}`"
-        data-action="missedDone"
-        @click="doneOnItsDay(r)"
-      >✓</WinxButton>
+      <WinxButton v-if="r.done" :title="`done on ${r.day}`" @click="doneOnItsDay(r)">✓</WinxButton>
       <WinxButton title="move to today" @click="toToday(r)">☀️</WinxButton>
     </div>
   </div>

@@ -1,5 +1,5 @@
 <!-- a day as a column (the week) or a card (under the phone's month): its heading, its tasks, its
-     drop zones -->
+     drop zones; the day a task is dragged from shows as the source (drag.js) -->
 <script setup>
 import { computed, inject } from "vue";
 import DayFill from "./DayFill.vue";
@@ -15,7 +15,10 @@ const today = computed(() => props.day === view.ctx.today);
 </script>
 
 <template>
-  <div :class="['winx-cal__day', { 'winx-cal__day--today': today }]">
+  <div
+    :class="['winx-cal__day',
+             { 'winx-cal__day--today': today, 'winx-cal__day--source': view.drag.day === day }]"
+  >
     <div class="winx-cal__head winx-text-center">{{ head }}</div>
     <DayFill :day="day" />
     <DayZones :day="day" />

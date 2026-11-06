@@ -64,7 +64,7 @@ const historyOf = list => {
 //   ahead    open dated tasks (no 🔁, but birthdays) after today's week, by month:
 //            [{ month: "2026-12", items }]; in a month by date, then area (the old Kanban's month /
 //            year / future columns)
-//   all      every task and pool item: what a data-task key is looked up in
+//   all      every task and pool item: what a row's key is looked up in
 // and the meta lines of the bottom panel's cards.
 export class CalendarData {
   /**
@@ -188,10 +188,10 @@ export class CalendarData {
   }
 }
 
-// A task's key in the calendar's markup (data-task): its file, line, status and words. It names the
-// same task in every draw: findTask() takes the task at that line if it still has those words and
-// that status, else the nearest one in the file that has them (lines move when a task is added on
-// top), else none — never another task.
+// A task's key in the calendar's rows (TaskRow, TaskCard, Missed): its file, line, status and
+// words. It names the same task in every draw: findTask() takes the task at that line if it still
+// has those words and that status, else the nearest one in the file that has them (lines move when
+// a task is added on top), else none — never another task.
 const words = t => t.pool ? Task.keyOf(`- ${t.text}`) : T(t).key;
 const stateOf = t => t.pool ? "p" : t.status;
 
@@ -207,7 +207,7 @@ export function findTask(key, tasks) {
   return same.sort((a, b) => Math.abs(a.line - want) - Math.abs(b.line - want))[0] ?? null;
 }
 
-// what a part shows of a task, with its key (data-task); made once per draw (ctx.infos). `app`
+// what a part shows of a task, with its key; made once per draw (ctx.infos). `app`
 // finds the stickers' pictures, ctx.actions whether it can be skipped
 export function taskInfo(t, ctx, app) {
   const known = ctx.infos.get(t);

@@ -1,94 +1,95 @@
-// The calendar's drag and drop: a task (data-drag) onto a day's zone, a chip of the drop bar, or
-// the panel (data-drop; "" = no date); in its own day (--source: no 📅 zone there, ✓ a strip at
-// the bottom), onto another open task of its group, before or after it (by the half it's over).
-// Returns { on }: true from a dragstart until the next touch, so a drag's finger moves don't count
-// as a swipe (swipe.js).
+// The calendar's drag and drop. A row (a day's task, a Missed row, a panel card: useDragSource) is
+// dragged onto a day's zone, a chip of the drop bar or the panel (useDropZone; no day = no date),
+// or, in its own day, onto another open task of its group, before or after it by the half it's
+// over (useReorder). The tab's state (dragState, view.drag): the task and the day it's dragged
+// from, so that day shows as the source (no 📅 zone there, ✓ a strip at the bottom); `active`
+// once the tab shows its zones (a tick later: zones covering the row at dragstart cancel the
+// drag); `on` from a dragstart until the next touch, so a drag's finger moves don't count as a
+// swipe (swipe.js).
+import { computed, reactive } from "vue";
 import { AudioEngine } from "#/helpers/sounds.js";
 import { SOUNDS } from "#/helpers/paths.js";
-import { canReorder, findTask } from "#/models/calendarData.js";
+import { canReorder } from "#/models/calendarData.js";
 
-export function useDrag(view) {
-  const el = view.contentEl, drag = { on: false };
-  const sounds = {
-    move: new AudioEngine(`${SOUNDS}/snd_scroll_menu.wav`),
-    gem: new AudioEngine(`${SOUNDS}/snd_pickup_gem01.wav`),
+const move = new AudioEngine(`${SOUNDS}/snd_scroll_menu.wav`);
+const gem = new AudioEngine(`${SOUNDS}/snd_pickup_gem01.wav`);
+
+export const dragState = () => reactive({ task: null, day: null, active: false, on: false });
+
+// what a drop takes: the dragged task, once
+function take(view, e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const t = view.drag.task;
+
+  view.drag.task = null;
+  return t;
+}
+
+// a row's dragstart / dragend; key: the task's, day: the one the row is in (a card: none)
+export function useDragSource(view, key, day = () => null) {
+  const { drag } = view;
+
+  return {
+    start(e) {
+      Object.assign(drag, { task: view.task(key()), day: day(), on: true });
+      e.dataTransfer?.setData("text/plain", "");
+      window.setTimeout(() => { drag.active = true; });
+    },
+    end() { Object.assign(drag, { task: null, day: null, active: false }); },
   };
-  let dragged = null, source = null, targets = new Map(), mark = null;
-  const zone = e => e.target.closest?.("[data-drop]") ?? null;
-  const SOURCE = ".winx-cal__day, .winx-cal__cell";
-  // the open task the pointer is over in the source day, and whether it's over its lower half
-  const target = e => {
-    const row = e.target.closest?.("[data-task]");
-    const r = row && targets.has(row) && row.getBoundingClientRect();
+}
 
-    return r ? { row, after: e.clientY > r.top + r.height / 2 } : null;
+// a drop target: `over` while the dragged task is above it; a drop places the task on `day`
+// (none: no date), done or open
+export function useDropZone(view, day = () => null, done = false) {
+  const zone = reactive({ over: false });
+
+  zone.enter = e => { e.preventDefault(); zone.over = true; };
+
+  zone.leave = () => { zone.over = false; };
+
+  zone.drop = async e => {
+    zone.over = false;
+    const t = take(view, e);
+
+    if (!t) return;
+    void (done ? gem : move).play({ gain: 0.25 });
+    await view.actions.place(t, day(), done);
   };
 
-  const unmark = () => {
-    mark?.classList.remove("winx-cal__task--drop-before", "winx-cal__task--drop-after");
-    mark = null;
+  return zone;
+}
+
+// an open task of a day as a reorder target (key: its own, day: its day, none: never): `mark`
+// (before | after) while the dragged task of its group is over it, by the half it's over
+export function useReorder(view, key, day) {
+  const { drag } = view;
+  const row = reactive({ mark: null });
+  const onto = computed(() =>
+    !!drag.task && !!day() && drag.day === day() && canReorder(drag.task, view.task(key())));
+  const half = e => {
+    const r = e.currentTarget.getBoundingClientRect();
+
+    return e.clientY > r.top + r.height / 2 ? "after" : "before";
   };
 
-  view.registerDomEvent(el, "dragstart", e => {
-    const src = e.target.closest?.("[data-drag]") ?? null;
-
-    if (!src || !view.ctx?.model) return;
-    dragged = view.taskOf(src);
-    drag.on = true;
-    source = src.closest(SOURCE);
-    source?.classList.add(`${source.classList[0]}--source`);
-    targets = new Map();
-    for (const row of source?.querySelectorAll(".winx-cal__task--open[data-task]") ?? []) {
-      const t = findTask(row.dataset.task, view.ctx.model.all);
-
-      if (t && dragged && canReorder(dragged, t)) targets.set(row, t);
-    }
-
-    e.dataTransfer?.setData("text/plain", "");
-    // later: zones covering the card at dragstart cancel the drag
-    window.setTimeout(() => view.ctx?.root?.classList.add("winx-cal--dragging"));
-  });
-  view.registerDomEvent(el, "dragend", () => {
-    view.ctx?.root?.classList.remove("winx-cal--dragging");
-    source?.classList.remove(`${source.classList[0]}--source`);
-    unmark();
-  });
-  view.registerDomEvent(el, "dragover", e => {
-    const z = zone(e), to = !z && target(e);
-
-    if (z) { e.preventDefault(); z.classList.add(`${z.classList[0]}--over`); }
-
-    if (to?.row !== mark) unmark();
-    if (!to) return;
+  row.over = e => {
+    if (!onto.value) return;
     e.preventDefault();
-    mark = to.row;
-    mark.classList.toggle("winx-cal__task--drop-before", !to.after);
-    mark.classList.toggle("winx-cal__task--drop-after", to.after);
-  });
-  view.registerDomEvent(el, "dragleave", e => {
-    const z = zone(e);
+    row.mark = half(e);
+  };
 
-    z?.classList.remove(`${z.classList[0]}--over`);
-  });
-  view.registerDomEvent(el, "drop", async e => {
-    const z = zone(e), to = !z && target(e);
+  row.leave = () => { row.mark = null; };
 
-    if (to && dragged) {
-      e.preventDefault(); e.stopPropagation(); unmark();
-      const t = dragged;
-      dragged = null;
-      void sounds.move.play({ gain: 0.25 });
-      return view.actions.reorder(t, targets.get(to.row), to.after);
-    }
+  row.drop = e => {
+    if (!onto.value) return;
+    row.mark = null;
+    const t = take(view, e), after = half(e) === "after";
 
-    if (!z) return;
-    e.preventDefault(); e.stopPropagation();
-    z.classList.remove(`${z.classList[0]}--over`);
-    if (!dragged) return;
-    const t = dragged, done = z.dataset.done === "1";
-    dragged = null;
-    void (done ? sounds.gem : sounds.move).play({ gain: 0.25 });
-    await view.actions.place(t, z.dataset.drop || null, done);
-  });
-  return drag;
+    void move.play({ gain: 0.25 });
+    return view.actions.reorder(t, view.task(key()), after);
+  };
+
+  return row;
 }

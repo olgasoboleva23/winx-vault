@@ -9,9 +9,11 @@ import AheadTab from "./AheadTab.vue";
 import PoolTab from "./PoolTab.vue";
 import RegularsTab from "./RegularsTab.vue";
 import { SHOWN } from "#/helpers/panelGroups.js";
+import { useDropZone } from "#/composables/drag.js";
 
 const view = inject("calendar");
 const state = view.state;
+const zone = useDropZone(view);   // a drop here: no date
 
 // Regulars' ⏸ / ▶ shown at once, until the new data comes: here, so a tab switch meanwhile keeps it
 const flipped = reactive(new Set());
@@ -30,7 +32,13 @@ const toggleMore = () => { state.backlogOpen = !state.backlogOpen; };
 </script>
 
 <template>
-  <div class="winx-cal__backlog winx-board-backlog" data-drop="" data-part="panel">
+  <div
+    :class="['winx-cal__backlog winx-board-backlog', { 'winx-cal__backlog--over': zone.over }]"
+    data-part="panel"
+    @dragover="zone.enter"
+    @dragleave="zone.leave"
+    @drop="zone.drop"
+  >
     <PanelTabs />
     <div class="winx-cal__backlog-grid">
       <NoDateTab v-if="state.tab === 'nodate'" />

@@ -1,72 +1,54 @@
-// The phone's swipes: a row right = done (a day's row: its checkbox; a Missed row: its ✓; a panel
-// card: ticked, a pool card: added to today), left = skip a 🔁 task / take an open one's date off.
-// Only a mostly-sideways swipe counts, so scrolling still works (touch-action: pan-y in the
-// styles); a swipe stops its touches at the row, so Obsidian doesn't take a sideways one for
-// opening a sidebar. `drag.on` (drag.js): a drag, not a swipe.
-import { T, findTask } from "#/models/calendarData.js";
+// A row's swipes on the phone (a day's row, a Missed row, a panel card): right = done, the row's
+// own way (`right`: its checkbox, its ✓, ticked at once, a pool card added to today), left = skip
+// a 🔁 task / take an open one's date off. Only a mostly-sideways swipe counts, so scrolling still
+// works (touch-action: pan-y in the styles); a swipe stops its touches at the row, so Obsidian
+// doesn't take a sideways one for opening a sidebar. `drag.on` (drag.js): a drag, not a swipe.
+// `swipe`: how far the row follows the finger (dx → --winx-swipe) and what letting go does (kind →
+// data-swipe: done | skip | nodate).
+import { reactive } from "vue";
+import { T } from "#/models/calendarData.js";
 
-export function useSwipe(view, drag) {
-  const el = view.contentEl;
-  const swipes = new WeakMap();   // row → { x0, y0, dx, on }
-  const row = e =>
-    document.body.classList.contains("is-mobile")
-      ? e.target.closest?.("[data-swipeable]") ?? null
-      : null;
+export function useSwipe(view, key, right, when = () => true) {
+  const swipe = reactive({ dx: 0, kind: null });
+  // x0, y0: where it started; on: sideways enough; t: the task; back: a left swipe's write
+  let s = null;
   const left = t => view.actions.canSkip(t) ? () => view.actions.skip(t)
     : T(t).date ? () => view.actions.unplan(t)
     : null;
-  const right = (r, t) => {
-    if (r.matches(".winx-missed__row"))
-      return r.querySelector('[data-action="missedDone"]')?.click();
-    if (r.matches(".winx-cal__task")) {
-      const box = r.querySelector('input[data-action="tick"]');
 
-      if (box && !box.checked) box.click();
-      return;
-    }
-
-    if (t.pool) return view.actions.fromPool(t, view.ctx.today, false);
-    // gone at once (hidden: the node is Vue's)
-    if (view.ctx.TASKS) {
-      r.hide();
-      view.actions.tick(t);
-    }
+  const start = e => {
+    if (!when() || !document.body.classList.contains("is-mobile")) return;
+    view.drag.on = false;
+    e.stopPropagation();
+    s = { x0: e.touches[0].clientX, y0: e.touches[0].clientY, on: false };
   };
 
-  view.registerDomEvent(el, "touchstart", e => {
-    const r = row(e);
-
-    if (!r) return;
-    drag.on = false;
-    e.stopPropagation();
-    swipes.set(r, { x0: e.touches[0].clientX, y0: e.touches[0].clientY, dx: 0, on: false });
-  }, { passive: true });
-  view.registerDomEvent(el, "touchmove", e => {
-    const r = row(e), s = r && swipes.get(r);
-
-    if (!r || !s) return;
-
-    const t = findTask(r.dataset.task, view.ctx?.model?.all ?? []), back = t && left(t);
+  const move = e => {
+    if (!s) return;
     const mx = e.touches[0].clientX - s.x0, my = e.touches[0].clientY - s.y0;
 
-    if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) s.on = true;
-    if (s.on) e.stopPropagation();
-    if (drag.on || !s.on || (mx < 0 && !back)) return;
-    s.dx = mx;
-    r.setCssProps({ "--winx-swipe": `${mx}px` });
-    r.dataset.swipe = mx > 0 ? "done" : view.actions.canSkip(t) ? "skip" : "nodate";
-  }, { passive: true });
-  view.registerDomEvent(el, "touchend", e => {
-    const r = row(e), s = r && swipes.get(r);
+    if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) {
+      s.on = true;
+      s.t = view.task(key());
+      s.back = s.t && left(s.t);
+    }
 
-    if (!r || !s) return;
+    if (!s.on) return;
+    e.stopPropagation();
+    if (!s.t || view.drag.on || (mx < 0 && !s.back)) return;
+    swipe.dx = mx;
+    swipe.kind = mx > 0 ? "done" : view.actions.canSkip(s.t) ? "skip" : "nodate";
+  };
 
-    r.setCssProps({ "--winx-swipe": "" });
-    delete r.dataset.swipe;
-    if (drag.on || !s.on || Math.abs(s.dx) <= 80) return;
-    const t = view.taskOf(r);
+  const end = () => {
+    if (!s) return;
+    const { on, t, back } = s, { dx } = swipe;
 
-    if (!t) return;
-    if (s.dx > 80) right(r, t); else left(t)?.();
-  });
+    s = null;
+    Object.assign(swipe, { dx: 0, kind: null });
+    if (!on || !t || view.drag.on || Math.abs(dx) <= 80) return;
+    if (dx > 0) right(t); else back?.();
+  };
+
+  return { swipe, start, move, end };
 }

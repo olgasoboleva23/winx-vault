@@ -1,11 +1,13 @@
 <!-- the month on the desktop: weekday names, then a cell per day with its tasks;
      @pick(event, day): a click on a cell -->
 <script setup>
+import { inject } from "vue";
 import DayFill from "#/components/pages/calendar/DayFill.vue";
 import DayZones from "#/components/pages/calendar/DayZones.vue";
 
 defineProps({ weekdays: { type: Array, required: true }, cells: { type: Array, required: true } });
 defineEmits(["pick"]);
+const view = inject("calendar");
 </script>
 
 <template>
@@ -18,6 +20,7 @@ defineEmits(["pick"]);
         'winx-cal__cell--today': c.today,
         'winx-cal__cell--picked': c.picked,
         'winx-cal__cell--outside': c.outside,
+        'winx-cal__cell--source': view.drag.day === c.d,
       }]"
       :data-day="c.d"
       @click="$emit('pick', $event, c.d)"
