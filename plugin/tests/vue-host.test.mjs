@@ -22,7 +22,7 @@ before(async () => {
 
 // a view that shows state.data.n (the host draws the error and the placeholder)
 const View = () => defineComponent({
-  props: { state: Object, actions: Object },
+  props: { state: Object },
   setup: p => () => h("b", p.state.error ? `err ${p.state.error}` : p.state.data ? String(p.state.data.n) : "…"),
 });
 // a load the test lets go: loads[i].ok(data) / .fail(error)
@@ -102,21 +102,26 @@ test("a card: its placeholder until the first data, then the view inside it; win
   host.unload();
 });
 
-test("a view that takes no actions gets none (no actions attribute on its root)", async () => {
-  const Bare = defineComponent({ props: { state: Object }, setup: p => () => h("b", p.state.data ? "ok" : "…") });
+test("the view gets retry by inject: it loads again", async () => {
+  const { inject } = await import("vue");
+  const Again = defineComponent({
+    props: { state: Object },
+    setup() { const retry = inject("retry"); return () => h("button", { onClick: retry }, "again"); },
+  });
   const s = slow(), el = document.body.appendChild(document.createElement("div"));
-  const host = new VueHost(el, Bare, { load: s.load, actions: { save: () => {} } });
+  const host = new VueHost(el, Again, { load: s.load });
   host.load();
-  s.loads[0].ok({}); await settle();
-  assert.equal(el.innerHTML, "<b>ok</b>");
+  s.loads[0].ok({ n: 1 }); await settle();
+  el.querySelector("button").click();
+  assert.equal(s.loads.length, 2);
   host.unload();
 });
 
-test("a card's button goes next to its title and gets the actions", async () => {
+test("a card's button goes next to its title", async () => {
   let added = 0;
-  const Plus = defineComponent({ props: { actions: Object }, setup: p => () => h("button", { onClick: p.actions.add }, "+") });
+  const Plus = defineComponent({ setup: () => () => h("button", { onClick: () => added++ }, "+") });
   const s = slow(), el = document.body.appendChild(document.createElement("div"));
-  const host = new VueHost(el, View(), { load: s.load, card: { title: "Market" }, cardButton: Plus, actions: { add: () => added++ } });
+  const host = new VueHost(el, View(), { load: s.load, card: { title: "Market" }, cardButton: Plus });
   host.load(); await settle();
   el.querySelector(".callout-title-inner + button").click();
   assert.equal(added, 1);

@@ -69,15 +69,11 @@ export function logPurchase(name, price) {
 
 // buy(name, cost): the star sound, the purchase if the gold covers it, a notice either way; true
 // when bought
-export function shopActions() {
-  const sound = new AudioEngine(`${ASSETS}/star.wav`);
+const star = new AudioEngine(`${ASSETS}/star.wav`);
 
-  return {
-    buy: async (name, cost) => {
-      void sound.play();
-      const bought = await logPurchase(name, cost);
-      new Notice(bought ? `✨ Bought ${name} for ${cost} gold` : `✦ Not enough gold for ${name}`);
-      return bought;
-    },
-  };
+export async function buy(name, cost) {
+  void star.play();
+  const bought = await logPurchase(name, cost);
+  new Notice(bought ? `✨ Bought ${name} for ${cost} gold` : `✦ Not enough gold for ${name}`);
+  return bought;
 }

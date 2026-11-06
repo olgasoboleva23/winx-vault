@@ -4,8 +4,9 @@
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxGroupHeader from "#/components/uikit/WinxGroupHeader.vue";
+import { runsLow } from "#/controllers/widgets/market.js";
 
-defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
+defineProps({ state: { type: Object, required: true } });
 </script>
 
 <template>
@@ -23,7 +24,7 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
         <WinxButton
           v-if="!r.listed"
           kind="pill"
-          @click="actions.low(r.name, r.tag)"
+          @click="runsLow(r.name, r.tag)"
         >running low</WinxButton>
       </div>
     </template>

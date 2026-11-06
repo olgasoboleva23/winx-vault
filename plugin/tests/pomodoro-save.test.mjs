@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { setApp } from "#/helpers/app.js";
-import { pomodoroActions } from "#/controllers/widgets/pomodoro.js";
+import { save } from "#/controllers/widgets/pomodoro.js";
 import { POMODORO as PATH } from "#/helpers/paths.js";
 
 globalThis.window ??= {};
@@ -27,7 +27,6 @@ const state = { settings: { focusMin: 25, breakMin: 5 }, current: null, mini: tr
 
 test("two saves at once: the later one keeps the minutes the earlier one added", async () => {
   const { stats } = vault();
-  const { save } = pomodoroActions();
   await Promise.all([save(state, 25), save({ ...state, mini: false })]);
   assert.equal(stats().minutes, 25);
   assert.equal(stats().sessions, 1);
@@ -35,7 +34,6 @@ test("two saves at once: the later one keeps the minutes the earlier one added",
 
 test("a failed save: its minutes go with the next one, each session counted once", async () => {
   const { stats, io } = vault();
-  const { save } = pomodoroActions();
   io.failing = 1;
   await assert.rejects(save(state, 25));
   await save(state, 25);

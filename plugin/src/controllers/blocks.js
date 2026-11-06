@@ -1,23 +1,21 @@
 // The ```winx block: the widgets by name (each a .vue on a VueHost) and what the plugin does
-// with a block.
+// with a block. A widget's writes aren't here: its .vue imports them from its controller.
 import { blockDv } from "#/helpers/plugins.js";
 import { app } from "#/helpers/app.js";
 import { VueHost } from "#/composables/vueHost.ts";
 import { loadLevelToday, loadLifeAreas, loadXpToday } from "#/controllers/widgets/xp.js";
-import { loadShop, shopActions } from "#/controllers/widgets/shop.js";
-import {
-  celestialMarketActions, loadCelestialMarket, loadSupplies, suppliesActions,
-} from "#/controllers/widgets/market.js";
+import { loadShop } from "#/controllers/widgets/shop.js";
+import { loadCelestialMarket, loadSupplies } from "#/controllers/widgets/market.js";
 import { loadGoals } from "#/controllers/widgets/goals.js";
-import { loadSavings, savingsActions } from "#/controllers/widgets/savings.js";
-import { cycleActions, loadCycle } from "#/controllers/widgets/cycle.js";
+import { loadSavings } from "#/controllers/widgets/savings.js";
+import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
-import { loadWeight, weightActions } from "#/controllers/widgets/weight.js";
+import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
   BODY_LOG, CYCLE, GOALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS, WEIGHT,
 } from "#/helpers/paths.js";
-import { dailyNoteActions, loadDailyNote } from "#/controllers/widgets/dailyNote.js";
-import { loadPomodoro, pomodoroActions } from "#/controllers/widgets/pomodoro.js";
+import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
+import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
 // the widgets' markup: components/pages/dashboard/widgets/
 import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
 import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";
@@ -35,10 +33,10 @@ import WeightCard from "#/components/pages/dashboard/widgets/body/WeightCard/ind
 import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vue";
 import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue";
 
-// the widgets: name → { view: the .vue, load(ctx): its data, actions(ctx): its writes,
-// cardButton: a .vue next to the card's title, bodyClass: a class on the card's body, watches: the
-// files it reads (a folder: ending in /): only their changes load it again (any other note's
-// doesn't), follows: false to load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
+// the widgets: name → { view: the .vue, load(ctx): its data, cardButton: a .vue next to the
+// card's title, bodyClass: a class on the card's body, watches: the files it reads (a folder:
+// ending in /): only their changes load it again (any other note's doesn't), follows: false to
+// load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
 const TASK_FILES = `${TASKS}/`, MARKET_NOTE = `${MARKET}.md`, LEDGER_FILES = `${LEDGER}/`;
 
 export const blocks = {
@@ -46,30 +44,23 @@ export const blocks = {
   levelToday: { view: LevelToday, load: loadLevelToday, watches: [TASK_FILES, CYCLE] },
   lifeAreas: { view: LifeAreas, load: loadLifeAreas, watches: [TASK_FILES] },
   shop: {
-    view: ShopWidget, load: loadShop, actions: shopActions, bodyClass: "winx-shop",
+    view: ShopWidget, load: loadShop, bodyClass: "winx-shop",
     watches: [TASK_FILES, `${SHOP}.md`, `${PURCHASES}.md`],
   },
-  supplies: {
-    view: SuppliesWidget, load: loadSupplies, actions: suppliesActions, watches: [MARKET_NOTE],
-  },
+  supplies: { view: SuppliesWidget, load: loadSupplies, watches: [MARKET_NOTE] },
   goals: { view: GoalsWidget, load: loadGoals, watches: [`${GOALS}.md`, TASK_FILES] },
-  savings: {
-    view: SavingsJars, load: loadSavings, actions: savingsActions, watches: [`${SAVINGS}/`],
-  },
-  cycle: { view: CycleWidget, load: loadCycle, actions: cycleActions, watches: [CYCLE] },
+  savings: { view: SavingsJars, load: loadSavings, watches: [`${SAVINGS}/`] },
+  cycle: { view: CycleWidget, load: loadCycle, watches: [CYCLE] },
   finance: { view: FinanceMonths, load: loadFinance, watches: [LEDGER_FILES, RULES] },
   financeMonth: { view: FinanceLine, load: loadFinanceLine, watches: [LEDGER_FILES, RULES] },
-  weight: {
-    view: WeightCard, load: loadWeight, actions: weightActions,
-    watches: [WEIGHT, BODY_LOG, CYCLE],   // typed picks stay
-  },
+  // a reload keeps the typed picks
+  weight: { view: WeightCard, load: loadWeight, watches: [WEIGHT, BODY_LOG, CYCLE] },
   // the tab's date only (useTabDate)
-  dailyNote: { view: DailyNoteOpen, load: loadDailyNote, actions: dailyNoteActions, watches: [] },
-  pomodoro: { view: PomodoroTimer, load: loadPomodoro, actions: pomodoroActions, follows: false },
+  dailyNote: { view: DailyNoteOpen, load: loadDailyNote, watches: [] },
+  pomodoro: { view: PomodoroTimer, load: loadPomodoro, follows: false },
   celestialMarket: {
     view: CelestialMarket,
     load: loadCelestialMarket,
-    actions: celestialMarketActions,
     cardButton: CelestialMarketAdd,
     watches: [MARKET_NOTE],
   },
@@ -83,9 +74,8 @@ function block(def, el, sourcePath, args) {
 
   // no card: the class goes on the block itself
   if (!card && def.bodyClass) el.addClass(def.bodyClass);
-  const load = () => def.load(ctx), actions = def.actions?.(ctx);
   const { cardButton, follows, watches } = def;
-  const opts = { load, actions, note: sourcePath, card, cardButton, follows, watches };
+  const opts = { load: () => def.load(ctx), note: sourcePath, card, cardButton, follows, watches };
 
   return new VueHost(el, def.view, opts);
 }

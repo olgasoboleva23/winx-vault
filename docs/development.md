@@ -25,7 +25,7 @@
 │   │   │                           cycle, savings, shop, market, finance, goals, xp, pomodoro, dailyNote),
 │   │   │                           tasks.js (a task's line with undo, new tasks and pool lines),
 │   │   │                           calendar.js (what the calendar writes), notes.js, mobileConfig.js,
-│   │   │                           blocks.js (the ```winx block: names → { view, load, actions })
+│   │   │                           blocks.js (the ```winx block: names → { view, load, watches })
 │   │   ├── 📁 models             — the things and their rules, no Obsidian in them: Task, Note, Goal,
 │   │   │                           MarketItem, SavingsJar, the weight / body / cycle logs, CalendarData,
 │   │   │                           repeats (🔁 rules), ledger (finance), timer (pomodoro), vitals (HP / MP),
@@ -80,15 +80,17 @@ A widget is a `.vue` file for its markup (`components/pages/dashboard/widgets/`)
 ```js
 // controllers/weight.js
 export async function loadWeight({ dv, app, args }) { … }     // what it shows (dv: Dataview for the block's note)
-export const weightActions = () => ({ logWeight: async typed => { … }, logBody: … });
+export async function logWeight(typed) { … }                  // what it writes: the .vue imports it
 // blocks.js
-weight: { view: WeightCard, load: loadWeight, actions: weightActions },
+weight: { view: WeightCard, load: loadWeight, watches: [WEIGHT, BODY_LOG, CYCLE] },
 ```
 
 ```vue
 <!-- components/pages/dashboard/widgets/body/WeightCard/index.vue -->
 <script setup>
-defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
+import { logWeight } from "#/controllers/widgets/weight.js";
+
+defineProps({ state: { type: Object, required: true } });
 </script>
 
 <template>
@@ -103,7 +105,9 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
   a file it names (`watches`) changes: the task files at once, from the plugin's own store, the rest a moment
   after Dataview's index has them (or the block's own note changes; a hidden block when it shows), drops a stale result,
   shows an error with retry, a card's placeholder until the first data, and the card itself (`card:` in the
-  block). `follows: false` loads once (the pomodoro); `cardButton` puts a button by the card's title.
+  block). `follows: false` loads once (the pomodoro); `cardButton` puts a button by the card's title. The view
+  gets `state` as its prop; a widget that must load again after its own write (the shop's balance) takes
+  `retry` by `inject("retry")`.
 - The parts in `plugin/src/components/uikit/` are reusable: `WinxButton` with a kind (`round`, `nav`, `pill`, `chip`,
   `toggle`, `text`), `WinxCard`, `WinxChart` (a Charts plugin chart, destroyed with it), `WinxEmpty` /
   `WinxMissing` / `WinxFailed`, `WinxNoteLink`, `WinxGroupHeader`, `WinxAddForm`.

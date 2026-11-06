@@ -9,14 +9,12 @@ import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 import { CYCLE } from "#/helpers/paths.js";
+import { markCycle } from "#/controllers/widgets/cycle.js";
 import CycleHead from "./CycleHead.vue";
 import CycleRows from "./CycleRows.vue";
 import CycleStats from "./CycleStats.vue";
 
-const props = defineProps({
-  state: { type: Object, required: true },
-  actions: { type: Object, required: true },
-});
+const props = defineProps({ state: { type: Object, required: true } });
 
 const d = computed(() => props.state.data);
 const tab = ref("days");   // or "stats"
@@ -52,7 +50,7 @@ const folded = computed(() => !open.value && d.value.info);
     <div class="winx-cycle__btns winx-flex winx-gap-m winx-wrap">
       <WinxButton
         kind="pill"
-        @click="actions.mark(d.mark.kind, d.day)"
+        @click="markCycle(d.mark.kind, d.day)"
       >{{ d.mark.text }}</WinxButton>
       <WinxNoteLink :path="CYCLE">dates</WinxNoteLink>
     </div>

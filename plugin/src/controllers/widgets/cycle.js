@@ -8,6 +8,7 @@ import { dm, pageDay, ymd } from "#/helpers/dates.js";
 import { mana, mpLine, mpTable } from "#/models/vitals.js";
 import { appendLine } from "#/helpers/files.js";
 import { CYCLE } from "#/helpers/paths.js";
+import { dataview } from "#/helpers/plugins.js";
 
 // the log of Cycle.md (null without the note): also the period days shaded under the Weight
 // widget's log
@@ -78,13 +79,9 @@ export async function loadCycle({ dv }) {
 
 // "started today / ended yesterday": a line in Cycle.md (once); started: today, ended: yesterday
 // was the last day of the period (CycleLog.endFor)
-export const cycleActions = ({ dv }) => ({
-  mark: (kind, day) => {
-    const log = kind === "end" && cycleLog(dv);
-    const date = log ? log.endFor(day) : day;
+export function markCycle(kind, day) {
+  const log = kind === "end" && cycleLog(dataview());
+  const date = log ? log.endFor(day) : day;
 
-    const line = `- ${kind}:: ${date}`;
-
-    return appendLine(CYCLE, line, { header: "period:: 8\n\n", unique: true });
-  },
-});
+  return appendLine(CYCLE, `- ${kind}:: ${date}`, { header: "period:: 8\n\n", unique: true });
+}

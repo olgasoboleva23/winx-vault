@@ -1,12 +1,13 @@
 <!-- Shop: the gold balance and the rewards; an affordable one is bought with a click, the rest are
      greyed out -->
 <script setup>
-const props = defineProps({
-  state: { type: Object, required: true },
-  actions: { type: Object, required: true },
-});
-// bought: drawn again at once (the balance), as before
-const buy = async i => { if (await props.actions.buy(i.name, i.cost)) props.actions.retry(); };
+import { inject } from "vue";
+import { buy as logBuy } from "#/controllers/widgets/shop.js";
+
+defineProps({ state: { type: Object, required: true } });
+// drawn again at once: the host's load (the balance), as before
+const retry = inject("retry");
+const buy = async i => { if (await logBuy(i.name, i.cost)) retry(); };
 </script>
 
 <template>

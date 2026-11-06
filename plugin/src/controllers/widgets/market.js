@@ -106,25 +106,19 @@ export async function addMarketItem() {
 
 const addToMarket = (name, tag) => appendLine(MARKET_NOTE, `- [ ] ${name} ${tag}`);
 
-export const celestialMarketActions = () => ({
-  add: () => addMarketItem(),
+// a row as bought, if its line is still that item
+export function buyMarketItem({ line, name }) {
+  const same = l => {
+    const item = new MarketItem(l);
 
-  // a row as bought, if its line is still that item
-  buy: ({ line, name }) => {
-    const same = l => {
-      const item = new MarketItem(l);
+    return !item.isBought && item.name === name;
+  };
 
-      return !item.isBought && item.name === name;
-    };
+  return editLine(MARKET_NOTE, line, same, l => new MarketItem(l).bought(todayYmd()));
+}
 
-    return editLine(MARKET_NOTE, line, same, l => new MarketItem(l).bought(todayYmd()));
-  },
-});
-
-// low(name, tag): back on the Celestial Market's list
-export const suppliesActions = () => ({
-  low: async (name, tag) => {
-    await addToMarket(name, tag);
-    new Notice(`✦ ${name} → Celestial Market`);
-  },
-});
+// runsLow(name, tag): back on the Celestial Market's list
+export async function runsLow(name, tag) {
+  await addToMarket(name, tag);
+  new Notice(`✦ ${name} → Celestial Market`);
+}

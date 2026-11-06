@@ -7,13 +7,11 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { Notice } from "obsidian";
 import { Timer } from "#/models/timer.js";
+import { askLengths, ding, save as write } from "#/controllers/widgets/pomodoro.js";
 import PomodoroMini from "./PomodoroMini.vue";
 import PomodoroRing from "./PomodoroRing.vue";
 
-const props = defineProps({
-  state: { type: Object, required: true },
-  actions: { type: Object, required: true },
-});
+const props = defineProps({ state: { type: Object, required: true } });
 
 const { saved, current } = props.state.data;
 const timer = new Timer(saved.settings, current);
@@ -39,7 +37,7 @@ function tick() {
 }
 
 let ending = 0, every = 0;
-const save = (focusMin = 0) => props.actions.save(
+const save = (focusMin = 0) => write(
   { settings: timer.settings, current: timer.current, mini: mini.value },
   focusMin,
 );
@@ -52,7 +50,7 @@ function arm() {
 
 async function finish() {
   const focusMin = timer.settings.focusMin, wasFocus = timer.next();
-  props.actions.ding(timer.type === "focus" ? 1.0 : 0.8);
+  ding(timer.type === "focus" ? 1.0 : 0.8);
   timer.play(); arm(); tick();
   // no click to hand the error to: said here (the minutes go with the next save)
   await save(wasFocus ? focusMin : 0).catch(e => {
@@ -71,7 +69,7 @@ const skip = () => act(t => t.reset(t.other));   // to the next session, this on
 const toggle = () => { mini.value = !mini.value; return save(); };
 
 async function gear() {
-  const lengths = await props.actions.lengths(timer.settings);
+  const lengths = await askLengths(timer.settings);
 
   if (lengths) await act(t => { t.settings = lengths; t.reset(); });
 }

@@ -8,6 +8,7 @@ import { SavingsJar } from "#/models/savingsJar.js";
 import { edit } from "#/helpers/files.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { SAVINGS } from "#/helpers/paths.js";
+import { app } from "#/helpers/app.js";
 
 const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const day = d => `${DAYS[weekday(d)]} ${dm(d)}`;
@@ -57,15 +58,11 @@ function shown(jar, today) {
 
 // deposit(path): the payday's deposit into that jar's note; no per_payday ("your part"): it asks
 // how much
-export function savingsActions({ app }) {
-  return {
-    deposit: async path => {
-      const props = app.metadataCache.getCache(path)?.frontmatter ?? {};
-      const sum = props.per_payday ?? (await Form.ask(app, "✦ Deposit",
-        [{ name: "Sum", key: "sum", text: "how much", number: true }],
-        { values: { sum: null }, required: ["sum"], submit: "Put in" }))?.sum;
+export async function deposit(path) {
+  const props = app.metadataCache.getCache(path)?.frontmatter ?? {};
+  const sum = props.per_payday ?? (await Form.ask(app, "✦ Deposit",
+    [{ name: "Sum", key: "sum", text: "how much", number: true }],
+    { values: { sum: null }, required: ["sum"], submit: "Put in" }))?.sum;
 
-      if (sum > 0) await edit(path, c => new SavingsJar(c, props).deposit(todayYmd(), sum));
-    },
-  };
+  if (sum > 0) await edit(path, c => new SavingsJar(c, props).deposit(todayYmd(), sum));
 }

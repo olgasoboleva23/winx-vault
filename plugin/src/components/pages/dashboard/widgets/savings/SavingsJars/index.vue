@@ -3,8 +3,9 @@
 <script setup>
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
+import { deposit } from "#/controllers/widgets/savings.js";
 
-defineProps({ state: { type: Object, required: true }, actions: { type: Object, required: true } });
+defineProps({ state: { type: Object, required: true } });
 </script>
 
 <template>
@@ -41,7 +42,7 @@ defineProps({ state: { type: Object, required: true }, actions: { type: Object, 
       </div>
       <div v-if="j.due" class="winx-jar__due winx-row winx-between winx-gap-m">
         <span>{{ j.due.when }}: <b class="winx-jar__due-sum">put in {{ j.due.sum }}</b></span>
-        <WinxButton kind="pill" @click="actions.deposit(j.path)">✓ done</WinxButton>
+        <WinxButton kind="pill" @click="deposit(j.path)">✓ done</WinxButton>
       </div>
       <div class="winx-jar__next winx-text-center">next payday: {{ j.next }}</div>
     </div>

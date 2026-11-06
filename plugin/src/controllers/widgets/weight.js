@@ -106,14 +106,14 @@ export async function loadWeight({ dv, app }) {
   return { weight, log };
 }
 
-export const weightActions = () => ({
-  // today's weight from what was typed; false when it isn't a weight
-  async logWeight(typed) {
-    const kg = amount(typed);
+// today's weight from what was typed; false when it isn't a weight
+export async function logWeight(typed) {
+  const kg = amount(typed);
 
-    if (!kg || kg <= 0) return false;
-    await edit(WEIGHT, c => new WeightLog(c).set(todayYmd(), kg));
-    return true;
-  },
-  logBody: (level, reasons) => edit(BODY_LOG, c => new BodyLog(c).set(todayYmd(), level, reasons)),
-});
+  if (!kg || kg <= 0) return false;
+  await edit(WEIGHT, c => new WeightLog(c).set(todayYmd(), kg));
+  return true;
+}
+
+export const logBody = (level, reasons) =>
+  edit(BODY_LOG, c => new BodyLog(c).set(todayYmd(), level, reasons));

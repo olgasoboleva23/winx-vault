@@ -3,9 +3,9 @@
 // It holds the block's state ({ data, error }) and runs `load` now and again a moment after
 // Dataview has a change (or the block's own note changes, or the dashboard's date); a hidden block
 // once it shows. A load overtaken by a newer one, or ending after the block went, writes nothing;
-// an error is shown with retry. On unload: Vue is unmounted. The .vue component gets `state` and
-// `actions` (the block's writes, and retry) as props; with `card` it is drawn inside a dashboard
-// card (components/uikit/WinxCard.vue).
+// an error is shown with retry. On unload: Vue is unmounted. The .vue component gets `state` as a
+// prop and `retry` by inject (its writes it imports from its controller itself); with `card` it is
+// drawn inside a dashboard card (components/uikit/WinxCard.vue).
 import { MarkdownRenderChild } from "obsidian";
 import { h, nextTick, reactive, watch, type Component as VueComponent } from "vue";
 import { useVueApp } from "./vueApp.ts";
@@ -20,10 +20,9 @@ const TASK_FILES = `${TASKS}/`;
 
 export interface HostOptions<D> {
   load: () => Promise<D>;
-  actions?: Record<string, (...args: any[]) => unknown>;
   note?: string;                               // the block's own note: its changes count too
   card?: { title: string; meta?: string[]; bodyClass?: string };   // drawn inside a dashboard card
-  cardButton?: VueComponent;                   // a button next to the card's title (gets actions)
+  cardButton?: VueComponent;                   // a button next to the card's title
   // its files (a folder: ending in /): only their changes reload it; none given: any file's. The
   // task files (`${TASKS}/`) reload it from the plugin's own store, at once; the rest through
   // Dataview's index
@@ -48,21 +47,17 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
   }
 
   onload() {
-    const retry = () => void this.refresh(), { view, state, opts: { card } } = this;
-    // actions only to a view that takes them (Vue would put an undeclared prop on its root as an
-    // attribute)
-    const takes = "actions" in ((view as { props?: object }).props ?? {});
-    const props = takes ? { state, actions: { ...this.opts.actions, retry } } : { state };
+    const retry = () => void this.refresh(), { view, state, opts: { card, cardButton } } = this;
     // the error with retry, a card's shimmering placeholder until the first data, else the view
     const body = () => state.error ? h(WinxFailed, { text: state.error, onRetry: retry })
       : state.data === null ? (card ? h("div", { class: "winx-widget__skeleton" }) : null)
-      : h(view, props);
-    const button = this.opts.cardButton, actions = { ...this.opts.actions, retry };
-    const slots = { default: body, ...(button ? { button: () => h(button, { actions }) } : {}) };
+      : h(view, { state });
+    const slots = { default: body, ...(cardButton ? { button: () => h(cardButton) } : {}) };
     const root = { render: () => card ? h(WinxCard, card, slots) : body() };
-    // where a NoteLink opens a note from; any error inside (a chart that fails): said, with retry
+    // where a NoteLink opens a note from, and the load again (a bought reward: the balance); any
+    // error inside (a chart that fails): said, with retry
     useVueApp(this, this.el, root, {
-      provide: { sourcePath: this.opts.note ?? "" },
+      provide: { sourcePath: this.opts.note ?? "", retry },
       onError: e => {
         console.error(e);
         if (!this.gone) state.error = e.message;

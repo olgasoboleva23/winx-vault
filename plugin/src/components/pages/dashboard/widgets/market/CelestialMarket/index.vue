@@ -7,11 +7,9 @@ import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import WinxGroupHeader from "#/components/uikit/WinxGroupHeader.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 import { MARKET, SUPPLIES } from "#/helpers/paths.js";
+import { buyMarketItem } from "#/controllers/widgets/market.js";
 
-const props = defineProps({
-  state: { type: Object, required: true },
-  actions: { type: Object, required: true },
-});
+const props = defineProps({ state: { type: Object, required: true } });
 const LINKS = [
   { text: "✦ open market", path: MARKET },
   { text: "✦ supplies", path: SUPPLIES },
@@ -28,7 +26,7 @@ async function buy(r) {
   let written = false;
 
   try {
-    written = await props.actions.buy(r);
+    written = await buyMarketItem(r);
   } finally {
     if (!written) bought.delete(key(r));
   }

@@ -1,10 +1,16 @@
 import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { vault } from "./stubs/vault.mjs";
+import { MARKET } from "#/helpers/paths.js";
+import { Notice } from "obsidian";
 
 let mount, View;
+// the note: green tea on line 3, rice on line 5
+const NOTE = "# Market\n\n## 🌿 Harvest\n- [ ] green tea #food\n\n- [ ] rice #food\n";
 before(async () => {
   GlobalRegistrator.register();
+  window.moment = () => ({ format: () => "2026-11-05" });
   ({ mount } = await import("@vue/test-utils"));
   View = (await import("#/components/pages/dashboard/widgets/market/CelestialMarket/index.vue")).default;
 });
@@ -14,33 +20,32 @@ const data = {
 };
 
 test("Celestial Market: items by group, what runs low, how many are left", () => {
-  const text = mount(View, { props: { state: { data }, actions: {} } }).text();
+  const text = mount(View, { props: { state: { data } } }).text();
   for (const s of ["🌿 Harvest", "green tea", "rice", "running low soon: salt", "2 items left"]) assert.match(text, new RegExp(s));
 });
 
 test("✓ sparkles the row at once and writes it as bought after the sparkle, once", async () => {
-  const bought = [];
-  const w = mount(View, { props: { state: { data }, actions: { buy: r => bought.push(r) } } });
+  const { files } = vault({ [`${MARKET}.md`]: NOTE });
+  const w = mount(View, { props: { state: { data } } });
   const tea = w.findAll(".winx-market__item")[0];
   await tea.find("button").trigger("click");
   await tea.find("button").trigger("click");
   assert.ok(tea.classes().includes("winx-market__item--bought"));
-  assert.equal(bought.length, 0);
+  assert.equal(files[`${MARKET}.md`], NOTE);
   await new Promise(r => setTimeout(r, 700));
-  assert.deepEqual(bought, [{ line: 3, name: "green tea" }]);
+  assert.equal(files[`${MARKET}.md`], NOTE.replace("- [ ] green tea #food", "- [x] green tea #food ✅ 2026-11-05"));
 });
 
 test("Celestial Market's note missing: Create …", () => {
-  const w = mount(View, { props: { state: { data: { missing: true, path: "x/Celestial Market.md" } }, actions: {} } });
+  const w = mount(View, { props: { state: { data: { missing: true, path: "x/Celestial Market.md" } } } });
   assert.equal(w.text(), "✦ Create x/Celestial Market.md");
 });
 
-test("a bought item back on the list can be bought again; a write that fails lets go of the row", async () => {
+test("a bought item back on the list can be bought again; a line that changed meanwhile lets go of the row", async () => {
   const { reactive, nextTick } = await import("vue");
   const state = reactive({ data });
-  const bought = [];
-  let answer = true;
-  const w = mount(View, { props: { state, actions: { buy: async r => { bought.push(r.name); return answer; } } } });
+  const { files } = vault({ [`${MARKET}.md`]: NOTE });
+  const w = mount(View, { props: { state } });
   await w.findAll(".winx-market__item")[0].find("button").trigger("click");
   await new Promise(r => setTimeout(r, 700));
   // written: the list comes back without it, then with it again (unticked in the note)
@@ -48,9 +53,10 @@ test("a bought item back on the list can be bought again; a write that fails let
   state.data = data; await nextTick();
   const tea = () => w.findAll(".winx-market__item")[0];
   assert.ok(!tea().classes().includes("winx-market__item--bought"));
-  answer = false;   // this time the line moved meanwhile: nothing written
+  files[`${MARKET}.md`] = NOTE.replace("green tea", "black tea");   // the line changed meanwhile: nothing written
   await tea().find("button").trigger("click");
   await new Promise(r => setTimeout(r, 700)); await nextTick();
-  assert.deepEqual(bought, ["green tea", "green tea"]);
+  assert.match(files[`${MARKET}.md`], /- \[ \] black tea/);
+  assert.match(String(Notice.last), /changed meanwhile/);
   assert.ok(!tea().classes().includes("winx-market__item--bought"));   // free again
 });
