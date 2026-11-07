@@ -15,8 +15,9 @@ export function makeActions(ctx) {
   // ⏭ skip a dated 🔁 task this time: the rule moves on (Tasks makes the next copy), this one stays
   // as cancelled "- [-] … ❌ date", which counts as neither done nor missed
   const canSkip = t => !!TASKS && T(t).canSkip;
-  const skip    = t => editTaskLineWithUndo(t,
-    line => Task.skipLines(TASKS.executeToggleTaskDoneCommand(line, t.path)), "⏭");
+  // a missed copy skipped: the next one from today on (skipLines)
+  const skip    = t => editTaskLineWithUndo(t, line => Task.skipLines(
+    TASKS.executeToggleTaskDoneCommand(line, t.path), T(t).isOverdue(today) ? today : null), "⏭");
   const tick    = t =>
     editTaskLineWithUndo(t, line => TASKS.executeToggleTaskDoneCommand(line, t.path), "✓");
   const unplan  = t =>

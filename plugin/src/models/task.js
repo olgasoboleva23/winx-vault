@@ -136,19 +136,21 @@ export class Task {
     return `${line.trimEnd().replace(/^(\s*)- /, "$1- [ ] ")} ➕ ${today}`;
   }
 
+  // the first day from `today` its rule allows: a weekday rule ("every week on Monday, …") its
+  // next such day (today included), an interval rule ("every 3 days [when done]") today, any
+  // other (the 1st, a year) none: the rule's own next is right
+  firstDay(today) {
+    const rule = this.rule ?? "";
+
+    if (/^every (\d+ )?weeks? on /i.test(rule))
+      return projectRepeats(rule, addDays(today, -1), addDays(today, 30))[0] ?? today;
+    return /^every (\d+ )?(day|week|month)s?( when done)?$/i.test(rule) ? today : null;
+  }
   // pause: drop its ⏳ 📅 🛫 dates (it leaves the calendar). Resume: due on the first day from today
-  // its rule allows: a weekday rule ("every week on Monday, …") its next such day, any other rule
-  // today. ponytail: only weekday rules are matched; "every month on the 1st" resumes today too.
+  // its rule allows (firstDay; none: today. ponytail: "every month on the 1st" resumes today too)
   pause() { return drop(this.line, "📅⏳🛫"); }
   togglePause(today) { return this.isPaused ? this.resume(today) : this.pause(); }
-  resume(today) {
-    const rule = this.rule ?? "";
-    const day  = /^every (\d+ )?weeks? on /i.test(rule)
-      ? projectRepeats(rule, addDays(today, -1), addDays(today, 30))[0] ?? today
-      : today;
-
-    return `${this.pause().trimEnd()} 📅 ${day}`;
-  }
+  resume(today) { return `${this.pause().trimEnd()} 📅 ${this.firstDay(today) ?? today}`; }
 
   // ── the Tasks plugin's output of ticking a task today (the done line, plus the next copy of a 🔁
   // task) ── as if ticked on `date`: ✅ moves there, and a "when done" next copy moves back with it
@@ -162,11 +164,16 @@ export class Task {
       : l).join("\n");
   }
   // as a skip of this time: the done line turns cancelled ("- [-] … ❌ date"), so the rule moves on
-  // but nothing counts as done
-  static skipLines(toggled) {
-    return toggled.split("\n").map(l => /^\s*- \[x\]/.test(l)
-      ? l.replace(/^(\s*- \[)x/, "$1-").replace(/✅(\s*\d{4}-\d{2}-\d{2})/u, "❌$1")
-      : l).join("\n");
+  // but nothing counts as done. `from` (today, for a missed copy): the next copy is due on the
+  // first day from it the rule allows, not the one after the missed date (could be in the past)
+  static skipLines(toggled, from = null) {
+    return toggled.split("\n").map(l => {
+      if (/^\s*- \[x\]/.test(l))
+        return l.replace(/^(\s*- \[)x/, "$1-").replace(/✅(\s*\d{4}-\d{2}-\d{2})/u, "❌$1");
+      const day = from && OPEN.test(l) && new Task(l).firstDay(from);
+
+      return day ? new Task(l).setDue(day) : l;
+    }).join("\n");
   }
 }
 

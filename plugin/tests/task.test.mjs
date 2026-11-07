@@ -120,6 +120,21 @@ test("skipLines", () => {
   assert.equal(Task.keyOf(skipped.split("\n")[1]), Task.keyOf(ticked.split("\n")[0]));   // still the same task for history
 });
 
+test("skipLines of a missed copy: the next one on the first day from today its rule allows, today included", () => {
+  const T = l => new Task(l);
+  // Tasks moved "every day when done" to tomorrow and the weekday rule to the next Wednesday: from today instead
+  assert.equal(Task.skipLines("- [ ] walk 🔁 every day when done 📅 2026-11-08\n- [x] walk 🔁 every day when done 📅 2026-11-04 ✅ 2026-11-07", "2026-11-07"),
+    "- [ ] walk 🔁 every day when done 📅 2026-11-07\n- [-] walk 🔁 every day when done 📅 2026-11-04 ❌ 2026-11-07");
+  assert.equal(Task.skipLines("- [ ] gym 🔁 every week on Monday, Wednesday when done 📅 2026-11-11\n- [x] gym 🔁 every week on Monday, Wednesday when done 📅 2026-11-06 ✅ 2026-11-09", "2026-11-09"),
+    "- [ ] gym 🔁 every week on Monday, Wednesday when done 📅 2026-11-09\n- [-] gym 🔁 every week on Monday, Wednesday when done 📅 2026-11-06 ❌ 2026-11-09");
+  // the 1st of a month, a year: the rule's own next stays
+  assert.equal(Task.skipLines("- [ ] rent 🔁 every month on the 1st 📅 2026-12-01\n- [x] rent 🔁 every month on the 1st 📅 2026-11-01 ✅ 2026-11-07", "2026-11-07").split("\n")[0],
+    "- [ ] rent 🔁 every month on the 1st 📅 2026-12-01");
+  assert.equal(T("- [ ] x 🔁 every 3 days when done 📅 2026-11-01").firstDay("2026-11-07"), "2026-11-07");
+  assert.equal(T("- [ ] x 🔁 every 2 weeks on Saturday 📅 2026-11-01").firstDay("2026-11-07"), "2026-11-07");
+  assert.equal(T("- [ ] x 🔁 every year 📅 2026-11-01").firstDay("2026-11-07"), null);
+});
+
 test("pause state, skipping and overdue are the task's own", () => {
   const open = new Task("- [ ] walk 🔁 every day 📅 2026-10-20"), paused = new Task("- [ ] walk 🔁 every week on Monday");
   assert.equal(open.isPaused, false); assert.equal(paused.isPaused, true);
