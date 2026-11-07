@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Note, notePath } from "#/models/note.js";
-import { KINDS, daily, parseMeds } from "#/models/kinds.js";
+import { KINDS, daily } from "#/models/kinds.js";
 
 const make = (kind, v, today = "2026-10-29") => new Note(KINDS[kind].note(v, today)).text;
 
@@ -105,27 +105,37 @@ test("a string that YAML would read as another type stays a string: true, null, 
   assert.match(more, /^d: "y"$/m);
 });
 
-test("parseMeds: the medicines typed on one line: name, dose, the times of day (none: once a day)", () => {
-  assert.deepEqual(parseMeds("Мастодинон 30 капель утро вечер; Аевит 1 таблетка; Новопассит 2 таблетки на ночь"), [
-    { name: "Мастодинон", dose: "30 капель", times: ["☀️", "🌙"], code: "МА" },
-    { name: "Аевит", dose: "1 таблетка", times: [], code: "АЕ" },
-    { name: "Новопассит", dose: "2 таблетки", times: ["🌙"], code: "НО" },
-  ]);
-  assert.deepEqual(parseMeds("Magne B6 2 tabs morning, evening; ; Ursosan"), [
-    { name: "Magne B6", dose: "2 tabs", times: ["☀️", "🌙"], code: "MA" },
-    { name: "Ursosan", dose: "", times: [], code: "UR" },
-  ]);
+test("a medication course: its medicines as the window's groups (name and dose, when, days): the doses, the legend, a day per row up to the longest", () => {
+  const meds = [
+    { name: "Мастодинон 30 капель", times: "both", meal: "before", days: 92 },
+    { name: "Аевит", dose: "1 таблетка", times: "any" },
+    { name: "Новопассит 2 таблетки", times: "evening", days: 30 },
+    { name: "Магний", times: "day", meal: "any", days: 10 },
+  ];
+  const text = make("meds", { start: "2026-11-05", meds });
+  assert.match(text, /^---\ntype: meds\nstart: 2026-11-05\ndays: 92\n---\n\n- Мастодинон/);
+  assert.equal(KINDS.meds.note({ meds }, "2026-11-05").file, "Мастодинон, Аевит, Новопассит, Магний");
+  assert.match(text, /\n- Мастодинон — 30 капель, утро и вечер, перед едой\n- Аевит — 1 таблетка\n- Новопассит — 2 таблетки, на ночь\n- Магний — днём\n/);
+  assert.match(text, /\n\| МА \| Мастодинон \|\n/);
+  assert.match(text, /\n\| ☀️ \| утро \|\n\| 🌤 \| день \|\n\| 🌙 \| вечер \/ на ночь \|\n/);
+  assert.match(text, /\n\| Дата \| МА☀️ \| МА🌙 \| АЕ \| НО🌙 \| МА🌤 \| Заметки \|\n\| --- \| :-: \| :-: \| :-: \| :-: \| :-: \| --- \|\n\| 2026-11-05 \| ☐ \| ☐ \| ☐ \| ☐ \| ☐ \|  \|\n/);
+  assert.match(text, /\n\| 2026-11-15 \| ☐ \| ☐ \| ☐ \| ☐ \|  \|  \|\n/);   // Магний's 10 days are over
+  assert.match(text, /\n\| 2026-12-05 \| ☐ \| ☐ \| ☐ \|  \|  \|  \|\n/);   // Новопассит's 30 too
+  assert.match(text, /\n\| 2027-02-04 \| ☐ \| ☐ \|  \|  \|  \|  \|\n$/);   // Аевит's 90 as well
+  assert.equal(text.match(/^\| 20\d\d-/gm).length, 92);
+  // no start typed: today; no days: 90; a name without a dose
+  assert.match(make("meds", { meds: [{ name: "Аевит" }] }, "2026-10-29"), /\nstart: 2026-10-29\ndays: 90\n---\n\n- Аевит\n/);
+  // the window: the medicines as a list of groups, a name each
+  const { rows, required } = KINDS.meds.form();
+  assert.deepEqual(rows[0].list.map(r => r.key), ["name", "dose", "times", "meal", "days"]);
+  assert.deepEqual(rows[0].list[3].options.map(o => o.label), ["перед едой", "после еды", "перед сном", "неважно"]);
+  assert.deepEqual(rows[0].required, ["name"]);
+  assert.deepEqual(rows[0].list[2].options.map(o => o.label), ["утром", "утром и вечером", "днём", "вечером", "неважно"]);
+  assert.deepEqual(required, ["meds"]);
 });
 
-test("a medication course: the start and length as properties, the doses, the legend and a day per row", () => {
-  const text = make("meds", { start: "2026-11-05", days: 92, meds: "Мастодинон 30 капель утро вечер; Аевит 1 таблетка; Новопассит 2 таблетки на ночь" });
-  assert.match(text, /^---\ntype: meds\nstart: 2026-11-05\ndays: 92\n---\n\n- Мастодинон/);
-  assert.equal(KINDS.meds.note({ meds: "Мастодинон 30 капель; Аевит" }, "2026-11-05").file, "Мастодинон, Аевит");
-  assert.match(text, /\n- Мастодинон — 30 капель, утро и вечер\n- Аевит — 1 таблетка\n- Новопассит — 2 таблетки, на ночь\n/);
-  assert.match(text, /\n\| МА \| Мастодинон \|\n/);
-  assert.match(text, /\n\| Дата \| МА☀️ \| МА🌙 \| АЕ \| НО🌙 \| Заметки \|\n\| --- \| :-: \| :-: \| :-: \| :-: \| --- \|\n\| 2026-11-05 \| ☐ \| ☐ \| ☐ \| ☐ \|  \|\n/);
-  assert.match(text, /\n\| 2027-02-04 \| ☐ \| ☐ \| ☐ \| ☐ \|  \|\n$/);
-  assert.equal(text.match(/^\| 20\d\d-/gm).length, 92);
-  // no start typed: today; no length: 90 days
-  assert.match(make("meds", { meds: "Аевит 1 таблетка" }, "2026-10-29"), /\nstart: 2026-10-29\ndays: 90\n/);
+test("a work task's file: the next number in its folder, then the title in lower case with underscores", () => {
+  const names = ["38_mail_templates.md", "3_taxonomy_for_skelary_2.md", "_future_tasks_notes.md"];
+  assert.equal(KINDS.work.file({ title: "Versions bug on Duplicates" }, names), "39_versions_bug_on_duplicates");
+  assert.equal(KINDS.work.file({ title: "First" }, []), "1_first");
 });

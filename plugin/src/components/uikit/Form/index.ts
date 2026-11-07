@@ -4,12 +4,16 @@ import { Modal, type App, type TFile } from "obsidian";
 //   { name, key, options: [{ label, value, img? }] }  buttons, the chosen one lit (mod-cta)
 //   { name, key, text: placeholder, number? }       a text box
 //   { name, key, check: description }               a checkbox
+//   { name, key, list: rows, required? }            groups of those rows, + adds one, × takes it
+//                                                   off; the value: an array of the groups' values
 // `values` has the starting ones; the keys in `required` must be set before the button works (it's
-// greyed out). Form.ask(...) resolves to the values on the button (or Enter), null when closed.
+// greyed out; a list: one group at least, each with its own required keys). Form.ask(...) resolves
+// to the values on the button (or Enter), null when closed.
 export type Row =
   | { name: string; key: string; options: { label: string; value: unknown; img?: TFile }[] }
   | { name: string; key: string; text: string; number?: boolean }
-  | { name: string; key: string; check: string };
+  | { name: string; key: string; check: string }
+  | { name: string; key: string; list: Row[]; required?: string[] };
 
 export type Values = Record<string, any>;
 type Options = { values?: Values; required?: string[]; submit?: string };
@@ -42,14 +46,20 @@ export class Form extends Modal {
   }
 
   private get ready() {
-    return this.required.every(k => ![null, undefined, ""].includes(this.values[k]));
+    const set = (v: unknown) => ![null, undefined, ""].includes(v as any);
+    const ok = (r: Row | undefined, v: unknown) => r && "list" in r
+      ? Array.isArray(v) && v.length > 0
+        && v.every(g => (r.required ?? []).every(k => set(g[k])))
+      : set(v);
+
+    return this.required.every(k => ok(this.rows.find(r => r.key === k), this.values[k]));
   }
   private update()    { this.button.disabled = !this.ready; }
   private send()      { if (this.ready) { this.done = true; this.close(); } }
 
   onOpen() {
     this.titleEl.setText(this.title);
-    for (const r of this.rows) this.row(r);
+    for (const r of this.rows) this.row(r, this.values, this.contentEl);
     this.button = this.contentEl.createDiv("modal-button-container")
       .createEl("button", { cls: "mod-cta", text: this.submit });
     this.button.onclick = () => this.send();
@@ -59,9 +69,9 @@ export class Form extends Modal {
   }
   onClose() { this.resolve(this.done ? this.values : null); }
 
-  private row(r: Row) {
-    const vals = this.values;
-    const item = this.contentEl.createDiv("setting-item");
+  private row(r: Row, vals: Values, parent: HTMLElement) {
+    if ("list" in r) return this.list(r, vals, parent);
+    const item = parent.createDiv("setting-item");
     const info = item.createDiv({ cls: "setting-item-info", attr: { style: "flex-shrink: 0" } });
     info.createDiv({ cls: "setting-item-name", text: r.name });
     if ("check" in r) info.createDiv({ cls: "setting-item-description", text: r.check });
@@ -102,5 +112,34 @@ export class Form extends Modal {
         this.update();
       };
     }
+  }
+
+  // the groups of a list row, each its rows and a ×, then a + for one more
+  private list(r: Extract<Row, { list: Row[] }>, vals: Values, parent: HTMLElement) {
+    const groups: Values[] = (vals[r.key] ??= []);
+    const item = parent.createDiv("setting-item");
+
+    item.createDiv({ cls: "setting-item-info" })
+      .createDiv({ cls: "setting-item-name", text: r.name });
+    const box = parent.createDiv({ attr: { style: "margin-left: 1em" } });
+    const draw = () => {
+      box.empty();
+      for (const g of groups) {
+        const style = "border-left: 2px solid var(--background-modifier-border); padding-left: 1em";
+        const group = box.createDiv({ attr: { style } });
+
+        for (const sub of r.list) this.row(sub, g, group);
+        const off = group.createEl("button", { text: "×", attr: { title: "Remove" } });
+
+        off.onclick = () => { groups.splice(groups.indexOf(g), 1); draw(); this.update(); };
+      }
+
+      const add = box.createEl("button", { text: "+", attr: { title: "One more" } });
+
+      add.onclick = () => { groups.push({}); draw(); this.update(); };
+    };
+
+    if (!groups.length) groups.push({});
+    draw();
   }
 }

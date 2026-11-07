@@ -4,11 +4,13 @@ import { todayYmd } from "#/helpers/dates.js";
 import { Note, notePath } from "#/models/note.js";
 import { app } from "#/helpers/app.js";
 
-// the note's file, named by the title typed (else by the note's `file`: a course's medicines);
-// " 1", " 2"… when taken
+// the note's file, named by the kind from the folder's files (a work task's number), else by the
+// title typed (else by the note's `file`: a course's medicines); " 1", " 2"… when taken
 export async function createNote(kind, values, dir) {
   const data = kind.note(values, todayYmd()), note = new Note(data);
-  const path = notePath(dir, values.title || data.file, p => !!app.vault.getAbstractFileByPath(p));
+  const names = app.vault.getFolderByPath(dir)?.children.map(f => f.name) ?? [];
+  const name = kind.file ? kind.file(values, names) : values.title || data.file;
+  const path = notePath(dir, name, p => !!app.vault.getAbstractFileByPath(p));
 
   if (!app.vault.getFolderByPath(dir)) await app.vault.createFolder(dir);
   return app.vault.create(path, note.text);

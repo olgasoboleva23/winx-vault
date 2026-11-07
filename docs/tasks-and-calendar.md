@@ -22,8 +22,8 @@ Tasks live in `00 System/Data/Tasks/Master.md` in the Tasks plugin's format, tag
 | **Winx: New task** | a task in `Tasks/Master.md` |
 | **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
 | **Winx: New recipe** | a note in `03 Resources/Collections/Recipes` |
-| **Winx: New work task** | a note in `01 Projects/Work/tasks` (another folder: `"workTasks"` in the plugin's `data.json`) |
-| **Winx: New medication course** | a note in `02 Areas/Health/Medication` (`"meds"` in `data.json`): the medicines typed on one line (`Name dose morning evening; …`), a start and a length; a legend and a day per row to tick |
+| **Winx: New work task** | a note in `01 Projects/Work/tasks` (another folder: `"workTasks"` in the plugin's `data.json`), named `<next number>_<title in lower case with underscores>` |
+| **Winx: New medication course** | a note in `02 Areas/Health/Medication` (`"meds"` in `data.json`): a group per medicine (+ adds one): name, dose, when (morning / morning and evening / day / evening / any), the meal (before / after / before sleep / any), its days; a start; a legend and a day per row to tick, up to the longest course |
 | **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
 | **Winx: New market item** | an item in `00 System/Data/Celestial Market.md` |
 

@@ -40,41 +40,39 @@ const item = ({ type, steps, types, statuses, ...rest }) => ({
   }),
 });
 
-// the medicines of a course, typed on one line: "Мастодинон 30 капель утро вечер; Аевит 1 таблетка;
-// Новопассит 2 таблетки на ночь" → [{ name, dose, times: ["☀️", "🌙"], code: "МД" }]. The name:
-// the words before the first number (all of them without one); the times: утро / morning ☀️,
-// вечер / ночь / evening / night 🌙 at the end (none: once a day); the code: its first two letters
-const TIMES = { утро: "☀️", утром: "☀️", morning: "☀️", вечер: "🌙", вечером: "🌙", ночь: "🌙",
-  evening: "🌙", night: "🌙" };
+// the medicines of a course, a group each in the window: the name, the dose ("30 капель"; none:
+// the words from the first number of the name), when (morning | both | day | evening | any: once a
+// day), the meal (before | after | sleep | any), days
+const WHEN = { morning: ["☀️"], both: ["☀️", "🌙"], day: ["🌤"], evening: ["🌙"], any: [] };
+const WHEN_TEXT = { "☀️": "утро", "🌤": "днём", "🌙": "на ночь" };
+const MEAL_TEXT = { before: "перед едой", after: "после еды", sleep: "перед сном" };
+const LEGEND = [["☀️", "утро"], ["🌤", "день"], ["🌙", "вечер / на ночь"]];
 
-export function parseMeds(line) {
-  return line.split(";").map(s => s.trim()).filter(Boolean).map(s => {
-    const words = s.split(/[\s,]+/), times = [];
+const medicine = g => {
+  const words = g.name.trim().split(/\s+/), at = words.findIndex(w => /^\d/.test(w));
+  const split = at < 0 ? words.length : at, name = words.slice(0, split).join(" ");
 
-    while (words.length && TIMES[words.at(-1).toLowerCase()]) times.unshift(TIMES[words.pop()]);
-    if (times.length && words.at(-1) === "на") words.pop();   // "на ночь"
-    const at = words.findIndex(w => /^\d/.test(w)), split = at < 0 ? words.length : at;
-    const name = words.slice(0, split).join(" ");
+  return {
+    name, dose: g.dose?.trim() || words.slice(split).join(" "), times: WHEN[g.times] ?? [],
+    meal: MEAL_TEXT[g.meal] ?? "", days: Number(g.days) || 90, code: name.slice(0, 2).toUpperCase(),
+  };
+};
 
-    const dose = words.slice(split).join(" ");
-
-    return { name, dose, times, code: name.slice(0, 2).toUpperCase() };
-  });
-}
-
-// the course as a note: its medicines and doses, the columns' legend, a day per row to tick
+// the course as a note: its medicines and doses, the columns' legend, a day per row up to the
+// longest course (a medicine's cells blank after its own days)
 const course = (v, today) => {
-  const meds = parseMeds(v.meds), start = v.start?.trim() || today, days = Number(v.days) || 90;
-  const when = m => ({ "☀️": "утро", "🌙": "на ночь" })[m.times[0]];
-  const dose = m => [m.dose, m.times.length > 1 ? "утро и вечер" : m.times.length ? when(m) : ""]
-    .filter(Boolean).join(", ");
-  const columns = meds.flatMap(m => m.times.length ? m.times.map(t => m.code + t) : [m.code]);
+  const meds = v.meds.map(medicine), start = v.start?.trim() || today;
+  const days = Math.max(...meds.map(m => m.days));
+  const when = m => m.times.length > 1 ? "утро и вечер" : WHEN_TEXT[m.times[0]] ?? "";
+  const dose = m => [m.dose, when(m), m.meal].filter(Boolean).join(", ");
+  const columns = meds.flatMap(m => (m.times.length ? m.times : [""]).map(t => ({ m, t })));
   const row = cells => `| ${cells.join(" | ")} |`;
+  const used = LEGEND.filter(([t]) => columns.some(c => c.t === t));
   const table = [
-    row(["Дата", ...columns, "Заметки"]),
+    row(["Дата", ...columns.map(c => c.m.code + c.t), "Заметки"]),
     row(["---", ...columns.map(() => ":-:"), "---"]),
     ...Array.from({ length: days }, (_, i) =>
-      row([addDays(start, i), ...columns.map(() => "☐"), ""])),
+      row([addDays(start, i), ...columns.map(c => i < c.m.days ? "☐" : ""), ""])),
   ];
 
   return {
@@ -85,7 +83,7 @@ const course = (v, today) => {
       "",
       row(["Код", "Препарат"]), row(["---", "---"]),
       ...meds.map(m => row([m.code, m.name])),
-      row(["☀️", "утро"]), row(["🌙", "вечер / на ночь"]),
+      ...used.map(row),
       "",
       ...table,
     ].join("\n"),
@@ -137,27 +135,51 @@ export const KINDS = {
       sections: { Ingredients: "", Steps: "", Notes: "", Variations: "" },
     }),
   },
-  // a course of medicines: a day per row to tick (the folder: "meds" in the plugin's data.json)
+  // a course of medicines, a group per medicine (+ adds one): a day per row to tick (the folder:
+  // "meds" in the plugin's data.json)
   meds: {
     id: "new-meds", name: "New medication course", folder: "02 Areas/Health/Medication",
     setting: "meds",
     form: () => ({
       rows: [
         {
-          name: "Medicines", key: "meds",
-          text: "Мастодинон 30 капель утро вечер; Аевит 1 таблетка; Новопассит 2 таблетки на ночь",
+          name: "Medicines", key: "meds", required: ["name"],
+          list: [
+            { name: "Name", key: "name", text: "Мастодинон" },
+            { name: "Dose", key: "dose", text: "30 капель" },
+            {
+              name: "When", key: "times",
+              options: pairs([
+                ["утром", "morning"], ["утром и вечером", "both"], ["днём", "day"],
+                ["вечером", "evening"], ["неважно", "any"],
+              ]),
+            },
+            {
+              name: "Meal", key: "meal",
+              options: pairs([
+                ["перед едой", "before"], ["после еды", "after"], ["перед сном", "sleep"],
+                ["неважно", "any"],
+              ]),
+            },
+            { name: "Days", key: "days", text: "90", number: true },
+          ],
         },
         { name: "Start", key: "start", text: "YYYY-MM-DD (empty: today)" },
-        { name: "Days", key: "days", text: "90", number: true },
       ],
       values: {}, required: ["meds"],
     }),
     note: course,
   },
-  // the folder can be set as "workTasks" in the plugin's data.json
+  // the folder can be set as "workTasks" in the plugin's data.json; the file: the next number in
+  // the folder, then the title in lower case with underscores ("39_mail_templates")
   work: {
     id: "new-work-task", name: "New work task", folder: "01 Projects/Work/tasks",
     setting: "workTasks", form: titleOnly,
+    file: (v, names) => {
+      const last = Math.max(0, ...names.map(n => Number(n.match(/^(\d+)_/)?.[1] || 0)));
+
+      return `${last + 1}_${v.title.trim().toLowerCase().replace(/\s+/g, "_")}`;
+    },
     note: (v, today) => ({
       props: { status: "active", created: today, asana: null },
       sections: {
