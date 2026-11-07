@@ -70,7 +70,7 @@ test("its state goes into Obsidian's layout and comes back; area and the phone's
   const v = new CalendarView({ app: { workspace: { requestSaveLayout: () => saves++ } } });
   await v.setState({ view: "month", tab: "pool", showDone: true, unfolded: ["2026-11-04", "bad"], date: "2026-12-09" }, {});
   assert.deepEqual(v.getState(), { date: "2026-12-09", view: "month", showDone: true, tab: "pool",
-    unfolded: ["2026-11-04"], backlogOpen: false });
+    unfolded: ["2026-11-04"], unfoldedDay: null, backlogOpen: false });
   await vue.nextTick();
   const before = saves;
   v.state.area = "#area/body"; v.state.picked = "2026-11-06";
@@ -113,6 +113,14 @@ test("a tick waiting its 2 s outlives the row, not the tab: closed meanwhile, no
     mock.timers.tick(3000);
     assert.equal(ticked.length, 0);
   } finally { mock.timers.reset(); }
+});
+
+test("the unfolded days are the day's: a click on a new day starts from none", async () => {
+  const { el, st } = mount({ unfolded: ["2026-11-03"], unfoldedDay: "2026-11-03" });   // yesterday's
+  el.querySelector(".winx-cal__routine-pill span").click();
+  await vue.nextTick();
+  assert.deepEqual(st.unfolded, [TODAY]);
+  assert.equal(st.unfoldedDay, TODAY);
 });
 
 test("a day's 🔁 box folds and unfolds by its edge (into the state), not by a task in it", async () => {

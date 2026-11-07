@@ -45,9 +45,13 @@ const fill = computed(() => {
 const open = computed(() => state.unfolded.includes(props.day));
 const tick = computed(() => !!ctx.value.TASKS);
 
+// the folds are the day's: the first click of a new day starts from none, so they don't pile up
+// in the saved state
 function fold(e) {
   if (!e.target.matches(EDGE)) return;
-  const d = props.day;
+  const d = props.day, { today } = ctx.value;
+
+  if (state.unfoldedDay !== today) Object.assign(state, { unfolded: [], unfoldedDay: today });
   state.unfolded = open.value ? state.unfolded.filter(x => x !== d) : [...state.unfolded, d];
 }
 </script>

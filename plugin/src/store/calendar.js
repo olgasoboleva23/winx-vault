@@ -4,7 +4,8 @@ import { monthGrid, weekOf } from "#/helpers/dates.js";
 // the one picked.
 
 export const DEFAULT = Object.freeze({
-  date: null, view: "week", showDone: false, tab: "nodate", unfolded: [], backlogOpen: false,
+  date: null, view: "week", showDone: false, tab: "nodate", unfolded: [], unfoldedDay: null,
+  backlogOpen: false,
 });
 
 // what's saved with the layout; the rest of the tab's state is not
@@ -30,6 +31,8 @@ export function readState(saved) {
     unfolded: Array.isArray(s.unfolded)
       ? [...new Set(s.unfolded.filter(d => typeof d === "string" && DATE.test(d)))]
       : [],
+    // the day the folds were made: another day starts from none (DayFill)
+    unfoldedDay: pick(s.unfoldedDay, v => typeof v === "string" && DATE.test(v), null),
     backlogOpen: pick(s.backlogOpen, bool, false),
   };
 }

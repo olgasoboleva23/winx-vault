@@ -5,12 +5,12 @@ import { DEFAULT, readState, baseDate, shownDays, dateFor } from "#/store/calend
 test("no or broken saved state gives the defaults", () => {
   assert.deepEqual(readState(undefined), DEFAULT);
   assert.deepEqual(readState({ view: "year", tab: "x", date: "soon", unfolded: "2026-10-28", showDone: "yes" }), DEFAULT);
-  assert.deepEqual(DEFAULT, { date: null, view: "week", showDone: false, tab: "nodate", unfolded: [], backlogOpen: false });
+  assert.deepEqual(DEFAULT, { date: null, view: "week", showDone: false, tab: "nodate", unfolded: [], unfoldedDay: null, backlogOpen: false });
 });
 
 test("a saved state comes back whole; unfolded days without repeats", () => {
-  const s = readState({ date: "2026-10-05", view: "month", showDone: true, tab: "pool", unfolded: ["2026-10-28", "2026-10-28", 5], backlogOpen: true });
-  assert.deepEqual(s, { date: "2026-10-05", view: "month", showDone: true, tab: "pool", unfolded: ["2026-10-28"], backlogOpen: true });
+  const s = readState({ date: "2026-10-05", view: "month", showDone: true, tab: "pool", unfolded: ["2026-10-28", "2026-10-28", 5], unfoldedDay: "2026-10-28", backlogOpen: true });
+  assert.deepEqual(s, { date: "2026-10-05", view: "month", showDone: true, tab: "pool", unfolded: ["2026-10-28"], unfoldedDay: "2026-10-28", backlogOpen: true });
 });
 
 test("no date follows today", () => {
