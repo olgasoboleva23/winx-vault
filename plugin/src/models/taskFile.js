@@ -11,10 +11,13 @@ export function parseNote(path, text) {
   let skip = null;   // the closer of the code block or the comment this line is in
 
   text.split("\n").forEach((raw, line) => {
-    if (skip) { if (raw.includes(skip)) skip = null; return; }
+    if (skip) {
+      if (skip === "-->" ? raw.includes(skip) : raw.trimStart().startsWith(skip)) skip = null;
+      return;
+    }
 
-    skip = raw.startsWith("```") ? "```"
-      : raw.startsWith("<!--") && !raw.includes("-->") ? "-->" : null;
+    skip = raw.trimStart().match(/^(```|~~~)/)?.[1]
+      ?? (raw.startsWith("<!--") && !raw.includes("-->") ? "-->" : null);
     const m = skip ? null : raw.match(ITEM);
 
     if (!m) { open.length = 0; return; }

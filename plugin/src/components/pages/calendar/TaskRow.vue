@@ -51,6 +51,7 @@ function onTick(e) {
 <template>
   <div
     v-if="!gone"
+    v-tip="compact ? task.label : null"
     :class="[
       'winx-cal__task',
       `winx-cal__task--${kind}`,
@@ -61,7 +62,6 @@ function onTick(e) {
     :data-area="task.area"
     :data-swipe="swipe.kind"
     :draggable="drags ? 'true' : null"
-    v-tip="compact ? task.label : null"
     @dragstart="drag.start"
     @dragend="drag.end"
     @dragover="onto.over"

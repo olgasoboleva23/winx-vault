@@ -110,6 +110,42 @@ test("a note deleted while its read is still on the way: the late read is droppe
   assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
 });
 
+test("parseNote: a ~~~ block and an indented fence are examples too", () => {
+  const text = "- [ ] a\n~~~\n- [x] b\n~~~\n  ```\n- [x] c\n  ```\n- [ ] d";
+  assert.deepEqual(parseNote(P, text).map(i => i.text), ["a", "d"]);
+});
+
+test("a note deleted while the first read is on the way: it doesn't come back", async () => {
+  const more = "00 System/Data/Tasks/More.md";
+  const { files, fire, app, layout } = vault({ [P]: "- [ ] a", [more]: "- [ ] c" }, false);
+  let release;
+
+  app.vault.cachedRead = f => f.path === more
+    ? new Promise(r => { release = () => r("- [ ] c"); }) : Promise.resolve(files[f.path]);
+  useTaskStore(plugin());
+  layout.forEach(fn => fn()); await settle();
+  delete files[more]; fire("delete", more); await settle();
+  release(); await settle();
+  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
+});
+
+test("turned on in an open Obsidian: a first read that fails is tried again at the next \"resolved\"", async () => {
+  const { fire, app } = vault({ [P]: "- [ ] a" });
+  const read = app.vault.cachedRead, error = console.error;
+
+  app.workspace.layoutReady = true;
+  app.vault.cachedRead = async () => { throw new Error("gone"); };
+  taskStore.ready = false;
+  console.error = () => {};
+  useTaskStore(plugin()); await settle();
+  console.error = error;
+  assert.equal(taskStore.ready, false);
+  app.vault.cachedRead = read;
+  fire("resolved"); await settle();
+  assert.equal(taskStore.ready, true);
+  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
+});
+
 test("put(path, text): the note's items set straight (tests, and a write the plugin just made)", () => {
   vault({});
   taskStore.put(P, "- [ ] z");

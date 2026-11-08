@@ -32,13 +32,20 @@ export const taskStore = {
 const inFolder = path => path.startsWith(FOLDER) && path.endsWith(".md");
 const reads = new Map();   // path → its last read's number: an older read, or one of a note dropped
                            // since, is not put
-const read = async file => {
+// the note's text, or null when a newer read began or the note was dropped meanwhile
+const fresh = async file => {
   const n = (reads.get(file.path) ?? 0) + 1;
 
   reads.set(file.path, n);
   const text = await app.vault.cachedRead(file);
 
-  if (reads.get(file.path) === n) taskStore.put(file.path, text);
+  return reads.get(file.path) === n ? text : null;
+};
+
+const read = async file => {
+  const text = await fresh(file);
+
+  if (text !== null) taskStore.put(file.path, text);
 };
 
 export function useTaskStore(plugin) {
@@ -64,7 +71,11 @@ export function useTaskStore(plugin) {
 
     byPath.clear();
     try {
-      for (const f of notes) byPath.set(f.path, parseNote(f.path, await app.vault.cachedRead(f)));
+      for (const f of notes) {
+        const text = await fresh(f);   // the same guard as a change's read
+
+        if (text !== null) byPath.set(f.path, parseNote(f.path, text));
+      }
     } catch (e) {
       started = false;   // the next "resolved" reads again
 
@@ -75,7 +86,8 @@ export function useTaskStore(plugin) {
     refresh();
   };
 
-  if (app.workspace.layoutReady) return void start();
-  app.workspace.onLayoutReady(start);
+  // "resolved" first: a first read that fails is tried again then, the plugin turned on late too
   plugin.registerEvent(app.metadataCache.on("resolved", start));
+  if (app.workspace.layoutReady) void start();
+  else app.workspace.onLayoutReady(start);
 }
