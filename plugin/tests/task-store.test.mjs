@@ -22,7 +22,7 @@ test("parseNote: an indented item has its parent's line; a blank or plain line e
 // a vault in memory: the Tasks folder's notes, their reads, and the events a listener gets
 const vault = (files, ready = true) => {
   const events = {}, layout = [];
-  setApp({
+  const app = {
     metadataCache: { on: (name, fn) => { (events[name] ??= []).push(fn); return { name }; } },
     vault: {
       getFolderByPath: p => p === "00 System/Data/Tasks"
@@ -31,9 +31,11 @@ const vault = (files, ready = true) => {
       on: (name, fn) => { (events[name] ??= []).push(fn); return { name }; },
     },
     workspace: { onLayoutReady: fn => ready ? fn() : layout.push(fn) },
-  });
+  };
+
+  setApp(app);
   const fire = (name, path) => events[name].forEach(fn => fn({ path }));
-  return { files, fire, layout };
+  return { files, fire, layout, app };
 };
 const plugin = () => ({ registerEvent() {}, register() {} });
 const settle = () => new Promise(r => setTimeout(r, 5));
@@ -71,6 +73,41 @@ test("a note in the folder saved, made, deleted or renamed: read again, the vers
   assert.deepEqual(taskStore.tasks.map(t => t.text), ["a", "b", "c"]);
   delete files["00 System/Data/Tasks/More.md"]; fire("delete", "00 System/Data/Tasks/More.md"); await settle();
   assert.deepEqual(taskStore.tasks.map(t => t.text), ["a", "b"]);
+});
+
+test("parseNote: a task inside a code block or an HTML comment is an example, not a task", () => {
+  const text = "- [ ] a\n```\n- [x] b #hard\n```\n<!--\n- [ ] c\n-->\n- [ ] d <!-- e -->";
+  assert.deepEqual(parseNote(P, text).map(i => i.text), ["a", "d <!-- e -->"]);
+});
+
+test("a read that fails at the start: the next \"resolved\" reads again (ready stays false till then)", async () => {
+  const { fire, app } = vault({ [P]: "- [ ] a" }, false);
+  const read = app.vault.cachedRead;
+  app.vault.cachedRead = async () => { throw new Error("gone"); };
+  taskStore.ready = false;   // a test before set it
+  useTaskStore(plugin());
+  const error = console.error;
+  console.error = () => {};
+  fire("resolved"); await settle();
+  console.error = error;
+  assert.equal(taskStore.ready, false);
+  app.vault.cachedRead = read;
+  fire("resolved"); await settle();
+  assert.equal(taskStore.ready, true);
+  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
+});
+
+test("a note deleted while its read is still on the way: the late read is dropped, not put back", async () => {
+  const { files, fire, app } = vault({ [P]: "- [ ] a" });
+  useTaskStore(plugin()); await settle();
+  const more = "00 System/Data/Tasks/More.md";
+  let release;
+  app.vault.cachedRead = f => f.path === more
+    ? new Promise(r => { release = () => r("- [ ] c"); }) : Promise.resolve(files[f.path]);
+  files[more] = "- [ ] c"; fire("create", more); await settle();
+  delete files[more]; fire("delete", more); await settle();
+  release(); await settle();
+  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
 });
 
 test("put(path, text): the note's items set straight (tests, and a write the plugin just made)", () => {

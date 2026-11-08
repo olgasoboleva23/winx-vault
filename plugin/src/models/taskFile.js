@@ -2,14 +2,20 @@
 // Dataview): { path, line, text, status, parent }. status: the checkbox's character (" ", "x",
 // "-"), null for a plain "- item" (a pool line); text: after the checkbox (what Task.of takes);
 // parent: the line of the list item it's indented under (a line that isn't a list item, blank or
-// not, ends the nesting). Only "- " items: Winx writes that form. Pure (tests/task-store.test.mjs).
+// not, ends the nesting). Only "- " items: Winx writes that form. A code block's or an HTML
+// comment's lines are examples, not items. Pure (tests/task-store.test.mjs).
 const ITEM = /^(\s*)- (?:\[(.)\] )?(.*)$/;
 
 export function parseNote(path, text) {
   const items = [], open = [];   // open: the items this one may be indented under, by indent
+  let skip = null;   // the closer of the code block or the comment this line is in
 
   text.split("\n").forEach((raw, line) => {
-    const m = raw.match(ITEM);
+    if (skip) { if (raw.includes(skip)) skip = null; return; }
+
+    skip = raw.startsWith("```") ? "```"
+      : raw.startsWith("<!--") && !raw.includes("-->") ? "-->" : null;
+    const m = skip ? null : raw.match(ITEM);
 
     if (!m) { open.length = 0; return; }
 

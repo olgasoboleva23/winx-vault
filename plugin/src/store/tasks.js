@@ -26,11 +26,20 @@ export const taskStore = {
   tasks: [], pool: [], ready: false, version: ref(0),
   // the note's items set from its text (a test's, or a write the plugin just made)
   put(path, text) { byPath.set(path, parseNote(path, text)); refresh(); },
-  drop(path) { if (byPath.delete(path)) refresh(); },
+  drop(path) { reads.delete(path); if (byPath.delete(path)) refresh(); },
 };
 
 const inFolder = path => path.startsWith(FOLDER) && path.endsWith(".md");
-const read = async file => taskStore.put(file.path, await app.vault.cachedRead(file));
+const reads = new Map();   // path → its last read's number: an older read, or one of a note dropped
+                           // since, is not put
+const read = async file => {
+  const n = (reads.get(file.path) ?? 0) + 1;
+
+  reads.set(file.path, n);
+  const text = await app.vault.cachedRead(file);
+
+  if (reads.get(file.path) === n) taskStore.put(file.path, text);
+};
 
 export function useTaskStore(plugin) {
   const changed = f => { if (inFolder(f.path)) void read(f); };
@@ -54,7 +63,14 @@ export function useTaskStore(plugin) {
       .filter(f => f.extension === "md");
 
     byPath.clear();
-    for (const f of notes) byPath.set(f.path, parseNote(f.path, await app.vault.cachedRead(f)));
+    try {
+      for (const f of notes) byPath.set(f.path, parseNote(f.path, await app.vault.cachedRead(f)));
+    } catch (e) {
+      started = false;   // the next "resolved" reads again
+
+      return console.error("winx: the tasks' notes weren't read", e);
+    }
+
     taskStore.ready = true;
     refresh();
   };
