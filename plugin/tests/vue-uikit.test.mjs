@@ -11,8 +11,8 @@ before(async () => {
   // a component is <Name>.vue, or <Name>/index.vue when it has its own styles
   const load = async n => (await import(`../src/components/uikit/${n}`)).default;
   ui = Object.fromEntries(await Promise.all(["WinxButton", "WinxNoteLink", "WinxEmpty", "WinxMissing", "WinxFailed",
-    "WinxGroupHeader", "WinxAddForm", "WinxCard"].map(async n => {
-    const styled = ["WinxButton", "WinxEmpty", "WinxAddForm", "WinxCard"].includes(n);
+    "WinxGroupHeader", "WinxAddForm", "WinxCard", "WinxTable"].map(async n => {
+    const styled = ["WinxButton", "WinxEmpty", "WinxAddForm", "WinxCard", "WinxTable"].includes(n);
 
     return [n, await load(styled ? `${n}/index.vue` : `${n}.vue`)];
   })));
@@ -21,7 +21,10 @@ const draws = (vue, html) => assert.equal(vue.element.outerHTML.replace(/<!--[^]
 
 test("WinxButton: kinds, on, title, extra classes", () => {
   draws(mount(ui.WinxButton, { props: { title: "delete task" }, slots: { default: "🗑" } }),
-    '<button class="winx-btn winx-btn--round" title="delete task" aria-label="delete task">🗑</button>');
+    '<button class="winx-btn winx-btn--round" aria-label="delete task" data-tip="winx-tooltip">🗑</button>');
+  // on a blue place (Missed, today): the pink tooltip
+  draws(mount(ui.WinxButton, { props: { title: "move to today", tip: "pink" }, slots: { default: "☀️" } }),
+    '<button class="winx-btn winx-btn--round" aria-label="move to today" data-tip="winx-tooltip winx-tooltip--pink">☀️</button>');
   draws(mount(ui.WinxButton, { props: { kind: "pill" }, attrs: { class: "winx-weight__list" }, slots: { default: "✦ list" } }),
     '<button class="winx-btn winx-btn--pill winx-weight__list">✦ list</button>');
   draws(mount(ui.WinxButton, { props: { kind: "toggle", on: true }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle winx-btn--on">✓ done</button>');
@@ -40,7 +43,7 @@ test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAdd
   draws(mount(ui.WinxGroupHeader, { props: { label: "🌿 Harvest" } }), '<div class="winx-group-header"><span>🌿 Harvest</span></div>');
   const input = { name: "kg", type: "number", placeholder: "today, kg" };
   draws(mount(ui.WinxAddForm, { props: { input, submit: "Save" } }),
-    '<form class="winx-add-form winx-flex winx-gap-s"><input class="winx-add-form__input" name="kg" type="number" placeholder="today, kg"><button class="winx-add-form__submit" type="submit">Save</button></form>');
+    '<form class="winx-add-form winx-flex winx-gap-s"><input class="winx-input winx-input--field winx-add-form__input" type="number" placeholder="today, kg" name="kg"><button class="winx-add-form__submit" type="submit">Save</button></form>');
   draws(mount(ui.WinxCard, { props: { title: "Weight", meta: ["scroll"] }, slots: { default: "<b>40 kg</b>" } }),
     '<div class="callout winx-widget" data-callout="card" data-callout-metadata="scroll" data-callout-fold=""><div class="callout-title winx-widget__title" dir="auto"><div class="callout-icon"></div><div class="callout-title-inner">Weight</div></div><div class="callout-content winx-widget__body"><b>40 kg</b></div></div>');
 });
@@ -63,4 +66,17 @@ test("WinxFailed's retry and WinxAddForm's submit reach the parent", async () =>
   await form.find("input").setValue("60.2");
   await form.find("form").trigger("submit");
   assert.deepEqual(form.emitted("submit")[0], ["60.2"]);
+});
+
+test("WinxTable: the columns' heads and classes, a row per item named by row-class, a cell's text or the cell slot; a column's tip on its head", () => {
+  const columns = [{ key: "name", label: "Код", class: "x-name", tip: "the medicine" }, { key: "n", label: "N", align: "center" }];
+  const rows = [{ name: "АЕ", n: 1, when: "past" }, { name: "МА", n: 2, when: "today" }];
+  const w = mount(ui.WinxTable, {
+    props: { columns, rows, rowKey: r => r.name, rowClass: r => `x-${r.when}` },
+    slots: { cell: `<template #cell="{ row, col }"><b v-if="col.key === 'n'">{{ row.n * 10 }}</b><template v-else>{{ row[col.key] }}</template></template>` },
+  });
+
+  draws(w, '<table class="winx-table"><thead><tr><th class="winx-table__head x-name" aria-label="the medicine" data-tip="winx-tooltip">Код</th><th class="winx-table__head winx-table__head--center">N</th></tr></thead>'
+    + '<tbody><tr class="winx-table__row x-past"><td class="winx-table__cell x-name">АЕ</td><td class="winx-table__cell winx-table__cell--center"><b>10</b></td></tr>'
+    + '<tr class="winx-table__row x-today"><td class="winx-table__cell x-name">МА</td><td class="winx-table__cell winx-table__cell--center"><b>20</b></td></tr></tbody></table>');
 });

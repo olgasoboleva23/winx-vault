@@ -9,7 +9,8 @@ import { weekday } from "#/helpers/dates.js";
 export const MARKS = ["☐", "✅", "❌"];
 
 export const next = mark => MARKS[(MARKS.indexOf(mark) + 1) % MARKS.length];
-const TIMES = { "☀️": "☀️ утро", "🌤": "🌤 днём", "🌙": "🌙 на ночь", "": "в любое время" };
+
+export const TIMES = { "☀️": "☀️ утро", "🌤": "🌤 днём", "🌙": "🌙 на ночь", "": "в любое время" };
 const MONTHS = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
 const DAYS = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 
@@ -91,7 +92,8 @@ export function carry(from, into) {
 }
 
 // the note rebuilt: `fresh` (its properties and the pieces Winx writes: the Приём, Заметки and
-// Легенда cards, the block), then whatever else `old` had, written by hand
+// Легенда cards: the last one from notes made before the block drew the legend, the block), then
+// whatever else `old` had, written by hand
 const MADE = /^(> \[!card\] (Приём|Заметки|Легенда)(\n|$)|```winx)/;
 const body = text => text.slice(text.indexOf("\n---\n", 3) + 5).trim();
 

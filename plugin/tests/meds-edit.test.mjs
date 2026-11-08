@@ -71,7 +71,9 @@ test("editCourse: the window with the course's values; saved: the medicines, the
   const text = files[P];
 
   assert.match(text, /^---\ntype: meds\nstart: 2026-11-07\ndays: 3\ncssclasses:\n  - dashboard\nmeds:\n  - \{"name":"Аевит","dose":"1 капсула","times":"any","meal":"any","days":3\}\n  - \{"name":"Новопассит 10 мл","dose":"","times":"evening","meal":"sleep","days":2\}\nnotes: "от врача: не запивать молоком\\nи не курить"\n---\n/);
-  assert.match(text, /\n> \[!card\] Приём\n> - 🌙 на ночь, перед сном: Новопассит 10 мл\n> - в любое время: Аевит 1 капсула\n\n> \[!card\] Заметки\n> от врача: не запивать молоком\n> и не курить\n\n> \[!card\] Легенда\n/);
+  // the old Легенда card (a note made before the block drew the legend) goes with the rebuild
+  assert.match(text, /\n> \[!card\] Приём\n> - 🌙 на ночь, перед сном: Новопассит 10 мл\n> - в любое время: Аевит 1 капсула\n\n> \[!card\] Заметки\n> от врача: не запивать молоком\n> и не курить\n\n```winx\n/);
+  assert.doesNotMatch(text, /Легенда/);
   // Аевит's marks and the day's note carried, Магний gone, Новопассит new (its 2 days)
   assert.match(text, /\n\| Дата \| АЕ \| НО🌙 \| Заметки \|\n\| --- \| :-: \| :-: \| --- \|\n\| 2026-11-07 \| ✅ \| ☐ \|  \|\n\| 2026-11-08 \| ✅ \| ☐ \| поездка \|\n\| 2026-11-09 \| ☐ \|  \|  \|\n```\n/);
   assert.match(text, /\n```\n\n> \[!card\] От врача\n> через месяц анализ\n$/);

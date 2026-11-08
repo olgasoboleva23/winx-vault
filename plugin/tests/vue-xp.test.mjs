@@ -17,7 +17,7 @@ test("LevelToday: level, XP, progress and a bar per vital with its reasons as th
   assert.equal(el.querySelector(".winx-level__text").textContent, "Level: 11 | Total XP: 2310");
   assert.equal(el.querySelector(".winx-level__progress-fill").style.width, "52.9%");
   const vital = el.querySelector(".winx-level__vital--hp");
-  assert.equal(vital.title, "missed tasks −40, done today +2");
+  assert.equal(vital.getAttribute("aria-label"), "missed tasks −40, done today +2");   // the tooltip (v-tip)
   assert.equal(vital.querySelector(".winx-level__vital-value").textContent, "12/50");
 });
 

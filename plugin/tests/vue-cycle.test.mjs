@@ -26,7 +26,7 @@ test("Cycle: folded shows the head and the buttons; a click on the head unfolds 
   const w = mount(CycleWidget, { props: { state: { data } } });
   assert.ok(w.classes().includes("winx-cycle--folded"));
   assert.equal(w.find(".winx-cycle__day").text(), "day 3 · period");
-  assert.equal(w.find(".winx-cycle__day").attributes("title"), "MP 1/4\n\nday 1–5 · period");
+  assert.equal(w.find(".winx-cycle__day").attributes("aria-label"), "MP 1/4\n\nday 1–5 · period");   // the tooltip
   assert.ok(!w.find(".winx-cycle__rows").exists());
   await w.find(".winx-cycle__head").trigger("click");
   assert.equal(local["winx-cycle-open"], "1");

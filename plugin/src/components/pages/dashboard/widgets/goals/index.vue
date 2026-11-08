@@ -1,6 +1,7 @@
 <!-- Goals: per goal "X of Y this week", Mon–Sun dots (done, missed, planned or none; the page's day
      ringed), the minimum version and how often it was done -->
 <script setup>
+import { vTip } from "#/components/uikit/tooltip.js";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 
 defineProps({ state: { type: Object, required: true } });
@@ -12,8 +13,8 @@ defineProps({ state: { type: Object, required: true } });
     <div
       v-for="g in state.data.goals"
       :key="g.name"
+      v-tip="g.plan"
       class="winx-goal"
-      :title="g.plan || null"
     >
       <div class="winx-goal__head winx-flex winx-between winx-gap-m">
         <span class="winx-goal__name">{{ g.name }}</span>
@@ -23,12 +24,12 @@ defineProps({ state: { type: Object, required: true } });
         <span
           v-for="d in g.dots"
           :key="d.day"
+          v-tip="d.day"
           :class="[
             'winx-goal__dot',
             `winx-goal__dot--${d.status}`,
             { 'winx-goal__dot--sel': d.sel },
           ]"
-          :title="d.day"
         />
       </div>
       <div v-if="g.min" class="winx-goal__min">{{ g.min }}</div>

@@ -2,6 +2,7 @@
      each piece labelled with its icon and done / all, the done part brighter; an area with none
      this week a grey icon after it. A piece: only that area's tasks; again: all -->
 <script setup>
+import { vTip } from "#/components/uikit/tooltip.js";
 import { computed, inject } from "vue";
 
 const view = inject("calendar");
@@ -37,10 +38,10 @@ const pickArea = a => { const tag = `#area/${a}`; state.area = tag === state.are
       <div
         v-for="p in balance.pieces"
         :key="p.area"
+        v-tip="p.title"
         :class="['winx-cal__area', { 'winx-cal__area--on': p.on }]"
         :data-area="p.area"
         :style="p.style"
-        :title="p.title"
         @click="pickArea(p.area)"
       >
         <span class="winx-cal__area-label">{{ p.icon }} {{ p.count }}</span>
@@ -49,10 +50,10 @@ const pickArea = a => { const tag = `#area/${a}`; state.area = tag === state.are
     </div>
     <div
       v-if="balance.none.length"
+      v-tip="'nothing this week'"
       class="winx-cal__balance-none winx-flex winx-gap-2xs"
-      title="nothing this week"
     >
-      <span v-for="x in balance.none" :key="x.title" :title="x.title">{{ x.icon }}</span>
+      <span v-for="x in balance.none" :key="x.title" v-tip="x.title">{{ x.icon }}</span>
     </div>
   </div>
 </template>

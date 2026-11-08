@@ -18,6 +18,8 @@ export const debounce = fn => Object.assign(fn, { cancel() {} });
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };
 export const Keymap = { isModEvent: () => false };
+// a tooltip: its text as aria-label, its classes noted
+export const setTooltip = (el, text, o = {}) => { el.setAttribute("aria-label", text); if (o.classes) el.dataset.tip = o.classes.join(" "); };
 export class Modal { constructor(app) { this.app = app; } open() {} close() {} }
 export class SuggestModal extends Modal { setPlaceholder() {} }
 // a tab: its leaf's app, its content element; the layout's state saved by Obsidian (setState: nothing here)

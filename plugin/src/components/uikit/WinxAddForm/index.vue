@@ -1,7 +1,9 @@
-<!-- one field and a submit button, a finger's height (block winx-add-form): v-model is the
-     field's text, @submit the parent's save; input: the field's attributes ({ name, type,
-     placeholder, … }) -->
+<!-- one field (WinxInput) and a submit button, a finger's height (block winx-add-form):
+     v-model is the field's text, @submit the parent's save; input: the field's attributes
+     ({ name, type, placeholder, … }) -->
 <script setup>
+import WinxInput from "#/components/uikit/WinxInput/index.vue";
+
 defineProps({
   input: { type: Object, default: () => ({}) },
   submit: { type: String, default: "Add" },
@@ -13,7 +15,7 @@ const value = defineModel({ type: [String, Number], default: "" });
 
 <template>
   <form class="winx-add-form winx-flex winx-gap-s" @submit.prevent="$emit('submit', value)">
-    <input v-model="value" class="winx-add-form__input" v-bind="input">
+    <WinxInput v-model="value" class="winx-add-form__input" v-bind="input" />
     <button class="winx-add-form__submit" type="submit">{{ submit }}</button>
   </form>
 </template>

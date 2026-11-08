@@ -66,7 +66,6 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
 @mixin row { display: flex; align-items: center; }
 // one thing in the middle of its box, both ways
 @mixin center { display: flex; align-items: center; justify-content: center; }
-
 // a token's colour at some opacity: alpha(--winx-gold, 90%) → rgb(from var(--winx-gold) r g b / 90%)
 @function alpha($token, $opacity) {
   @return string.unquote("rgb(from var(#{$token}) r g b / #{$opacity})");

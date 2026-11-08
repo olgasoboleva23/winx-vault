@@ -7,6 +7,7 @@
      onto a day or the panel, and an open one is a reorder target in its day (drag.js); on the
      phone it's swiped (swipe.js): right ticks its checkbox -->
 <script setup>
+import { vTip } from "#/components/uikit/tooltip.js";
 import { computed, inject, ref } from "vue";
 import TaskText from "./TaskText.vue";
 import TaskButtons from "./TaskButtons.vue";
@@ -60,7 +61,7 @@ function onTick(e) {
     :data-area="task.area"
     :data-swipe="swipe.kind"
     :draggable="drags ? 'true' : null"
-    :title="compact ? task.label : null"
+    v-tip="compact ? task.label : null"
     @dragstart="drag.start"
     @dragend="drag.end"
     @dragover="onto.over"

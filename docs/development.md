@@ -11,7 +11,8 @@
 │   │   │                           the commands
 │   │   ├── 📁 components         — every .vue (a styled one: a folder with index.vue and its index.scss)
 │   │   │   ├── 📁 uikit          — the shared parts: WinxButton (round, nav, pill, chip, toggle, text),
-│   │   │   │                       WinxCard, WinxChart, WinxNoteLink, WinxEmpty / WinxMissing / WinxFailed,
+│   │   │   │                       WinxCard, WinxChart, WinxTable, WinxInput, WinxCheckbox, WinxNoteLink,
+│   │   │   │                       WinxEmpty / WinxMissing / WinxFailed, tooltip.js (the v-tip directive),
 │   │   │   │                       WinxGroupHeader, WinxAddForm; Obsidian's windows: Form, Search,
 │   │   │   │                       TaskWindow (a task's difficulty, area, time, sticker), TaskSearch
 │   │   │   └── 📁 pages
@@ -111,8 +112,16 @@ defineProps({ state: { type: Object, required: true } });
   gets `state` as its prop; a widget that must load again after its own write (the shop's balance) takes
   `retry` by `inject("retry")`.
 - The parts in `plugin/src/components/uikit/` are reusable: `WinxButton` with a kind (`round`, `nav`, `pill`, `chip`,
-  `toggle`, `text`), `WinxCard`, `WinxChart` (a Charts plugin chart, destroyed with it), `WinxEmpty` /
-  `WinxMissing` / `WinxFailed`, `WinxNoteLink`, `WinxGroupHeader`, `WinxAddForm`.
+  `toggle`, `text`) and its tooltip (`title`; `tip="pink"` on a blue place), `WinxCard`, `WinxChart` (a Charts
+  plugin chart, destroyed with it), `WinxTable` (columns with a key, label, align, class and tip; rows; a cell
+  slot; a row's key and class), `WinxInput` (a text field: `field`, or `inline` in a table's row), `WinxCheckbox`
+  (a box with a mark ☐ / ✅ / ❌ and its sound; `static` for a legend), `WinxEmpty` / `WinxMissing` /
+  `WinxFailed`, `WinxNoteLink`, `WinxGroupHeader`, `WinxAddForm`.
+- A hint on hover is the `v-tip` directive (`uikit/tooltip.js`), not a component: it asks Obsidian for its tooltip
+  (`setTooltip`), which is drawn on the body, so a card's edge or a table's scroll never clips it, and it goes
+  on any element (a `th`, a `div`, a button) without a wrapper in the DOM. `v-tip="text"`, `v-tip:bottom`,
+  `v-tip.pink` on a blue place (Missed, today); the look is `styles/_tooltip.scss` (`.tooltip.winx-tooltip`).
+  No `title` attributes: a button's `title` prop becomes its tooltip and `aria-label`.
 - The data comes ready from `load` (labels, sums, dates); the template has values, `v-for` with a `:key` and
   `v-if`. A click is `@click` calling an action; what a card only shows (a mode, a fold, a picked level) is the
   component's own state.

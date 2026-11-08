@@ -54,7 +54,8 @@ test("MedsCourse: the counts, today's chips, the grid; a click on a tick or a ch
   assert.equal(w.find(".winx-meds__sum").text().replace(/\s+/g, " "), "день 2 из 3 · принято 4 из 6");
   assert.deepEqual(w.findAll(".winx-meds__chip").map(c => [c.text(), c.attributes("data-mark")]),
     [["магний", "✅"], ["магний", "☐"], ["аевит", "☐"]]);
-  assert.equal(w.findAll(".winx-meds__row").length, 3);
+  assert.equal(w.findAll(".winx-table__row").length, 3);
+  assert.deepEqual(w.findAll(".winx-meds__legend")[0].findAll("span").map(e => e.text().replace(/\s+/g, " ")), ["АЕ аевит", "МА магний", "☀️ утро", "🌙 на ночь"]);
   assert.equal(w.findAll(".winx-meds__row--today").length, 1);
   assert.equal(w.findAll(".winx-meds__tick").length, 8);   // Аевит's last day is blank
   assert.equal(w.find(".winx-meds__row--past .winx-meds__tick").classes("winx-check--on"), true);

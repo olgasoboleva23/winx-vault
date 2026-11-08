@@ -1,0 +1,22 @@
+@use "mixins" as *;
+/* Obsidian's tooltip with the winx-tooltip class (uikit/tooltip.js, v-tip): the sky over the pink
+   paper, the pink paper (--pink) over a blue place; the arrow in the same colour */
+.tooltip.winx-tooltip {
+  padding: $space-s $space-xl;
+  border: 1px solid var(--winx-blue);
+  border-radius: $radius-m;
+  background: var(--winx-sky);
+  color: var(--winx-text-dark);
+  font-size: $text-m;
+  line-height: 1.4;
+  white-space: pre-line;   /* a hint of several lines (the cycle's MP) */
+  box-shadow: 0 4px 16px alpha(--winx-purple-deep, 25%);
+  .tooltip-arrow { border-top-color: var(--winx-blue); }
+  &.mod-bottom .tooltip-arrow { border-bottom-color: var(--winx-blue); }
+  &.winx-tooltip--pink {
+    border-color: var(--winx-border);
+    background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
+    .tooltip-arrow { border-top-color: var(--winx-pink); }
+    &.mod-bottom .tooltip-arrow { border-bottom-color: var(--winx-pink-light); }
+  }
+}

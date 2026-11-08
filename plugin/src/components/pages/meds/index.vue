@@ -1,16 +1,31 @@
 <!-- A medication course (block winx-meds): the counts and the course's progress, today's doses
      by anchor as chips, the course's grid (a mark per day and medicine, a note per day typed into
-     the last column), the legend. A mark goes
+     the last column), the legend (the codes, the times of day, the marks). A mark goes
      round ☐ → ✅ → ❌ on a click (WinxCheckbox, with its sound): the cell changes at once, the
      note's table is written, and the block is drawn again from it -->
 <script setup>
-import { inject } from "vue";
+import { computed, inject } from "vue";
 import WinxCheckbox from "#/components/uikit/WinxCheckbox/index.vue";
-import { next } from "#/models/course.js";
+import WinxInput from "#/components/uikit/WinxInput/index.vue";
+import WinxTable from "#/components/uikit/WinxTable/index.vue";
+import { TIMES, next } from "#/models/course.js";
 import { tickMeds } from "#/controllers/meds.js";
 import { playMark } from "#/helpers/sounds.js";
 
 const props = defineProps({ state: { type: Object, required: true } });
+// the legend under the grid: the codes' medicines, the times of day in use
+const codes = computed(() => [...new Map(props.state.data.columns.map(c => [c.code, c.name]))]);
+const times = computed(() =>
+  [...new Set(props.state.data.columns.map(c => c.time).filter(Boolean))].map(t => TIMES[t]));
+// the grid's columns: the date, a medicine (its code and time) each, the day's note
+const columns = computed(() => [
+  { key: "label", label: "Дата", class: "winx-meds__date" },
+  ...props.state.data.columns.map((c, col) => ({
+    key: `m${col}`, label: c.code + c.time, align: "center", col,
+    tip: `${c.name}, ${TIMES[c.time]}`,
+  })),
+  { key: "note", label: "Заметки", class: "winx-meds__note" },
+]);
 const sourcePath = inject("sourcePath");
 const today = () => props.state.data.rows.find(r => r.when === "today");
 // today's chips show the same cells as the grid's today row
@@ -64,43 +79,34 @@ const note = (r, text) => {
       </div>
     </div>
     <div class="winx-meds__grid">
-      <table class="winx-meds__table">
-        <thead>
-          <tr>
-            <th class="winx-meds__th">Дата</th>
-            <th v-for="(c, i) in state.data.columns" :key="i" class="winx-meds__th">
-              {{ c.code }}{{ c.time }}
-            </th>
-            <th class="winx-meds__th winx-meds__th--note">Заметки</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="r in state.data.rows"
-            :key="r.date"
-            :class="['winx-meds__row', `winx-meds__row--${r.when}`]"
-          >
-            <td class="winx-meds__date">{{ r.label }}</td>
-            <td v-for="(m, col) in r.marks" :key="col" class="winx-meds__cell">
-              <WinxCheckbox
-                v-if="m"
-                class="winx-meds__tick"
-                :mark="m"
-                @tick="toggle(r, col)"
-              />
-            </td>
-            <td class="winx-meds__note">
-              <input
-                class="winx-meds__note-input"
-                type="text"
-                :value="r.note"
-                placeholder="…"
-                @change="note(r, $event.target.value)"
-              >
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <WinxTable
+        :columns="columns"
+        :rows="state.data.rows"
+        :row-key="r => r.date"
+        :row-class="r => `winx-meds__row--${r.when}`"
+      >
+        <template #cell="{ row, col }">
+          <template v-if="col.key === 'label'">{{ row.label }}</template>
+          <WinxInput
+            v-else-if="col.key === 'note'"
+            kind="inline"
+            class="winx-meds__note-input"
+            :model-value="row.note"
+            placeholder="…"
+            @change="note(row, $event.target.value)"
+          />
+          <WinxCheckbox
+            v-else-if="row.marks[col.col]"
+            class="winx-meds__tick"
+            :mark="row.marks[col.col]"
+            @tick="toggle(row, col.col)"
+          />
+        </template>
+      </WinxTable>
+    </div>
+    <div class="winx-meds__legend winx-center winx-wrap winx-gap-xl">
+      <span v-for="[code, name] in codes" :key="code"><b>{{ code }}</b> {{ name }}</span>
+      <span v-for="t in times" :key="t">{{ t }}</span>
     </div>
     <div class="winx-meds__legend winx-center winx-wrap winx-gap-xl">
       <span><WinxCheckbox mark="☐" size="s" static /> не отмечено</span>

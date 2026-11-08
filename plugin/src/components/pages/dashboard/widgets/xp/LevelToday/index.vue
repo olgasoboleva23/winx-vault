@@ -1,6 +1,8 @@
 <!-- Level and XP: the level, total XP, progress to the next level; HP and MP bars, their reasons in
-     the tooltip -->
+     the tooltip (v-tip) -->
 <script setup>
+import { vTip } from "#/components/uikit/tooltip.js";
+
 defineProps({ state: { type: Object, required: true } });
 </script>
 
@@ -18,9 +20,9 @@ defineProps({ state: { type: Object, required: true } });
         <div
           v-for="v in state.data.vitals"
           :key="v.name"
+          v-tip="v.title"
           class="winx-level__vital winx-row winx-gap-s"
           :class="`winx-level__vital--${v.mod}`"
-          :title="v.title"
         >
           <b class="winx-level__vital-name">{{ v.name }}</b>
           <div class="winx-level__vital-bar winx-grow">

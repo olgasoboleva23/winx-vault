@@ -28,40 +28,25 @@
     &[data-mark="❌"] { border-color: var(--winx-pink-deep); background: rgb(255 240 244); }
   }
 
-  /* the grid */
+  /* the grid: a WinxTable; the table in front outweighs its own cell rules */
   &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: white(40%); }
-  &__table { width: 100%; border: none; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  /* Obsidian styles a note's table (.markdown-rendered td, the alternate columns' fill): the block's
-     table in front outweighs it */
-  & &__table :is(&__th, &__date, &__cell, &__note) {
-    border: none; border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%); background: none;
-  }
-  & &__table &__th {
-    padding: $space-m $space-xs $space-s; border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
-    font-family: $font-deco; font-size: $text-s; font-weight: 600; letter-spacing: 0.06em; color: var(--winx-purple-deep);
-    text-align: center; white-space: nowrap;
-    &:first-child { text-align: left; }
-  }
-  &__date, &__cell, &__note { padding: $space-xs; }
-  & &__table &__row:last-child > * { border-bottom: none; }
-  &__date { white-space: nowrap; font-size: $text-xl; }
-  &__cell { text-align: center; }
-  &__note { font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
-  & &__note-input {
-    width: 100%; min-width: 6em; padding: 0; border: none; border-radius: 0; background: none;
-    box-shadow: none; font: inherit; color: inherit;
-    &::placeholder { color: alpha(--winx-purple-deep, 30%); }
-    &:focus { outline: none; border-bottom: 1px solid var(--winx-gold-deep); }
-  }
+  & .winx-table &__date { white-space: nowrap; }
+  & .winx-table &__note { font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
+  &__row--past &__date, &__row--future &__date { color: alpha(--winx-text-dark, 60%); }
+  &__row--today { background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%)); }
+  &__row--today &__date { font-weight: 600; color: var(--winx-purple-deep); }
+  &__tick { margin: 0 auto; }
+  &__note-input { width: 100%; min-width: 6em; }
   &__row--past &__date, &__row--future &__date { color: alpha(--winx-text-dark, 60%); }
   &__row--today { background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%)); }
   &__row--today &__date { font-weight: 600; color: var(--winx-purple-deep); }
   &__tick { margin: 0 auto; }
   &__legend { margin-top: $space-l; font-size: $text-m; color: alpha(--winx-purple-deep, 70%); }
   &__legend span { @include row; gap: $space-s; }
+  &__legend b { color: var(--winx-purple-deep); font-family: $font-deco; font-size: $text-s; letter-spacing: 0.06em; }
 
   body.is-mobile & {
-    &__th--note, &__note { display: none; }
+    &__note { display: none; }
     &__date { font-size: $text-l; }
   }
 }

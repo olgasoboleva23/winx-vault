@@ -47,7 +47,6 @@ const WHEN = { morning: ["☀️"], both: ["☀️", "🌙"], day: ["🌤"], eve
 const WHEN_TEXT = { "☀️": "☀️ утро", "🌤": "🌤 днём", "🌙": "🌙 на ночь", "": "в любое время" };
 const MEAL_TEXT = { before: "перед едой", after: "после еды", sleep: "перед сном" };
 const MEALS = [...Object.values(MEAL_TEXT), ""];
-const LEGEND = [["☀️", "утро"], ["🌤", "день"], ["🌙", "вечер / на ночь"]];
 
 // a name as typed may carry the dose ("Мастодинон 30 капель"): the words before its first number
 const parts = typed => {
@@ -70,8 +69,8 @@ const medicine = g => {
 };
 
 // the course as a note: the medicines as data in its properties; the day by its anchors (a time
-// of day, a meal: what to take then, the doses), the notes typed and the columns' legend, on cards
-// (the page has the dashboard's photo behind it; the marks' legend is the block's own), and a day
+// of day, a meal: what to take then, the doses) and the notes typed, on cards (the page has the
+// dashboard's photo behind it; the legend is the block's own), and a day
 // per row up to the longest course (a medicine's cells blank after its own days) inside a
 // ```winx meds block, which draws it and ticks it (components/pages/meds)
 const course = (v, today) => {
@@ -87,7 +86,6 @@ const course = (v, today) => {
     return take.length ? `- ${label}: ${take.join(", ")}` : "";
   })).filter(Boolean);
   const row = cells => `| ${cells.join(" | ")} |`;
-  const used = LEGEND.filter(([t]) => columns.some(c => c.t === t));
   const notes = v.notes?.trim() ? v.notes.trim().split("\n") : [];
   const table = [
     row(["Дата", ...columns.map(c => c.m.code + c.t), "Заметки"]),
@@ -112,13 +110,6 @@ const course = (v, today) => {
       ...anchors.map(a => `> ${a}`),
       "",
       ...(notes.length ? ["> [!card] Заметки", ...notes.map(l => `> ${l}`), ""] : []),
-      "> [!card] Легенда",
-      ...[
-        row(["Код", "Препарат"]), row(["---", "---"]),
-        ...meds.map(m => row([m.code, m.name])),
-        ...used.map(row),
-      ].map(l => `> ${l}`),
-      "",
       "```winx", "meds", "card: Курс", ...table, "```",
     ].join("\n"),
   };

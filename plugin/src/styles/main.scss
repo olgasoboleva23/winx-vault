@@ -37,6 +37,9 @@
 @use "../components/pages/dashboard";
 // was injected by the widget itself, after everything else: last
 @use "../components/pages/finance" as finance-page;
+@use "tooltip";
+@use "../components/uikit/WinxTable";
+@use "../components/uikit/WinxInput";
 @use "../components/uikit/WinxCheckbox";
 @use "../components/uikit/WinxChart";
 @use "../components/pages/meds";

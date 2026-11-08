@@ -1,0 +1,18 @@
+@use "mixins" as *;
+/* ===== A table (block winx-table): the block in front outweighs Obsidian's table styles
+   (.markdown-rendered td: borders, the alternate columns' fill, the cells' size) ===== */
+.winx-table {
+  width: 100%; border: none; border-collapse: collapse; font-variant-numeric: tabular-nums;
+  /* the rows parted by gold dashes, the header in Cinzel */
+  & &__head, & &__cell {
+    padding: $space-xs; border: none; border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
+    background: none; color: var(--winx-text-dark); font-size: $text-xl;
+  }
+  & &__head {
+    padding: $space-m $space-xs $space-s; text-align: left; white-space: nowrap;
+    font-family: $font-deco; font-size: $text-s; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--winx-purple-deep);
+  }
+  & &__head--center, & &__cell--center { text-align: center; }
+  & &__row:last-child > * { border-bottom: none; }
+}

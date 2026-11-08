@@ -1,20 +1,13 @@
 @use "mixins" as *;
-/* AddForm (src/uikit/addForm.js): a field and a pink submit, a finger's height; the doubled class beats Obsidian's
-   own input / button styles */
+/* AddForm: a field (WinxInput) and a pink submit, a finger's height; the doubled class beats Obsidian's
+   own button styles */
 .winx-add-form {
-  &#{&} &__input, &#{&} &__submit {
+  &__input { flex: 1; min-width: 0; }   /* the field's look: WinxInput --field */
+  &#{&} &__submit {
     min-height: $tap;
     border-radius: $radius-l;
     border: $border;
-    background: white(65%);
-    color: var(--winx-text-dark);
     box-shadow: none;
-  }
-  &#{&} &__input {
-    flex: 1; min-width: 0; padding: 0 $space-xl; font-size: $text-2xl;
-    &::placeholder { color: var(--winx-purple); }
-  }
-  &#{&} &__submit {
     padding: 0 $space-3xl;
     font-weight: 600;
     color: #fff;

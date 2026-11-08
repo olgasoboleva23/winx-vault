@@ -1,6 +1,7 @@
 <!-- a task's difficulty stars (in the area's colour), its text, its stickers (withIcon: the area's
      icon in front) -->
 <script setup>
+import { vTip } from "#/components/uikit/tooltip.js";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -13,9 +14,9 @@ const text = computed(() => props.withIcon ? props.task.label : props.task.text)
 <template>
   <span
     v-if="task.difficulty"
+    v-tip="'difficulty'"
     class="tag"
     :data-tag-name="task.difficulty"
-    title="difficulty"
   />
   {{ text }}
   <img

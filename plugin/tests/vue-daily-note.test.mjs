@@ -15,7 +15,7 @@ test("Daily note: ✦ Open for the page's date opens its note; no date, no butto
   app.workspace.openLinkText = async p => opened.push(p);
   const w = mount(DailyNoteOpen, { props: { state: { data: { date: "2026-11-04", text: "✦ Open" } } } });
   assert.equal(w.find("button").text(), "✦ Open");
-  assert.equal(w.find("button").attributes("title"), "open the day's note");
+  assert.equal(w.find("button").attributes("aria-label"), "open the day's note");
   await w.find("button").trigger("click");
   await new Promise(r => setTimeout(r));
   assert.deepEqual(opened, ["2026-11-04"]);

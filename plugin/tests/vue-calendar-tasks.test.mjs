@@ -19,7 +19,7 @@ const html = (C, props) => mount(C, { props, global }).html({ raw: true }).repla
 test("TaskText: stars (none without a difficulty), the text, the stickers", () => {
   assert.equal(mount({ components: { TaskText }, template: "<div><TaskText :task='t' /></div>", data: () => ({ t: info() }) })
     .element.innerHTML.replace(/<!--[^]*?-->/g, ""),
-    '<span class="tag" data-tag-name="#⭐⭐medium" title="difficulty"></span> walk &lt;fast&gt; ' +
+    '<span class="tag" data-tag-name="#⭐⭐medium" aria-label="difficulty" data-tip="winx-tooltip"></span> walk &lt;fast&gt; ' +
     '<img class="winx-cal__sticker" src="app://x/levi.png" alt="">');
 });
 
@@ -27,12 +27,12 @@ test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons 
   const open = html(TaskRow, { task: info({ canSkip: true }), kind: "open", tick: true });
   assert.match(open, /^<div class="winx-cal__task winx-cal__task--open" data-area="body" draggable="true">/);
   assert.match(open, /<input type="checkbox" class="task-list-item-checkbox" aria-label="done">/);
-  assert.match(open, /<div class="winx-task-btns"><button class="winx-btn winx-btn--round" title="skip this time" aria-label="skip this time">⏭<\/button>/);
+  assert.match(open, /<div class="winx-task-btns"><button class="winx-btn winx-btn--round" aria-label="skip this time" data-tip="winx-tooltip">⏭<\/button>/);
   const ghost = html(TaskRow, { task: info(), kind: "ghost", tick: true });
   assert.match(ghost, /^<div class="winx-cal__task winx-cal__task--ghost" data-area="body">🔁 <span class="tag"/);
   assert.doesNotMatch(ghost, /checkbox|winx-task-btns|draggable/);
   const month = html(TaskRow, { task: info(), kind: "open", compact: true, tick: true });
-  assert.match(month, / title="🌺 walk <fast>"/);   // the DOM writes "<" as it is in an attribute
+  assert.match(month, / aria-label="🌺 walk <fast>"/);   // the tooltip; the DOM writes "<" as it is in an attribute
   assert.doesNotMatch(month, /checkbox|winx-task-btns/);
   const after = html(TaskRow, { task: info(), kind: "open", tick: true, after: true });
   assert.match(after, /draggable="true"><span class="winx-cal__after">↳<\/span><input type="checkbox"/);
@@ -43,6 +43,6 @@ test("TaskCard: a panel card, its meta line, its buttons (a pool item: ✏️ �
   assert.match(card, /^<div class="winx-task-card" data-area="body" draggable="true"><div class="winx-task-card__text"><span class="tag"/);
   assert.match(card, /<div class="winx-task-card__meta">waiting 3 d<\/div><div class="winx-task-btns">/);
   const pool = html(TaskCard, { task: info({ pool: true }), meta: "never done" });
-  assert.match(pool, /title="edit: difficulty, area, time, sticker, then text"/);
+  assert.match(pool, /aria-label="edit: difficulty, area, time, sticker, then text"/);
   assert.doesNotMatch(pool, /skip this time/);
 });

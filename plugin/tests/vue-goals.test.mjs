@@ -13,7 +13,7 @@ test("Goals: a goal's count, its dots (the page's day ringed), its plan as the t
   const dots = [{ day: "2026-11-02", status: "done", sel: false }, { day: "2026-11-03", status: "missed", sel: true }];
   const data = { goals: [{ name: "Stretch", plan: "5 min", count: "1 of 3", dots, min: "min: 1 pose" }] };
   const el = mount(GoalsWidget, { props: { state: { data } } }).element;
-  assert.equal(el.querySelector(".winx-goal").title, "5 min");
+  assert.equal(el.querySelector(".winx-goal").getAttribute("aria-label"), "5 min");   // the tooltip
   assert.equal(el.querySelector(".winx-goal__count").textContent, "1 of 3 this week");
   assert.deepEqual([...el.querySelectorAll(".winx-goal__dot")].map(d => d.className),
     ["winx-goal__dot winx-goal__dot--done", "winx-goal__dot winx-goal__dot--missed winx-goal__dot--sel"]);

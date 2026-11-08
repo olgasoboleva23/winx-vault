@@ -2,6 +2,7 @@
      day), the done ones ✓ done hides as ✓N. A click on the box's edge, its pill or a group
      heading folds / unfolds the day (saved) -->
 <script setup>
+import { vTip } from "#/components/uikit/tooltip.js";
 import { computed, inject } from "vue";
 import TaskRow from "./TaskRow.vue";
 import DoneMarks from "./DoneMarks.vue";
@@ -73,7 +74,7 @@ function fold(e) {
     :data-day="day"
     @click="fold"
   >
-    <div v-show="!open" class="winx-cal__routine-pill" :title="fill.routine.title">
+    <div v-show="!open" v-tip="fill.routine.title" class="winx-cal__routine-pill">
       <span>{{ fill.routine.count }}</span>
     </div>
     <div v-show="open" class="winx-cal__routine-list">

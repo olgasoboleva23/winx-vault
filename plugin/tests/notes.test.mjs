@@ -119,12 +119,10 @@ test("a medication course: its medicines as the window's groups (name and dose, 
   const noted = make("meds", { start: "2026-11-05", meds, notes: "от врача:\nне запивать молоком" });
 
   assert.match(noted, /\nnotes: "от врача:\\nне запивать молоком"\n---\n/);   // a property too, to edit
-  assert.match(noted, /\n> - в любое время: Аевит 1 таблетка\n\n> \[!card\] Заметки\n> от врача:\n> не запивать молоком\n\n> \[!card\] Легенда\n/);
+  assert.match(noted, /\n> - в любое время: Аевит 1 таблетка\n\n> \[!card\] Заметки\n> от врача:\n> не запивать молоком\n\n```winx\n/);
   assert.equal(KINDS.meds.note({ meds }, "2026-11-05").file, "Мастодинон, Аевит, Новопассит, Магний");
   // the day by its anchors (a time of day and a meal), the medicines with their doses after it
-  assert.match(text, /\n> - ☀️ утро, перед едой: Мастодинон 30 капель\n> - 🌤 днём: Магний\n> - 🌙 на ночь, перед едой: Мастодинон 30 капель\n> - 🌙 на ночь: Новопассит 2 таблетки\n> - в любое время: Аевит 1 таблетка\n\n> \[!card\] Легенда\n> \| Код \| Препарат \|\n/);
-  assert.match(text, /\n> \| МА \| Мастодинон \|\n/);
-  assert.match(text, /\n> \| ☀️ \| утро \|\n> \| 🌤 \| день \|\n> \| 🌙 \| вечер \/ на ночь \|\n\n```winx\n/);
+  assert.match(text, /\n> - ☀️ утро, перед едой: Мастодинон 30 капель\n> - 🌤 днём: Магний\n> - 🌙 на ночь, перед едой: Мастодинон 30 капель\n> - 🌙 на ночь: Новопассит 2 таблетки\n> - в любое время: Аевит 1 таблетка\n\n```winx\n/);
   // the table inside a winx block: the course's page draws and ticks it
   assert.match(text, /\n```winx\nmeds\ncard: Курс\n\| Дата \| МА☀️ \| МА🌙 \| АЕ \| НО🌙 \| МА🌤 \| Заметки \|\n\| --- \| :-: \| :-: \| :-: \| :-: \| :-: \| --- \|\n\| 2026-11-05 \| ☐ \| ☐ \| ☐ \| ☐ \| ☐ \|  \|\n/);
   assert.match(text, /\n\| 2026-11-15 \| ☐ \| ☐ \| ☐ \| ☐ \|  \|  \|\n/);   // Магний's 10 days are over
