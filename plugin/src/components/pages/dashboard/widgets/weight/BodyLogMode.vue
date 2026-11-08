@@ -2,7 +2,7 @@
      today (@save), the 30 days' bars, ✦ list -->
 <script setup>
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
-import WinxChart from "#/components/uikit/WinxChart.vue";
+import WinxChart from "#/components/uikit/WinxChart/index.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 import { BODY_LOG } from "#/helpers/paths.js";
 

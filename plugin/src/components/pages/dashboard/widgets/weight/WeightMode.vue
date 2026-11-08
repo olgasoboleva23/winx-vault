@@ -2,7 +2,7 @@
      typed; @save), the 30-day line, ✦ list -->
 <script setup>
 import WinxAddForm from "#/components/uikit/WinxAddForm/index.vue";
-import WinxChart from "#/components/uikit/WinxChart.vue";
+import WinxChart from "#/components/uikit/WinxChart/index.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 import { WEIGHT } from "#/helpers/paths.js";
 

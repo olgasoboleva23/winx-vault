@@ -1,0 +1,7 @@
+/* ===== A chart (block winx-chart): the box never grows to its canvas, so a canvas once drawn
+   wider (a redraw before the layout settled) can't widen the widget around it; the canvas
+   follows the box ===== */
+.winx-chart {
+  min-width: 0;
+  canvas { max-width: 100%; }
+}

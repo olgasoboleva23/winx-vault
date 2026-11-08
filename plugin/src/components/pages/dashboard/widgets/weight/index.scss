@@ -1,7 +1,9 @@
 @use "mixins" as *;
 /* ── Weight (src/widgets/body/weight.js) ── */
 .winx-weight {
-  display: grid; gap: $space-m;
+  /* one column that never grows to the chart's canvas: a canvas once drawn wider (a redraw before
+     the layout settled) would keep the whole widget that wide */
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: $space-m;
   &__head { display: flex; align-items: baseline; gap: $space-l; }
   &__now { font-family: $font-deco; font-size: $text-4xl; color: var(--winx-text-dark); }
   &__delta { font-size: $text-m; color: var(--winx-purple-deep); }
