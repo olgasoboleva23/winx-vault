@@ -56,6 +56,8 @@ Or let a GitHub Action do it, if your vault is a git repo: check out this repo n
 
 The plugin works on the phone (no desktop-only code). It only has to get there: whatever syncs your vault (Obsidian Sync, iCloud, Remotely Save, …) must carry `.obsidian/plugins/winx/`, and **Winx** must be on in the phone's Community plugins. Tools that skip dot-folders (Remotely Save does) need a visible copy of the config folder that you move into place on the phone; **Winx: Update mobile config** (on the phone) does that from an `obsidian-mobile/` folder.
 
+A sync tool can bring deleted or renamed notes back: Remotely Save decides deletions from its memory of the previous sync, and when that memory is missing on one device, a note absent on the other side counts as new and is copied back (on 2026-11-06 it returned 78 old copies of Collections notes renamed the day before). Two guards, no plugin code involved: in Remotely Save's settings set **Protect modification percentage** low (5 %: a sync that would change more than that share of the vault stops and asks) and keep **Delete to** on the system trash; and after a mass rename or delete, sync from the desktop right away, then sync the phone before editing anything there.
+
 ---
 
 ## ⚙️ Plugins
