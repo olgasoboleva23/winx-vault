@@ -8,7 +8,7 @@ before(async () => {
   GlobalRegistrator.register();
   globalThis.window.moment = () => ({ format: () => "2026-10-30" });
   ({ mount } = await import("@vue/test-utils"));
-  SavingsJars = (await import("#/components/pages/dashboard/widgets/savings/SavingsJars/index.vue")).default;
+  SavingsJars = (await import("#/components/pages/dashboard/widgets/savings/index.vue")).default;
   ({ deposit } = await import("#/controllers/widgets/savings.js"));
   ({ Form } = await import("#/components/uikit/Form/index.ts"));
 });

@@ -18,9 +18,11 @@
 │   │   │       ├── 📁 dashboard  — view.ts (the tab: its date, the ✦ pill), layout.md (its cards),
 │   │   │       │                   DashboardDate.vue (the date row), index.scss; widgets/<topic>/ (each
 │   │   │       │                   widget's markup and styles)
-│   │   │       └── 📁 calendar   — view.ts (the tab: its state, the model, the listeners), CalendarTab,
-│   │   │                           CalendarHeader, CalendarMissed, CalendarGrid, CalendarPanel, the days
-│   │   │                           and the tasks (TaskRow, TaskCard…)
+│   │   │       ├── 📁 calendar   — view.ts (the tab: its state, the model, the listeners), CalendarTab,
+│   │   │       │                   CalendarHeader, CalendarMissed, CalendarGrid, CalendarPanel, the days
+│   │   │       │                   and the tasks (TaskRow, TaskCard…)
+│   │   │       └── 📁 finance, shop, supplies, meds — the pages on notes of their own: a note's
+│   │   │                           ```winx block (FinanceMonths, ShopWidget, SuppliesWidget, MedsCourse)
 │   │   ├── 📁 controllers        — per topic, what a widget shows (its load) and what it writes (weight,
 │   │   │                           cycle, savings, shop, market, finance, goals, xp, pomodoro, dailyNote),
 │   │   │                           tasks.js (a task's line with undo, new tasks and pool lines),
@@ -73,7 +75,7 @@ After a rebuild run **Winx: Reload** (Cmd+P) and reopen the open notes (widgets 
 
 ## A widget
 
-A widget is a `.vue` file for its markup (`components/pages/dashboard/widgets/`) and its controller
+A widget is a `.vue` file for its markup (`components/pages/dashboard/widgets/`; a page on a note of its own: `components/pages/<page>/`) and its controller
 (`controllers/<topic>.js`: what it loads and what it writes), registered by name in
 `plugin/src/controllers/blocks.js`:
 
@@ -86,7 +88,7 @@ weight: { view: WeightCard, load: loadWeight, watches: [WEIGHT, BODY_LOG, CYCLE]
 ```
 
 ```vue
-<!-- components/pages/dashboard/widgets/body/WeightCard/index.vue -->
+<!-- components/pages/dashboard/widgets/weight/index.vue -->
 <script setup>
 import { logWeight } from "#/controllers/widgets/weight.js";
 

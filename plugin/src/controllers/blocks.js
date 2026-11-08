@@ -20,18 +20,18 @@ import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
 import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
 import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";
 import LifeAreas from "#/components/pages/dashboard/widgets/xp/LifeAreas/index.vue";
-import ShopWidget from "#/components/pages/dashboard/widgets/shop/ShopWidget/index.vue";
-import SuppliesWidget from "#/components/pages/dashboard/widgets/market/SuppliesWidget/index.vue";
-import CelestialMarket from "#/components/pages/dashboard/widgets/market/CelestialMarket/index.vue";
+import ShopWidget from "#/components/pages/shop/index.vue";
+import SuppliesWidget from "#/components/pages/supplies/index.vue";
+import CelestialMarket from "#/components/pages/dashboard/widgets/market/index.vue";
 import CelestialMarketAdd from "#/components/pages/dashboard/widgets/market/CelestialMarketAdd.vue";
-import GoalsWidget from "#/components/pages/dashboard/widgets/goals/GoalsWidget/index.vue";
-import SavingsJars from "#/components/pages/dashboard/widgets/savings/SavingsJars/index.vue";
-import CycleWidget from "#/components/pages/dashboard/widgets/body/CycleWidget/index.vue";
-import FinanceMonths from "#/components/pages/dashboard/widgets/finance/FinanceMonths/index.vue";
-import FinanceLine from "#/components/pages/dashboard/widgets/finance/FinanceLine/index.vue";
-import WeightCard from "#/components/pages/dashboard/widgets/body/WeightCard/index.vue";
+import GoalsWidget from "#/components/pages/dashboard/widgets/goals/index.vue";
+import SavingsJars from "#/components/pages/dashboard/widgets/savings/index.vue";
+import CycleWidget from "#/components/pages/dashboard/widgets/cycle/index.vue";
+import FinanceMonths from "#/components/pages/finance/index.vue";
+import FinanceLine from "#/components/pages/dashboard/widgets/finance/index.vue";
+import WeightCard from "#/components/pages/dashboard/widgets/weight/index.vue";
 import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vue";
-import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/PomodoroTimer/index.vue";
+import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/index.vue";
 
 // the widgets: name → { view: the .vue, load(ctx): its data, cardButton: a .vue next to the
 // card's title, bodyClass: a class on the card's body, watches: the files it reads (a folder:

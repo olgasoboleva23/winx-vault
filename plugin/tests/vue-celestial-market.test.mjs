@@ -12,7 +12,7 @@ before(async () => {
   GlobalRegistrator.register();
   window.moment = () => ({ format: () => "2026-11-05" });
   ({ mount } = await import("@vue/test-utils"));
-  View = (await import("#/components/pages/dashboard/widgets/market/CelestialMarket/index.vue")).default;
+  View = (await import("#/components/pages/dashboard/widgets/market/index.vue")).default;
 });
 const data = {
   empty: false, left: "2 items left", soon: "salt",

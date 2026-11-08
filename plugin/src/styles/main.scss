@@ -7,23 +7,23 @@
 @use "assets";
 @use "callout-grid";
 @use "../components/uikit/WinxCard";   // the widget's card, where the card snippet was
-@use "../components/pages/dashboard/widgets/market/CelestialMarket";
+@use "../components/pages/dashboard/widgets/market";
 @use "fonts";
 @use "../components/pages/dashboard/widgets/xp/XpToday";
 @use "kanban";
 @use "layout";
-@use "../components/pages/dashboard/widgets/pomodoro/PomodoroTimer";
-@use "../components/pages/dashboard/widgets/shop/ShopWidget";
+@use "../components/pages/dashboard/widgets/pomodoro";
+@use "../components/pages/shop";
 @use "tasks-minimal";
 @use "tokens";
 @use "../components/pages/dashboard/widgets/xp/LevelToday";
-@use "../components/pages/dashboard/widgets/goals/GoalsWidget";
+@use "../components/pages/dashboard/widgets/goals";
 @use "../components/pages/dashboard/widgets/xp/LifeAreas";
-@use "../components/pages/dashboard/widgets/body/CycleWidget";
-@use "../components/pages/dashboard/widgets/market/SuppliesWidget";
+@use "../components/pages/dashboard/widgets/cycle";
+@use "../components/pages/supplies";
 @use "scroll-cards";
-@use "../components/pages/dashboard/widgets/body/WeightCard";
-@use "../components/pages/dashboard/widgets/savings/SavingsJars";
+@use "../components/pages/dashboard/widgets/weight";
+@use "../components/pages/dashboard/widgets/savings";
 @use "../components/pages/calendar/TaskCard";
 @use "../components/uikit/WinxButton";
 @use "../components/uikit/WinxEmpty";
@@ -36,6 +36,6 @@
 @use "../components/pages/calendar/CalendarMissed";
 @use "../components/pages/dashboard";
 // was injected by the widget itself, after everything else: last
-@use "../components/pages/dashboard/widgets/finance/FinanceMonths";
-@use "../components/pages/dashboard/widgets/finance/FinanceLine";
+@use "../components/pages/finance" as finance-page;
+@use "../components/pages/dashboard/widgets/finance";
 @use "helpers";   // global .winx-is-* helpers, after the blocks

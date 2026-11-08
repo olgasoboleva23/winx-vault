@@ -11,7 +11,7 @@ const dataview = { page: () => ({ file: { lists: da([{ text: "- start:: 2026-11-
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
-  CycleWidget = (await import("#/components/pages/dashboard/widgets/body/CycleWidget/index.vue")).default;
+  CycleWidget = (await import("#/components/pages/dashboard/widgets/cycle/index.vue")).default;
 });
 
 const data = {

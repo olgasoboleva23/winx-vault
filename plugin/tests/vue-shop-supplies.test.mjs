@@ -12,8 +12,8 @@ before(async () => {
   ({ taskStore } = await import("#/store/tasks.js"));
   ({ mount } = await import("@vue/test-utils"));
   ({ h, defineComponent } = await import("vue"));
-  ShopWidget = (await import("#/components/pages/dashboard/widgets/shop/ShopWidget/index.vue")).default;
-  SuppliesWidget = (await import("#/components/pages/dashboard/widgets/market/SuppliesWidget/index.vue")).default;
+  ShopWidget = (await import("#/components/pages/shop/index.vue")).default;
+  SuppliesWidget = (await import("#/components/pages/supplies/index.vue")).default;
 });
 // the view inside a stand-in for its card's body, the host's retry provided
 const inBody = (C, data, retry = () => {}) =>

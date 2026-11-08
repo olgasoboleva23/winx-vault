@@ -11,7 +11,7 @@ before(async () => {
   window.renderChart = async () => ({ destroy() {} });   // the Charts plugin
   ({ mount } = await import("@vue/test-utils"));
   ({ nextTick } = await import("vue"));
-  WeightCard = (await import("#/components/pages/dashboard/widgets/body/WeightCard/index.vue")).default;
+  WeightCard = (await import("#/components/pages/dashboard/widgets/weight/index.vue")).default;
 });
 
 const data = {

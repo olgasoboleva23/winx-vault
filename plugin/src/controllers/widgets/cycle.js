@@ -2,7 +2,7 @@
 // date, the next start forecast; the current cycle and the 3 before it as rows of day pills (the
 // period, the fertile window, the ovulation), or the last 10 cycles' lengths and period lengths as
 // columns with their average. Writes: "started today / ended yesterday" in Cycle.md. The markup:
-// widgets/body/CycleWidget (folded by default: a click on the head toggles it, kept per device).
+// widgets/cycle (folded by default: a click on the head toggles it, kept per device).
 import { CycleLog } from "#/models/cycleLog.js";
 import { dm, pageDay, ymd } from "#/helpers/dates.js";
 import { mana, mpLine, mpTable } from "#/models/vitals.js";

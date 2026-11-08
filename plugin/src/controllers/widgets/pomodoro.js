@@ -1,6 +1,6 @@
 // The pomodoro's controller: its state in 00 System/Data/pomodoro.json (settings, the current
 // session, the mini row, today's stats); the end-of-session sound, the lengths' window and the
-// save. The markup and the ticking: widgets/pomodoro/PomodoroTimer (a running session lives on in
+// save. The markup and the ticking: widgets/pomodoro (a running session lives on in
 // models/timer.js through a remount; the ticking stops when the block goes).
 import { todayYmd } from "#/helpers/dates.js";
 import { readJson } from "#/helpers/files.js";
