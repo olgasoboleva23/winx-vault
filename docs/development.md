@@ -23,7 +23,7 @@
 │   │   │       │                   CalendarHeader, CalendarMissed, CalendarGrid, CalendarPanel, the days
 │   │   │       │                   and the tasks (TaskRow, TaskCard…)
 │   │   │       └── 📁 finance, shop, supplies, meds — the pages on notes of their own: a note's
-│   │   │                           ```winx block (FinanceMonths, ShopWidget, SuppliesWidget, MedsCourse)
+│   │   │                           ```winx block (meds: a course of vitamins or medicines)
 │   │   ├── 📁 controllers        — per topic, what a widget shows (its load) and what it writes (weight,
 │   │   │                           cycle, savings, shop, market, finance, goals, xp, pomodoro, dailyNote),
 │   │   │                           tasks.js (a task's line with undo, new tasks and pool lines),

@@ -18,6 +18,6 @@ The repo is two things at once:
 ## Docs
 
 - [Installation](docs/installation.md) — install, your own vault, keeping it in sync, the phone
-- [Tasks and the calendar](docs/tasks-and-calendar.md) — tasks, commands, the calendar tab
+- [Tasks and the calendar](docs/tasks-and-calendar.md) — tasks, commands, the calendar tab, medication courses (vitamins and medicines: what to take when, ticked day by day)
 - [Dashboard](docs/dashboard.md) — the cards, XP, shop, market, goals, daily note
 - [Development](docs/development.md) — structure, build, tests
