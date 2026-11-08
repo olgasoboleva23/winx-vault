@@ -1,0 +1,13 @@
+@use "mixins" as *;
+/* ===== A box with a mark (block winx-check): as Obsidian draws a task's checkbox, rounded and
+   purple when done; the button nested under the block outweighs Obsidian's button styles ===== */
+.winx-check {
+  @include center;
+  width: 22px; height: 22px; flex: none;
+  border: 1.5px solid var(--winx-purple); border-radius: $radius-s;
+  background: white; color: white; font-size: $text-xl; line-height: 1;
+  &--s { width: 16px; height: 16px; font-size: $text-s; border-radius: $space-xs; }
+  &--on { background: var(--winx-purple); border-color: var(--winx-purple); &::after { content: "✓"; } }
+  &--no { background: var(--winx-pink-deep); border-color: var(--winx-pink-deep); &::after { content: "✕"; } }
+  &#{&}--btn { margin: 0; padding: 0; box-shadow: none; cursor: pointer; transition: background $fast ease, border-color $fast ease; }
+}

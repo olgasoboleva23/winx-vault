@@ -17,6 +17,9 @@ import WinxCard from "#/components/uikit/WinxCard/index.vue";
 import WinxFailed from "#/components/uikit/WinxFailed.vue";
 
 const TASK_FILES = `${TASKS}/`;
+// a block drawn again on its own note's change (Reading view renders the section anew) keeps its
+// height while it loads, so the page doesn't jump: the last body height, by view and note
+const heights = new WeakMap<VueComponent, Map<string, number>>();
 
 export interface HostOptions<D> {
   load: () => Promise<D>;
@@ -49,9 +52,13 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
   onload() {
     const retry = () => void this.refresh(), { view, state, opts: { card, cardButton } } = this;
     // the error with retry, a card's shimmering placeholder until the first data, else the view
+    const kept = heights.get(view)?.get(this.opts.note ?? "");
     const body = () => state.error ? h(WinxFailed, { text: state.error, onRetry: retry })
-      : state.data === null ? (card ? h("div", { class: "winx-widget__skeleton" }) : null)
-      : h(view, { state });
+      : state.data === null
+        ? h("div", {
+          class: "winx-widget__skeleton", style: kept ? { minHeight: `${kept}px` } : null,
+        })
+        : h(view, { state });
     const slots = { default: body, ...(cardButton ? { button: () => h(cardButton) } : {}) };
     const root = { render: () => card ? h(WinxCard, card, slots) : body() };
     // where a NoteLink opens a note from, and the load again (a bought reward: the balance); any
@@ -87,6 +94,10 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
       if (this.gone || n !== this.runs) return;   // closed, or a newer load is on its way
       Object.assign(this.state, { data, error: null });
       await nextTick();
+      const body = this.el.querySelector<HTMLElement>(".winx-widget__body") ?? this.el;
+
+      if (!heights.has(this.view)) heights.set(this.view, new Map());
+      heights.get(this.view)!.set(this.opts.note ?? "", body.offsetHeight);
       // the dashboard's ✦ pill goes
       this.el.dispatchEvent(new CustomEvent("winx-drawn", { bubbles: true }));
     } catch (e) {

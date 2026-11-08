@@ -50,6 +50,17 @@ export class AudioEngine {
 
 export const isMuted = () => app.loadLocalStorage("winx-mute") === "1";
 
+// a mark's sound (WinxCheckbox, a course's chips): a gem for ✅, the slowed gem back to ☐, a
+// chime for ❌
+const MARK_SOUNDS = {
+  "✅": () => new AudioEngine(`${SOUNDS}/snd_pickup_gem0${1 + Math.floor(Math.random() * 6)}.wav`),
+  "☐": () => new AudioEngine(`${SOUNDS}/snd_pickup_gem01.wav`),
+  "❌": () => new AudioEngine(`${SOUNDS}/snd_pressure_chime.wav`),
+};
+
+export const playMark = mark =>
+  void MARK_SOUNDS[mark]?.().play(mark === "☐" ? { rate: 0.6, gain: 0.2 } : { gain: 0.25 });
+
 export const toggleMute = () => app.saveLocalStorage("winx-mute", isMuted() ? null : "1");
 
 // ticking a task anywhere

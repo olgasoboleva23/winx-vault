@@ -48,21 +48,32 @@ const WHEN_TEXT = { "☀️": "☀️ утро", "🌤": "🌤 днём", "🌙"
 const MEAL_TEXT = { before: "перед едой", after: "после еды", sleep: "перед сном" };
 const MEALS = [...Object.values(MEAL_TEXT), ""];
 const LEGEND = [["☀️", "утро"], ["🌤", "день"], ["🌙", "вечер / на ночь"]];
-const MARKS = [["✅", "принято"], ["❌", "пропущено намеренно"], ["☐", "не отмечено"]];
+
+// a name as typed may carry the dose ("Мастодинон 30 капель"): the words before its first number
+const parts = typed => {
+  const words = typed.trim().split(/\s+/), at = words.findIndex(w => /^\d/.test(w));
+
+  return at < 0 ? [words.join(" "), ""] : [words.slice(0, at).join(" "), words.slice(at).join(" ")];
+};
+
+export const nameOf = typed => parts(typed)[0];
+
+export const codeOf = typed => nameOf(typed).slice(0, 2).toUpperCase();
 
 const medicine = g => {
-  const words = g.name.trim().split(/\s+/), at = words.findIndex(w => /^\d/.test(w));
-  const split = at < 0 ? words.length : at, name = words.slice(0, split).join(" ");
+  const [name, dose] = parts(g.name);
 
   return {
-    name, dose: g.dose?.trim() || words.slice(split).join(" "), times: WHEN[g.times] ?? [],
-    meal: MEAL_TEXT[g.meal] ?? "", days: Number(g.days) || 90, code: name.slice(0, 2).toUpperCase(),
+    name, dose: g.dose?.trim() || dose, times: WHEN[g.times] ?? [],
+    meal: MEAL_TEXT[g.meal] ?? "", days: Number(g.days) || 90, code: codeOf(g.name),
   };
 };
 
-// the course as a note: the day by its anchors (a time of day, a meal: what to take then, the
-// doses), the columns' legend and the marks, a day per row up to the longest course (a medicine's
-// cells blank after its own days)
+// the course as a note: the medicines as data in its properties; the day by its anchors (a time
+// of day, a meal: what to take then, the doses), the notes typed and the columns' legend, on cards
+// (the page has the dashboard's photo behind it; the marks' legend is the block's own), and a day
+// per row up to the longest course (a medicine's cells blank after its own days) inside a
+// ```winx meds block, which draws it and ticks it (components/pages/meds)
 const course = (v, today) => {
   const meds = v.meds.map(medicine), start = v.start?.trim() || today;
   const days = Math.max(...meds.map(m => m.days));
@@ -77,6 +88,7 @@ const course = (v, today) => {
   })).filter(Boolean);
   const row = cells => `| ${cells.join(" | ")} |`;
   const used = LEGEND.filter(([t]) => columns.some(c => c.t === t));
+  const notes = v.notes?.trim() ? v.notes.trim().split("\n") : [];
   const table = [
     row(["Дата", ...columns.map(c => c.m.code + c.t), "Заметки"]),
     row(["---", ...columns.map(() => ":-:"), "---"]),
@@ -85,17 +97,29 @@ const course = (v, today) => {
   ];
 
   return {
-    props: { type: "meds", start, days },
+    props: {
+      type: "meds", start, days, cssclasses: ["dashboard"],   // the card look
+      // the medicines as typed, to edit the course later (controllers/meds.js)
+      meds: v.meds.map(g => ({
+        name: g.name, dose: g.dose ?? "", times: g.times ?? "any", meal: g.meal ?? "any",
+        days: Number(g.days) || 90,
+      })),
+      ...(v.notes?.trim() ? { notes: v.notes.trim() } : {}),
+    },
     file: meds.map(m => m.name).join(", "),
     body: [
-      ...anchors,
+      "> [!card] Приём",
+      ...anchors.map(a => `> ${a}`),
       "",
-      row(["Код", "Препарат"]), row(["---", "---"]),
-      ...meds.map(m => row([m.code, m.name])),
-      ...used.map(row),
-      ...MARKS.map(row),
+      ...(notes.length ? ["> [!card] Заметки", ...notes.map(l => `> ${l}`), ""] : []),
+      "> [!card] Легенда",
+      ...[
+        row(["Код", "Препарат"]), row(["---", "---"]),
+        ...meds.map(m => row([m.code, m.name])),
+        ...used.map(row),
+      ].map(l => `> ${l}`),
       "",
-      ...table,
+      "```winx", "meds", "card: Курс", ...table, "```",
     ].join("\n"),
   };
 };
@@ -148,7 +172,7 @@ export const KINDS = {
   // a course of medicines, a group per medicine (+ adds one): a day per row to tick (the folder:
   // "meds" in the plugin's data.json)
   meds: {
-    id: "new-meds", name: "New medication course", folder: "02 Areas/Health/Medication",
+    id: "new-meds", name: "New medication course", folder: "00 System/Data/Medication",
     setting: "meds",
     form: () => ({
       rows: [
@@ -175,6 +199,10 @@ export const KINDS = {
           ],
         },
         { name: "Start", key: "start", text: "YYYY-MM-DD (empty: today)" },
+        {
+          name: "Notes", key: "notes", text: "доп. информация: от врача, как принимать…",
+          lines: true,
+        },
       ],
       values: {}, required: ["meds"],
     }),

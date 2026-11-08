@@ -16,6 +16,7 @@ import {
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
+import { loadMeds } from "#/controllers/meds.js";
 // the widgets' markup: components/pages/dashboard/widgets/
 import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
 import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";
@@ -32,11 +33,15 @@ import FinanceLine from "#/components/pages/dashboard/widgets/finance/index.vue"
 import WeightCard from "#/components/pages/dashboard/widgets/weight/index.vue";
 import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vue";
 import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/index.vue";
+// the pages on notes of their own: components/pages/<page>/
+import MedsCourse from "#/components/pages/meds/index.vue";
+import MedsEdit from "#/components/pages/meds/EditButton.vue";
 
 // the widgets: name → { view: the .vue, load(ctx): its data, cardButton: a .vue next to the
 // card's title, bodyClass: a class on the card's body, watches: the files it reads (a folder:
 // ending in /): only their changes load it again (any other note's doesn't), follows: false to
-// load once }, where ctx is { dv, app, args, sourcePath } (dv: blockDv)
+// load once }, where ctx is { dv, app, args, sourcePath, source: the block's own text } (dv:
+// blockDv)
 const TASK_FILES = `${TASKS}/`, MARKET_NOTE = `${MARKET}.md`, LEDGER_FILES = `${LEDGER}/`;
 
 export const blocks = {
@@ -64,11 +69,13 @@ export const blocks = {
     cardButton: CelestialMarketAdd,
     watches: [MARKET_NOTE],
   },
+  // a medication course's own note: its table is the block's text
+  meds: { view: MedsCourse, load: loadMeds, cardButton: MedsEdit, watches: [] },
 };
 
 // a widget on its block: its VueHost, with the card when the block has a "card:" line
-function block(def, el, sourcePath, args) {
-  const ctx = { get dv() { return blockDv(sourcePath, el); }, app, args, sourcePath };
+function block(def, el, sourcePath, args, source) {
+  const ctx = { get dv() { return blockDv(sourcePath, el); }, app, args, sourcePath, source };
   const meta = args.meta ? String(args.meta).split(/\s+/) : [];
   const card = args.card ? { title: String(args.card), meta, bodyClass: def.bodyClass } : undefined;
 
@@ -81,7 +88,7 @@ function block(def, el, sourcePath, args) {
 }
 
 // A ```winx block's text: the widget's name on the first line, then "key: value" lines (a JSON
-//   value, else text).
+//   value, else text); a table's lines (| …) are the block's own text, not arguments.
 //   ```winx
 //   weight
 //   input: true
@@ -93,7 +100,7 @@ export function parseBlock(source) {
   for (const line of rest) {
     const i = line.indexOf(":");
 
-    if (i < 1) continue;
+    if (i < 1 || line.startsWith("|")) continue;
     const value = line.slice(i + 1).trim();
 
     const key = line.slice(0, i).trim();
@@ -109,5 +116,5 @@ export const drawBlock = (source, el, ctx) => {
   const def = blocks[name];
 
   if (!def) return void el.createDiv({ text: `winx: no widget "${name}"` });
-  ctx.addChild(block(def, el, ctx.sourcePath, args));
+  ctx.addChild(block(def, el, ctx.sourcePath, args, source));
 };

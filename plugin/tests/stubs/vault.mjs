@@ -15,6 +15,7 @@ export function vault(files = {}, { folders = [], props = {}, dataview = null } 
       cachedRead: async f => files[f.path],
       process: async (f, fn) => { files[f.path] = fn(files[f.path]); },
       create: async (p, text) => { files[p] = text; return { path: p }; },
+      modify: async (f, text) => { files[f.path] = text; },
       createFolder: async p => { dirs.add(p); },
       adapter: {
         exists: async p => p in files,
@@ -27,6 +28,7 @@ export function vault(files = {}, { folders = [], props = {}, dataview = null } 
     },
     metadataCache: {
       getCache: p => ({ frontmatter: props[p] ?? {} }),
+      getFileCache: f => ({ frontmatter: props[f.path] ?? {} }),
       getFirstLinkpathDest: p => byPath(p) ?? byPath(`${p}.md`),
     },
     loadLocalStorage: k => local[k] ?? null,

@@ -2,7 +2,7 @@ import { Modal, type App, type TFile } from "obsidian";
 
 // One window of fields instead of a chain of prompts. Each row is
 //   { name, key, options: [{ label, value, img? }] }  buttons, the chosen one lit (mod-cta)
-//   { name, key, text: placeholder, number? }       a text box
+//   { name, key, text: placeholder, number?, lines? }   a text box (lines: several lines of text)
 //   { name, key, check: description }               a checkbox
 //   { name, key, list: rows, required? }            groups of those rows, + adds one, × takes it
 //                                                   off; the value: an array of the groups' values
@@ -11,7 +11,7 @@ import { Modal, type App, type TFile } from "obsidian";
 // to the values on the button (or Enter), null when closed.
 export type Row =
   | { name: string; key: string; options: { label: string; value: unknown; img?: TFile }[] }
-  | { name: string; key: string; text: string; number?: boolean }
+  | { name: string; key: string; text: string; number?: boolean; lines?: boolean }
   | { name: string; key: string; check: string }
   | { name: string; key: string; list: Row[]; required?: string[] };
 
@@ -64,7 +64,11 @@ export class Form extends Modal {
       .createEl("button", { cls: "mod-cta", text: this.submit });
     this.button.onclick = () => this.send();
     this.update();
-    this.scope.register([], "Enter", e => { e.preventDefault(); this.send(); });
+    this.scope.register([], "Enter", e => {
+      if ((e.target as HTMLElement)?.tagName === "TEXTAREA") return;   // a new line there
+      e.preventDefault();
+      this.send();
+    });
     this.contentEl.querySelector<HTMLInputElement>("input:not([type=checkbox])")?.focus();
   }
   onClose() { this.resolve(this.done ? this.values : null); }
@@ -100,6 +104,12 @@ export class Form extends Modal {
       const box = ctl.createEl("input", { type: "checkbox" });
       box.checked = !!vals[r.key];
       box.onchange = () => { vals[r.key] = box.checked; };
+    } else if (r.lines) {
+      const attr = { placeholder: r.text, rows: 4, style: "width: 100%" };
+      const area = ctl.createEl("textarea", { attr });
+
+      area.value = vals[r.key] ?? "";
+      area.oninput = () => { vals[r.key] = area.value; this.update(); };
     } else {
       const input = ctl.createEl("input", {
         type: r.number ? "number" : "text", attr: { placeholder: r.text },

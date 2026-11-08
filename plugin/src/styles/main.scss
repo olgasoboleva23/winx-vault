@@ -37,5 +37,7 @@
 @use "../components/pages/dashboard";
 // was injected by the widget itself, after everything else: last
 @use "../components/pages/finance" as finance-page;
+@use "../components/uikit/WinxCheckbox";
+@use "../components/pages/meds";
 @use "../components/pages/dashboard/widgets/finance";
 @use "helpers";   // global .winx-is-* helpers, after the blocks

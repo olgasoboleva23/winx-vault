@@ -10,6 +10,7 @@ import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { addMarketItem } from "#/controllers/widgets/market.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
 import { createNote } from "#/controllers/notes.js";
+import { editCourse } from "#/controllers/meds.js";
 import { tasksApi } from "#/helpers/plugins.js";
 import { MASTER } from "#/helpers/paths.js";
 
@@ -61,6 +62,14 @@ export function registerCommands(plugin: Plugin) {
       await app.workspace.getLeaf("tab").openFile(file);
     });
   }
+
+  // the open medication course, its window again (the ✎ on its card does the same)
+  add("edit-meds", "Edit medication course", async () => {
+    const file = app.workspace.getActiveFile();
+
+    if (!file) return void new Notice("✦ Open a medication course first");
+    await editCourse(file.path);
+  });
 
   // a purchase, logged to Purchases.md (the wallet's spent)
   add("buy-reward", "Buy reward", async () => {
