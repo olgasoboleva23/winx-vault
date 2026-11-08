@@ -44,9 +44,11 @@ const item = ({ type, steps, types, statuses, ...rest }) => ({
 // the words from the first number of the name), when (morning | both | day | evening | any: once a
 // day), the meal (before | after | sleep | any), days
 const WHEN = { morning: ["☀️"], both: ["☀️", "🌙"], day: ["🌤"], evening: ["🌙"], any: [] };
-const WHEN_TEXT = { "☀️": "утро", "🌤": "днём", "🌙": "на ночь" };
+const WHEN_TEXT = { "☀️": "☀️ утро", "🌤": "🌤 днём", "🌙": "🌙 на ночь", "": "в любое время" };
 const MEAL_TEXT = { before: "перед едой", after: "после еды", sleep: "перед сном" };
+const MEALS = [...Object.values(MEAL_TEXT), ""];
 const LEGEND = [["☀️", "утро"], ["🌤", "день"], ["🌙", "вечер / на ночь"]];
+const MARKS = [["✅", "принято"], ["❌", "пропущено намеренно"], ["☐", "не отмечено"]];
 
 const medicine = g => {
   const words = g.name.trim().split(/\s+/), at = words.findIndex(w => /^\d/.test(w));
@@ -58,14 +60,21 @@ const medicine = g => {
   };
 };
 
-// the course as a note: its medicines and doses, the columns' legend, a day per row up to the
-// longest course (a medicine's cells blank after its own days)
+// the course as a note: the day by its anchors (a time of day, a meal: what to take then, the
+// doses), the columns' legend and the marks, a day per row up to the longest course (a medicine's
+// cells blank after its own days)
 const course = (v, today) => {
   const meds = v.meds.map(medicine), start = v.start?.trim() || today;
   const days = Math.max(...meds.map(m => m.days));
-  const when = m => m.times.length > 1 ? "утро и вечер" : WHEN_TEXT[m.times[0]] ?? "";
-  const dose = m => [m.dose, when(m), m.meal].filter(Boolean).join(", ");
   const columns = meds.flatMap(m => (m.times.length ? m.times : [""]).map(t => ({ m, t })));
+  const anchors = Object.keys(WHEN_TEXT).flatMap(t => MEALS.map(meal => {
+    const take = columns.filter(c => c.t === t && c.m.meal === meal)
+      .map(c => [c.m.name, c.m.dose].filter(Boolean).join(" "));
+
+    const label = [WHEN_TEXT[t], meal].filter(Boolean).join(", ");
+
+    return take.length ? `- ${label}: ${take.join(", ")}` : "";
+  })).filter(Boolean);
   const row = cells => `| ${cells.join(" | ")} |`;
   const used = LEGEND.filter(([t]) => columns.some(c => c.t === t));
   const table = [
@@ -79,11 +88,12 @@ const course = (v, today) => {
     props: { type: "meds", start, days },
     file: meds.map(m => m.name).join(", "),
     body: [
-      ...meds.map(m => `- ${m.name}${dose(m) ? ` — ${dose(m)}` : ""}`),
+      ...anchors,
       "",
       row(["Код", "Препарат"]), row(["---", "---"]),
       ...meds.map(m => row([m.code, m.name])),
       ...used.map(row),
+      ...MARKS.map(row),
       "",
       ...table,
     ].join("\n"),

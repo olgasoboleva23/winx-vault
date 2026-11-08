@@ -113,18 +113,19 @@ test("a medication course: its medicines as the window's groups (name and dose, 
     { name: "Магний", times: "day", meal: "any", days: 10 },
   ];
   const text = make("meds", { start: "2026-11-05", meds });
-  assert.match(text, /^---\ntype: meds\nstart: 2026-11-05\ndays: 92\n---\n\n- Мастодинон/);
+  assert.match(text, /^---\ntype: meds\nstart: 2026-11-05\ndays: 92\n---\n\n- ☀️ утро/);
   assert.equal(KINDS.meds.note({ meds }, "2026-11-05").file, "Мастодинон, Аевит, Новопассит, Магний");
-  assert.match(text, /\n- Мастодинон — 30 капель, утро и вечер, перед едой\n- Аевит — 1 таблетка\n- Новопассит — 2 таблетки, на ночь\n- Магний — днём\n/);
+  // the day by its anchors (a time of day and a meal), the medicines with their doses after it
+  assert.match(text, /\n- ☀️ утро, перед едой: Мастодинон 30 капель\n- 🌤 днём: Магний\n- 🌙 на ночь, перед едой: Мастодинон 30 капель\n- 🌙 на ночь: Новопассит 2 таблетки\n- в любое время: Аевит 1 таблетка\n/);
   assert.match(text, /\n\| МА \| Мастодинон \|\n/);
-  assert.match(text, /\n\| ☀️ \| утро \|\n\| 🌤 \| день \|\n\| 🌙 \| вечер \/ на ночь \|\n/);
+  assert.match(text, /\n\| ☀️ \| утро \|\n\| 🌤 \| день \|\n\| 🌙 \| вечер \/ на ночь \|\n\| ✅ \| принято \|\n\| ❌ \| пропущено намеренно \|\n\| ☐ \| не отмечено \|\n/);
   assert.match(text, /\n\| Дата \| МА☀️ \| МА🌙 \| АЕ \| НО🌙 \| МА🌤 \| Заметки \|\n\| --- \| :-: \| :-: \| :-: \| :-: \| :-: \| --- \|\n\| 2026-11-05 \| ☐ \| ☐ \| ☐ \| ☐ \| ☐ \|  \|\n/);
   assert.match(text, /\n\| 2026-11-15 \| ☐ \| ☐ \| ☐ \| ☐ \|  \|  \|\n/);   // Магний's 10 days are over
   assert.match(text, /\n\| 2026-12-05 \| ☐ \| ☐ \| ☐ \|  \|  \|  \|\n/);   // Новопассит's 30 too
   assert.match(text, /\n\| 2027-02-04 \| ☐ \| ☐ \|  \|  \|  \|  \|\n$/);   // Аевит's 90 as well
   assert.equal(text.match(/^\| 20\d\d-/gm).length, 92);
   // no start typed: today; no days: 90; a name without a dose
-  assert.match(make("meds", { meds: [{ name: "Аевит" }] }, "2026-10-29"), /\nstart: 2026-10-29\ndays: 90\n---\n\n- Аевит\n/);
+  assert.match(make("meds", { meds: [{ name: "Аевит" }] }, "2026-10-29"), /\nstart: 2026-10-29\ndays: 90\n---\n\n- в любое время: Аевит\n/);
   // the window: the medicines as a list of groups, a name each
   const { rows, required } = KINDS.meds.form();
   assert.deepEqual(rows[0].list.map(r => r.key), ["name", "dose", "times", "meal", "days"]);
