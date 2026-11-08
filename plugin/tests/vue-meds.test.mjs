@@ -77,3 +77,26 @@ test("MedsCourse: the counts, today's chips, the grid; a click on a tick or a ch
   await input.trigger("change"); await tick();
   assert.match(files[P], /\n\| 2026-11-09 \|  \| ☐ \| ☐ \| забыла \/ поездка \|\n/);
 });
+
+test("MedsCourse: a write that fails puts the mark and the note back, and says so", async () => {
+  const { app } = vault({ [P]: NOTE });
+  const { Notice } = await import("obsidian");
+  const state = reactive({ data: courseData(TABLE, { "АЕ": "аевит", "МА": "магний" }, "2026-11-08") });
+  const w = mount(MedsCourse, { props: { state }, global: { provide: { sourcePath: P } } });
+
+  app.vault.process = async () => { throw new Error("disk"); };
+  const error = console.error;
+
+  console.error = () => {};
+  const box = w.find(".winx-meds__row--future .winx-meds__tick");
+
+  await box.trigger("click"); await tick(); await tick();
+  assert.equal(w.find(".winx-meds__row--future .winx-meds__tick").attributes("data-mark"), "☐");
+  assert.match(Notice.last, /Not saved/);
+  const input = w.find(".winx-meds__row--future .winx-meds__note-input");
+
+  input.element.value = "забыла";
+  await input.trigger("change"); await tick(); await tick();
+  assert.equal(state.data.rows[2].note, "");
+  console.error = error;
+});

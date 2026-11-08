@@ -59,12 +59,30 @@ export const nameOf = typed => parts(typed)[0];
 
 export const codeOf = typed => nameOf(typed).slice(0, 2).toUpperCase();
 
+// a code per medicine, its column's name, the key its marks follow through an edit: kept once it
+// has one (a rename or a new order keeps it), else free letters of its name (Мастодинон МА,
+// Магний МГ), else a number
+const withCodes = groups => {
+  const taken = new Set(groups.map(g => g.code).filter(Boolean));
+
+  return groups.map(g => {
+    if (g.code) return g;
+    const n = nameOf(g.name).toUpperCase().replace(/[^\p{L}\p{N}]/gu, "");
+    const tries = [...n.slice(1)].map(c => n[0] + c)
+      .concat(Array.from({ length: 9 }, (_, i) => n.slice(0, 2) + (i + 2)));
+    const code = tries.find(c => !taken.has(c)) ?? n.slice(0, 2);
+
+    taken.add(code);
+    return { ...g, code };
+  });
+};
+
 const medicine = g => {
   const [name, dose] = parts(g.name);
 
   return {
     name, dose: g.dose?.trim() || dose, times: WHEN[g.times] ?? [],
-    meal: MEAL_TEXT[g.meal] ?? "", days: Number(g.days) || 90, code: codeOf(g.name),
+    meal: MEAL_TEXT[g.meal] ?? "", days: Number(g.days) || 90, code: g.code,
   };
 };
 
@@ -74,7 +92,7 @@ const medicine = g => {
 // per row up to the longest course (a medicine's cells blank after its own days) inside a
 // ```winx meds block, which draws it and ticks it (components/pages/meds)
 const course = (v, today) => {
-  const meds = v.meds.map(medicine), start = v.start?.trim() || today;
+  const groups = withCodes(v.meds), meds = groups.map(medicine), start = v.start?.trim() || today;
   const days = Math.max(...meds.map(m => m.days));
   const columns = meds.flatMap(m => (m.times.length ? m.times : [""]).map(t => ({ m, t })));
   const anchors = Object.keys(WHEN_TEXT).flatMap(t => MEALS.map(meal => {
@@ -98,9 +116,9 @@ const course = (v, today) => {
     props: {
       type: "meds", start, days, cssclasses: ["dashboard"],   // the card look
       // the medicines as typed, to edit the course later (controllers/meds.js)
-      meds: v.meds.map(g => ({
-        name: g.name, dose: g.dose ?? "", times: g.times ?? "any", meal: g.meal ?? "any",
-        days: Number(g.days) || 90,
+      meds: groups.map(g => ({
+        name: g.name, code: g.code, dose: g.dose ?? "", times: g.times ?? "any",
+        meal: g.meal ?? "any", days: Number(g.days) || 90,
       })),
       ...(v.notes?.trim() ? { notes: v.notes.trim() } : {}),
     },

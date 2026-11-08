@@ -2,7 +2,8 @@
 // medication course"): the course from the block's own lines (its table), the medicines' names
 // from the note's legend (a two-cell row: | КОД | name |, on a card or not), today's doses; a mark
 // or a note's text written into the note's table; the course edited (the ✎ by the card's title,
-// the command): the window again with the course's values, the note rebuilt with its marks kept.
+// the command): the window again with the course's values, the note rebuilt with its marks kept
+// (by each medicine's code, kept in the properties).
 import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
 import { edit } from "#/helpers/files.js";
@@ -18,8 +19,10 @@ const props = path => {
   return file && app.metadataCache.getFileCache(file)?.frontmatter;
 };
 
-// the medicines' names by code, from the note's `meds` property
-const names = fm => Object.fromEntries((fm?.meds ?? []).map(g => [codeOf(g.name), nameOf(g.name)]));
+// the medicines' names by code, from the note's `meds` property (a note before codes were kept:
+// the first two letters)
+const names = fm =>
+  Object.fromEntries((fm?.meds ?? []).map(g => [g.code ?? codeOf(g.name), nameOf(g.name)]));
 
 export async function loadMeds({ source, sourcePath }) {
   return courseData(source, names(props(sourcePath)), todayYmd());
@@ -34,13 +37,22 @@ export async function editCourse(path, ask = (...a) => Form.ask(app, ...a)) {
     return void new Notice("✦ Not a medication course (no medicines in its properties)");
   }
 
-  const old = await app.vault.read(file);
+  const old = await app.vault.read(file);   // its properties: the course the window shows
   const { rows, required } = KINDS.meds.form();
   const values = { meds: fm.meds.map(g => ({ ...g })), start: fm.start, notes: fm.notes ?? "" };
   const v = await ask("✦ Edit medication course", rows, { values, required, submit: "Save" });
 
   if (!v) return;
   const fresh = new Note(KINDS.meds.note(v, todayYmd())).text;
+  let changed = false;
 
-  await app.vault.modify(file, rebuild(old, carry(old, fresh)));
+  // from the note as it is now (a mark or a card written while the window was open stays); a
+  // course changed meanwhile (its properties: another device, another window) isn't written over
+  await edit(path, now => {
+    changed = head(now) !== head(old);
+    return changed ? now : rebuild(now, carry(now, fresh));
+  });
+  if (changed) new Notice("✦ The course changed meanwhile: open its window again");
 }
+
+const head = text => text.slice(0, text.indexOf("\n---\n", 3));

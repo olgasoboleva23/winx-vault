@@ -5,6 +5,7 @@
      note's table is written, and the block is drawn again from it -->
 <script setup>
 import { computed, inject } from "vue";
+import { Notice } from "obsidian";
 import WinxCheckbox from "#/components/uikit/WinxCheckbox/index.vue";
 import WinxInput from "#/components/uikit/WinxInput/index.vue";
 import WinxTable from "#/components/uikit/WinxTable/index.vue";
@@ -28,25 +29,38 @@ const columns = computed(() => [
 ]);
 const sourcePath = inject("sourcePath");
 const today = () => props.state.data.rows.find(r => r.when === "today");
-// today's chips show the same cells as the grid's today row
-const toggle = (r, col) => {
-  const mark = next(r.marks[col]);
 
-  r.marks[col] = mark;
-  if (r.when === "today") {
-    const items = props.state.data.today.flatMap(g => g.items);
-
-    items.forEach(i => { if (i.col === col) i.mark = mark; });
+// a cell shown at once, then written; a write that fails puts it back and says so
+async function write(r, col, value, undo) {
+  try {
+    await tickMeds(sourcePath, r.date, col, value);
+  } catch (e) {
+    console.error(e);
+    undo();
+    new Notice(`✦ Not saved (${e.message}): try again`);
   }
+}
 
-  void tickMeds(sourcePath, r.date, col, mark);
+// today's chips show the same cells as the grid's today row
+const mark = (r, col, m) => {
+  r.marks[col] = m;
+  if (r.when !== "today") return;
+  props.state.data.today.flatMap(g => g.items).forEach(i => { if (i.col === col) i.mark = m; });
+};
+
+const toggle = (r, col) => {
+  const was = r.marks[col];
+
+  mark(r, col, next(was));
+  return write(r, col, r.marks[col], () => mark(r, col, was));
 };
 
 // the day's note, typed into the last column (a | would break the row)
-const note = (r, text) => {
-  r.note = text.replace(/\|/g, "/").trim();
+const note = (r, el) => {
+  const was = r.note;
 
-  void tickMeds(sourcePath, r.date, props.state.data.columns.length, r.note);
+  r.note = el.value.replace(/\|/g, "/").trim();
+  return write(r, props.state.data.columns.length, r.note, () => { r.note = was; el.value = was; });
 };
 </script>
 
@@ -93,7 +107,7 @@ const note = (r, text) => {
             class="winx-meds__note-input"
             :model-value="row.note"
             placeholder="…"
-            @change="note(row, $event.target.value)"
+            @change="note(row, $event.target)"
           />
           <WinxCheckbox
             v-else-if="row.marks[col.col]"

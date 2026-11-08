@@ -114,7 +114,7 @@ test("a medication course: its medicines as the window's groups (name and dose, 
   ];
   const text = make("meds", { start: "2026-11-05", meds });
   // the medicines as data too (to edit the course later), the notes on their own card
-  assert.match(text, /^---\ntype: meds\nstart: 2026-11-05\ndays: 92\ncssclasses:\n  - dashboard\nmeds:\n  - \{"name":"Мастодинон 30 капель","dose":"","times":"both","meal":"before","days":92\}\n  - \{"name":"Аевит","dose":"1 таблетка","times":"any","meal":"any","days":90\}\n/);
+  assert.match(text, /^---\ntype: meds\nstart: 2026-11-05\ndays: 92\ncssclasses:\n  - dashboard\nmeds:\n  - \{"name":"Мастодинон 30 капель","code":"МА","dose":"","times":"both","meal":"before","days":92\}\n  - \{"name":"Аевит","code":"АЕ","dose":"1 таблетка","times":"any","meal":"any","days":90\}\n/);
   assert.match(text, /\n---\n\n> \[!card\] Приём\n> - ☀️ утро/);
   const noted = make("meds", { start: "2026-11-05", meds, notes: "от врача:\nне запивать молоком" });
 
@@ -124,13 +124,13 @@ test("a medication course: its medicines as the window's groups (name and dose, 
   // the day by its anchors (a time of day and a meal), the medicines with their doses after it
   assert.match(text, /\n> - ☀️ утро, перед едой: Мастодинон 30 капель\n> - 🌤 днём: Магний\n> - 🌙 на ночь, перед едой: Мастодинон 30 капель\n> - 🌙 на ночь: Новопассит 2 таблетки\n> - в любое время: Аевит 1 таблетка\n\n```winx\n/);
   // the table inside a winx block: the course's page draws and ticks it
-  assert.match(text, /\n```winx\nmeds\ncard: Курс\n\| Дата \| МА☀️ \| МА🌙 \| АЕ \| НО🌙 \| МА🌤 \| Заметки \|\n\| --- \| :-: \| :-: \| :-: \| :-: \| :-: \| --- \|\n\| 2026-11-05 \| ☐ \| ☐ \| ☐ \| ☐ \| ☐ \|  \|\n/);
+  assert.match(text, /\n```winx\nmeds\ncard: Курс\n\| Дата \| МА☀️ \| МА🌙 \| АЕ \| НО🌙 \| МГ🌤 \| Заметки \|\n\| --- \| :-: \| :-: \| :-: \| :-: \| :-: \| --- \|\n\| 2026-11-05 \| ☐ \| ☐ \| ☐ \| ☐ \| ☐ \|  \|\n/);
   assert.match(text, /\n\| 2026-11-15 \| ☐ \| ☐ \| ☐ \| ☐ \|  \|  \|\n/);   // Магний's 10 days are over
   assert.match(text, /\n\| 2026-12-05 \| ☐ \| ☐ \| ☐ \|  \|  \|  \|\n/);   // Новопассит's 30 too
   assert.match(text, /\n\| 2027-02-04 \| ☐ \| ☐ \|  \|  \|  \|  \|\n```\n$/);   // Аевит's 90 as well
   assert.equal(text.match(/^\| 20\d\d-/gm).length, 92);
   // no start typed: today; no days: 90; a name without a dose
-  assert.match(make("meds", { meds: [{ name: "Аевит" }] }, "2026-10-29"), /\nstart: 2026-10-29\ndays: 90\ncssclasses:\n  - dashboard\nmeds:\n  - \{"name":"Аевит","dose":"","times":"any","meal":"any","days":90\}\n---\n\n> \[!card\] Приём\n> - в любое время: Аевит\n/);
+  assert.match(make("meds", { meds: [{ name: "Аевит" }] }, "2026-10-29"), /\nstart: 2026-10-29\ndays: 90\ncssclasses:\n  - dashboard\nmeds:\n  - \{"name":"Аевит","code":"АЕ","dose":"","times":"any","meal":"any","days":90\}\n---\n\n> \[!card\] Приём\n> - в любое время: Аевит\n/);
   // the window: the medicines as a list of groups, a name each
   const { rows, required } = KINDS.meds.form();
   assert.deepEqual(rows.map(r => r.key), ["meds", "start", "notes"]);
@@ -146,4 +146,13 @@ test("a work task's file: the next number in its folder, then the title in lower
   const names = ["38_mail_templates.md", "3_taxonomy_for_skelary_2.md", "_future_tasks_notes.md"];
   assert.equal(KINDS.work.file({ title: "Versions bug on Duplicates" }, names), "39_versions_bug_on_duplicates");
   assert.equal(KINDS.work.file({ title: "First" }, []), "1_first");
+});
+
+test("a course's codes: unique (Магний and Мастодинон don't share МА), kept in its properties, kept through a rename", () => {
+  const note = KINDS.meds.note({ meds: [{ name: "Мастодинон" }, { name: "Магний" }, { name: "Масло" }] }, "2026-11-08");
+  assert.deepEqual(note.props.meds.map(m => m.code), ["МА", "МГ", "МС"]);
+  assert.match(note.body, /\n\| Дата \| МА \| МГ \| МС \| Заметки \|\n/);
+  // edited: a medicine renamed keeps its code, a new one gets a free one
+  const edited = KINDS.meds.note({ meds: [{ name: "Магний цитрат", code: "МГ" }, { name: "Мастодинон", code: "МА" }, { name: "Мелатонин" }] }, "2026-11-08");
+  assert.deepEqual(edited.props.meds.map(m => m.code), ["МГ", "МА", "МЕ"]);
 });

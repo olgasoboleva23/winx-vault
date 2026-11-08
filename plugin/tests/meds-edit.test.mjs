@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { vault } from "./stubs/vault.mjs";
 import { editCourse } from "#/controllers/meds.js";
+import { Notice } from "obsidian";
 
 globalThis.window ??= {};
 window.moment = () => ({ format: () => "2026-11-08" });
@@ -70,7 +71,7 @@ test("editCourse: the window with the course's values; saved: the medicines, the
   assert.deepEqual(asked.values, { meds: MEDS, start: "2026-11-07", notes: "от врача: не запивать молоком" });
   const text = files[P];
 
-  assert.match(text, /^---\ntype: meds\nstart: 2026-11-07\ndays: 3\ncssclasses:\n  - dashboard\nmeds:\n  - \{"name":"Аевит","dose":"1 капсула","times":"any","meal":"any","days":3\}\n  - \{"name":"Новопассит 10 мл","dose":"","times":"evening","meal":"sleep","days":2\}\nnotes: "от врача: не запивать молоком\\nи не курить"\n---\n/);
+  assert.match(text, /^---\ntype: meds\nstart: 2026-11-07\ndays: 3\ncssclasses:\n  - dashboard\nmeds:\n  - \{"name":"Аевит","code":"АЕ","dose":"1 капсула","times":"any","meal":"any","days":3\}\n  - \{"name":"Новопассит 10 мл","code":"НО","dose":"","times":"evening","meal":"sleep","days":2\}\nnotes: "от врача: не запивать молоком\\nи не курить"\n---\n/);
   // the old Легенда card (a note made before the block drew the legend) goes with the rebuild
   assert.match(text, /\n> \[!card\] Приём\n> - 🌙 на ночь, перед сном: Новопассит 10 мл\n> - в любое время: Аевит 1 капсула\n\n> \[!card\] Заметки\n> от врача: не запивать молоком\n> и не курить\n\n```winx\n/);
   assert.doesNotMatch(text, /Легенда/);
@@ -84,4 +85,51 @@ test("editCourse: the window with the course's values; saved: the medicines, the
   await editCourse("x.md", async () => { calls++; return null; });
   assert.equal(calls, 0);
   assert.equal(other["x.md"], "- [ ] a");
+});
+
+const TWO = [{ name: "Мастодинон", code: "МА", days: 2 }, { name: "Магний", code: "МГ", days: 2 }];
+const twoNote = marks => `---
+type: meds
+start: 2026-11-07
+days: 2
+meds:
+  - {"name":"Мастодинон","code":"МА","days":2}
+  - {"name":"Магний","code":"МГ","days":2}
+---
+
+\`\`\`winx
+meds
+card: Курс
+| Дата | МА | МГ | Заметки |
+| --- | :-: | :-: | --- |
+| 2026-11-07 | ${marks[0]} | ${marks[1]} |  |
+| 2026-11-08 | ☐ | ☐ |  |
+\`\`\`
+`;
+
+test("editCourse: the marks follow their medicine by its code, through a rename and a new order", async () => {
+  const { files } = vault({ [P]: twoNote(["✅", "❌"]) }, { props: { [P]: { type: "meds", start: "2026-11-07", meds: TWO } } });
+
+  await editCourse(P, async (t, rows, o) => ({ ...o.values, meds: [{ ...o.values.meds[1], name: "Магний цитрат" }, o.values.meds[0]] }));
+  assert.match(files[P], /\n\| Дата \| МГ \| МА \| Заметки \|\n/);
+  assert.match(files[P], /\n\| 2026-11-07 \| ❌ \| ✅ \|  \|\n/);
+});
+
+test("editCourse: a mark or a card written while the window was open stays; a course changed meanwhile isn't written over", async () => {
+  const { files } = vault({ [P]: twoNote(["☐", "☐"]) }, { props: { [P]: { type: "meds", start: "2026-11-07", meds: TWO } } });
+
+  await editCourse(P, async (t, rows, o) => {
+    files[P] = twoNote(["✅", "☐"]) + "\n> [!card] От врача\n> новое\n";
+    return { ...o.values, notes: "пить воду" };
+  });
+  assert.match(files[P], /\n\| 2026-11-07 \| ✅ \| ☐ \|  \|\n/);
+  assert.match(files[P], /\n> \[!card\] От врача\n> новое\n/);
+  assert.match(files[P], /\n> \[!card\] Заметки\n> пить воду\n/);
+  // the medicines changed in the file meanwhile (another device): nothing written, a notice
+  const changed = twoNote(["☐", "☐"]).replace('"days":2}\n---', '"days":2}\n  - {"name":"Цинк","code":"ЦИ","days":2}\n---');
+
+  files[P] = twoNote(["☐", "☐"]);
+  await editCourse(P, async (t, rows, o) => { files[P] = changed; return o.values; });
+  assert.equal(files[P], changed);
+  assert.match(Notice.last, /changed meanwhile/);
 });
