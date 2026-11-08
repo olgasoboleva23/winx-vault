@@ -96,6 +96,28 @@
       border-color: var(--winx-pink-deep);
     }
 
+    /* a table written in Markdown on a card (a course's legend; a widget's own table is deeper and
+       styles itself): Obsidian's cell borders and column fill go, the rows parted by the gold
+       dashes of the course's grid, the header in Cinzel */
+    > .callout-content > table {
+      border-collapse: collapse;
+      th, td {
+        padding: $space-xs $space-m;
+        border: none;
+        border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
+        background: none;
+        color: var(--winx-text-dark);
+      }
+      th {
+        font-family: $font-deco;
+        font-size: $text-s;
+        letter-spacing: 0.06em;
+        color: var(--winx-purple-deep);
+        text-align: left;
+      }
+      tr:last-child td { border-bottom: none; }
+    }
+
     /* Custom scrollbar */
     > .callout-content {
       overflow: auto;
