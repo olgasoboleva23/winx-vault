@@ -58,6 +58,32 @@ test("the small row opens into the ring (kept in the json); a finished focus cou
   w.unmount();
 });
 
+test("a running session keeps the screen awake: ▶ asks for the wake lock, ⏸ lets it go, so does closing", async () => {
+  const locks = [];
+  Object.defineProperty(navigator, "wakeLock", {
+    configurable: true,
+    value: { request: async type => { const l = { type, released: false, release: async () => { l.released = true; } }; locks.push(l); return l; } },
+  });
+  const { w } = draw();
+  await nextTick();
+  assert.equal(locks.length, 0);   // stopped: nothing asked
+  await w.find(".winx-pomodoro__btn--play").trigger("click"); await saved();
+  assert.deepEqual(locks.map(l => [l.type, l.released]), [["screen", false]]);
+  mock.timers.tick(3_000); await saved();
+  assert.equal(locks.length, 1);   // asked once, not every second
+  await w.find(".winx-pomodoro__btn--play").trigger("click"); await saved();   // pause
+  assert.equal(locks[0].released, true);
+  await w.find(".winx-pomodoro__btn--play").trigger("click"); await saved();
+  assert.deepEqual([locks.length, locks[1].released], [2, false]);
+  // the system let it go (the window hidden): asked again once the clock ticks with the window back
+  locks[1].released = true;
+  mock.timers.tick(1_000); await saved();
+  assert.deepEqual([locks.length, locks[2].released], [3, false]);
+  w.unmount(); await saved();
+  assert.equal(locks[2].released, true);
+  delete navigator.wakeLock;
+});
+
 test("unmounted: the clock stops ticking (no more timers)", async () => {
   const { w } = draw();
   await w.find(".winx-pomodoro__btn--play").trigger("click");

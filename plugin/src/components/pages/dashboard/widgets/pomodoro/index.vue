@@ -1,13 +1,15 @@
 <!-- Pomodoro: the small row (a ring, the time, the mode and stars, ▶) that opens into the full ring
      (click the time): ↺ ▶ ⏭, the mode and session, the stars, the lengths and ⚙. The Timer ticks
      once a second here, and at once when the window is back (a background window's timers run
-     late); the end of a running session starts the next. The Timer and its clock live here;
+     late); the end of a running session starts the next; while one runs the screen stays on
+     (helpers/wakeLock.js). The Timer and its clock live here;
      PomodoroMini and PomodoroRing draw what `shown` says. -->
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { Notice } from "obsidian";
 import { Timer } from "#/models/timer.js";
 import { askLengths, ding, save as write } from "#/controllers/widgets/pomodoro.js";
+import { keepAwake } from "#/helpers/wakeLock.js";
 import PomodoroMini from "./PomodoroMini.vue";
 import PomodoroRing from "./PomodoroRing.vue";
 
@@ -34,6 +36,7 @@ function tick() {
     filled,
     sets: sets > 0 ? `×${sets}` : "",
   });
+  void keepAwake(timer.running);   // a running session keeps the screen on, the Mac awake
 }
 
 let ending = 0, every = 0;
@@ -82,6 +85,7 @@ onMounted(() => {
   window.addEventListener("focus", tick);
 });
 onBeforeUnmount(() => {
+  void keepAwake(false);
   window.clearInterval(every);
   window.clearTimeout(ending);
   document.removeEventListener("visibilitychange", back);
