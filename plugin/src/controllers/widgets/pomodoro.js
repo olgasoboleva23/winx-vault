@@ -8,7 +8,7 @@ import { AudioEngine } from "#/helpers/sounds.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { app } from "#/helpers/app.js";
 import { addStats } from "#/models/timer.js";
-import { ASSETS, POMODORO } from "#/helpers/paths.js";
+import { ASSETS, POMODORO, SOUNDS } from "#/helpers/paths.js";
 
 export const ICON = {
   play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
@@ -31,39 +31,47 @@ export async function loadPomodoro() {
   return { saved, current: saved.current?.date === todayYmd() ? saved.current : null };
 }
 
-// the end of a session
+// the end of a session; a meditation's: a slow chime
 const sparkle = new AudioEngine(`${ASSETS}/sparkle.wav`);
+const chime = new AudioEngine(`${SOUNDS}/snd_pressure_chime.wav`);
 
 export const ding = rate => sparkle.play({ rate });
 
-// ⚙: the session lengths in the shared window; null when closed or not both set
-export async function askLengths(settings) {
-  const v = await Form.ask(app, "✦ Pomodoro", [
-    { name: "Focus", key: "focusMin", text: "minutes", number: true },
-    { name: "Break", key: "breakMin", text: "minutes", number: true },
-  ], { values: settings, required: ["focusMin", "breakMin"], submit: "Save" });
+export const bell = () => chime.play({ rate: 0.7, gain: 0.35, duration: 3 });
 
-  const ok = v?.focusMin > 0 && v.breakMin > 0;
+// ⚙: the lengths of the mode on (the pomodoro's focus and break, or the meditation's) in the
+// shared window; the settings with them, null when closed or one isn't above zero
+export async function askLengths(settings, meditation = false) {
+  const rows = meditation
+    ? [{ name: "Meditation", key: "meditationMin", text: "minutes", number: true }]
+    : [
+      { name: "Focus", key: "focusMin", text: "minutes", number: true },
+      { name: "Break", key: "breakMin", text: "minutes", number: true },
+    ];
+  const keys = rows.map(r => r.key);
+  const v = await Form.ask(app, meditation ? "✦ Meditation" : "✦ Pomodoro", rows,
+    { values: settings, required: keys, submit: "Save" });
 
-  return ok ? { focusMin: v.focusMin, breakMin: v.breakMin } : null;
+  return v && keys.every(k => v[k] > 0)
+    ? { ...settings, ...Object.fromEntries(keys.map(k => [k, v[k]])) } : null;
 }
 
 // the save: settings, the current session, mini and today's stats (a finished focus session adds
-// its minutes). One save at a time, each reading what the one before wrote (a finished session and
-// the ⇄ click at once); the minutes of finished sessions a failed save didn't write go with the
-// next save
+// its minutes, a meditation its own: `kind`). One save at a time, each reading what the one before
+// wrote (a finished session and the ⇄ click at once); the minutes of finished sessions a failed
+// save didn't write go with the next save
 let queue = Promise.resolve();
 const unsaved = [];
 
-export function save({ settings, current, mini }, focusMin = 0) {
-  if (focusMin) unsaved.push(focusMin);
+export function save({ settings, current, mini }, min = 0, kind = "focus") {
+  if (min) unsaved.push({ min, kind });
   const write = queue.then(async () => {
     const sessions = unsaved.splice(0);
 
     try {
       const data = addStats(await load(), 0, todayYmd());
       Object.assign(data, { settings, current, mini });
-      for (const min of sessions) addStats(data, min, todayYmd());
+      for (const s of sessions) addStats(data, s.min, todayYmd(), s.kind);
       await app.vault.adapter.write(POMODORO, JSON.stringify(data, null, 2));
     } catch (e) {
       unsaved.unshift(...sessions);

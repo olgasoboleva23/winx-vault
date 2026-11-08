@@ -8,7 +8,7 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { Notice } from "obsidian";
 import { Timer } from "#/models/timer.js";
-import { askLengths, ding, save as write } from "#/controllers/widgets/pomodoro.js";
+import { askLengths, bell, ding, save as write } from "#/controllers/widgets/pomodoro.js";
 import { keepAwake } from "#/helpers/wakeLock.js";
 import PomodoroMini from "./PomodoroMini.vue";
 import PomodoroRing from "./PomodoroRing.vue";
@@ -22,16 +22,21 @@ const mini = ref(saved.mini ?? true);
 // what the clock shows: set by tick()
 const shown = reactive({
   time: "--:--", p: 0, mode: "", session: "", lengths: "", running: false, filled: 0, sets: "",
+  meditation: false,
 });
+const MODE = { focus: "Focus", break: "Break", meditation: "Meditation" };
 
 function tick() {
-  const { filled, sets } = timer.stars;
+  const { filled, sets } = timer.stars, meditation = timer.type === "meditation";
+  const { focusMin, breakMin, meditationMin } = timer.settings;
+
   Object.assign(shown, {
     time: timer.clock,
     p: 1 - timer.remaining / timer.duration,
-    mode: timer.type === "focus" ? "Focus" : "Break",
-    session: `Session ${timer.sessions + 1}`,
-    lengths: `${timer.settings.focusMin}m · ${timer.settings.breakMin}m`,
+    mode: MODE[timer.type],
+    session: meditation ? "" : `Session ${timer.sessions + 1}`,
+    lengths: meditation ? `${meditationMin}m` : `${focusMin}m · ${breakMin}m`,
+    meditation,
     running: timer.running,
     filled,
     sets: sets > 0 ? `×${sets}` : "",
@@ -40,9 +45,9 @@ function tick() {
 }
 
 let ending = 0, every = 0;
-const save = (focusMin = 0) => write(
+const save = (min = 0, kind = "focus") => write(
   { settings: timer.settings, current: timer.current, mini: mini.value },
-  focusMin,
+  min, kind,
 );
 
 // the end of a running session: the next one starts by itself
@@ -51,12 +56,17 @@ function arm() {
   if (timer.running) ending = window.setTimeout(finish, timer.remaining);
 }
 
+// a meditation ends with the bell and stops; a pomodoro's session starts the next
 async function finish() {
-  const focusMin = timer.settings.focusMin, wasFocus = timer.next();
-  ding(timer.type === "focus" ? 1.0 : 0.8);
-  timer.play(); arm(); tick();
+  const was = timer.type, min = was === "break" ? 0 : timer.duration / 60_000;
+
+  timer.next();
+  if (was === "meditation") bell();
+  else { ding(timer.type === "focus" ? 1.0 : 0.8); timer.play(); }
+
+  arm(); tick();
   // no click to hand the error to: said here (the minutes go with the next save)
-  await save(wasFocus ? focusMin : 0).catch(e => {
+  await save(min, was).catch(e => {
     console.error(e);
     new Notice("Pomodoro: not saved, the next save will try again");
   });
@@ -67,12 +77,14 @@ async function act(change) { change(timer); arm(); tick(); await save(); }
 const play = () => act(t => t.running ? t.pause() : t.play());
 const reset = () => act(t => t.reset());
 const skip = () => act(t => t.reset(t.other));   // to the next session, this one not counted
+// 🧘 the pomodoro ⇄ the meditation, the session on stopped
+const switchMode = () => act(t => t.reset(t.type === "meditation" ? "focus" : "meditation"));
 
 // the small row ⇄ the full ring; kept in the json
 const toggle = () => { mini.value = !mini.value; return save(); };
 
 async function gear() {
-  const lengths = await askLengths(timer.settings);
+  const lengths = await askLengths(timer.settings, timer.type === "meditation");
 
   if (lengths) await act(t => { t.settings = lengths; t.reset(); });
 }
@@ -103,6 +115,7 @@ onBeforeUnmount(() => {
       @reset="reset"
       @skip="skip"
       @gear="gear"
+      @mode="switchMode"
     />
   </div>
 </template>

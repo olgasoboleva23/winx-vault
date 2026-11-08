@@ -2,7 +2,8 @@
 // (Date.now; a test's own).
 import { todayYmd } from "#/helpers/dates.js";
 
-const DEFAULTS = { focusMin: 25, breakMin: 5 };
+const DEFAULTS = { focusMin: 25, breakMin: 5, meditationMin: 10 };
+const LENGTH = { focus: "focusMin", break: "breakMin", meditation: "meditationMin" };
 
 // the running session: { sessionType, baseElapsed, startedAt }, in memory only (gone after a
 // restart or a reload)
@@ -25,15 +26,14 @@ export class Timer {
     }
   }
   get running()   { return this.start > 0; }
-  get duration()  {
-    return (this.type === "focus" ? this.settings.focusMin : this.settings.breakMin) * 60_000;
-  }
+  get duration()  { return this.settings[LENGTH[this.type]] * 60_000; }
   get remaining() {
     const now = this.running ? this.now() - this.start : 0;   // the running part since `start`
 
     return Math.max(0, this.duration - this.elapsed - now);
   }
-  get other()     { return this.type === "focus" ? "break" : "focus"; }
+  // focus ↔ break; a meditation stays one
+  get other()     { return { focus: "break", break: "focus" }[this.type] ?? this.type; }
   // what's left as m:ss
   get clock() {
     const rem = this.remaining;
@@ -58,8 +58,13 @@ export class Timer {
   reset(type = this.type) { this.type = type; this.elapsed = 0; this.stop(); }
   stop()  { this.start = 0; live = null; }
   // the session ended: a focus counts, then the other kind from zero (stopped); true when it
-  // was a focus
+  // was a focus. A meditation starts over, stopped, and counts no star
   next() {
+    if (this.type === "meditation") {
+      this.reset();
+      return false;
+    }
+
     const wasFocus = this.type === "focus";
 
     if (wasFocus) this.sessions++;
@@ -77,10 +82,15 @@ export class Timer {
   }
 }
 
-// today's stats in the saved json: a new day starts them over; a finished focus adds its minutes
-export function addStats(data, focusMin, today) {
+// today's stats in the saved json: a new day starts them over; a finished focus adds its minutes,
+// a finished meditation its own (stats.meditation)
+export function addStats(data, min, today, kind = "focus") {
   if (data.stats?.date !== today) data.stats = { date: today, sessions: 0, minutes: 0 };
-  if (focusMin) { data.stats.sessions++; data.stats.minutes += focusMin; }
+  if (!min) return data;
+  const to = kind === "meditation"
+    ? (data.stats.meditation ??= { sessions: 0, minutes: 0 }) : data.stats;
 
+  to.sessions++;
+  to.minutes += min;
   return data;
 }

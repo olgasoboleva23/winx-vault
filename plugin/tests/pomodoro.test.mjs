@@ -43,3 +43,15 @@ test("the clock reads m:ss of what's left; stars: 4 per set, ×N the full sets b
   const at = n => Object.assign(new Timer({}, null, clock()), { sessions: n }).stars;
   assert.deepEqual([at(0), at(4), at(5), at(13)], [{ filled: 0, sets: 0 }, { filled: 4, sets: 0 }, { filled: 1, sets: 1 }, { filled: 1, sets: 3 }]);
 });
+
+test("meditation: its own length (10 min by default), one session that stops when it ends, no stars counted", () => {
+  const now = clock(), t = new Timer({ focusMin: 25 }, { sessionType: "meditation", sessions: 2 }, now);
+  assert.deepEqual([t.type, t.duration, t.clock], ["meditation", 10 * 60_000, "10:00"]);
+  t.play(); now.go(10 * 60_000);
+  assert.equal(t.next(), false);
+  assert.deepEqual([t.type, t.running, t.sessions, t.remaining], ["meditation", false, 2, 10 * 60_000]);
+  assert.equal(new Timer({ meditationMin: 15 }, { sessionType: "meditation" }, now).duration, 15 * 60_000);
+  // its minutes go apart from the focus ones
+  const data = addStats({ stats: { date: "2026-11-08", sessions: 1, minutes: 25 } }, 10, "2026-11-08", "meditation");
+  assert.deepEqual(data.stats, { date: "2026-11-08", sessions: 1, minutes: 25, meditation: { sessions: 1, minutes: 10 } });
+});

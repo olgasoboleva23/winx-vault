@@ -84,6 +84,26 @@ test("a running session keeps the screen awake: ▶ asks for the wake lock, ⏸ 
   delete navigator.wakeLock;
 });
 
+test("🧘 switches to meditation: its own clock, no stars; at its end a bell, the clock stops, its minutes counted apart", async () => {
+  const { w, json } = draw();
+  await nextTick();
+  await w.find(".winx-pomodoro__mode-switch").trigger("click"); await nextTick(); await saved();
+  assert.deepEqual([w.find(".winx-pomodoro__time").text(), w.find(".winx-pomodoro__mode-text").text()], ["10:00", "Meditation"]);
+  assert.equal(w.find(".winx-pomodoro__settings-info").text(), "10m");
+  assert.ok(!w.find(".winx-pomodoro__stars").exists());
+  assert.equal(json().current.sessionType, "meditation");
+  await w.find(".winx-pomodoro__btn--play").trigger("click");
+  mock.timers.tick(10 * 60_000); await nextTick(); await nextTick(); await saved();
+  assert.equal(w.find(".winx-pomodoro__time").text(), "10:00");
+  assert.equal(w.find(".winx-pomodoro__btn--play").html().includes("M8 5v14"), true);   // ▶: stopped
+  assert.deepEqual(json().stats.meditation, { sessions: 1, minutes: 10 });
+  assert.equal(json().stats.sessions, 0);
+  // back to the pomodoro
+  await w.find(".winx-pomodoro__mode-switch").trigger("click"); await nextTick();
+  assert.deepEqual([w.find(".winx-pomodoro__time").text(), w.find(".winx-pomodoro__mode-text").text()], ["25:00", "Focus"]);
+  w.unmount();
+});
+
 test("unmounted: the clock stops ticking (no more timers)", async () => {
   const { w } = draw();
   await w.find(".winx-pomodoro__btn--play").trigger("click");

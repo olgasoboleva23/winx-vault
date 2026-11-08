@@ -1,11 +1,12 @@
 <!-- the full ring: ↺ ▶ ⏭ around the time (a click on it folds back to the small row), the mode and
-     session, the stars, the lengths and ⚙ -->
+     session, the stars (not for a meditation), 🧘 / 🍅 (the mode), the lengths and ⚙ -->
 <script setup>
 import { ICON } from "#/controllers/widgets/pomodoro.js";
 import PomodoroStars from "./PomodoroStars.vue";
+import { vTip } from "#/components/uikit/tooltip.js";
 
 defineProps({ shown: { type: Object, required: true } });
-defineEmits(["toggle", "play", "reset", "skip", "gear"]);
+defineEmits(["toggle", "play", "reset", "skip", "gear", "mode"]);
 </script>
 
 <template>
@@ -38,8 +39,13 @@ defineEmits(["toggle", "play", "reset", "skip", "gear"]);
       <span class="winx-pomodoro__mode-text">{{ shown.mode }}</span>
       <span class="winx-pomodoro__session">{{ shown.session }}</span>
     </div>
-    <PomodoroStars :filled="shown.filled" :sets="shown.sets" />
+    <PomodoroStars v-if="!shown.meditation" :filled="shown.filled" :sets="shown.sets" />
     <div class="winx-pomodoro__bottom winx-center winx-gap-m">
+      <button
+        v-tip="shown.meditation ? 'pomodoro' : 'meditation'"
+        class="winx-pomodoro__gear winx-pomodoro__mode-switch"
+        @click="$emit('mode')"
+      >{{ shown.meditation ? "🍅" : "🧘" }}</button>
       <span class="winx-pomodoro__settings-info">{{ shown.lengths }}</span>
       <button class="winx-pomodoro__gear" @click="$emit('gear')" v-html="ICON.gear" />
     </div>

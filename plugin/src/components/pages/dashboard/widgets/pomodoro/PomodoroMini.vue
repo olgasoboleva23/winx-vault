@@ -14,9 +14,10 @@ defineEmits(["toggle", "play"]);
     <div class="winx-pomodoro__mini-ring" :style="{ '--p': shown.p }" @click="$emit('toggle')" />
     <div class="winx-pomodoro__mini-info winx-grow" @click="$emit('toggle')">
       <div class="winx-pomodoro__mini-time">{{ shown.time }}</div>
-      <PomodoroStars :filled="shown.filled" :sets="shown.sets">
+      <PomodoroStars v-if="!shown.meditation" :filled="shown.filled" :sets="shown.sets">
         <span class="winx-pomodoro__mini-mode">{{ shown.mode }}</span>
       </PomodoroStars>
+      <span v-else class="winx-pomodoro__mini-mode">{{ shown.mode }}</span>
     </div>
     <button
       class="winx-pomodoro__mini-play"

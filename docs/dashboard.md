@@ -9,7 +9,7 @@ A tab of its own: the ✨ icon on the left (it opens the dashboard and the calen
 | Card | What it shows |
 |---|---|
 | **Level** | Current level, total XP, progress to the next level |
-| **Pomodoro** | 25/5 min focus timer, session counter |
+| **Pomodoro** | 25/5 min focus timer, session counter; 🧘 switches to a meditation (10 min by default, its own length under ⚙, a chime at its end, its minutes counted apart); a running session keeps the screen on, so the Mac doesn't sleep |
 | **Goals** | Per goal "X of Y this week", Mon–Sun dots, the minimum version |
 | **Life Areas** | Radar chart — XP earned per area this month |
 | **Cycle** | Cycle day, next start forecast, "started today" button |
