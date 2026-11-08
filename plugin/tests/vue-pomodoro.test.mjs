@@ -104,6 +104,22 @@ test("🧘 switches to meditation: its own clock, no stars; at its end a bell, t
   w.unmount();
 });
 
+test("closed while the wake lock was still being asked for: the lock that comes is let go at once", async () => {
+  const { keepAwake } = await import("#/helpers/wakeLock.js");
+  let give;
+  const lock = { released: false, release: async () => { lock.released = true; } };
+
+  Object.defineProperty(navigator, "wakeLock", {
+    configurable: true, value: { request: () => new Promise(r => { give = () => r(lock); }) },
+  });
+  const asked = keepAwake(true);
+
+  await keepAwake(false);
+  give(); await asked;
+  assert.equal(lock.released, true);
+  delete navigator.wakeLock;
+});
+
 test("unmounted: the clock stops ticking (no more timers)", async () => {
   const { w } = draw();
   await w.find(".winx-pomodoro__btn--play").trigger("click");
