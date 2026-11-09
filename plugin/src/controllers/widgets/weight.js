@@ -2,15 +2,10 @@
 // days, the last value, the change vs a week ago; the free journals (a note each in JOURNALS: its
 // name the file's, its `reasons` and `lag` its properties): a level 0–3 and today's reasons, bars
 // for 30 days (the reasons in the tooltip) over the cycle's period days. Writes: today's weight in
-// Weight.md, today's level and reasons in a journal. The markup: widgets/weight.
+// Weight.md (a journal's: controllers/journals.js). The markup: widgets/weight.
 import { addDays, dm, todayYmd } from "#/helpers/dates.js";
 import { WeightLog } from "#/models/weightLog.js";
-import { BodyLog } from "#/models/bodyLog.js";
 import { readJournals } from "#/controllers/journals.js";
-import { createNote } from "#/controllers/notes.js";
-import { KINDS } from "#/models/kinds.js";
-import { Form } from "#/components/uikit/Form/index.ts";
-import { app } from "#/helpers/app.js";
 import { cycleLog } from "./cycle.js";
 import { chartColor } from "#/helpers/chart.js";
 import { edit } from "#/helpers/files.js";
@@ -113,22 +108,3 @@ export async function logWeight(typed) {
   await edit(WEIGHT, c => new WeightLog(c).set(todayYmd(), kg));
   return true;
 }
-
-// ＋ a new free journal in its window (Winx: New journal's); its path, null when closed
-export async function addJournal() {
-  const { rows, values, required } = KINDS.journal.form();
-  const v = await Form.ask(app, "✦ New journal", rows, { values, required, submit: "Create" });
-
-  return v ? (await createNote(KINDS.journal, v, KINDS.journal.folder)).path : null;
-}
-
-// 🗑 a journal: asked first, then into the trash (Obsidian's, as set: recoverable)
-export async function deleteJournal(path, name) {
-  const yes = await Form.ask(app, `✦ Delete the journal «${name}»?`, [], { submit: "Delete" });
-  const file = yes && app.vault.getFileByPath(path);
-
-  if (file) await app.fileManager.trashFile(file);
-}
-
-export const logBody = (path, level, reasons) =>
-  edit(path, c => new BodyLog(c).set(todayYmd(), level, reasons));

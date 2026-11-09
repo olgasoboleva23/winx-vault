@@ -9,7 +9,8 @@ import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import { WEIGHT } from "#/helpers/paths.js";
 import { app } from "#/helpers/app.js";
-import { addJournal, deleteJournal, logBody, logWeight } from "#/controllers/widgets/weight.js";
+import { logWeight } from "#/controllers/widgets/weight.js";
+import { addJournal, deleteJournal, logBody } from "#/controllers/journals.js";
 import WeightMode from "./WeightMode.vue";
 import BodyLogMode from "./BodyLogMode.vue";
 
