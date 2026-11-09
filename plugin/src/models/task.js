@@ -176,24 +176,29 @@ export class Task {
   }
 }
 
-// Every task and pool item (Tasks) once, for the "New task" search: its latest name and picks, how
-// many times it was done and when last; by `areaOrder` (["#area/…"], the rest after), then the most
-// done and the most recent first.
-export function taskChoices(tasks, areaOrder) {
-  const by = {};
+// Every record of tasks.json (pool ones too) once, for the "New task" search: its name and picks,
+// how many lines with its id are done and when last; by `areaOrder` (["#area/…"], the rest after),
+// then the most done and the most recent first.
+export function taskChoices(tasks, records, areaOrder) {
+  const done = {};
 
-  for (const t of tasks.filter(t => t.text)) {
-    const when = t.doneOn ?? t.date ?? t.created ?? "";
-    const c = by[t.key] ??= { done: 0, last: null, when: "" };
+  for (const t of tasks) {
+    if (!t.id || !t.isDone) continue;
+    const c = done[t.id] ??= { done: 0, last: null };
 
-    if (t.isDone) { c.done++; if (!c.last || t.doneOn > c.last) c.last = t.doneOn; }
-
-    if (when >= c.when) Object.assign(c, { when, name: t.text, area: t.area, picks: t.picks });
+    c.done++;
+    if (!c.last || t.doneOn > c.last) c.last = t.doneOn;
   }
 
   const rank = area => areaOrder.indexOf(area) >>> 0;
 
-  return Object.values(by).map(({ when, ...c }) => c)
-    .sort((a, b) => rank(a.area) - rank(b.area) || b.done - a.done
-      || (b.last ?? "").localeCompare(a.last ?? ""));
+  return [...records].map(([id, r]) => ({
+    id, name: r.name ?? id, area: r.area ?? null,
+    picks: {
+      difficulty: r.difficulty ?? null, area: r.area ?? null,
+      time: r.time ? `#time/${r.time}` : null, sticker: r.sticker ?? null,
+    },
+    done: done[id]?.done ?? 0, last: done[id]?.last ?? null,
+  })).sort((a, b) => rank(a.area) - rank(b.area) || b.done - a.done
+    || (b.last ?? "").localeCompare(a.last ?? ""));
 }

@@ -121,9 +121,17 @@ test("a new task: a new name gets a new id, a past name its old one; the line go
   assert.equal(files[MASTER], "- [ ] t5 [created:: 2026-11-02] [due:: 2026-11-06]\n- [ ] t4 [due:: 2026-11-03]\n");
   assert.deepEqual(json(files).t5, { name: "stretch", difficulty: "#⭐easy", area: "#area/body", time: "evening", goal: null, tags: [], sticker: "a.webp", after: null });
   taskStore.putRecords(json(files));
-  await saveNewTask("Walk", PICK, "- [ ] Walk [created:: 2026-11-02]");
+  await saveNewTask("Walk ", PICK, "- [ ] Walk  [created:: 2026-11-02]", "t4");
   assert.match(files[MASTER], /^- \[ \] t4 \[created:: 2026-11-02\]\n/);
   assert.equal(Object.keys(json(files)).length, 2);
+});
+
+test("a new task from a past one under another name: a new task, the past one keeps its name", async () => {
+  const files = vault({ [MASTER]: "- [ ] t4\n" }, { t4: { name: "walk", goal: null, tags: [] } });
+  await saveNewTask("walk the dog", PICK, "- [ ] walk the dog [created:: 2026-11-02]", "t4");
+  assert.match(files[MASTER], /^- \[ \] t5 /);
+  assert.equal(json(files).t4.name, "walk");
+  assert.equal(json(files).t5.name, "walk the dog");
 });
 
 test("a new task to the pool: a record with pool: true, no line", async () => {

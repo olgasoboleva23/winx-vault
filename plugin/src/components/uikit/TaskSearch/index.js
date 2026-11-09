@@ -10,7 +10,7 @@ import { app } from "#/helpers/app.js";
 
 export function pickTask() {
   const choices = taskChoices(
-    [...taskStore.tasks, ...taskStore.pool].map(t => Task.of(t)), config.areas.map(a => a.tag),
+    taskStore.tasks.map(t => Task.of(t)), taskStore.records, config.areas.map(a => a.tag),
   );
   const label = area => area
     ? `${config.areaIcons[area] ?? "✦"} ${config.areaMap[area] ?? area.slice(6)}`

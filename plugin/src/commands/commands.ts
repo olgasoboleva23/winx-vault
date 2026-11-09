@@ -38,7 +38,7 @@ export function registerCommands(plugin: Plugin) {
     const result = await api.editTaskLineModal(`- [ ] ${found.name} [created:: ${todayYmd()}]`);
 
     if (!result) return;
-    if (!await saveNewTask(found.name, pick, result)) {
+    if (!await saveNewTask(found.name, pick, result, found.id)) {
       new Notice(`✦ ${MASTER} not found — task not saved`);
     }
   });

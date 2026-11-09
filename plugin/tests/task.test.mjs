@@ -149,12 +149,13 @@ test("taskChoices: one per task, by area, the most done first; the picks of its 
   };
   const c = taskChoices([
     "- [x] t1 [completion:: 2026-10-01]", "- [x] t1 [completion:: 2026-10-20]",
-    "- [ ] t2 [due:: 2026-11-01]", "- t3", "- [x] t2 [completion:: 2026-09-01]",
-  ].map(l => new Task(l, null, recs[l.match(/t\d+/)[0]])), ["#area/body", "#area/base"]);
-  assert.deepEqual(c.map(x => [x.name, x.area, x.done, x.last]), [
-    ["stretch", "#area/body", 1, "2026-09-01"],
-    ["Wash dishes", "#area/base", 2, "2026-10-20"],
-    ["take out trash", "#area/base", 0, null],
+    "- [ ] t2 [due:: 2026-11-01]", "- [x] t2 [completion:: 2026-09-01]",
+  ].map(l => new Task(l, null, recs[l.match(/t\d+/)[0]])), new Map(Object.entries(recs)),
+  ["#area/body", "#area/base"]);
+  assert.deepEqual(c.map(x => [x.id, x.name, x.area, x.done, x.last]), [
+    ["t2", "stretch", "#area/body", 1, "2026-09-01"],
+    ["t1", "Wash dishes", "#area/base", 2, "2026-10-20"],
+    ["t3", "take out trash", "#area/base", 0, null],
   ]);
   assert.deepEqual(c[1].picks, { difficulty: "#⭐⭐medium", area: "#area/base", time: "#time/evening", sticker: "cat.png" });
 });
