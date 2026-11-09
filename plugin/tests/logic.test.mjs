@@ -96,13 +96,13 @@ test("ruleText", () => {
 
 
 test("vitals: HP loses 2 a star for each missed task, gets 1 a star back for each done today", () => {
-  const T = l => new Task(l);
+  const T = (l, difficulty) => new Task(l, null, { difficulty });
   const v = vitals({
-    missed: [T("- [ ] #⭐⭐⭐hard #area/base clean [due:: 2026-10-24]"), T("- [ ] #⭐easy #area/body mask [due:: 2026-10-22]")],
-    doneToday: [T("- [x] #⭐⭐medium #area/mind read [completion:: 2026-10-31]")],
+    missed: [T("- [ ] t1 [due:: 2026-10-24]", "#⭐⭐⭐hard"), T("- [ ] t2 [due:: 2026-10-22]", "#⭐easy")],
+    doneToday: [T("- [x] t3 [completion:: 2026-10-31]", "#⭐⭐medium")],
   });
   assert.deepEqual(v, { hp: 44, hpMax: 50, damage: 8, heal: 2 });
-  assert.equal(vitals({ missed: Array(20).fill(T("- [ ] #⭐⭐⭐hard x [due:: 2026-10-01]")), doneToday: [] }).hp, 0);
+  assert.equal(vitals({ missed: Array(20).fill(T("- [ ] t4 [due:: 2026-10-01]", "#⭐⭐⭐hard")), doneToday: [] }).hp, 0);
 });
 
 test("MP by the day of the cycle: period 1, after it 3, the fertile days and ovulation 4, then 3, the last 5 days 2", () => {

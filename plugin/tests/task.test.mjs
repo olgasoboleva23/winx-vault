@@ -4,19 +4,27 @@ import { Task, fieldsOf, taskChoices } from "#/models/task.js";
 
 const T = line => new Task(line);
 
-test("what a line is", () => {
-  const t = T("- [ ] #⭐⭐medium #area/body #time/evening #goal/workout gym ![[fairy.png|28]] ![[bloom.gif|28]] [repeat:: every week on Monday, Friday when done] [due:: 2026-10-28] [created:: 2026-05-01]");
+test("what a line is: its dates from the line, its own part from the record of its id", () => {
+  const rec = { name: "gym", difficulty: "#⭐⭐medium", area: "#area/body", time: "evening", goal: "#goal/workout", tags: ["#old"], sticker: "fairy.webp", after: "t3" };
+  const t = new Task("- [ ] t12 [repeat:: every week on Monday, Friday when done] [due:: 2026-10-28] [created:: 2026-05-01]", null, rec);
   assert.equal(t.status, " ");
   assert.ok(t.isOpen && !t.isDone && !t.isSkipped);
+  assert.equal(t.id, "t12");
+  assert.equal(t.rec, rec);
   assert.equal(t.area, "#area/body");
   assert.equal(t.difficulty, "#⭐⭐medium");
   assert.equal(t.time, "evening");
+  assert.equal(t.after, "t3");
+  assert.deepEqual(t.tags, ["#⭐⭐medium", "#area/body", "#time/evening", "#goal/workout", "#old"]);
   assert.equal(t.rule, "every week on Monday, Friday when done");
   assert.ok(t.isRecurring && t.whenDone && !t.isBirthday && !t.isPaused);
   assert.equal(t.date, "2026-10-28");
   assert.equal(t.created, "2026-05-01");
-  assert.deepEqual(t.stickers, ["fairy.png", "bloom.gif"]);
+  assert.deepEqual(t.stickers, ["fairy.webp"]);
   assert.equal(t.text, "gym");
+  assert.equal(t.key, "t12");
+  assert.equal(Task.of({ status: "x", text: "t12 [completion:: 2026-10-29]", rec }).text, "gym");
+  assert.deepEqual(new Task("- [ ] t12", null, { name: "gym", difficulty: "#⭐easy", area: null, time: null, goal: null, tags: [], sticker: null, after: null }).tags, ["#⭐easy"]);
 
   const plain = T("- [x] call bank [scheduled:: 2026-10-20] [due:: 2026-10-22] [completion:: 2026-10-21]");
   assert.ok(plain.isDone && !plain.isRecurring);
@@ -78,7 +86,8 @@ test("setTag, setSticker, picks", () => {
   const two = "- [ ] gym ![[a.png|28]] ![[b.gif|28]] [due:: 2026-10-30]";
   assert.equal(T(two).setSticker("c.png"), "- [ ] gym ![[c.png|28]] ![[b.gif|28]] [due:: 2026-10-30]");   // only the first
   assert.equal(T(two).setSticker(null), "- [ ] gym ![[b.gif|28]] [due:: 2026-10-30]");
-  const t = T("- [ ] #⭐easy #area/mind #time/morning meditate ![[bloom.gif|28]] [repeat:: every day]");
+  const t = new Task("- [ ] #⭐easy #area/mind #time/morning meditate ![[bloom.gif|28]] [repeat:: every day]", null,
+    { name: "meditate", difficulty: "#⭐easy", area: "#area/mind", time: "morning", sticker: "bloom.gif" });
   assert.deepEqual(t.picks, { difficulty: "#⭐easy", area: "#area/mind", time: "#time/morning", sticker: "bloom.gif" });
   assert.equal(t.withPicks({ time: null, sticker: "rings.gif" }), "- [ ] #⭐easy #area/mind meditate ![[rings.gif|28]] [repeat:: every day]");
   assert.equal(t.withPicks({}), t.line);
@@ -149,14 +158,16 @@ test("pause state, skipping and overdue are the task's own", () => {
   assert.equal(paused.isOverdue("2026-10-28"), false);
 });
 
-test("taskChoices: one per task, by area, the most done first; the picks of its latest line", () => {
+test("taskChoices: one per task, by area, the most done first; the picks of its record", () => {
+  const recs = {
+    t1: { name: "Wash dishes", difficulty: "#⭐⭐medium", area: "#area/base", time: "evening", sticker: "cat.png" },
+    t2: { name: "stretch", difficulty: "#⭐easy", area: "#area/body" },
+    t3: { name: "take out trash", difficulty: "#⭐⭐medium", area: "#area/base", pool: true },
+  };
   const c = taskChoices([
-    "- [x] #⭐easy #area/base wash dishes [completion:: 2026-10-01]",
-    "- [x] #⭐⭐medium #area/base #time/evening Wash dishes ![[cat.png|28]] [completion:: 2026-10-20]",
-    "- [ ] #⭐easy #area/body stretch [due:: 2026-11-01]",
-    "- #⭐⭐medium #area/base take out trash",
-    "- [x] #⭐easy #area/body stretch [completion:: 2026-09-01]",
-  ], ["#area/body", "#area/base"]);
+    "- [x] t1 [completion:: 2026-10-01]", "- [x] t1 [completion:: 2026-10-20]",
+    "- [ ] t2 [due:: 2026-11-01]", "- t3", "- [x] t2 [completion:: 2026-09-01]",
+  ].map(l => new Task(l, null, recs[l.match(/t\d+/)[0]])), ["#area/body", "#area/base"]);
   assert.deepEqual(c.map(x => [x.name, x.area, x.done, x.last]), [
     ["stretch", "#area/body", 1, "2026-09-01"],
     ["Wash dishes", "#area/base", 2, "2026-10-20"],
@@ -165,13 +176,16 @@ test("taskChoices: one per task, by area, the most done first; the picks of its 
   assert.deepEqual(c[1].picks, { difficulty: "#⭐⭐medium", area: "#area/base", time: "#time/evening", sticker: "cat.png" });
 });
 
-test("#id/<id> and #after/id/<id>: a task's id and the one it comes after, not part of the words", () => {
-  const t = T("- [ ] #⭐easy #area/body #after/id/workout помыть голову [repeat:: every week on Monday when done] [due:: 2026-11-04]");
-  assert.equal(t.after, "workout");
-  assert.equal(t.text, "помыть голову");
-  assert.equal(T("- [ ] #id/workout треня").id, "workout");
-  assert.equal(T("- [ ] треня").after, null);
-  assert.equal(T("- [ ] треня").id, null);
+test("a line whose id has no record (hand-typed, or a stale tasks.json): its id is its name", () => {
+  const t = T("- [ ] t99 [due:: 2026-11-09]");
+  assert.equal(t.id, "t99");
+  assert.equal(t.text, "t99");
+  assert.equal(t.key, "t99");
+  assert.deepEqual(t.tags, []);
+  assert.deepEqual(t.stickers, []);
+  assert.deepEqual([t.area, t.difficulty, t.time, t.after, t.rec], [null, null, null, null, null]);
+  assert.equal(T("- [ ] t12x walk").id, null);   // not an id: its words lowercased are its key
+  assert.equal(T("- [ ] t12x walk").key, "t12x walk");
 });
 
 test("sameAs: the same copy of a task (words, status, day), not its done copy or another day's", () => {
@@ -181,9 +195,12 @@ test("sameAs: the same copy of a task (words, status, day), not its done copy or
   assert.ok(!open.sameAs(new Task("- [ ] workout [repeat:: every day] [due:: 2026-10-29]")));
 });
 
-test("Task.of a pool item (no checkbox) is its pool line, so its line is found again", () => {
-  const p = { text: "#⭐easy #area/base take out trash", pool: true };
-  assert.ok(Task.of(p).sameAs(new Task("- #⭐easy #area/base take out trash")));
+test("Task.of a pool item (a record with pool: true): its id as the line, its record", () => {
+  const rec = { name: "take out trash", area: "#area/base", pool: true };
+  const t = Task.of({ id: "t3", pool: true, rec, path: "tasks.json" });
+  assert.equal(t.line, "- t3");
+  assert.equal(t.text, "take out trash");
+  assert.equal(t.area, "#area/base");
 });
 
 test("fieldsOf reads every field, a rule with words up to its ]", () => {

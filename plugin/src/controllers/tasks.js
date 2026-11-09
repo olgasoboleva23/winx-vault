@@ -22,8 +22,8 @@ export const editTaskModal = async t => {
   const text = await app.vault.cachedRead(app.vault.getAbstractFileByPath(t.path));
   const line = text.split("\n")[t.line];
 
-  if (!api || Task.keyOf(line ?? "") !== Task.keyOf(t.text)) return;
-  const was  = new Task(line).picks;
+  if (!api || Task.keyOf(line ?? "") !== Task.of(t).key) return;
+  const was  = new Task(line, null, t.rec).picks;
   const pick = await taskWindow(was);
 
   if (!pick) return;

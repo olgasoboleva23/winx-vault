@@ -4,7 +4,7 @@ import { parseNote } from "#/models/taskFile.js";
 import { setApp } from "#/helpers/app.js";
 import { taskStore, useTaskStore } from "#/store/tasks.js";
 
-const P = "00 System/Data/Tasks/Master.md";
+const P = "00 System/Data/Tasks/Master.md", J = "00 System/Data/Tasks/tasks.json";
 
 test("parseNote: the list items of a note: tasks (status, text, line) and plain lines (no status)", () => {
   const items = parseNote(P, "# Tasks\n\n- [ ] #area/body walk 📅 2026-11-04\n- [x] tea ✅ 2026-11-03\n- [-] skipped\nnot a list\n- a plain line\n* [ ] not ours");
@@ -25,8 +25,7 @@ const vault = (files, ready = true) => {
   const app = {
     metadataCache: { on: (name, fn) => { (events[name] ??= []).push(fn); return { name }; } },
     vault: {
-      getFolderByPath: p => p === "00 System/Data/Tasks"
-        ? { children: Object.keys(files).map(path => ({ path, extension: path.split(".").pop() })) } : null,
+      getFileByPath: p => p in files ? { path: p, extension: p.split(".").pop() } : null,
       cachedRead: async f => files[f.path],
       on: (name, fn) => { (events[name] ??= []).push(fn); return { name }; },
     },
@@ -40,15 +39,20 @@ const vault = (files, ready = true) => {
 const plugin = () => ({ registerEvent() {}, register() {} });
 const settle = () => new Promise(r => setTimeout(r, 5));
 
-test("the store reads the folder's notes once the layout is ready: tasks and the pool's lines, ready, a version", async () => {
-  const { layout } = vault({ [P]: "- [ ] a\n- [x] b", "00 System/Data/Tasks/Pool.md": "intro\n\n- pick me", "00 System/Data/Tasks/x.png": "" }, false);
+test("the store reads Master.md and tasks.json once the layout is ready: tasks with their records, the pool, ready, a version", async () => {
+  const { layout } = vault({
+    [P]: "- [ ] t1 [due:: 2026-11-09]\n- [x] t2\n- [ ] t9",
+    [J]: JSON.stringify({ t1: { name: "a" }, t2: { name: "b" }, t3: { name: "pick me", pool: true } }),
+    "00 System/Data/Tasks/Pool.md": "- old pool line", "00 System/Data/Tasks/Master (old).md": "- [ ] old",
+  }, false);
   useTaskStore(plugin());
   assert.equal(taskStore.ready, false);
   const was = taskStore.version.value;
   layout.forEach(fn => fn()); await settle();
   assert.equal(taskStore.ready, true);
-  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a", "b"]);
-  assert.deepEqual(taskStore.pool.map(t => t.text), ["pick me"]);
+  assert.deepEqual(taskStore.tasks.map(t => [t.text, t.rec?.name ?? null]), [["t1 [due:: 2026-11-09]", "a"], ["t2", "b"], ["t9", null]]);
+  assert.equal(taskStore.records.get("t3").name, "pick me");
+  assert.deepEqual(taskStore.pool, [{ id: "t3", pool: true, rec: taskStore.records.get("t3"), path: J }]);
   assert.ok(taskStore.version.value > was);
 });
 
@@ -60,19 +64,44 @@ test("at a start the cache's first \"resolved\" is enough: onLayoutReady may nev
   assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
 });
 
-test("a note in the folder saved, made, deleted or renamed: read again, the version moves; another note: nothing", async () => {
-  const { files, fire } = vault({ [P]: "- [ ] a" });
+test("Master.md or tasks.json saved, made, deleted or renamed: read again, the version moves; another note of the folder: nothing", async () => {
+  const { files, fire } = vault({ [P]: "- [ ] t1", [J]: "{}" });
   useTaskStore(plugin()); await settle();
-  const v = () => taskStore.version.value;
+  const v = () => taskStore.version.value, name = () => taskStore.tasks.map(t => t.rec?.name ?? t.text);
   let was = v();
-  files[P] = "- [ ] a\n- [ ] b"; fire("modify", P); await settle();
-  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a", "b"]); assert.ok(v() > was); was = v();
+  files[P] = "- [ ] t1\n- [ ] t2"; fire("modify", P); await settle();
+  assert.deepEqual(name(), ["t1", "t2"]); assert.ok(v() > was); was = v();
+  files[J] = JSON.stringify({ t2: { name: "b" } }); fire("modify", J); await settle();
+  assert.deepEqual(name(), ["t1", "b"]); assert.ok(v() > was); was = v();
   fire("modify", "Notes/other.md"); await settle();
-  assert.equal(v(), was);
   files["00 System/Data/Tasks/More.md"] = "- [ ] c"; fire("create", "00 System/Data/Tasks/More.md"); await settle();
-  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a", "b", "c"]);
-  delete files["00 System/Data/Tasks/More.md"]; fire("delete", "00 System/Data/Tasks/More.md"); await settle();
-  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a", "b"]);
+  assert.equal(v(), was);
+  assert.deepEqual(name(), ["t1", "b"]);
+  delete files[P]; fire("delete", P); await settle();
+  assert.deepEqual(taskStore.tasks, []);
+  files[P] = "- [ ] t2"; fire("rename", P); await settle();
+  assert.deepEqual(name(), ["b"]);
+});
+
+test("a tasks.json that isn't JSON: the records stay as they were, an error is logged", async () => {
+  const { files, fire } = vault({ [P]: "- [ ] t1", [J]: JSON.stringify({ t1: { name: "a" } }) });
+  useTaskStore(plugin()); await settle();
+  const error = console.error, logged = [];
+  console.error = (...a) => logged.push(a);
+  files[J] = "{ half"; fire("modify", J); await settle();
+  console.error = error;
+  assert.equal(taskStore.tasks[0].rec.name, "a");
+  assert.equal(logged.length, 1);
+});
+
+test("putRecords: the records set straight, every task's record attached again", () => {
+  vault({});
+  taskStore.put(P, "- [ ] t1\n- [ ] t2 [due:: 2026-11-09]");
+  const was = taskStore.version.value;
+  taskStore.putRecords({ t2: { name: "b" }, t5: { name: "e", pool: true } });
+  assert.deepEqual(taskStore.tasks.map(t => t.rec), [null, { name: "b" }]);
+  assert.deepEqual(taskStore.pool.map(p => p.id), ["t5"]);
+  assert.ok(taskStore.version.value > was);
 });
 
 test("parseNote: a task inside a code block or an HTML comment is an example, not a task", () => {
@@ -100,14 +129,13 @@ test("a read that fails at the start: the next \"resolved\" reads again (ready s
 test("a note deleted while its read is still on the way: the late read is dropped, not put back", async () => {
   const { files, fire, app } = vault({ [P]: "- [ ] a" });
   useTaskStore(plugin()); await settle();
-  const more = "00 System/Data/Tasks/More.md";
   let release;
-  app.vault.cachedRead = f => f.path === more
+  app.vault.cachedRead = f => f.path === P
     ? new Promise(r => { release = () => r("- [ ] c"); }) : Promise.resolve(files[f.path]);
-  files[more] = "- [ ] c"; fire("create", more); await settle();
-  delete files[more]; fire("delete", more); await settle();
+  files[P] = "- [ ] c"; fire("modify", P); await settle();
+  delete files[P]; fire("delete", P); await settle();
   release(); await settle();
-  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
+  assert.deepEqual(taskStore.tasks, []);
 });
 
 test("parseNote: a ~~~ block and an indented fence are examples too", () => {
@@ -116,17 +144,16 @@ test("parseNote: a ~~~ block and an indented fence are examples too", () => {
 });
 
 test("a note deleted while the first read is on the way: it doesn't come back", async () => {
-  const more = "00 System/Data/Tasks/More.md";
-  const { files, fire, app, layout } = vault({ [P]: "- [ ] a", [more]: "- [ ] c" }, false);
+  const { files, fire, app, layout } = vault({ [P]: "- [ ] a" }, false);
   let release;
 
-  app.vault.cachedRead = f => f.path === more
-    ? new Promise(r => { release = () => r("- [ ] c"); }) : Promise.resolve(files[f.path]);
+  app.vault.cachedRead = f => f.path === P
+    ? new Promise(r => { release = () => r("- [ ] a"); }) : Promise.resolve(files[f.path]);
   useTaskStore(plugin());
   layout.forEach(fn => fn()); await settle();
-  delete files[more]; fire("delete", more); await settle();
+  delete files[P]; fire("delete", P); await settle();
   release(); await settle();
-  assert.deepEqual(taskStore.tasks.map(t => t.text), ["a"]);
+  assert.deepEqual(taskStore.tasks, []);
 });
 
 test("turned on in an open Obsidian: a first read that fails is tried again at the next \"resolved\"", async () => {

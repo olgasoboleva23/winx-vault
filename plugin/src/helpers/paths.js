@@ -7,6 +7,9 @@ export const TASKS = `${DATA}/Tasks`;
 
 export const MASTER = `${TASKS}/Master.md`, POOL = `${TASKS}/Pool.md`;
 
+// Winx's part of every task (name, difficulty, area…), an object by id
+export const TASK_RECORDS = `${TASKS}/tasks.json`;
+
 export const GOALS = `${DATA}/Goals`;
 
 export const LEDGER = `${DATA}/Finance/Ledger`, RULES = `${DATA}/Finance/rules.json`;

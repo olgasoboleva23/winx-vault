@@ -2,10 +2,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { weekOf } from "#/helpers/dates.js";
 import { T, CalendarData, canReorder } from "#/models/calendarData.js";
+import { idTask } from "./stubs/idTask.mjs";
 
-// Dataview-like tasks: { status, text, path, line }
+// the store's tasks: { status, text, path, line, rec }, from a readable spec (idTask)
 let n = 0;
-const task = (status, text) => ({ status, text, path: "Tasks/Master.md", line: n++ });
+const task = (status, spec) => ({ status, ...idTask(spec), path: "Tasks/Master.md", line: n++ });
+// a pool record's item
+const poolItem = spec => { const { text, rec } = idTask(spec); return { id: text, pool: true, rec, path: "tasks.json" }; };
 const texts = list => list.map(t => T(t).text);
 const TODAY = "2026-10-28";   // a Wednesday
 const AREAS = ["#area/body", "#area/mind", "#area/base"];
@@ -28,8 +31,8 @@ test("days: open on their date, done on their ✅ date, 🔁 repeats faded in th
   assert.ok(!Object.values(m.byDay).flat().some(e => T(e.t).text === "call bank"));
   assert.deepEqual(texts(m.backlog), ["plan trip"]);
   assert.deepEqual(texts(m.regulars), ["stretch", "mask"]);
-  assert.deepEqual([...m.doneBy.keys()], ["read"]);
-  assert.deepEqual([...m.skipsBy.keys()], ["stretch"]);
+  assert.deepEqual([...m.doneBy.keys()], [T(m.byDay["2026-10-27"][0].t).id]);   // by id
+  assert.deepEqual([...m.skipsBy.keys()], [T(m.regulars[0]).id]);
 });
 
 test("a day lists open, then repeats, then done", () => {
@@ -41,12 +44,14 @@ test("a day lists open, then repeats, then done", () => {
   assert.deepEqual(m.byDay["2026-10-29"].map(e => e.kind), ["open", "ghost", "done"]);
 });
 
-test("pool lines become pool items with their own Task", () => {
-  const m = data([], { poolLines: [{ text: "#⭐easy #area/base take out trash", path: "Tasks/Pool.md", line: 2 }] });
+test("pool records become pool items with their own Task", () => {
+  const item = poolItem("#⭐easy #area/base take out trash");
+  const m = data([], { poolLines: [item] });
   assert.equal(m.pool.length, 1);
   assert.ok(m.pool[0].pool);
   assert.equal(T(m.pool[0]).text, "take out trash");
-  assert.equal(T(m.pool[0]).line, "- #⭐easy #area/base take out trash");
+  assert.equal(T(m.pool[0]).area, "#area/base");
+  assert.equal(T(m.pool[0]).line, `- ${item.id}`);
   assert.ok(m.all.includes(m.pool[0]));   // a data-task key finds pool items too
 });
 
@@ -70,8 +75,8 @@ test("No date: by area, then the longest waiting", () => {
 
 test("Pool: by area, then the longest since last done (never done first)", () => {
   const m = data([task("x", "dust [completion:: 2026-10-01]"), task("x", "vacuum [completion:: 2026-09-01]")], { days: [TODAY], poolLines: [
-    { text: "#area/base dust", path: "P", line: 0 }, { text: "#area/base vacuum", path: "P", line: 1 },
-    { text: "#area/base wash windows", path: "P", line: 2 }, { text: "#area/body run", path: "P", line: 3 },
+    poolItem("#area/base dust"), poolItem("#area/base vacuum"),
+    poolItem("#area/base wash windows"), poolItem("#area/body run"),
   ] });
   assert.deepEqual(texts(m.pool), ["run", "wash windows", "vacuum", "dust"]);
 });
@@ -100,7 +105,7 @@ test("meta lines", () => {
 
 test("a task's key finds the same task again: by its line, after lines moved, never another task", async () => {
   const { taskKey, findTask } = await import("#/models/calendarData.js");
-  const at = (line, status, text) => ({ status, text, path: "Tasks/Master.md", line });
+  const at = (line, status, spec) => ({ status, ...idTask(spec), path: "Tasks/Master.md", line });
   const workout = at(10, " ", "#area/body workout [due:: 2026-10-30]"), skipped = at(11, "-", "#area/body workout [due:: 2026-10-28] [cancelled:: 2026-10-28]");
   const key = taskKey(workout);
   assert.equal(findTask(key, [workout, skipped]), workout);
@@ -110,9 +115,10 @@ test("a task's key finds the same task again: by its line, after lines moved, ne
   assert.equal(findTask(taskKey(skipped), moved), moved[2]);
   // gone (deleted or renamed): nothing, rather than a neighbour
   assert.equal(findTask(key, [at(10, " ", "#area/body stretch")]), null);
-  // a pool item (no checkbox)
-  const pool = { text: "#area/base take out trash", path: "Tasks/Pool.md", line: 2, pool: true };
-  assert.equal(findTask(taskKey(pool), [{ ...pool, line: 3 }]).line, 3);
+  // a pool item (a record, no line): by its id
+  const pool = poolItem("#area/base take out trash");
+  assert.equal(findTask(taskKey(pool), [{ ...pool }])?.id, pool.id);
+  assert.equal(findTask(taskKey(pool), [poolItem("dust")]), null);
   assert.equal(findTask("nonsense", [workout]), null);
 });
 
@@ -164,12 +170,14 @@ test("Ahead: open dated tasks after this week, by month; in a month by date, the
   assert.deepEqual(m.ahead.map(g => [g.month, texts(g.items)]), [["2026-12", ["tea", "Bo", "dentist", "book"]], ["2027-02", ["visa"]]]);
 });
 
-test("a day's parts: a task with #after/id/<id> stands right under the task with #id/<id> the same day, in its time group", () => {
+test("a day's parts: a task whose record has after: <id> stands right under the task with that id the same day, in its time group", () => {
+  const lead = task(" ", "#time/evening треня [repeat:: every week] [due:: 2026-10-28]");
+  const after = t => (t.rec.after = lead.text.split(" ")[0], t);
   const m = data([
-    task(" ", "#time/evening #id/workout треня [repeat:: every week] [due:: 2026-10-28]"),
+    lead,
     task(" ", "#time/evening stretch [repeat:: every day] [due:: 2026-10-28]"),
-    task(" ", "#after/id/workout помыть голову [repeat:: every week] [due:: 2026-10-28]"),
-    task(" ", "#after/id/workout маска [repeat:: every week] [due:: 2026-10-29]"),   // no workout that day: an ordinary task
+    after(task(" ", "помыть голову [repeat:: every week] [due:: 2026-10-28]")),
+    after(task(" ", "маска [repeat:: every week] [due:: 2026-10-29]")),   // no workout that day: an ordinary task
   ], { days: ["2026-10-28", "2026-10-29"] });
   const shown = { open: true, ghost: true, done: true };
   const day = m.dayParts("2026-10-28", shown).routineRows;
@@ -180,7 +188,7 @@ test("a day's parts: a task with #after/id/<id> stands right under the task with
 
 test("taskInfo: what a part shows of a task — its key, area, text, label, stickers as images, whether it can be skipped; once per draw", async () => {
   const { taskInfo } = await import("#/models/calendarData.js");
-  const t = { text: "#⭐easy #area/body stretch ![[fist.webp|28]] [repeat:: every day] [due:: 2026-11-03]", status: " ", path: "Tasks/Master.md", line: 4 };
+  const t = { ...idTask("#⭐easy #area/body stretch ![[fist.webp|28]] [repeat:: every day] [due:: 2026-11-03]"), status: " ", path: "Tasks/Master.md", line: 4 };
   let lookups = 0;
   const app = {
     metadataCache: { getFirstLinkpathDest: (name, from) => (lookups++, name === "fist.webp" ? { path: `Assets/${name}` } : null) },
@@ -199,7 +207,8 @@ test("a day's open task goes before or after another only in its own group and f
   const morning2 = task(" ", "walk #time/morning [repeat:: every day] [due:: 2026-10-28]");
   const evening = task(" ", "read #time/evening [repeat:: every day] [due:: 2026-10-28]");
   const other = task(" ", "plants [repeat:: every week] [due:: 2026-10-28]");
-  const follower = task(" ", "c #after/id/x [due:: 2026-10-28]");
+  const follower = task(" ", "c [due:: 2026-10-28]");
+  follower.rec.after = "t999";
   const elsewhere = { ...task(" ", "d [due:: 2026-10-28]"), path: "Daily Notes/2026-10-28.md" };
   assert.equal(canReorder(a, b), true);
   assert.equal(canReorder(morning, morning2), true);

@@ -4,15 +4,13 @@ import { Search } from "#/components/uikit/Search/index.ts";
 import config from "#/helpers/config.js";
 import { dm } from "#/helpers/dates.js";
 import { findChoices } from "#/helpers/find.js";
-import { taskChoices } from "#/models/task.js";
+import { Task, taskChoices } from "#/models/task.js";
 import { taskStore } from "#/store/tasks.js";
 import { app } from "#/helpers/app.js";
 
 export function pickTask() {
   const choices = taskChoices(
-    [...taskStore.tasks, ...taskStore.pool]
-      .map(l => l.status !== null ? `- [${l.status}] ${l.text}` : `- ${l.text}`),
-    config.areas.map(a => a.tag),
+    [...taskStore.tasks, ...taskStore.pool].map(t => Task.of(t)), config.areas.map(a => a.tag),
   );
   const label = area => area
     ? `${config.areaIcons[area] ?? "✦"} ${config.areaMap[area] ?? area.slice(6)}`

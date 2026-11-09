@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { createRequire } from "node:module";
 import { setApp } from "#/helpers/app.js";
+import { idTask } from "./stubs/idTask.mjs";
 
 // The calendar tab on Vue: its state through Obsidian's layout, a tick's 2 s, the folds, the panel's tab
 const require = createRequire(import.meta.url);
@@ -31,7 +32,8 @@ before(async () => {
 });
 
 let n = 0;
-const task = (status, text) => ({ status, text, path: "00 System/Data/Tasks/Master.md", line: n++ });
+// the store's tasks, from a readable spec (idTask)
+const task = (status, spec) => ({ status, ...idTask(spec), path: "00 System/Data/Tasks/Master.md", line: n++ });
 const TASKS = () => { n = 0; return [
   task(" ", "#area/body walk [due:: 2026-11-04]"),
   task(" ", "#area/body #time/morning stretch [repeat:: every day] [due:: 2026-11-04]"),

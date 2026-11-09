@@ -49,7 +49,7 @@ const historyOf = list => {
   return by;
 };
 
-// What the calendar shows, worked out once per draw from the tasks, Pool.md's lines, the shown
+// What the calendar shows, worked out once per draw from the tasks, the pool's records, the shown
 // days, today and the areas' order (tags; unknown areas last):
 //   byDay    day → entries { t, kind: open | ghost | done }: open ones on their date (today and
 //            later; the overdue ones are in missed), done ones on their ✅ date, a 🔁 task's next
@@ -57,8 +57,8 @@ const historyOf = list => {
 //   missed   "Missed?": open tasks whose day has passed, the latest first
 //   backlog  No date: open one-offs with no date, by area, then the longest waiting (➕ created)
 //            first
-//   pool     Pool.md's lines (no checkbox), each { text, path, line, pool: true } with its Task: by
-//            area, then the longest since last done (never done first)
+//   pool     the pool's records, each { id, pool: true, rec, path } with its Task: by area, then
+//            the longest since last done (never done first)
 //   regulars open 🔁 tasks (an undated one is paused) but dated birthdays (a yearly rule, in Ahead):
 //            by area, dated before paused, the longest overdue, then the longest since last done
 //   ahead    open dated tasks (no 🔁, but birthdays) after today's week, by month:
@@ -114,9 +114,9 @@ export class CalendarData {
     this.skipsBy = historyOf(tasks.map(T).filter(t => t.isSkipped));
     this.missed = tasks.filter(t => T(t).isOverdue(today))
       .sort((a, b) => T(b).date.localeCompare(T(a).date));
-    const pool = poolLines.map(l => {
-      const p = { text: l.text, path: l.path, line: l.line, pool: true };
-      p.winxTask = new Task(`- ${l.text}`, p);
+    const pool = poolLines.map(({ id, rec, path }) => {
+      const p = { id, pool: true, rec, path };
+      p.winxTask = new Task(`- ${id}`, p, rec);
       return p;
     });
     this.all = [...tasks, ...pool];
@@ -188,11 +188,11 @@ export class CalendarData {
   }
 }
 
-// A task's key in the calendar's rows (TaskRow, TaskCard, Missed): its file, line, status and
-// words. It names the same task in every draw: findTask() takes the task at that line if it still
-// has those words and that status, else the nearest one in the file that has them (lines move when
-// a task is added on top), else none — never another task.
-const words = t => t.pool ? Task.keyOf(`- ${t.text}`) : T(t).key;
+// A task's key in the calendar's rows (TaskRow, TaskCard, Missed): its file, line, status and id
+// (its words without one). It names the same task in every draw: findTask() takes the task at that
+// line if it still has that id and that status, else the nearest one in the file that has them
+// (lines move when a task is added on top), else none — never another task.
+const words = t => T(t).key;
 const stateOf = t => t.pool ? "p" : t.status;
 
 export const taskKey = t => [t.path, t.line, stateOf(t), words(t)].join("|");

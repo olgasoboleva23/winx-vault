@@ -1,15 +1,15 @@
-// One task line in the Tasks plugin's Dataview format: what it is (getters) and how to change it
-// (methods that return the new line; widgets write it). The only place that knows the format:
-//   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening
-//   · #id/<id> · #after/id/<id> · ![[sticker]]
+// One task: its line in the Tasks plugin's Dataview format (status, rule, dates) and Winx's own
+// part, its record in tasks.json (name, difficulty, area, time, goal, tags, sticker, after), found
+// by the line's id. What it is (getters) and how to change its line (methods that return the new
+// line; widgets write it). The only place that knows the format:
+//   - [ ] / [x] done / [-] skipped · t12 (its id: the record's key)
 //   fields [key:: value]: repeat (the rule, up to its ]) · due · scheduled (wins over due) · start
 //   · completion · cancelled · created
 // No Obsidian globals (tested by tests/task.test.mjs).
-// Wrap a Dataview task (or a pool item, { text, pool: true }) with Task.of(t) (t is kept as .src,
-// for its path and line) or a raw line with new Task(line).
-// A pool line (Pool.md: a task to pick when it's time, "- #⭐easy #area/base take out trash") is the
-// same without checkbox, rule or dates; its copies on the days are ordinary tasks with the same
-// text.
+// Wrap a store item ({ text, status, rec }, or a pool item { id, pool: true, rec }) with Task.of(t)
+// (t is kept as .src, for its path and line) or a raw line with new Task(line, null, rec).
+// A pool item is a record with pool: true, no line; its copies on the days are ordinary tasks with
+// its id.
 import { addDays, diffDays } from "#/helpers/dates.js";
 import { projectRepeats } from "./repeats.js";
 
@@ -32,25 +32,35 @@ const dropFields = (line, keys) => keys.reduce((l, k) => withField(l, k, null), 
 
 const OPEN   = /^\s*- \[ \]/, ANY = /^\s*- \[.\]/, DONE = /^\s*- \[[xX]\]/;
 
+const ID = /^t\d+(?=\s|$)/;   // the line's first word
+
 export class Task {
-  constructor(line, src = null) { this.line = line; this.src = src; }
+  constructor(line, src = null, rec = null) { this.line = line; this.src = src; this.rec = rec; }
   get fields()     { return fieldsOf(this.line); }
-  // a pool item: no checkbox
-  static of(t) { return new Task(t.pool ? `- ${t.text}` : `- [${t.status}] ${t.text}`, t); }
+  // a pool item: its id, no checkbox
+  static of(t) {
+    return new Task(t.pool ? `- ${t.id}` : `- [${t.status}] ${t.text}`, t, t.rec ?? null);
+  }
 
   get status()     { return this.line.match(/^\s*- \[(.)\]/)?.[1] ?? null; }
   get isOpen()     { return this.status === " "; }
   get isDone()     { return DONE.test(this.line); }
   get isSkipped()  { return this.status === "-"; }
-  get tags()       { return this.line.match(/#[^\s#]+/gu) ?? []; }
-  get area()       { return this.tags.find(t => t.startsWith("#area/")) ?? null; }   // "#area/body"
-  get difficulty() { return this.tags.find(t => t.startsWith("#⭐")) ?? null; }
-  // its id, for #after
-  get id()         { return this.tags.find(t => t.startsWith("#id/"))?.slice(4) ?? null; }
+  // its id: the first word of the line, "t12"
+  get id()         { return this.words.match(ID)?.[0] ?? null; }
+  // its record's tags in one list, as xp, shop, goals and reminders read them
+  get tags() {
+    const r = this.rec ?? {};
+
+    return [r.difficulty, r.area, r.time && `#time/${r.time}`, r.goal, ...r.tags ?? []]
+      .filter(Boolean);
+  }
+  get area()       { return this.rec?.area ?? null; }   // "#area/body"
+  get difficulty() { return this.rec?.difficulty ?? null; }
   // the id it follows
-  get after()      { return this.tags.find(t => t.startsWith("#after/id/"))?.slice(10) ?? null; }
+  get after()      { return this.rec?.after ?? null; }
   // "morning" | "evening"
-  get time()       { return this.tags.find(t => t.startsWith("#time/"))?.slice(6) ?? null; }
+  get time()       { return this.rec?.time ?? null; }
   get rule()       { return this.fields.repeat ?? null; }
   get isRecurring(){ return this.rule !== null; }
   get whenDone()   { return /when done$/.test(this.rule ?? ""); }
@@ -65,16 +75,18 @@ export class Task {
   get canSkip()    { return this.isOpen && this.isRecurring && !!this.date; }
   // open, its day gone by
   isOverdue(today) { return this.isOpen && !!this.date && this.date < today; }
-  // file names of ![[x.png|28]]
-  get stickers()   { return [...this.line.matchAll(/!\[\[([^\]|]+)/g)].map(m => m[1]); }
-  // the words alone: no checkbox, sticker, tags, rule or date fields
-  get text() {
+  // its sticker's file name, in a list
+  get stickers()   { return this.rec?.sticker ? [this.rec.sticker] : []; }
+  // its name: the record's, else the line's words (a line whose id has no record: the id)
+  get text()       { return this.rec?.name ?? this.words; }
+  // the line's words alone: no checkbox, sticker, tags, rule or date fields
+  get words() {
     return this.line.replace(ANY, "").replace(/^\s*- /, "").replace(FIELD, "")
       .replace(/!\[\[[^\]]*\]\]/g, "").replace(/#[^\s]+/g, "").replace(/\s+/g, " ").trim();
   }
   // identity across copies (open, done, skipped) of the same task, for history and for finding its
-  // line again
-  get key() { return this.text.toLowerCase(); }
+  // line again: its id, else its words lowercased
+  get key() { return this.id ?? this.words.toLowerCase(); }
   static keyOf = line => new Task(line).key;
   // the same copy: its words, status and day (not its done copy, nor another day's)
   sameAs(other) {
@@ -189,13 +201,13 @@ export class Task {
   }
 }
 
-// Every task and pool line once, for the "New task" search: its latest spelling and picks, how many
-// times it was done and when last; by `areaOrder` (["#area/…"], the rest after), then the most done
-// and the most recent first.
-export function taskChoices(lines, areaOrder) {
+// Every task and pool item (Tasks) once, for the "New task" search: its latest name and picks, how
+// many times it was done and when last; by `areaOrder` (["#area/…"], the rest after), then the most
+// done and the most recent first.
+export function taskChoices(tasks, areaOrder) {
   const by = {};
 
-  for (const t of lines.map(l => new Task(l)).filter(t => t.text)) {
+  for (const t of tasks.filter(t => t.text)) {
     const when = t.doneOn ?? t.date ?? t.created ?? "";
     const c = by[t.key] ??= { done: 0, last: null, when: "" };
 

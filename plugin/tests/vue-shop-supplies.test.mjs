@@ -22,7 +22,8 @@ const tick = () => new Promise(r => setTimeout(r));
 
 test("Shop: the balance, an affordable reward bought with a click (a purchase line, then drawn again), the rest greyed out", async () => {
   const { files } = vault({ [`${PURCHASES}.md`]: "# Purchases\n\n- 2026-11-01 | Tea | 5\n" });
-  taskStore.put(`${TASKS}/Master.md`, "- [x] a quest #⭐⭐⭐⭐epic [completion:: 2026-11-01]\n");
+  taskStore.put(`${TASKS}/Master.md`, "- [x] t1 [completion:: 2026-11-01]\n");
+  taskStore.putRecords({ t1: { name: "a quest", difficulty: "#⭐⭐⭐⭐epic" } });
   let retried = 0;
   const w = inBody(ShopWidget, { balance: 25, items: [
     { name: "Coffee", cost: 20, affordable: true }, { name: "Trip", cost: 500, affordable: false },
