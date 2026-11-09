@@ -13,7 +13,7 @@ A tab of its own: the ✨ icon on the left (it opens the dashboard and the calen
 | **Goals** | Per goal "X of Y this week", Mon–Sun dots, the minimum version |
 | **Life Areas** | Radar chart — XP earned per area this month |
 | **Cycle** | Cycle day, next start forecast, "started today" button |
-| **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight |
+| **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight; the second pill shows a free journal (`00 System/Data/Journals/`, a note each: a level 0–3 a day and its reasons; with more than one, a select under the pills picks it): a click on a level or a reason saves the day |
 | **XP Today** | XP earned today, level name, streak heatmap |
 | **Quests** | Tasks due today, grouped by life area |
 | **Celestial Market** | Pending shopping items grouped by category |

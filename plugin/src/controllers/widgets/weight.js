@@ -1,16 +1,17 @@
 // The weight card's controller: what it shows and its writes. Weight: a line chart of the last 30
-// days, the last value, the change vs a week ago; with a body log note (BODY_LOG: its `name` and
-// `reasons` are the vault's own) the log's mode: a level 0–3 and today's reasons, bars for 30 days
-// (the reasons in the tooltip) over the cycle's period days. Writes: today's weight in Weight.md,
-// today's level and reasons in the body log. The markup: widgets/weight.
+// days, the last value, the change vs a week ago; the free journals (a note each in JOURNALS: its
+// name the file's, its `reasons` and `lag` its properties): a level 0–3 and today's reasons, bars
+// for 30 days (the reasons in the tooltip) over the cycle's period days. Writes: today's weight in
+// Weight.md, today's level and reasons in a journal. The markup: widgets/weight.
 import { addDays, dm, todayYmd } from "#/helpers/dates.js";
 import { WeightLog } from "#/models/weightLog.js";
 import { BodyLog } from "#/models/bodyLog.js";
+import { readJournals } from "#/controllers/journals.js";
 import { cycleLog } from "./cycle.js";
 import { chartColor } from "#/helpers/chart.js";
 import { edit } from "#/helpers/files.js";
 import { amount } from "#/helpers/format.js";
-import { BODY_LOG, WEIGHT } from "#/helpers/paths.js";
+import { WEIGHT } from "#/helpers/paths.js";
 
 const DAYS = 30;
 
@@ -70,12 +71,13 @@ function logChart(days, entries, period) {
   };
 }
 
-// { weight: { missing } | { last, change, chart }, log: { name, reasons, now, chart } | null };
-// both modes at once, the card switches between them without loading
+// { weight: { missing } | { last, change, chart },
+//   logs: [{ path, name, reasons, lag, now, chart }] };
+// every mode at once, the card switches between them without loading
 export async function loadWeight({ dv, app }) {
   const today = todayYmd();
   const days = Array.from({ length: DAYS }, (_, i) => addDays(today, i - DAYS + 1));
-  const [weightText, logText] = await Promise.all([read(app, WEIGHT), read(app, BODY_LOG)]);
+  const weightText = await read(app, WEIGHT);
   let weight = { missing: true };
 
   if (weightText !== null) {
@@ -90,20 +92,13 @@ export async function loadWeight({ dv, app }) {
     };
   }
 
-  let log = null;
+  const cycle = cycleLog(dv), period = days.map(d => !!cycle?.on(d)?.isPeriod);
+  const logs = (await readJournals()).map(({ entries, ...j }) => ({
+    ...j, day: today, now: entries.get(today) ?? null,   // today's entry
+    chart: logChart(days, days.map(d => entries.get(d) ?? null), period),
+  }));
 
-  if (logText !== null) {
-    const props = app.metadataCache.getCache(BODY_LOG)?.frontmatter ?? {};
-    const byDay = new Map(new BodyLog(logText).entries.map(e => [e.date, e])), cycle = cycleLog(dv);
-    const entries = days.map(d => byDay.get(d) ?? null);
-    log = {
-      name: String(props.name ?? "log"), reasons: (props.reasons ?? []).map(String),
-      day: today, now: byDay.get(today) ?? null,   // today's entry
-      chart: logChart(days, entries, days.map(d => !!cycle?.on(d)?.isPeriod)),
-    };
-  }
-
-  return { weight, log };
+  return { weight, logs };
 }
 
 // today's weight from what was typed; false when it isn't a weight
@@ -115,5 +110,5 @@ export async function logWeight(typed) {
   return true;
 }
 
-export const logBody = (level, reasons) =>
-  edit(BODY_LOG, c => new BodyLog(c).set(todayYmd(), level, reasons));
+export const logBody = (path, level, reasons) =>
+  edit(path, c => new BodyLog(c).set(todayYmd(), level, reasons));

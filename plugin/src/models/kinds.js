@@ -217,6 +217,27 @@ export const KINDS = {
     }),
     note: course,
   },
+  // a free journal (the weight card's journals): a level 0–3 a day and its reasons; lag: the days
+  // after a meal its level is looked at on the food page (a rash: the next day)
+  journal: {
+    id: "new-journal", name: "New journal", folder: "00 System/Data/Journals",
+    form: () => ({
+      rows: [
+        { name: "Title", key: "title", text: "Высыпания" },
+        { name: "Reasons", key: "reasons", text: "🍰 сладкое, 😴 недосып, ❔ не знаю" },
+        { name: "Days after a meal", key: "lag", text: "0", number: true },
+      ],
+      values: { lag: 0 }, required: ["title"],
+    }),
+    note: v => ({
+      props: {
+        type: "journal", lag: Number(v.lag) || 0,
+        reasons: (v.reasons ?? "").split(",").map(r => r.trim()).filter(Boolean),
+      },
+      body: "%% Строки: - YYYY-MM-DD уровень(0–3) причина, причина. Или на дашборде: Weight → "
+        + "пилюля журнала. Причины — свойство reasons выше. %%",
+    }),
+  },
   // the folder can be set as "workTasks" in the plugin's data.json; the file: the next number in
   // the folder, then the title in lower case with underscores ("39_mail_templates")
   work: {

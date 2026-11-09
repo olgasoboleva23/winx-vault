@@ -8,7 +8,12 @@
   &__now { font-family: $font-deco; font-size: $text-4xl; color: var(--winx-text-dark); }
   &__delta { font-size: $text-m; color: var(--winx-purple-deep); }
   &__list { justify-self: start; }
-  /* weight ↔ the body log, and the log's form: a level 0–3, the reasons, save */
+  /* which journal (more than one): a small select under the pills */
+  & &__journal {
+    justify-self: start; height: $btn-s; padding: 0 $space-m; border: $border; border-radius: $pill;
+    background: white(75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer;
+  }
+  /* weight ↔ a journal, and the journal's form: a level 0–3, the reasons */
   &__log {
     display: grid; gap: $space-m; justify-items: start;
   }

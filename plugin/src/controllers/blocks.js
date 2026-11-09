@@ -12,7 +12,7 @@ import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
 import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
-  BODY_LOG, CYCLE, GOALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS, WEIGHT,
+  CYCLE, GOALS, JOURNALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS, WEIGHT,
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
@@ -59,7 +59,7 @@ export const blocks = {
   finance: { view: FinanceMonths, load: loadFinance, watches: [LEDGER_FILES, RULES] },
   financeMonth: { view: FinanceLine, load: loadFinanceLine, watches: [LEDGER_FILES, RULES] },
   // a reload keeps the typed picks
-  weight: { view: WeightCard, load: loadWeight, watches: [WEIGHT, BODY_LOG, CYCLE] },
+  weight: { view: WeightCard, load: loadWeight, watches: [WEIGHT, `${JOURNALS}/`, CYCLE] },
   // the tab's date only (useTabDate)
   dailyNote: { view: DailyNoteOpen, load: loadDailyNote, watches: [] },
   pomodoro: { view: PomodoroTimer, load: loadPomodoro, follows: false },

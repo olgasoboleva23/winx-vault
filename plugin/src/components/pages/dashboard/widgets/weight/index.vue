@@ -1,48 +1,50 @@
-<!-- Weight: the last value and the change vs a week ago, a field for today, a 30-day line; with a
-     body log note, a toggle switches to that log: a level 0–3 and today's reasons, bars over the
-     cycle's period days. The mode, the typed weight and the log's picks live here; WeightMode and
-     BodyLogMode draw them. -->
+<!-- Weight: the last value and the change vs a week ago, a field for today, a 30-day line; the
+     journal's pill shows a free journal (with more than one, a select under the pills picks it:
+     this device remembers it): a level 0–3 and today's reasons, bars over the cycle's period days.
+     A level saves the day at once, a reason too (once there's a level). The mode, the typed weight
+     and the picks live here; WeightMode and BodyLogMode draw them. -->
 <script setup>
 import { computed, ref, watch } from "vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import { WEIGHT } from "#/helpers/paths.js";
+import { app } from "#/helpers/app.js";
 import { logBody, logWeight } from "#/controllers/widgets/weight.js";
 import WeightMode from "./WeightMode.vue";
 import BodyLogMode from "./BodyLogMode.vue";
 
 const props = defineProps({ state: { type: Object, required: true } });
 
-const w = computed(() => props.state.data.weight), log = computed(() => props.state.data.log);
+const w = computed(() => props.state.data.weight), logs = computed(() => props.state.data.logs);
 const mode = ref("weight");   // or "log"
+const picked = ref(app.loadLocalStorage("winx-journal"));
+const log = computed(() => logs.value.find(l => l.path === picked.value) ?? logs.value[0]);
 const logging = computed(() => mode.value === "log" && !!log.value);
 
 const kg = ref("");
 const save = async () => { if (await logWeight(kg.value)) kg.value = ""; };
 
-// the log's picks: today's entry until you change them (a reload of the same data keeps them);
-// again after a save or on another day
-const level = ref(null), reasons = ref([]);
-let touched = false, applying = false, day = null;
-
-watch(() => log.value && `${log.value.day}|${JSON.stringify(log.value.now)}`, key => {
-  if (!key || (touched && log.value.day === day)) return;
-  const now = log.value.now;
-
-  applying = true;
-  level.value = now?.level ?? null;
-  reasons.value = [...(now?.reasons ?? [])];
-  touched = false;
-  day = log.value.day;
-  applying = false;
-}, { immediate: true });
-watch([level, reasons], () => { if (!applying) touched = true; }, { flush: "sync" });
-
-const saveLog = async () => {
-  if (level.value === null) return;
-  await logBody(level.value, reasons.value);
-  touched = false;   // the file has them now: follow it
+// a journal picked: shown, and remembered on this device
+const pick = path => {
+  picked.value = path;
+  app.saveLocalStorage("winx-journal", path);
+  mode.value = "log";
 };
+
+// the picks: the journal's today, again when its file or the day changes
+const level = ref(null), reasons = ref([]);
+
+const shown = () => log.value
+  && `${log.value.path}|${log.value.day}|${JSON.stringify(log.value.now)}`;
+
+watch(shown, () => {
+  level.value = log.value?.now?.level ?? null;
+  reasons.value = [...(log.value?.now?.reasons ?? [])];
+}, { immediate: true });
+
+// a level saves the day at once, a reason too once there's a level
+const saveLog = () =>
+  level.value === null ? null : logBody(log.value.path, level.value, reasons.value);
 </script>
 
 <template>
@@ -55,10 +57,18 @@ const saveLog = async () => {
       >⚖️ weight</WinxButton>
       <WinxButton
         kind="toggle"
-        :on="mode === 'log'"
+        :on="logging"
         @click="mode = 'log'"
       >{{ log.name }}</WinxButton>
     </div>
+    <select
+      v-if="logging && logs.length > 1"
+      class="winx-weight__journal"
+      :value="log.path"
+      @change="pick($event.target.value)"
+    >
+      <option v-for="l in logs" :key="l.path" :value="l.path">{{ l.name }}</option>
+    </select>
     <BodyLogMode
       v-if="logging"
       v-model:level="level"

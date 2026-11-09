@@ -17,7 +17,13 @@ export const MARKET = `${DATA}/Celestial Market`, SUPPLIES = `${DATA}/Supplies`;
 
 export const SAVINGS = `${DATA}/Savings`;
 
-export const WEIGHT = `${DATA}/Weight.md`, BODY_LOG = `${DATA}/Body log.md`;
+// the free journals: a note each (a level 0–3 a day and its reasons; Высыпания the first)
+export const WEIGHT = `${DATA}/Weight.md`, JOURNALS = `${DATA}/Journals`;
+
+// the food journal: the page (its block), the foods with their marks, what was eaten a day
+export const FOOD = `${DATA}/Food/Food.md`, FOODS = `${DATA}/Food/Foods.md`;
+
+export const FOOD_LOG = `${DATA}/Food/Log.md`;
 
 export const CYCLE = `${DATA}/Cycle.md`;
 
