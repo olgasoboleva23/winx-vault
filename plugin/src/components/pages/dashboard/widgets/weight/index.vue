@@ -9,7 +9,7 @@ import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import { WEIGHT } from "#/helpers/paths.js";
 import { app } from "#/helpers/app.js";
-import { logBody, logWeight } from "#/controllers/widgets/weight.js";
+import { addJournal, logBody, logWeight } from "#/controllers/widgets/weight.js";
 import WeightMode from "./WeightMode.vue";
 import BodyLogMode from "./BodyLogMode.vue";
 
@@ -29,6 +29,13 @@ const pick = path => {
   picked.value = path;
   app.saveLocalStorage("winx-journal", path);
   mode.value = "log";
+};
+
+// ＋ a new journal: shown once the card loads it
+const newJournal = async () => {
+  const path = await addJournal();
+
+  if (path) pick(path);
 };
 
 // the picks: the journal's today, again when its file or the day changes
@@ -60,6 +67,12 @@ const saveLog = () =>
         :on="logging"
         @click="mode = 'log'"
       >{{ log.name }}</WinxButton>
+      <WinxButton
+        kind="round"
+        title="new journal"
+        class="winx-weight__new"
+        @click="newJournal"
+      >+</WinxButton>
     </div>
     <select
       v-if="logging && logs.length > 1"

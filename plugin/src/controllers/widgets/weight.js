@@ -7,6 +7,10 @@ import { addDays, dm, todayYmd } from "#/helpers/dates.js";
 import { WeightLog } from "#/models/weightLog.js";
 import { BodyLog } from "#/models/bodyLog.js";
 import { readJournals } from "#/controllers/journals.js";
+import { createNote } from "#/controllers/notes.js";
+import { KINDS } from "#/models/kinds.js";
+import { Form } from "#/components/uikit/Form/index.ts";
+import { app } from "#/helpers/app.js";
 import { cycleLog } from "./cycle.js";
 import { chartColor } from "#/helpers/chart.js";
 import { edit } from "#/helpers/files.js";
@@ -108,6 +112,14 @@ export async function logWeight(typed) {
   if (!kg || kg <= 0) return false;
   await edit(WEIGHT, c => new WeightLog(c).set(todayYmd(), kg));
   return true;
+}
+
+// ＋ a new free journal in its window (Winx: New journal's); its path, null when closed
+export async function addJournal() {
+  const { rows, values, required } = KINDS.journal.form();
+  const v = await Form.ask(app, "✦ New journal", rows, { values, required, submit: "Create" });
+
+  return v ? (await createNote(KINDS.journal, v, KINDS.journal.folder)).path : null;
 }
 
 export const logBody = (path, level, reasons) =>

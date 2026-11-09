@@ -70,6 +70,7 @@ const act = async (write) => {
       <WinxTable
         :columns="columns"
         :rows="rows"
+        bordered
         :row-key="r => r.date"
         :row-class="r => (r.when ? `winx-food__row--${r.when}` : null)"
       >

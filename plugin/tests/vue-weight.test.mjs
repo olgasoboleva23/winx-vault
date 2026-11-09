@@ -60,6 +60,20 @@ test("Weight: the journal's pill shows it, a select under it picks another; a le
   assert.equal(files[SKIN], "---\nreasons: []\n---\n");
 });
 
+test("Weight: ＋ after the journal's pill makes a new journal in its window and shows it", async () => {
+  const { Form } = await import("#/components/uikit/Form/index.ts");
+  const ask = Form.ask;
+  const { files, local } = vault({ [SKIN]: "" });
+
+  Form.ask = async () => ({ title: "Живот", reasons: "🥛 молоко", lag: 0 });
+  const w = mount(WeightCard, { props: { state: { data } } });
+
+  await w.find(".winx-weight__new").trigger("click"); await new Promise(r => setTimeout(r)); await nextTick();
+  Form.ask = ask;
+  assert.match(files[`${JOURNALS}/Живот.md`], /^---\ntype: journal\nlag: 0\nreasons:\n  - "🥛 молоко"\n---\n/);
+  assert.equal(local["winx-journal"], `${JOURNALS}/Живот.md`);   // picked: shown once the card loads it
+});
+
 test("Weight: the log's picks follow the data: a new day starts empty", async () => {
   const { reactive } = await import("vue");
   const entry = { date: "2026-11-05", level: 1, reasons: [] };

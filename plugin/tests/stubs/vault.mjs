@@ -10,6 +10,7 @@ export function vault(files = {}, { folders = [], props = {}, dataview = null } 
   const app = {
     vault: {
       getFileByPath: byPath,
+      getAbstractFileByPath: byPath,
       // a folder: made, or holding files; its children the files right in it
       getFolderByPath: p => {
         const inIt = Object.keys(files).filter(f => f.startsWith(`${p}/`) && !f.slice(p.length + 1).includes("/"));
