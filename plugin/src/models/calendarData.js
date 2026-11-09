@@ -44,7 +44,8 @@ const chain = list => {
 
 const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 
-// { count, last } by task key over `list` (Tasks): done copies by their ✅ date, skipped by ❌
+// { count, last } by task key over `list` (Tasks): done copies by their completion date, skipped by
+// their cancelled one
 const historyOf = list => {
   const by = new Map();
 
@@ -58,12 +59,12 @@ const historyOf = list => {
 };
 
 // What the calendar shows, worked out once per draw from the tasks, the pool's records, the shown
-// days, today and the areas' order (tags; unknown areas last):
+// days, today and the areas' order (keys; unknown areas last):
 //   byDay    day → entries { t, kind: open | ghost | done }: open ones on their date (today and
-//            later; the overdue ones are in missed), done ones on their ✅ date, a 🔁 task's next
-//            repeats faded (future days only)
+//            later; the overdue ones are in missed), done ones on their completion date, a 🔁
+//            task's next repeats faded (future days only)
 //   missed   "Missed?": open tasks whose day has passed, the latest first
-//   backlog  No date: open one-offs with no date, by area, then the longest waiting (➕ created)
+//   backlog  No date: open one-offs with no date, by area, then the longest waiting (created)
 //            first
 //   pool     the pool's records, each { id, pool: true, rec, path } with its Task: by area, then
 //            the longest since last done (never done first)

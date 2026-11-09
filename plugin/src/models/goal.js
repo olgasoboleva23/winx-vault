@@ -28,7 +28,7 @@ export class Goal {
     });
   }
   get weeklyTarget() { return this.days?.length ?? this.perWeek ?? 0; }
-  // how many days of `week` have a done task (doneDates: its ✅ dates)
+  // how many days of `week` have a done task (doneDates: their completion dates)
   doneIn(doneDates, week) { return new Set(doneDates.filter(d => week.includes(d))).size; }
   // done | missed (a planned day gone by) | planned | none
   statusOn(date, doneSet, today) {

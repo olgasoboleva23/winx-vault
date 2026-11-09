@@ -200,3 +200,10 @@ test("Task.nameKey: a name's words, lowercased, spaces folded (an id-like name s
   assert.equal(Task.nameKey("t12"), "t12");
   assert.notEqual(Task.nameKey("t12"), Task.nameKey("t12 run"));
 });
+
+test("a line as Tasks writes it (two spaces between fields): a date set, moved, dropped", () => {
+  const l = "- [ ] t61  [repeat:: every day when done]  [due:: 2026-11-10]";
+  assert.equal(new Task(l).setDue("2026-11-12"), "- [ ] t61  [repeat:: every day when done] [due:: 2026-11-12]");
+  assert.equal(new Task(l).place(null, false), "- [ ] t61  [repeat:: every day when done]");
+  assert.equal(Task.backdateDone(l, "2026-11-09", "2026-11-10"), "- [ ] t61  [repeat:: every day when done]  [due:: 2026-11-09]");
+});

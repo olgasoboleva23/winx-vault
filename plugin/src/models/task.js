@@ -13,8 +13,8 @@
 import { addDays, diffDays } from "#/helpers/dates.js";
 import { projectRepeats } from "./repeats.js";
 
-const DATE   = "\\d{4}-\\d{2}-\\d{2}";
 const FIELD  = /\[(\w+):: ([^\]]*)\]/g;
+const SPACED = new RegExp(`\\s*${FIELD.source}`, "g");   // a field with the spaces before it
 
 // every [key:: value] of a line, by key
 export const fieldsOf = line =>
@@ -22,10 +22,11 @@ export const fieldsOf = line =>
 
 // a line with one field set (replaced in place, or added at the end); null drops it
 function withField(line, key, value) {
-  const re = new RegExp(`\\s*\\[${key}:: [^\\]]*\\]`);
   const text = value === null ? "" : ` [${key}:: ${value}]`;
+  let found = false;
+  const out = line.replace(SPACED, (m, k) => k !== key || found ? m : (found = true, text));
 
-  return re.test(line) ? line.replace(re, text) : line.trimEnd() + text;
+  return found ? out : line.trimEnd() + text;
 }
 
 const dropFields = (line, keys) => keys.reduce((l, k) => withField(l, k, null), line);
@@ -155,8 +156,8 @@ export class Task {
     return toggled.split("\n").map(l =>
       DONE.test(l) ? new Task(l).place(date, true)
       : /when done/.test(l)
-        ? l.replace(new RegExp(`\\[(due|scheduled|start):: (${DATE})\\]`, "g"),
-          (_, k, d) => `[${k}:: ${addDays(d, shift)}]`)
+        ? l.replace(FIELD, (m, k, d) =>
+          ["due", "scheduled", "start"].includes(k) ? `[${k}:: ${addDays(d, shift)}]` : m)
       : l).join("\n");
   }
   // as a skip of this time: the done line turns cancelled ("- [-] … [cancelled:: date]"),
