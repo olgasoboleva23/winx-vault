@@ -1,11 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { migrate, migrateTasks } from "#/controllers/taskMigration.js";
+import { migrate, migrateGoals, migrateTasks } from "#/controllers/taskMigration.js";
 import { vault } from "./stubs/vault.mjs";
 import { Notice } from "obsidian";
 
 const DIR = "00 System/Data/Tasks";
 const MASTER = `${DIR}/Master.md`, POOL = `${DIR}/Pool.md`, RECORDS = `${DIR}/tasks.json`;
+const GOALS = "00 System/Data/Goals.md";
 
 test("an emoji line with every field becomes an id and Dataview fields in order", () => {
   const old = "- [x] #⭐⭐medium #area/body #time/morning stretch a bit ![[cat.webp|28]] "
@@ -94,9 +95,10 @@ test("the command refuses when tasks.json exists or Master.md is missing", async
 
 test("the command keeps old copies, rewrites Master.md, writes tasks.json, trashes Pool.md", async () => {
   const oldMaster = "- [ ] #⭐easy walk 📅 2026-11-03", oldPool = "Pool.\n\n- #⭐easy nap\n";
-  const { files } = vault({ [MASTER]: oldMaster, [POOL]: oldPool });
+  const { files } = vault({ [MASTER]: oldMaster, [POOL]: oldPool, [GOALS]: "- name:: Walk\n  tag:: #goal/walk\n" });
 
   await migrateTasks();
+  assert.equal(files[GOALS], "- name:: Walk\n  key:: walk\n");
   assert.equal(files[`${DIR}/Master (old).md`], oldMaster);
   assert.equal(files[`${DIR}/Pool (old).md`], oldPool);
   assert.equal(files[MASTER], "- [ ] t1 [due:: 2026-11-03]");
@@ -155,4 +157,9 @@ test("Master.md changed while migrating, before its rewrite: Master.md not overw
   await migrateTasks();
   assert.equal(files[MASTER], "- [ ] #⭐easy walk\n- [ ] #⭐easy nap");
   assert.match(Notice.last, /migration stopped: Master\.md changed while migrating/);
+});
+
+test("Goals.md: a goal's tag:: #goal/x becomes key:: x, the rest stays", () => {
+  assert.equal(migrateGoals("# Goals\n\n- name:: Walk\n  tag:: #goal/walk\n  days:: пн\n- name:: Read\n  key:: read\n"),
+    "# Goals\n\n- name:: Walk\n  key:: walk\n  days:: пн\n- name:: Read\n  key:: read\n");
 });

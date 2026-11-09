@@ -72,13 +72,13 @@ A goal is a recurring task whose record in `tasks.json` has `"goal": "<key>"`, t
 
 ```
 - name:: Stretching
-  tag:: stretch
+  key:: stretch
   days:: tue, thu, sat
   min:: 5 minutes on the mat
   plan:: when I shut the laptop in the evening, I roll out the mat
 ```
 
-- `tag` is the goal's key (an old `#goal/stretch` is read as `stretch`).
+- `key` is the goal's key: a task counts for it when its record says `"goal": "stretch"`. **Winx: Migrate tasks** turns an old `tag:: #goal/stretch` into `key:: stretch`.
 - `days` sets the weekly plan; otherwise `perWeek:: N` (`days` wins if both are given). A day counts when a done task of the goal has its `✅` on that day. Weeks start on Monday.
 - A missed goal task stays on its day: the calendar's **Missed?** lists it, to tick it for that day or move it to today.
 

@@ -5,14 +5,14 @@ import { weekday } from "#/helpers/dates.js";
 const DAY_NAMES = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 const DAY_NAMES_EN = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
-// A goal of Goals.md (Shop.md format: "name:: …" plus continuation lines): its name, key (its `tag`
-// without "#goal/": the tasks whose record's goal it is count), planned weekdays (days, ISO 1–7)
-// or a number per week, the minimum version, a plan and a reminder time.
+// A goal of Goals.md (Shop.md format: "name:: …" plus continuation lines): its name, key (the
+// tasks whose record's goal it is count), planned weekdays (days, ISO 1–7) or a number per week,
+// the minimum version, a plan and a reminder time.
 export class Goal {
   static parse(text) {
     const field = k =>
       text.match(new RegExp(`(?:^|\\s)${k}::[ \\t]*(.*)`, "m"))?.[1].trim() || null;
-    const name = field("name"), key = field("tag")?.replace(/^#goal\//, "");
+    const name = field("name"), key = field("key");
 
     if (!name || !key) return null;
     const daysRaw = field("days");

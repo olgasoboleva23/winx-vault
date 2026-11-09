@@ -4,7 +4,7 @@
 // The old emoji parsing lives here only.
 import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
-import { MASTER, MASTER_OLD, POOL, POOL_OLD, TASK_RECORDS } from "#/helpers/paths.js";
+import { GOALS, MASTER, MASTER_OLD, POOL, POOL_OLD, TASK_RECORDS } from "#/helpers/paths.js";
 
 const DATE = "\\d{4}-\\d{2}-\\d{2}";
 // the old date emojis and their Dataview fields, in the order the new line writes them
@@ -93,11 +93,15 @@ export function migrate(masterText, poolText) {
   return { master, records };
 }
 
+// Goals.md: a goal's old "tag:: #goal/x" line becomes "key:: x" (a task's record names it so)
+export const migrateGoals = text => text.replace(/^(\s*)tag::[ \t]*#goal\/(\S+)/gm, "$1key:: $2");
+
 // The one-off move to the id format (the Migrate tasks command): not when tasks.json or an old
 // copy is there, or Master.md is missing. The old notes kept as copies (Master.md is not renamed:
 // a rename would rewrite links to it), then tasks.json, then Master.md rewritten last (a failed
-// write before it leaves the old Master.md as it was), then Pool.md to the trash. Master.md or
-// Pool.md changed meanwhile: it stops before the first write, or before the rewrite.
+// write before it leaves the old Master.md as it was), Goals.md's tags made keys, then Pool.md
+// to the trash. Master.md or Pool.md changed meanwhile: it stops before the first write, or
+// before the rewrite.
 export async function migrateTasks() {
   const { vault, fileManager } = app;
   const master = vault.getFileByPath(MASTER), pool = vault.getFileByPath(POOL);
@@ -121,6 +125,9 @@ export async function migrateTasks() {
       return void new Notice(`${stopped} — delete tasks.json and the (old) copies, run it again`);
 
     await vault.modify(master, next);
+    const goals = vault.getFileByPath(`${GOALS}.md`);
+
+    if (goals) await vault.process(goals, migrateGoals);
     if (pool) await fileManager.trashFile(pool);
     const n = Object.keys(records).length;
 

@@ -9,16 +9,15 @@ import { MarketItem } from "#/models/marketItem.js";
 import { paydays, SavingsJar } from "#/models/savingsJar.js";
 
 // 2026-10-19 is a Monday
-const w = Goal.parse("name:: Stretching\n  tag:: #goal/stretch\n  days:: пн, ср, пт\n  min:: 10 minutes\n  plan:: if...");
-const l = Goal.parse("name:: Reading\n  tag:: #goal/read\n  perWeek:: 5");
+const w = Goal.parse("name:: Stretching\n  key:: stretch\n  days:: пн, ср, пт\n  min:: 10 minutes\n  plan:: if...");
+const l = Goal.parse("name:: Reading\n  key:: read\n  perWeek:: 5");
 
 test("Goal.parse and its weekly target", () => {
   assert.deepEqual([w.name, w.key, w.days, w.perWeek], ["Stretching", "stretch", [1, 3, 5], null]);
   assert.equal(l.weeklyTarget, 5); assert.equal(w.weeklyTarget, 3);
-  assert.equal(Goal.parse("name:: X\n days:: пн\n perWeek:: 4\n tag:: #goal/x").perWeek, null);
-  assert.equal(Goal.parse("name:: no tag"), null);
-  assert.equal(Goal.parse("name:: X\n tag:: x").key, "x");   // a plain key works too
-  assert.deepEqual(Goal.parse("name:: X\n tag:: #goal/x\n days:: Mon, wed, Friday").days, [1, 3, 5]);
+  assert.equal(Goal.parse("name:: X\n days:: пн\n perWeek:: 4\n key:: x").perWeek, null);
+  assert.equal(Goal.parse("name:: no key"), null);
+  assert.deepEqual(Goal.parse("name:: X\n key:: x\n days:: Mon, wed, Friday").days, [1, 3, 5]);
 });
 
 test("Goal: days done in a week, and a day's status", () => {
@@ -31,8 +30,8 @@ test("Goal: days done in a week, and a day's status", () => {
 
 test("reminders", () => {
   const goals = [
-    Goal.parse("name:: Stretching\n tag:: #goal/stretch\n days:: пн, ср, пт\n plan:: after lunch → yoga mat"),
-    Goal.parse("name:: Reading\n tag:: #goal/read\n perWeek:: 5\n min:: one chapter\n remind:: 20:30"),
+    Goal.parse("name:: Stretching\n key:: stretch\n days:: пн, ср, пт\n plan:: after lunch → yoga mat"),
+    Goal.parse("name:: Reading\n key:: read\n perWeek:: 5\n min:: one chapter\n remind:: 20:30"),
   ];
   assert.equal(goals[0].remind, "18:00");                 // default
   assert.equal(goals[1].remind, "20:30");
