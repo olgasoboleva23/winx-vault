@@ -37,9 +37,13 @@ export async function saveRecords(patch) {
   await app.vault.create(TASK_RECORDS, apply(""));
 }
 
-// the next free id: the biggest one of the records plus one
-export const newId = records =>
-  `t${Math.max(0, ...[...records.keys()].map(id => +id.slice(1))) + 1}`;
+// the next free id: the biggest one of the records and of the lines (a line whose record was lost
+// to a sync conflict keeps its id) plus one
+export const newId = (records, tasks = []) => {
+  const ids = [...records.keys(), ...tasks.map(t => Task.of(t).id).filter(Boolean)];
+
+  return `t${Math.max(0, ...ids.map(id => +id.slice(1))) + 1}`;
+};
 
 // Edit a task: the task window (difficulty, area, time, sticker: to its record), then the Tasks
 // plugin's own edit dialog on its line with the name in place of the id (name: to the record,
@@ -90,7 +94,7 @@ export async function saveNewTask(name, pick, result, oldId = null) {
   const key = n => Task.keyOf(`- [ ] ${n}`);
   const same = id => key(records.get(id)?.name ?? "") === key(name);
   const old = same(oldId) ? oldId : [...records.keys()].find(same) ?? null;
-  const id = old ?? newId(records);
+  const id = old ?? newId(records, taskStore.tasks);
   const back = Task.unnamed(result, id);
 
   await saveRecords({

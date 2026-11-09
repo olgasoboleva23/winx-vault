@@ -144,7 +144,7 @@ test("a new task typed with a name a record already has (no pick): reuses its id
 test("a new task to the pool: a record with pool: true, no line", async () => {
   const files = vault({ [MASTER]: "- [ ] t1\n" });
   assert.equal(await saveNewTask("water herbs", { ...PICK, pool: true }, "- [ ] water herbs [created:: 2026-11-02]"), true);
-  assert.deepEqual(json(files).t1.pool, true);
+  assert.deepEqual(json(files).t2.pool, true);   // t1 is taken by the line
   assert.equal(files[MASTER], "- [ ] t1\n");
 });
 
@@ -198,4 +198,10 @@ test("a 🔁 task set to done in the Tasks dialog: both lines get the id, the na
   assert.equal(json(files).t1.name, "walk");
   assert.equal(files[MASTER], "- [ ] t1 [repeat:: every day] [due:: 2026-11-03]\n"
     + "- [x] t1 [repeat:: every day] [due:: 2026-11-02] [completion:: 2026-11-02]\n");
+});
+
+test("a new id skips the ids of lines whose record is gone (lost to a sync conflict)", async () => {
+  const files = vault({ [MASTER]: "- [ ] t7\n" }, { t1: { name: "walk" } });
+  await saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02]");
+  assert.match(files[MASTER], /^- \[ \] t8 /);
 });
