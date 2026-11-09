@@ -17,6 +17,10 @@ const MONTHS_SHORT = ["jan", "feb", "mar", "apr", "may", "jun",
 const PALETTE = ["--winx-pink", "--winx-gold", "--winx-purple", "--winx-lavender", "--winx-blue",
   "--winx-pink-deep", "--winx-gold-deep", "--winx-purple-light"];
 
+// a month's rows by its note's path, with the modification time they were read at: a load reads
+// only the notes that changed since (both Finance widgets share it)
+const parsed = new Map();
+
 // the pipe tables themselves (no Dataview fields): a cash row added by hand counts like an
 // imported one
 async function readLedger(app) {
@@ -26,7 +30,13 @@ async function readLedger(app) {
   const months = {};
 
   for (const file of listing.files.filter(f => f.endsWith(".md"))) {
-    const rows = parseLedger(await app.vault.adapter.read(file));
+    const mtime = (await app.vault.adapter.stat(file))?.mtime ?? null;
+
+    if (!parsed.has(file) || mtime === null || parsed.get(file).mtime !== mtime) {
+      parsed.set(file, { mtime, rows: parseLedger(await app.vault.adapter.read(file)) });
+    }
+
+    const { rows } = parsed.get(file);
 
     if (rows.length) months[file.slice(file.lastIndexOf("/") + 1, -3)] = rows;
   }
