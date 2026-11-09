@@ -132,3 +132,31 @@ test("a failing tasks.json write leaves Master.md untouched and says so", async 
   assert.equal(Notice.last,
     "✦ migration stopped: disk full — your old notes are in Master (old).md");
 });
+
+test("Master.md changed while migrating, before the first write: nothing written, says so", async () => {
+  const { files, app } = vault({ [MASTER]: "- [ ] #⭐easy walk" });
+  const read = app.vault.read;
+
+  app.vault.read = async f => {
+    const text = await read(f);
+
+    if (f.path === MASTER) files[MASTER] = "- [ ] #⭐easy walk\n- [ ] #⭐easy nap";
+    return text;
+  };
+  await migrateTasks();
+  assert.deepEqual(files, { [MASTER]: "- [ ] #⭐easy walk\n- [ ] #⭐easy nap" });
+  assert.match(Notice.last, /migration stopped: Master\.md changed while migrating — run it again/);
+});
+
+test("Master.md changed while migrating, before its rewrite: Master.md not overwritten, says so", async () => {
+  const { files, app } = vault({ [MASTER]: "- [ ] #⭐easy walk" });
+  const create = app.vault.create;
+
+  app.vault.create = async (p, text) => {
+    if (p === RECORDS) files[MASTER] = "- [ ] #⭐easy walk\n- [ ] #⭐easy nap";
+    return create(p, text);
+  };
+  await migrateTasks();
+  assert.equal(files[MASTER], "- [ ] #⭐easy walk\n- [ ] #⭐easy nap");
+  assert.match(Notice.last, /migration stopped: Master\.md changed while migrating/);
+});

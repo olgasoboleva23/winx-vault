@@ -179,7 +179,8 @@ export const tickTask = t =>
 // The one-off move to the id format (the Migrate tasks command): not when tasks.json or an old
 // copy is there, or Master.md is missing. The old notes kept as copies (Master.md is not renamed:
 // a rename would rewrite links to it), then tasks.json, then Master.md rewritten last (a failed
-// write before it leaves the old Master.md as it was), then Pool.md to the trash.
+// write before it leaves the old Master.md as it was), then Pool.md to the trash. Master.md or
+// Pool.md changed meanwhile: it stops before the first write, or before the rewrite.
 export async function migrateTasks() {
   const { vault, fileManager } = app;
   const master = vault.getFileByPath(MASTER), pool = vault.getFileByPath(POOL);
@@ -190,10 +191,18 @@ export async function migrateTasks() {
   try {
     const masterText = await vault.read(master), poolText = pool ? await vault.read(pool) : "";
     const { master: next, records } = migrate(masterText, poolText);
+    // Master.md or Pool.md changed since they were read (a sync, Tasks): migrating would lose it
+    const changed = async () => await vault.read(master) !== masterText
+      || (pool ? await vault.read(pool) : "") !== poolText;
+    const stopped = "✦ migration stopped: Master.md changed while migrating";
 
+    if (await changed()) return void new Notice(`${stopped} — run it again`);
     await vault.create(MASTER_OLD, masterText);
     if (pool) await vault.create(POOL_OLD, poolText);
     await vault.create(TASK_RECORDS, JSON.stringify(records, null, 2));
+    if (await changed())
+      return void new Notice(`${stopped} — delete tasks.json and the (old) copies, run it again`);
+
     await vault.modify(master, next);
     if (pool) await fileManager.trashFile(pool);
     const n = Object.keys(records).length;
