@@ -7,7 +7,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { Notice } from "obsidian";
-import { Timer } from "#/models/timer.js";
+import { Timer, listen } from "#/models/timer.js";
 import { askLengths, bell, ding, save as write } from "#/controllers/widgets/pomodoro.js";
 import { keepAwake } from "#/helpers/wakeLock.js";
 import PomodoroMini from "./PomodoroMini.vue";
@@ -44,7 +44,7 @@ function tick() {
   void keepAwake(timer.running);   // a running session keeps the screen on, the Mac awake
 }
 
-let ending = 0, every = 0;
+let ending = 0, every = 0, unlisten;
 const save = (min = 0, kind = "focus") => write(
   { settings: timer.settings, current: timer.current, mini: mini.value },
   min, kind,
@@ -58,16 +58,13 @@ function arm() {
 
 // a meditation ends with the bell and stops; a pomodoro's session starts the next
 async function finish() {
-  // another pomodoro shown (a second tab) ended it first and counted it
-  if (timer.ended) return void (timer.follow(), arm(), tick());
-
   const was = timer.type, min = was === "break" ? 0 : timer.duration / 60_000;
 
   timer.next();
   if (was === "meditation") bell();
   else { ding(timer.type === "focus" ? 1.0 : 0.8); timer.play(); }
 
-  arm(); tick();
+  timer.share(); arm(); tick();
   // no click to hand the error to: said here (the minutes go with the next save)
   await save(min, was).catch(e => {
     console.error(e);
@@ -75,7 +72,11 @@ async function finish() {
   });
 }
 
-async function act(change) { change(timer); arm(); tick(); await save(); }
+async function act(change) { change(timer); timer.share(); arm(); tick(); await save(); }
+
+// another pomodoro shown (a second tab) changed the session: shown here at once, its end re-armed
+// (so it ends and counts once, there)
+const follow = t => { if (t !== timer) { timer.take(t); arm(); tick(); } };
 
 const play = () => act(t => t.running ? t.pause() : t.play());
 const reset = () => act(t => t.reset());
@@ -94,12 +95,14 @@ async function gear() {
 
 const back = () => document.hidden || tick();
 onMounted(() => {
+  unlisten = listen(follow);
   arm(); tick();
   every = window.setInterval(tick, 1000);
   document.addEventListener("visibilitychange", back);
   window.addEventListener("focus", tick);
 });
 onBeforeUnmount(() => {
+  unlisten();
   void keepAwake(false);
   window.clearInterval(every);
   window.clearTimeout(ending);

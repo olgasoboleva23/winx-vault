@@ -8,6 +8,10 @@ const LENGTH = { focus: "focusMin", break: "breakMin", meditation: "meditationMi
 // the running session: { sessionType, sessions, baseElapsed, startedAt }, in memory only (gone
 // after a restart or a reload); shared by every pomodoro shown (two tabs)
 let live = null;
+// the pomodoros shown: each hears the changes another makes (on mount; off on unmount)
+const listeners = new Set();
+
+export function listen(fn) { listeners.add(fn); return () => listeners.delete(fn); }
 
 // focus or break and its time: a stopped session counts `elapsed` (ms), a running one also the time
 // since `start`
@@ -56,16 +60,13 @@ export class Timer {
       startedAt: this.start,
     };
   }
-  // another pomodoro shown ended this running session (and runs the next) or stopped it
-  get ended() { return this.running && live?.startedAt !== this.start; }
-  // the session that one runs, without counting this one again
-  follow() {
-    this.start = 0;
-    if (!live) return;
-    this.type = live.sessionType;
-    this.sessions = live.sessions;
-    this.elapsed = live.baseElapsed;
-    this.start = live.startedAt;
+  // tell the other pomodoros shown: they take this one's session, running or not
+  share() { for (const fn of listeners) fn(this); }
+  // another's session: its mode, stars, clock and lengths
+  take(t) {
+    Object.assign(this, {
+      type: t.type, sessions: t.sessions, elapsed: t.elapsed, start: t.start, settings: t.settings,
+    });
   }
   pause() { if (!this.running) return; this.elapsed += this.now() - this.start; this.stop(); }
   // a session of `type` from zero, stopped

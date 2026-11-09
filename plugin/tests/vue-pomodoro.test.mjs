@@ -170,3 +170,32 @@ test("two pomodoros at once (two tabs): a finished focus counts once; one closed
   assert.deepEqual(counted(), [2, 50]);
   other.unmount();
 });
+
+test("two pomodoros at once: ⏸, ↺, ⏭ and ▶ in one show in the other at once; nothing counted twice", async () => {
+  const { w, json } = draw();
+  const props = { state: { data: { saved: { settings: { focusMin: 25, breakMin: 5 } }, current: null } } };
+  const other = mount(PomodoroTimer, { props });
+  const time = x => x.find(".winx-pomodoro__time").text();
+  const paused = x => x.find(".winx-pomodoro__btn--play").html().includes("M8 5v14");   // ▶ shown
+  await w.find(".winx-pomodoro__btn--play").trigger("click"); await nextTick(); await saved();
+  const { sessions, minutes } = json().stats;
+  assert.equal(paused(other), false);   // ▶ in one: the other runs
+  mock.timers.tick(61_000); await nextTick();
+  assert.equal(time(other), "23:59");
+  await w.find(".winx-pomodoro__btn--play").trigger("click"); await nextTick(); await saved();   // ⏸
+  assert.equal(paused(other), true);
+  mock.timers.tick(10_000); await nextTick();
+  assert.equal(time(other), "23:59");
+  await w.find(".winx-pomodoro__btn--reset").trigger("click"); await nextTick(); await saved();
+  assert.equal(time(other), "25:00");
+  await w.find(".winx-pomodoro__btn--skip").trigger("click"); await nextTick(); await saved();
+  assert.deepEqual([time(other), other.find(".winx-pomodoro__mode-text").text()], ["5:00", "Break"]);
+  await other.find(".winx-pomodoro__btn--skip").trigger("click"); await nextTick(); await saved();
+  // ▶ in the second: the first runs too, and the focus ends once in both
+  await other.find(".winx-pomodoro__btn--play").trigger("click"); await nextTick(); await saved();
+  assert.equal(paused(w), false);
+  mock.timers.tick(25 * 60_000); await nextTick(); await nextTick(); await saved();
+  assert.deepEqual([json().stats.sessions - sessions, json().stats.minutes - minutes], [1, 25]);
+  assert.deepEqual([w, other].map(x => x.find(".winx-pomodoro__session").text()), ["Session 2", "Session 2"]);
+  w.unmount(); other.unmount();
+});
