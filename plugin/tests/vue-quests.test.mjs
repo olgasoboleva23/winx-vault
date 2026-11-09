@@ -38,6 +38,13 @@ test("loadQuests: the day's open tasks (by area, then name), then its done ones"
   assert.deepEqual(q.done.map(r => [r.label, r.done]), [["🌙 Tea", true]]);
 });
 
+test("loadQuests: a task with a time carries its mark and goes after the untimed ones", async () => {
+  taskStore.put(MASTER, "- [ ] t1 [due:: 2026-11-09]\n- [ ] t2 [due:: 2026-11-09]\n- [ ] t3 [due:: 2026-11-09]");
+  taskStore.putRecords({ t1: { name: "Eve", time: "evening" }, t2: { name: "Dawn", time: "morning" }, t3: { name: "Any" } });
+  const q = await loadQuests({ dv: dv("2026-11-09") });
+  assert.deepEqual(q.open.map(r => r.label), ["🌅 Dawn", "Any", "🌙 Eve"]);
+});
+
 test("QuestsCard: a row per task, a tick toggles the line through Tasks; an empty day says so", async () => {
   const { files, app } = vault({ [MASTER]: NOTE });
   app.plugins = { plugins: { "obsidian-tasks-plugin": { apiV1: {

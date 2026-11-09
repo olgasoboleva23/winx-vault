@@ -196,7 +196,7 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
   };
   const ctx = { infos: new Map(), config: { areaIcons: { "#area/body": "🌺" } }, actions: { canSkip: () => true } };
   const i = taskInfo(t, ctx, app);
-  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true });
+  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, time: null });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
 });
@@ -218,6 +218,7 @@ test("a day's open task goes before or after another only in its own group and f
   assert.equal(canReorder(evening, other), false);
   assert.equal(canReorder(follower, a), false);
   assert.equal(canReorder(a, follower), false);
+  assert.equal(canReorder(task(" ", "x #time/morning [due:: 2026-10-28]"), task(" ", "y [due:: 2026-10-28]")), false);
   assert.equal(canReorder(a, elsewhere), true);   // another file: the order is not in the line
   assert.equal(canReorder(a, { status: " ", text: "x [due:: 2026-10-28]", path: b.path, line: 99 }), false);   // no id
 });
@@ -234,4 +235,21 @@ test("canReorder: a subtask only among its siblings (same parent)", () => {
   assert.equal(canReorder(sub, sub2), true);
   assert.equal(canReorder(parent, sub), false);
   assert.equal(canReorder(sub, parent), false);
+});
+
+test("a day's one-offs go morning, none, evening, then by order; the 🔁 box keeps its groups", () => {
+  const late = task(" ", "late #time/evening [due:: 2026-10-28]");
+  const plain = task(" ", "plain [due:: 2026-10-28]");
+  const early = task(" ", "early #time/morning [due:: 2026-10-28]");
+  const early2 = task(" ", "early2 #time/morning [due:: 2026-10-28]");
+  early2.rec.order = 0;
+  assert.deepEqual(texts(data([late, plain, early, early2]).byDay[TODAY].map(e => e.t)), ["early2", "early", "plain", "late"]);
+});
+
+test("taskInfo: a one-off's time is shown, a 🔁 task's is left to its box heading", async () => {
+  const { taskInfo } = await import("#/models/calendarData.js");
+  const app = { metadataCache: { getFirstLinkpathDest: () => null }, vault: {} };
+  const ctx = { infos: new Map(), config: { areaIcons: {} }, actions: { canSkip: () => false } };
+  assert.equal(taskInfo(task(" ", "tea #time/evening [due:: 2026-10-28]"), ctx, app).time, "evening");
+  assert.equal(taskInfo(task(" ", "run #time/evening [repeat:: every day] [due:: 2026-10-28]"), ctx, app).time, null);
 });

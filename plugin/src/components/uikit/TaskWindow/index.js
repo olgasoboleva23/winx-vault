@@ -23,7 +23,7 @@ export const taskWindow = async (preset = {}, required = false) => {
       options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.tag })),
     },
     { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.tag })) },
-    // a routine's time of day: the calendar groups its 🔁 box by it
+    // any task's time of day: a one-off goes morning / evening in its day, a 🔁 box groups by it
     { name: "Time of day", key: "time", options: [
       { label: "—", value: null },
       { label: "🌅 morning", value: "#time/morning" },

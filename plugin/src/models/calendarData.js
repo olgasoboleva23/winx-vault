@@ -12,11 +12,19 @@ const ORDER = { open: 0, ghost: 1, done: 2 };
 export const dayGroup = t => !T(t).isRecurring ? "one"
   : ["morning", "evening"].includes(T(t).time) ? T(t).time : "other";
 
+// the mark of a task's time of day, "" without one
+export const timeMark = time => ({ morning: "🌅 ", evening: "🌙 " })[time] ?? "";
+
+// morning → none → evening
+export const timeRank = time => ["morning", null, "evening"].indexOf(time);
+// a one-off's place by time; a 🔁 task keeps its box's groups, so counts as none
+const slot = t => timeRank(T(t).isRecurring ? null : T(t).time);
+
 // a task dragged onto another of its day: it moves before or after it only within its group and
 // (the order is the record's), among its siblings (a subtask under its parent), and neither follows
 // a lead (#after: it stays under it); both need an id
 export const canReorder = (a, b) => a !== b && !!T(a).id && !!T(b).id && a.parent === b.parent
-  && dayGroup(a) === dayGroup(b) && !T(a).after && !T(b).after;
+  && dayGroup(a) === dayGroup(b) && T(a).time === T(b).time && !T(a).after && !T(b).after;
 // a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its
 // earlier followers), with .follows set to it; the rest in their order
 const chain = list => {
@@ -110,6 +118,7 @@ export class CalendarData {
     }
 
     for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]
+      || slot(a.t) - slot(b.t)
       || (T(a.t).rec?.order ?? Infinity) - (T(b.t).rec?.order ?? Infinity) || 0);
     this.doneBy = historyOf(tasks.map(T).filter(t => t.isDone && t.doneOn));
     this.skipsBy = historyOf(tasks.map(T).filter(t => t.isSkipped));
@@ -218,6 +227,7 @@ export function taskInfo(t, ctx, app) {
   const i = {
     key: taskKey(t), area: area?.slice(6) ?? null, difficulty: task.difficulty, text: task.text,
     pool: !!t.pool,
+    time: task.isRecurring ? null : task.time,   // a 🔁 task's is its box heading's
     label: `${ctx.config.areaIcons[area] ?? ""} ${task.text}`.trim(),
     stickers: task.stickers.map(name => app.metadataCache.getFirstLinkpathDest(name, t.path))
       .filter(Boolean)

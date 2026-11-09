@@ -23,6 +23,13 @@ test("TaskText: stars (none without a difficulty), the text, the stickers", () =
     '<img class="winx-cal__sticker" src="app://x/levi.png" alt="">');
 });
 
+test("TaskText: 🌅 / 🌙 before a one-off's label", () => {
+  const t = time => mount(TaskText, { props: { task: info({ time }), withIcon: true } }).text();
+  assert.equal(t("morning"), "🌅 🌺 walk <fast>");
+  assert.equal(t("evening"), "🌙 🌺 walk <fast>");
+  assert.equal(t(null), "🌺 walk <fast>");
+});
+
 test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons for an open one", () => {
   const open = html(TaskRow, { task: info({ canSkip: true }), kind: "open", tick: true });
   assert.match(open, /^<div class="winx-cal__task winx-cal__task--open" data-area="body" draggable="true">/);
