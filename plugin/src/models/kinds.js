@@ -224,7 +224,10 @@ export const KINDS = {
     form: () => ({
       rows: [
         { name: "Title", key: "title", text: "Высыпания" },
-        { name: "Reasons", key: "reasons", text: "🍰 сладкое, 😴 недосып, ❔ не знаю" },
+        {
+          name: "Reasons", key: "reasons",
+          list: [{ name: "Reason", key: "reason", text: "🍰 сладкое" }],
+        },
         { name: "Days after a meal", key: "lag", text: "0", number: true },
       ],
       values: { lag: 0 }, required: ["title"],
@@ -232,7 +235,7 @@ export const KINDS = {
     note: v => ({
       props: {
         type: "journal", lag: Number(v.lag) || 0,
-        reasons: (v.reasons ?? "").split(",").map(r => r.trim()).filter(Boolean),
+        reasons: (v.reasons ?? []).map(g => g.reason?.trim()).filter(Boolean),
       },
       body: "%% Строки: - YYYY-MM-DD уровень(0–3) причина, причина. Или на дашборде: Weight → "
         + "пилюля журнала. Причины — свойство reasons выше. %%",

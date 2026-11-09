@@ -33,6 +33,7 @@ test("the food page: the week, a row a day: what was eaten with its marks, the m
   assert.deepEqual(mon.findAll(".winx-food__item-name").map(i => i.text()), ["каша с 4 ч 🍫", "кофе с бзм 🥛↓"]);
   assert.deepEqual(mon.findAll(".winx-food__count").map(c => c.text()), ["1", "", "1"]);
   assert.equal(mon.find(".winx-food__level").text(), "2");   // Высыпания on the 3rd
+  assert.ok(w.findAll(".winx-table__head").map(h => h.text()).includes("Высыпания +1д"));   // the next day's, said in its head
   assert.equal(mon.find(".winx-food__course").text(), "💊");
   assert.equal(mon.find(".winx-food__med").text(), "МА");
   assert.equal(mon.find(".winx-food__med").attributes("aria-label"), "мастодинон: не принято");

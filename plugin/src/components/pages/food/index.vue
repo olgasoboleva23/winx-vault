@@ -32,7 +32,7 @@ const columns = computed(() => [
     key: `mark:${m.tag}`, label: m.icon, align: "center", tip: m.name, tag: m.tag,
   })),
   ...d.value.journals.map((j, i) => ({
-    key: `journal:${i}`, label: j.name, align: "center", i,
+    key: `journal:${i}`, label: j.lag ? `${j.name} +${j.lag}д` : j.name, align: "center", i,
     tip: j.lag ? `уровень через ${j.lag} дн. после еды` : "уровень в тот же день",
   })),
   { key: "courses", label: "💊", align: "center", tip: "курс лекарств в этот день" },

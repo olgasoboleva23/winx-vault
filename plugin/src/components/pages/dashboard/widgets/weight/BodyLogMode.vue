@@ -1,12 +1,12 @@
 <!-- a free journal: a level 0–3 and today's reasons (v-model:level, v-model:reasons), each click
-     saved (@save), the 30 days' bars, ✦ list (its note) -->
+     saved (@save), the 30 days' bars, ✦ list (its note), 🗑 (@delete) -->
 <script setup>
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxChart from "#/components/uikit/WinxChart/index.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 
 defineProps({ log: { type: Object, required: true } });
-const emit = defineEmits(["save"]);
+const emit = defineEmits(["save", "delete"]);
 const level = defineModel("level", { type: Number, default: null });
 const reasons = defineModel("reasons", { type: Array, default: () => [] });
 
@@ -43,5 +43,12 @@ const pick = r => {
     </div>
   </div>
   <WinxChart :config="log.chart" />
-  <WinxNoteLink :path="log.path" class="winx-weight__list">✦ list</WinxNoteLink>
+  <div class="winx-row winx-gap-s">
+    <WinxNoteLink :path="log.path" class="winx-weight__list">✦ list</WinxNoteLink>
+    <WinxButton
+      title="delete the journal"
+      class="winx-weight__delete"
+      @click="$emit('delete')"
+    >🗑</WinxButton>
+  </div>
 </template>

@@ -65,13 +65,32 @@ test("Weight: ＋ after the journal's pill makes a new journal in its window and
   const ask = Form.ask;
   const { files, local } = vault({ [SKIN]: "" });
 
-  Form.ask = async () => ({ title: "Живот", reasons: "🥛 молоко", lag: 0 });
+  Form.ask = async () => ({ title: "Живот", reasons: [{ reason: "🥛 молоко" }], lag: 0 });
   const w = mount(WeightCard, { props: { state: { data } } });
 
   await w.find(".winx-weight__new").trigger("click"); await new Promise(r => setTimeout(r)); await nextTick();
   Form.ask = ask;
   assert.match(files[`${JOURNALS}/Живот.md`], /^---\ntype: journal\nlag: 0\nreasons:\n  - "🥛 молоко"\n---\n/);
   assert.equal(local["winx-journal"], `${JOURNALS}/Живот.md`);   // picked: shown once the card loads it
+});
+
+test("Weight: 🗑 by a journal's list asks first, then puts the journal in the trash; closed: nothing", async () => {
+  const { Form } = await import("#/components/uikit/Form/index.ts");
+  const ask = Form.ask;
+  const { files } = vault({ [SKIN]: "- 2026-11-05 1\n", [GUT]: "" });
+  const w = mount(WeightCard, { props: { state: { data } } });
+
+  await w.findAll(".winx-weight__modes button")[1].trigger("click");
+  let asked;
+
+  Form.ask = async (app, title) => { asked = title; return null; };
+  await w.find(".winx-weight__delete").trigger("click"); await new Promise(r => setTimeout(r));
+  assert.equal(files[SKIN], "- 2026-11-05 1\n");
+  assert.match(asked, /Skin/);
+  Form.ask = async () => ({});
+  await w.find(".winx-weight__delete").trigger("click"); await new Promise(r => setTimeout(r));
+  Form.ask = ask;
+  assert.equal(SKIN in files, false);
 });
 
 test("Weight: the log's picks follow the data: a new day starts empty", async () => {

@@ -9,7 +9,7 @@ import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import { WEIGHT } from "#/helpers/paths.js";
 import { app } from "#/helpers/app.js";
-import { addJournal, logBody, logWeight } from "#/controllers/widgets/weight.js";
+import { addJournal, deleteJournal, logBody, logWeight } from "#/controllers/widgets/weight.js";
 import WeightMode from "./WeightMode.vue";
 import BodyLogMode from "./BodyLogMode.vue";
 
@@ -68,7 +68,7 @@ const saveLog = () =>
         @click="mode = 'log'"
       >{{ log.name }}</WinxButton>
       <WinxButton
-        kind="round"
+        kind="add"
         title="new journal"
         class="winx-weight__new"
         @click="newJournal"
@@ -88,6 +88,7 @@ const saveLog = () =>
       v-model:reasons="reasons"
       :log="log"
       @save="saveLog"
+      @delete="deleteJournal(log.path, log.name)"
     />
     <WinxMissing v-else-if="w.missing" :path="WEIGHT" />
     <WeightMode

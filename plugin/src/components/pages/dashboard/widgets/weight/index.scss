@@ -8,6 +8,7 @@
   &__now { font-family: $font-deco; font-size: $text-4xl; color: var(--winx-text-dark); }
   &__delta { font-size: $text-m; color: var(--winx-purple-deep); }
   &__list { justify-self: start; }
+  &__modes { align-items: center; }   /* the pills and the ＋ on one middle line */
   /* which journal (more than one): a small select under the pills */
   & &__journal {
     justify-self: start; height: $btn-s; padding: 0 $space-m; border: $border; border-radius: $pill;

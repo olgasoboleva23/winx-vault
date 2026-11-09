@@ -157,8 +157,8 @@ test("a course's codes: unique (Магний and Мастодинон don't shar
   assert.deepEqual(edited.props.meds.map(m => m.code), ["МГ", "МА", "МЕ"]);
 });
 
-test("a free journal: its reasons from the comma list, its lag, the note named by its title", () => {
-  const text = make("journal", { title: "Живот", reasons: "🥛 молоко, ❔ не знаю ,", lag: 1 });
+test("a free journal: its reasons from the window's items, its lag, the note named by its title", () => {
+  const text = make("journal", { title: "Живот", reasons: [{ reason: "🥛 молоко" }, { reason: "❔ не знаю " }, {}], lag: 1 });
   assert.match(text, /^---\ntype: journal\nlag: 1\nreasons:\n  - "🥛 молоко"\n  - "❔ не знаю"\n---\n/);
   assert.deepEqual(KINDS.journal.form().rows.map(r => r.key), ["title", "reasons", "lag"]);
 });
