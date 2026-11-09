@@ -1,7 +1,7 @@
 // One task: its line in the Tasks plugin's Dataview format (status, rule, dates) and Winx's own
-// part, its record in tasks.json (name, difficulty, area, time, goal, tags, sticker, after), found
-// by the line's id. What it is (getters) and how to change its line (methods that return the new
-// line; widgets write it). The only place that knows the format:
+// part, its record in tasks.json (name, difficulty, area, daytime, goal, tags, sticker, after),
+// found by the line's id. What it is (getters) and how to change its line (methods that return
+// the new line; widgets write it). The only place that knows the format:
 //   - [ ] / [x] done / [-] skipped · t12 (its id: the record's key)
 //   fields [key:: value]: repeat (the rule, up to its ]) · due · scheduled (wins over due) · start
 //   · completion · cancelled · created
@@ -52,7 +52,7 @@ export class Task {
   get tags() {
     const r = this.rec ?? {};
 
-    return [r.difficulty, r.area, r.time && `#time/${r.time}`, r.goal, ...r.tags ?? []]
+    return [r.difficulty, r.area, r.daytime && `#time/${r.daytime}`, r.goal, ...r.tags ?? []]
       .filter(Boolean);
   }
   get area()       { return this.rec?.area ?? null; }   // "#area/body"
@@ -60,7 +60,7 @@ export class Task {
   // the id it follows
   get after()      { return this.rec?.after ?? null; }
   // "morning" | "evening"
-  get time()       { return this.rec?.time ?? null; }
+  get daytime()    { return this.rec?.daytime ?? null; }
   get rule()       { return this.fields.repeat ?? null; }
   get isRecurring(){ return this.rule !== null; }
   get whenDone()   { return /when done$/.test(this.rule ?? ""); }
@@ -111,11 +111,11 @@ export class Task {
 
     return done ? withField(base, "completion", date) : new Task(base).setDue(date);
   }
-  // what the task window shows and sets: difficulty, area, time ("#time/…") and the sticker
+  // what the task window shows and sets: difficulty, area, daytime ("#time/…") and the sticker
   get picks() {
     return {
       difficulty: this.difficulty, area: this.area,
-      time: this.time && `#time/${this.time}`, sticker: this.stickers[0] ?? null,
+      daytime: this.daytime && `#time/${this.daytime}`, sticker: this.stickers[0] ?? null,
     };
   }
   // the line with its id swapped for `name`: what the Tasks plugin's dialog shows and edits
@@ -197,7 +197,7 @@ export function taskChoices(tasks, records, areaOrder) {
     id, name: r.name ?? id, area: r.area ?? null,
     picks: {
       difficulty: r.difficulty ?? null, area: r.area ?? null,
-      time: r.time ? `#time/${r.time}` : null, sticker: r.sticker ?? null,
+      daytime: r.daytime ? `#time/${r.daytime}` : null, sticker: r.sticker ?? null,
     },
     done: done[id]?.done ?? 0, last: done[id]?.last ?? null,
   })).sort((a, b) => rank(a.area) - rank(b.area) || b.done - a.done

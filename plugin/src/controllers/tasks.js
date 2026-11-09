@@ -16,9 +16,9 @@ import { MASTER, MASTER_OLD, POOL, POOL_OLD, TASK_RECORDS } from "#/helpers/path
 export const editTaskLine = (t, fn) =>
   editLine(t.path, t.line, line => new Task(line).sameAs(Task.of(t)), fn);
 
-// The task window's picks as record fields: time "#time/morning" → "morning".
+// The task window's picks as record fields: daytime "#time/morning" → "morning".
 const recOf = p => ({
-  difficulty: p.difficulty ?? null, area: p.area ?? null, time: p.time?.slice(6) ?? null,
+  difficulty: p.difficulty ?? null, area: p.area ?? null, daytime: p.daytime?.slice(6) ?? null,
   sticker: p.sticker ?? null,
 });
 
@@ -45,7 +45,7 @@ export const newId = (records, tasks = []) => {
   return `t${Math.max(0, ...ids.map(id => +id.slice(1))) + 1}`;
 };
 
-// Edit a task: the task window (difficulty, area, time, sticker: to its record), then the Tasks
+// Edit a task: the task window (difficulty, area, daytime, sticker: to its record), then the Tasks
 // plugin's own edit dialog on its line with the name in place of the id (name: to the record,
 // dates: to the line; works on the phone). Cancelling either changes nothing. A pool item has no
 // line: the window alone, with its name. `ask` is the window (a test gives its own). A line changed

@@ -1,6 +1,6 @@
 // A test's task in the id format, written as a readable spec in the old one-line form:
 // "#⭐easy #area/body #time/morning #goal/x walk ![[a.webp|28]] [due:: …]" → the line's text
-// "t<n> [due:: …]" and its record { name: "walk", difficulty, area, time, goal, tags, sticker,
+// "t<n> [due:: …]" and its record { name: "walk", difficulty, area, daytime, goal, tags, sticker,
 // after: null }. The same name (any case) gets the same id: copies of a task share it.
 const ids = new Map();
 const FIELD = /\[\w+:: [^\]]*\]/g;
@@ -16,7 +16,7 @@ export function idTask(spec) {
   return {
     text: [id, ...spec.match(FIELD) ?? []].join(" "),
     rec: {
-      name, difficulty: tag("#⭐"), area: tag("#area/"), time: tag("#time/")?.slice(6) ?? null,
+      name, difficulty: tag("#⭐"), area: tag("#area/"), daytime: tag("#time/")?.slice(6) ?? null,
       goal: tag("#goal/"), tags: tags.filter(t => !/^#(⭐|area\/|time\/|goal\/)/u.test(t)),
       sticker: spec.match(/!\[\[([^\]|]+)/)?.[1] ?? null, after: null,
     },

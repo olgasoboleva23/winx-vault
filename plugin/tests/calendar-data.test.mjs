@@ -196,7 +196,7 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
   };
   const ctx = { infos: new Map(), config: { areaIcons: { "#area/body": "🌺" } }, actions: { canSkip: () => true } };
   const i = taskInfo(t, ctx, app);
-  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, time: null });
+  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
 });
@@ -250,6 +250,6 @@ test("taskInfo: a one-off's time is shown, a 🔁 task's is left to its box head
   const { taskInfo } = await import("#/models/calendarData.js");
   const app = { metadataCache: { getFirstLinkpathDest: () => null }, vault: {} };
   const ctx = { infos: new Map(), config: { areaIcons: {} }, actions: { canSkip: () => false } };
-  assert.equal(taskInfo(task(" ", "tea #time/evening [due:: 2026-10-28]"), ctx, app).time, "evening");
-  assert.equal(taskInfo(task(" ", "run #time/evening [repeat:: every day] [due:: 2026-10-28]"), ctx, app).time, null);
+  assert.equal(taskInfo(task(" ", "tea #time/evening [due:: 2026-10-28]"), ctx, app).daytime, "evening");
+  assert.equal(taskInfo(task(" ", "run #time/evening [repeat:: every day] [due:: 2026-10-28]"), ctx, app).daytime, null);
 });

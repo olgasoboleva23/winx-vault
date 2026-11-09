@@ -40,7 +40,7 @@ test("loadQuests: the day's open tasks (by area, then name), then its done ones"
 
 test("loadQuests: a task with a time carries its mark and goes after the untimed ones", async () => {
   taskStore.put(MASTER, "- [ ] t1 [due:: 2026-11-09]\n- [ ] t2 [due:: 2026-11-09]\n- [ ] t3 [due:: 2026-11-09]");
-  taskStore.putRecords({ t1: { name: "Eve", time: "evening" }, t2: { name: "Dawn", time: "morning" }, t3: { name: "Any" } });
+  taskStore.putRecords({ t1: { name: "Eve", daytime: "evening" }, t2: { name: "Dawn", daytime: "morning" }, t3: { name: "Any" } });
   const q = await loadQuests({ dv: dv("2026-11-09") });
   assert.deepEqual(q.open.map(r => r.label), ["🌅 Dawn", "Any", "🌙 Eve"]);
 });

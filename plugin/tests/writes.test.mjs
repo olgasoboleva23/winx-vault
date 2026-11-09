@@ -79,16 +79,16 @@ const withTasksApi = (edited, seen = []) => {
   app.plugins.plugins["obsidian-tasks-plugin"] = { apiV1: { editTaskLineModal: async l => (seen.push(l), edited) } };
   return seen;
 };
-const PICK = { difficulty: "#⭐easy", area: "#area/body", time: "#time/evening", sticker: "a.webp" };
+const PICK = { difficulty: "#⭐easy", area: "#area/body", daytime: "#time/evening", sticker: "a.webp" };
 
 test("editing a task: the picks and the new name go to its record, its dates to its line", async () => {
-  const rec = { name: "walk", difficulty: null, area: null, time: null, goal: null, tags: [], sticker: null, after: null };
+  const rec = { name: "walk", difficulty: null, area: null, daytime: null, goal: null, tags: [], sticker: null, after: null };
   const files = vault({ [MASTER]: "- [ ] t1 [due:: 2026-11-03]\n" }, { t1: rec });
   const seen = withTasksApi("- [ ] walk far [due:: 2026-11-05]");
   const item = taskStore.tasks[0];
   await editTaskModal(item, async () => PICK);
   assert.deepEqual(seen, ["- [ ] walk [due:: 2026-11-03]"]);
-  assert.deepEqual(json(files).t1, { ...rec, ...{ difficulty: "#⭐easy", area: "#area/body", time: "evening", sticker: "a.webp" }, name: "walk far" });
+  assert.deepEqual(json(files).t1, { ...rec, ...{ difficulty: "#⭐easy", area: "#area/body", daytime: "evening", sticker: "a.webp" }, name: "walk far" });
   assert.equal(files[MASTER], "- [ ] t1 [due:: 2026-11-05]\n");
 });
 
@@ -147,7 +147,7 @@ test("the line ticked meanwhile, only the picks changed: the record untouched", 
 test("a pool item: the window's picks and name go to its record, no line", async () => {
   const files = vault({ [MASTER]: "- [ ] t2\n" }, { t1: { name: "water herbs", pool: true } });
   await editTaskModal(taskStore.pool[0], async was => (assert.equal(was.name, "water herbs"), { ...PICK, name: "feed herbs" }));
-  assert.deepEqual(json(files).t1, { name: "feed herbs", pool: true, difficulty: "#⭐easy", area: "#area/body", time: "evening", sticker: "a.webp" });
+  assert.deepEqual(json(files).t1, { name: "feed herbs", pool: true, difficulty: "#⭐easy", area: "#area/body", daytime: "evening", sticker: "a.webp" });
   assert.equal(files[MASTER], "- [ ] t2\n");
 });
 
@@ -155,7 +155,7 @@ test("a new task: a new name gets a new id, a past name its old one; the line go
   const files = vault({ [MASTER]: "- [ ] t4 [due:: 2026-11-03]\n" }, { t4: { name: "walk", goal: null, tags: [] } });
   await saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02] [due:: 2026-11-06]");
   assert.equal(files[MASTER], "- [ ] t5 [created:: 2026-11-02] [due:: 2026-11-06]\n- [ ] t4 [due:: 2026-11-03]\n");
-  assert.deepEqual(json(files).t5, { name: "stretch", difficulty: "#⭐easy", area: "#area/body", time: "evening", goal: null, tags: [], sticker: "a.webp", after: null });
+  assert.deepEqual(json(files).t5, { name: "stretch", difficulty: "#⭐easy", area: "#area/body", daytime: "evening", goal: null, tags: [], sticker: "a.webp", after: null });
   taskStore.putRecords(json(files));
   await saveNewTask("Walk ", PICK, "- [ ] Walk  [created:: 2026-11-02]", "t4");
   assert.match(files[MASTER], /^- \[ \] t4 \[created:: 2026-11-02\]\n/);

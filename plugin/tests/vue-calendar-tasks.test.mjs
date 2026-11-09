@@ -24,7 +24,7 @@ test("TaskText: stars (none without a difficulty), the text, the stickers", () =
 });
 
 test("TaskText: 🌅 / 🌙 before a one-off's label", () => {
-  const t = time => mount(TaskText, { props: { task: info({ time }), withIcon: true } }).text();
+  const t = time => mount(TaskText, { props: { task: info({ daytime: time }), withIcon: true } }).text();
   assert.equal(t("morning"), "🌅 🌺 walk <fast>");
   assert.equal(t("evening"), "🌙 🌺 walk <fast>");
   assert.equal(t(null), "🌺 walk <fast>");

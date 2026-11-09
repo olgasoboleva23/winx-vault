@@ -5,7 +5,7 @@ import { Task, fieldsOf, taskChoices } from "#/models/task.js";
 const T = line => new Task(line);
 
 test("what a line is: its dates from the line, its own part from the record of its id", () => {
-  const rec = { name: "gym", difficulty: "#⭐⭐medium", area: "#area/body", time: "evening", goal: "#goal/workout", tags: ["#old"], sticker: "fairy.webp", after: "t3" };
+  const rec = { name: "gym", difficulty: "#⭐⭐medium", area: "#area/body", daytime: "evening", goal: "#goal/workout", tags: ["#old"], sticker: "fairy.webp", after: "t3" };
   const t = new Task("- [ ] t12 [repeat:: every week on Monday, Friday when done] [due:: 2026-10-28] [created:: 2026-05-01]", null, rec);
   assert.equal(t.status, " ");
   assert.ok(t.isOpen && !t.isDone && !t.isSkipped);
@@ -13,7 +13,7 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.equal(t.rec, rec);
   assert.equal(t.area, "#area/body");
   assert.equal(t.difficulty, "#⭐⭐medium");
-  assert.equal(t.time, "evening");
+  assert.equal(t.daytime, "evening");
   assert.equal(t.after, "t3");
   assert.deepEqual(t.tags, ["#⭐⭐medium", "#area/body", "#time/evening", "#goal/workout", "#old"]);
   assert.equal(t.rule, "every week on Monday, Friday when done");
@@ -24,7 +24,7 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.equal(t.text, "gym");
   assert.equal(t.key, "t12");
   assert.equal(Task.of({ status: "x", text: "t12 [completion:: 2026-10-29]", rec }).text, "gym");
-  assert.deepEqual(new Task("- [ ] t12", null, { name: "gym", difficulty: "#⭐easy", area: null, time: null, goal: null, tags: [], sticker: null, after: null }).tags, ["#⭐easy"]);
+  assert.deepEqual(new Task("- [ ] t12", null, { name: "gym", difficulty: "#⭐easy", area: null, daytime: null, goal: null, tags: [], sticker: null, after: null }).tags, ["#⭐easy"]);
 
   const plain = T("- [x] call bank [scheduled:: 2026-10-20] [due:: 2026-10-22] [completion:: 2026-10-21]");
   assert.ok(plain.isDone && !plain.isRecurring);
@@ -32,7 +32,7 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.equal(plain.doneOn, "2026-10-21");
   assert.equal(plain.area, null);
   assert.equal(plain.difficulty, null);
-  assert.equal(plain.time, null);
+  assert.equal(plain.daytime, null);
   assert.deepEqual(plain.stickers, []);
 
   assert.ok(T("- [ ] stretch [repeat:: every day] [created:: 2026-05-01]").isPaused);
@@ -77,8 +77,8 @@ test("place", () => {
 
 test("picks, named, unnamed", () => {
   const t = new Task("- [ ] t7 [repeat:: every day]", null,
-    { name: "meditate", difficulty: "#⭐easy", area: "#area/mind", time: "morning", sticker: "bloom.gif" });
-  assert.deepEqual(t.picks, { difficulty: "#⭐easy", area: "#area/mind", time: "#time/morning", sticker: "bloom.gif" });
+    { name: "meditate", difficulty: "#⭐easy", area: "#area/mind", daytime: "morning", sticker: "bloom.gif" });
+  assert.deepEqual(t.picks, { difficulty: "#⭐easy", area: "#area/mind", daytime: "#time/morning", sticker: "bloom.gif" });
   const line = "- [x] t7 [repeat:: every week on Monday when done] [due:: 2026-11-02] [completion:: 2026-11-02]";
   const named = T(line).named("meditate daily");
   assert.equal(named, "- [x] meditate daily [repeat:: every week on Monday when done] [due:: 2026-11-02] [completion:: 2026-11-02]");
@@ -143,7 +143,7 @@ test("pause state, skipping and overdue are the task's own", () => {
 
 test("taskChoices: one per task, by area, the most done first; the picks of its record", () => {
   const recs = {
-    t1: { name: "Wash dishes", difficulty: "#⭐⭐medium", area: "#area/base", time: "evening", sticker: "cat.png" },
+    t1: { name: "Wash dishes", difficulty: "#⭐⭐medium", area: "#area/base", daytime: "evening", sticker: "cat.png" },
     t2: { name: "stretch", difficulty: "#⭐easy", area: "#area/body" },
     t3: { name: "take out trash", difficulty: "#⭐⭐medium", area: "#area/base", pool: true },
   };
@@ -157,7 +157,7 @@ test("taskChoices: one per task, by area, the most done first; the picks of its 
     ["t1", "Wash dishes", "#area/base", 2, "2026-10-20"],
     ["t3", "take out trash", "#area/base", 0, null],
   ]);
-  assert.deepEqual(c[1].picks, { difficulty: "#⭐⭐medium", area: "#area/base", time: "#time/evening", sticker: "cat.png" });
+  assert.deepEqual(c[1].picks, { difficulty: "#⭐⭐medium", area: "#area/base", daytime: "#time/evening", sticker: "cat.png" });
 });
 
 test("a line whose id has no record (hand-typed, or a stale tasks.json): its id is its name", () => {
@@ -167,7 +167,7 @@ test("a line whose id has no record (hand-typed, or a stale tasks.json): its id 
   assert.equal(t.key, "t99");
   assert.deepEqual(t.tags, []);
   assert.deepEqual(t.stickers, []);
-  assert.deepEqual([t.area, t.difficulty, t.time, t.after, t.rec], [null, null, null, null, null]);
+  assert.deepEqual([t.area, t.difficulty, t.daytime, t.after, t.rec], [null, null, null, null, null]);
   assert.equal(T("- [ ] t12x walk").id, null);   // not an id: its words lowercased are its key
   assert.equal(T("- [ ] t12x walk").key, "t12x walk");
 });

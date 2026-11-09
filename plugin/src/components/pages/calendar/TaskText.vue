@@ -2,7 +2,7 @@
      icon in front) -->
 <script setup>
 import { vTip } from "#/components/uikit/tooltip.js";
-import { timeMark } from "#/models/calendarData.js";
+import { daytimeMark } from "#/models/calendarData.js";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -10,7 +10,7 @@ const props = defineProps({
   withIcon: { type: Boolean, default: false },
 });
 const text = computed(() =>
-  timeMark(props.task.time) + (props.withIcon ? props.task.label : props.task.text));
+  daytimeMark(props.task.daytime) + (props.withIcon ? props.task.label : props.task.text));
 </script>
 
 <template>

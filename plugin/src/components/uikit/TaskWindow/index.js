@@ -24,7 +24,7 @@ export const taskWindow = async (preset = {}, required = false) => {
     },
     { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.tag })) },
     // any task's time of day: a one-off goes morning / evening in its day, a 🔁 box groups by it
-    { name: "Time of day", key: "time", options: [
+    { name: "Time of day", key: "daytime", options: [
       { label: "—", value: null },
       { label: "🌅 morning", value: "#time/morning" },
       { label: "🌙 evening", value: "#time/evening" },
@@ -40,7 +40,7 @@ export const taskWindow = async (preset = {}, required = false) => {
       }]
       : []),
   ], {
-    values: { difficulty: null, area: null, time: null, sticker: null, ...preset },
+    values: { difficulty: null, area: null, daytime: null, sticker: null, ...preset },
     required: required ? ["difficulty", "area"] : [],
   });
 };

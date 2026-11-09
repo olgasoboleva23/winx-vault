@@ -16,7 +16,7 @@ test("an emoji line with every field becomes an id and Dataview fields in order"
   assert.equal(master, "- [x] t1 [repeat:: every day when done] [due:: 2026-11-08] "
     + "[created:: 2026-11-07] [completion:: 2026-11-08]");
   assert.deepEqual(records, { t1: {
-    name: "stretch a bit", difficulty: "#⭐⭐medium", area: "#area/body", time: "morning",
+    name: "stretch a bit", difficulty: "#⭐⭐medium", area: "#area/body", daytime: "morning",
     goal: null, tags: [], sticker: "cat.webp", after: null,
   } });
 });
@@ -56,7 +56,7 @@ test("a pool line and a Master line with the same words share the id, with pool:
   assert.equal(records.t1.pool, true);
   assert.equal(records.t1.name, "feed the fish");
   assert.deepEqual(records.t2, {
-    name: "dust shelves", difficulty: "#⭐easy", area: "#area/home", time: null, goal: null,
+    name: "dust shelves", difficulty: "#⭐easy", area: "#area/home", daytime: null, goal: null,
     tags: [], sticker: null, after: null, pool: true,
   });
 });

@@ -15,7 +15,7 @@ Every task has an id (`t12`). `00 System/Data/Tasks/Master.md` holds the Tasks p
 Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `difficulty`, `area`, `time` (morning / evening), `goal`, `tags`, `sticker`, `after` (the task it follows), `order` (the place in its day), `pool`. A rename or a new sticker changes only the record: the done lines keep the id, so the history stays. Difficulty and area live in the record too, so changing them recounts the gold and XP of all that task's past done copies (no history of changes is kept). A line whose id has no record shows the id as its name.
 
 ```
-"t12": { "name": "read a chapter", "difficulty": "#⭐⭐medium", "area": "#area/mind", "time": "evening", "sticker": "rings.webp" }
+"t12": { "name": "read a chapter", "difficulty": "#⭐⭐medium", "area": "#area/mind", "daytime": "evening", "sticker": "rings.webp" }
 ```
 
 **Winx: New task** (Cmd+P, or **＋ task** in the calendar):
