@@ -1,0 +1,32 @@
+@use "mixins" as *;
+/* Form (uikit/Form/index.ts), block winx-form on the window's content: Obsidian's setting rows,
+   a list's groups under them */
+$indent: 1em;      // a list's groups sit one em in from its name (the window's text: 15px)
+$narrow: 3.5em;    // a checkbox, a colour, the ×: room for a short name over them
+.winx-form {
+  // over Obsidian's .setting-item-info / -control (0,1,0): a long name wraps, but many buttons
+  // never squeeze it; the buttons wrap
+  & &__info { min-width: 8em; }
+  & &__control { flex-wrap: wrap; }
+  &__img { height: 24px; }
+  &__textarea { width: 100%; }
+  &__list {
+    margin-left: $indent;
+    &--lines { display: flex; flex-direction: column; gap: $space-s; }
+  }
+  &__group { padding-left: $indent; border-left: 2px solid var(--background-modifier-border); }
+  &__more { margin: $space-s 0 0 $indent; }
+  // the one-line list: a line of the rows' names, then one line a group
+  &__line {
+    display: flex;
+    gap: $space-s;
+    align-items: center;
+    &--head { font-size: var(--font-ui-smaller); color: var(--text-muted); }
+  }
+  &__cell {
+    flex: 1 1 0;
+    min-width: 0;
+    &--narrow { flex: none; width: $narrow; }
+  }
+  &__cell &__input { width: 100%; }
+}
