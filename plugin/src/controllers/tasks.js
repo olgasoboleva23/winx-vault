@@ -130,3 +130,7 @@ export async function addTask(line) {
   await edit(MASTER, c => line + "\n" + c);
   return true;
 }
+
+// Tick (or untick) a task through the Tasks plugin, so a 🔁 one gets its next copy
+export const tickTask = t =>
+  editTaskLineWithUndo(t, line => tasksApi().executeToggleTaskDoneCommand(line, t.path), "✓");

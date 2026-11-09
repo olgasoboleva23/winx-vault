@@ -4,7 +4,7 @@
 import { Task } from "#/models/task.js";
 import { T, canReorder } from "#/models/calendarData.js";
 import {
-  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal, saveRecords,
+  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal, saveRecords, tickTask,
 } from "./tasks.js";
 
 
@@ -17,8 +17,6 @@ export function makeActions(ctx) {
   // a missed copy skipped: the next one from today on (skipLines)
   const skip    = t => editTaskLineWithUndo(t, line => Task.skipLines(
     TASKS.executeToggleTaskDoneCommand(line, t.path), T(t).isOverdue(today) ? today : null), "⏭");
-  const tick    = t =>
-    editTaskLineWithUndo(t, line => TASKS.executeToggleTaskDoneCommand(line, t.path), "✓");
   const unplan  = t =>
     editTaskLineWithUndo(t, line => new Task(line).place(null, false), "↩ no date");
   // a pool item's copy (its id, created today) goes to the top of Master.md, like a new task:
@@ -54,7 +52,8 @@ export function makeActions(ctx) {
   };
 
   return {
-    canSkip, skip, tick, unplan, fromPool, place, reorder, doneOnItsDay, toToday, pauseOrResume,
+    canSkip, skip, tick: tickTask, unplan, fromPool, place, reorder, doneOnItsDay, toToday,
+    pauseOrResume,
     remove: deleteTaskLine, edit: editTaskModal,
   };
 }

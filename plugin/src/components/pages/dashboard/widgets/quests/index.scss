@@ -1,0 +1,8 @@
+@use "mixins" as *;
+
+.winx-quests {
+  &__row--done &__label {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+}

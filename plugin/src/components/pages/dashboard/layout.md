@@ -47,8 +47,11 @@
 > > card: XP Today
 > > ```
 > >
-> > > [!card|scroll] Quests
-> > > <div class="winx-dash__quests"></div>
+> > ```winx
+> > quests
+> > card: Quests
+> > meta: scroll
+> > ```
 > >
 > > ```winx
 > > celestialMarket
@@ -67,13 +70,3 @@
 > >
 > > > [!card] Pages
 > > > [[02 Areas/Finance|💰 Finance]] · [[00 System/Data/Shop|🛍 Shop]] · [[00 System/Data/Supplies|📦 Supplies]] · [[00 System/Data/Medication/_index.base|💊 Medication]] · [[00 System/Data/Food/Food|🍽 Food]]
-
-%% Quests, for the tab's day (drawn into its card): what's left of the day's plan, and what was done that day %%
-
-```tasks
-((due on {{date}}) AND (not done)) OR (done on {{date}})
-path includes 00 System/Data/Tasks
-short mode
-sort by status
-sort by tags
-```

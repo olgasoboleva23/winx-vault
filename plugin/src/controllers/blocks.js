@@ -4,6 +4,7 @@ import { blockDv } from "#/helpers/plugins.js";
 import { app } from "#/helpers/app.js";
 import { VueHost } from "#/composables/vueHost.ts";
 import { loadLevelToday, loadLifeAreas, loadXpToday } from "#/controllers/widgets/xp.js";
+import { loadQuests } from "#/controllers/widgets/quests.js";
 import { loadShop } from "#/controllers/widgets/shop.js";
 import { loadCelestialMarket, loadSupplies } from "#/controllers/widgets/market.js";
 import { loadGoals } from "#/controllers/widgets/goals.js";
@@ -23,6 +24,7 @@ import { loadFood } from "#/controllers/food.js";
 import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
 import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";
 import LifeAreas from "#/components/pages/dashboard/widgets/xp/LifeAreas/index.vue";
+import QuestsCard from "#/components/pages/dashboard/widgets/quests/index.vue";
 import ShopWidget from "#/components/pages/shop/index.vue";
 import SuppliesWidget from "#/components/pages/supplies/index.vue";
 import CelestialMarket from "#/components/pages/dashboard/widgets/market/index.vue";
@@ -49,6 +51,7 @@ const TASK_FILES = `${TASKS}/`, MARKET_NOTE = `${MARKET}.md`, LEDGER_FILES = `${
 
 export const blocks = {
   xpToday: { view: XpToday, load: loadXpToday, watches: [TASK_FILES] },
+  quests: { view: QuestsCard, load: loadQuests, watches: [TASK_FILES] },
   levelToday: { view: LevelToday, load: loadLevelToday, watches: [TASK_FILES, CYCLE] },
   lifeAreas: { view: LifeAreas, load: loadLifeAreas, watches: [TASK_FILES] },
   shop: {
