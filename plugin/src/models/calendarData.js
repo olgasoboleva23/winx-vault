@@ -13,9 +13,9 @@ export const dayGroup = t => !T(t).isRecurring ? "one"
   : ["morning", "evening"].includes(T(t).time) ? T(t).time : "other";
 
 // a task dragged onto another of its day: it moves before or after it only within its group and
-// its file (a line moves), among its siblings (a subtask under its parent), and neither follows a
-// lead (#after: it stays under it)
-export const canReorder = (a, b) => a !== b && a.path === b.path && a.parent === b.parent
+// (the order is the record's), among its siblings (a subtask under its parent), and neither follows
+// a lead (#after: it stays under it); both need an id
+export const canReorder = (a, b) => a !== b && !!T(a).id && !!T(b).id && a.parent === b.parent
   && dayGroup(a) === dayGroup(b) && !T(a).after && !T(b).after;
 // a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its
 // earlier followers), with .follows set to it; the rest in their order
@@ -109,7 +109,8 @@ export class CalendarData {
       this.ahead.at(-1).items.push(t);
     }
 
-    for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
+    for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]
+      || (T(a.t).rec?.order ?? Infinity) - (T(b.t).rec?.order ?? Infinity) || 0);
     this.doneBy = historyOf(tasks.map(T).filter(t => t.isDone && t.doneOn));
     this.skipsBy = historyOf(tasks.map(T).filter(t => t.isSkipped));
     this.missed = tasks.filter(t => T(t).isOverdue(today))

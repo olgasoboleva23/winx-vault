@@ -88,7 +88,7 @@ export function useReorder(view, key, day) {
     const t = take(view, e), after = half(e) === "after";
 
     void move.play({ gain: 0.25 });
-    return view.actions.reorder(t, view.task(key()), after);
+    return view.actions.reorder(t, view.task(key()), after, day());
   };
 
   return row;

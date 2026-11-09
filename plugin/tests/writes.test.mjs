@@ -4,6 +4,7 @@ import { setApp } from "#/helpers/app.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
 import { addTask, saveRecords, newId, editTaskModal, saveNewTask } from "#/controllers/tasks.js";
 import { makeActions } from "#/controllers/calendar.js";
+import { CalendarData } from "#/models/calendarData.js";
 import { taskStore } from "#/store/tasks.js";
 
 const MASTER = "00 System/Data/Tasks/Master.md", RECORDS = "00 System/Data/Tasks/tasks.json", BUY = "00 System/Data/Purchases.md";
@@ -161,4 +162,15 @@ test("a purchase for 2.5 counts 2.5", async () => {
 test("a purchase for 1 000 (a space in it) counts 1000", async () => {
   vault({ [MASTER]: "- [x] t3\n", [BUY]: "# Purchases\n\n- 2026-10-01 | Tea | 1 000\n" }, RECS);
   assert.equal(await logPurchase("Gum", 1), false);   // 25 − 1000
+});
+
+test("a drop renumbers the day's group 0…n in the records", async () => {
+  const day = "2026-11-02", recs = { t1: { name: "a" }, t2: { name: "b" }, t3: { name: "c" }, t4: { name: "d" } };
+  const lines = ["t1", "t2", "t3", "t4 [repeat:: every day]"].map(l => `- [ ] ${l} [due:: ${day}]`);
+  const files = vault({ [MASTER]: lines.join("\n") }, recs);
+  const tasks = taskStore.tasks.map((t, i) => ({ ...t, line: i }));
+  const model = new CalendarData({ tasks, poolLines: [], days: [day], today: day, areaOrder: [] });
+  await makeActions({ today: day, model }).reorder(tasks[2], tasks[0], false, day);   // c before a
+  assert.deepEqual(Object.fromEntries(Object.entries(json(files)).map(([k, r]) => [k, r.order])),
+    { t1: 1, t2: 2, t3: 0, t4: undefined });
 });

@@ -2,10 +2,9 @@
 // text); most come with an undo notice. A 🔁 task ticked goes through the Tasks plugin, so it gets
 // its next copy.
 import { Task } from "#/models/task.js";
-import { T } from "#/models/calendarData.js";
-import { moveLine } from "#/helpers/files.js";
+import { T, canReorder } from "#/models/calendarData.js";
 import {
-  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal,
+  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal, saveRecords,
 } from "./tasks.js";
 
 
@@ -44,9 +43,15 @@ export function makeActions(ctx) {
   // ⏸ pause: drop its dates; ▶ resume: from today, on the first day its rule allows
   const pauseOrResume = t =>
     editTaskLineWithUndo(t, line => new Task(line).togglePause(today), T(t).isPaused ? "▶" : "⏸");
-  // a task dropped on another of its day (canReorder): its line before / after that one's
-  const same    = t => line => new Task(line).sameAs(Task.of(t));
-  const reorder = (t, to, after) => moveLine(t.path, t.line, same(t), to.line, same(to), after);
+  // a task dropped on another of `day` (canReorder): it goes before / after that one among the
+  // day's open tasks of its group, and the group is numbered 0…n in the records
+  const reorder = (t, to, after, day) => {
+    const group = ctx.model.byDay[day].filter(e => e.kind === "open" && canReorder(t, e.t))
+      .map(e => e.t);
+
+    group.splice(group.indexOf(to) + (after ? 1 : 0), 0, t);
+    return saveRecords(Object.fromEntries(group.map((x, i) => [T(x).id, { order: i }])));
+  };
 
   return {
     canSkip, skip, tick, unplan, fromPool, place, reorder, doneOnItsDay, toToday, pauseOrResume,

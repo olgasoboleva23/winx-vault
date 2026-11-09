@@ -218,7 +218,14 @@ test("a day's open task goes before or after another only in its own group and f
   assert.equal(canReorder(evening, other), false);
   assert.equal(canReorder(follower, a), false);
   assert.equal(canReorder(a, follower), false);
-  assert.equal(canReorder(a, elsewhere), false);
+  assert.equal(canReorder(a, elsewhere), true);   // another file: the order is not in the line
+  assert.equal(canReorder(a, { status: " ", text: "x [due:: 2026-10-28]", path: b.path, line: 99 }), false);   // no id
+});
+
+test("a day's open tasks go by their record's order, those without one after, in file order", () => {
+  const [a, b, c, d] = ["a", "b", "c", "d"].map(x => task(" ", `${x} [due:: 2026-10-28]`));
+  b.rec.order = 0; a.rec.order = 1;
+  assert.deepEqual(texts(data([a, c, b, d]).byDay[TODAY].map(e => e.t)), ["b", "a", "c", "d"]);
 });
 
 test("canReorder: a subtask only among its siblings (same parent)", () => {
