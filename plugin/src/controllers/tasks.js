@@ -8,7 +8,8 @@ import { Task } from "#/models/task.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { app } from "#/helpers/app.js";
 import { taskStore } from "#/store/tasks.js";
-import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
+import { migrate } from "#/models/taskMigration.js";
+import { MASTER, MASTER_OLD, POOL, POOL_OLD, TASK_RECORDS } from "#/helpers/paths.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
 // only if that line is still the same copy of the task.
@@ -134,3 +135,25 @@ export async function addTask(line) {
 // Tick (or untick) a task through the Tasks plugin, so a 🔁 one gets its next copy
 export const tickTask = t =>
   editTaskLineWithUndo(t, line => tasksApi().executeToggleTaskDoneCommand(line, t.path), "✓");
+
+// The one-off move to the id format (the Migrate tasks command): not when tasks.json is there or
+// Master.md is missing. The old notes kept as copies (Master.md is not renamed: a rename would
+// rewrite links to it), then Master.md rewritten, tasks.json written, Pool.md to the trash.
+export async function migrateTasks() {
+  const { vault, fileManager } = app;
+  const master = vault.getFileByPath(MASTER), pool = vault.getFileByPath(POOL);
+
+  if (vault.getFileByPath(TASK_RECORDS)) return void new Notice(`✦ ${TASK_RECORDS} exists`);
+  if (!master) return void new Notice(`✦ ${MASTER} not found`);
+  const masterText = await vault.read(master), poolText = pool ? await vault.read(pool) : "";
+  const { master: next, records } = migrate(masterText, poolText);
+
+  await vault.create(MASTER_OLD, masterText);
+  if (pool) await vault.create(POOL_OLD, poolText);
+  await vault.modify(master, next);
+  await vault.create(TASK_RECORDS, JSON.stringify(records, null, 2));
+  if (pool) await fileManager.trashFile(pool);
+  const n = Object.keys(records).length;
+
+  new Notice(`✦ ${n} tasks migrated: switch Tasks → Task format → Dataview`);
+}

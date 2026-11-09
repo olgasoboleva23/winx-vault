@@ -7,6 +7,9 @@ export const TASKS = `${DATA}/Tasks`;
 
 export const MASTER = `${TASKS}/Master.md`, POOL = `${TASKS}/Pool.md`;
 
+// the old notes kept by the Migrate tasks command
+export const MASTER_OLD = `${TASKS}/Master (old).md`, POOL_OLD = `${TASKS}/Pool (old).md`;
+
 // Winx's part of every task (name, difficulty, area…), an object by id
 export const TASK_RECORDS = `${TASKS}/tasks.json`;
 
