@@ -62,7 +62,8 @@ export class FoodLog {
 
 // journals: [{ path, name, lag, entries: Map date → { level, reasons } }]; courses: [{ path, name,
 // start, days, meds: [{ code, name, days }], taken: Map date → the codes with a ✅ that day }]
-export function foodWeek({ foods, marks, log, journals, courses, days }) {
+// task: { id, name, days: Set of the dates it was done } or null: each row then says `trained`
+export function foodWeek({ foods, marks, log, journals, courses, days, task = null }) {
   const byId = new Map(foods.map(f => [f.id, f]));
   const icon = new Map(marks.map(m => [m.tag, m.icon]));
 
@@ -72,7 +73,7 @@ export function foodWeek({ foods, marks, log, journals, courses, days }) {
     const all = log.eaten(date).flatMap(id => byId.get(id)?.marks ?? []);
 
     return {
-      date, items, note: log.note(date),
+      date, items, note: log.note(date), ...(task && { trained: task.days.has(date) }),
       counts: Object.fromEntries(marks.map(m => [m.tag, all.filter(t => t === m.tag).length])),
       journals: journals.map(j => {
         const on = addDays(date, j.lag), e = j.entries.get(on);

@@ -78,7 +78,7 @@ export const blocks = {
   // a medication course's own note: its table is the block's text
   meds: { view: MedsCourse, load: loadMeds, cardButton: MedsEdit, watches: [] },
   // the food journal's own note (00 System/Data/Food/Food.md)
-  food: { view: FoodPage, load: loadFood, watches: [FOODS, FOOD_LOG, `${JOURNALS}/`] },
+  food: { view: FoodPage, load: loadFood, watches: [FOODS, FOOD_LOG, `${JOURNALS}/`, TASK_FILES] },
 };
 
 // a widget on its block: its VueHost, with the card when the block has a "card:" line

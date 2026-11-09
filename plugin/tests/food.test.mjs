@@ -57,3 +57,12 @@ test("foodWeek: a row per day: what was eaten with its marks, the marks counted,
   assert.equal(mon.note, "сыпь на подбородке");
   assert.deepEqual(tue.journals, [{ name: "Skin", level: null, reasons: [], on: "2026-11-04" }]);
 });
+
+test("foodWeek: a task set puts its done days on the rows; no task, no field", () => {
+  const args = { foods: [], marks: [], log: new FoodLog(""), journals: [], courses: [], days: ["2026-11-02", "2026-11-03"] };
+  const task = { id: "t5", name: "gym", days: new Set(["2026-11-02"]) };
+  const [mon, tue] = foodWeek({ ...args, task });
+
+  assert.deepEqual([mon.trained, tue.trained], [true, false]);
+  assert.equal(foodWeek(args)[0].trained, undefined);
+});

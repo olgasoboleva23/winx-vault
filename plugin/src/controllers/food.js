@@ -10,6 +10,10 @@ import { DEFAULT_MARKS, FoodLog, Foods } from "#/models/food.js";
 import { readJournals } from "#/controllers/journals.js";
 import { codeOf, nameOf } from "#/models/kinds.js";
 import { parseCourse } from "#/models/course.js";
+import { Task } from "#/models/task.js";
+import { Notice } from "obsidian";
+import { pickTask } from "#/components/uikit/TaskSearch/index.js";
+import { taskStore } from "#/store/tasks.js";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { FOOD_LOG, FOODS } from "#/helpers/paths.js";
@@ -31,8 +35,15 @@ async function made(path, text) {
   await app.vault.create(path, text);
 }
 
-const marksHead = marks =>
-  `---\nmarks:\n${marks.map(m => `  - ${JSON.stringify(m)}`).join("\n")}\n---\n`;
+const taskIdOf = () => app.metadataCache.getCache(FOODS)?.frontmatter?.task ?? null;
+
+// the properties: the marks, and the training task's id when one is picked
+const marksHead = (marks, task = null) => {
+  const list = marks.map(m => `  - ${JSON.stringify(m)}`).join("\n");
+
+  return `---\nmarks:\n${list}\n${task ? `task: ${task}\n` : ""}---\n`;
+};
+
 const ready = async () => {
   await made(FOODS, marksHead(DEFAULT_MARKS));
   await made(FOOD_LOG, "");
@@ -63,8 +74,12 @@ export async function loadFood() {
   const [foods, log, journals, taking] =
     await Promise.all([read(FOODS), read(FOOD_LOG), readJournals(), courses()]);
 
+  const id = taskIdOf(), rec = id && taskStore.records.get(id);
+  const done = id ? taskStore.tasks.map(t => Task.of(t)).filter(t => t.id === id && t.isDone) : [];
+  const task = id && { id, name: rec?.name ?? id, days: new Set(done.map(t => t.doneOn)) };
+
   return {
-    today: todayYmd(), foods: new Foods(foods).list, marks: marksOf(), log, journals,
+    task, today: todayYmd(), foods: new Foods(foods).list, marks: marksOf(), log, journals,
     courses: taking,
   };
 }
@@ -138,5 +153,15 @@ export async function editMarks() {
   const next = v.marks
     .map(m => ({ tag: m.tag ?? `m${++n}`, icon: m.icon.trim(), name: m.name.trim() }));
 
-  await edit(FOODS, t => marksHead(next) + t.replace(/^---\n[\s\S]*?\n---\n/, ""));
+  await edit(FOODS, t => marksHead(next, taskIdOf()) + t.replace(/^---\n[\s\S]*?\n---\n/, ""));
+}
+
+// 🏋 the training task: a past one from the search (its id goes to Foods.md), not a new name
+export async function pickTrainingTask() {
+  await ready();
+  const pick = await pickTask();
+
+  if (!pick) return;
+  if (pick.isNew) return void new Notice("✦ pick a task you already have");
+  await edit(FOODS, t => marksHead(marksOf(), pick.id) + t.replace(/^---\n[\s\S]*?\n---\n/, ""));
 }

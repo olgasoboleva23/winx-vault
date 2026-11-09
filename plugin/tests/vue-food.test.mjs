@@ -74,3 +74,12 @@ test("loadFood: the foods and marks, the log, the journals, the medication cours
   assert.deepEqual(d.courses.map(({ taken, ...c }) => c), [{ path: "M/Курс.md", name: "Курс", start: "2026-11-02", days: 5, meds: [{ code: "МА", name: "мастодинон", days: 5 }] }]);
   assert.deepEqual([...d.courses[0].taken], [["2026-11-02", new Set(["МА"])], ["2026-11-03", new Set()]]);   // a ✅ that day (❌ isn't one)
 });
+
+test("the food page: a training task adds a 🏋 column, ✓ on the days it was done", () => {
+  const w = mount(FoodPage, { props: { state: { data: { ...data(), task: { id: "t5", name: "gym", days: new Set(["2026-11-02"]) } } } } });
+  const rows = w.findAll(".winx-table__row");
+
+  assert.ok(w.findAll(".winx-table__head").map(h => h.text()).includes("🏋"));
+  assert.equal(rows[0].find(".winx-food__trained").text(), "✓");
+  assert.equal(rows[1].find(".winx-food__trained").text(), "");
+});

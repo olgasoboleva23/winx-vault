@@ -13,7 +13,9 @@ import { vTip } from "#/components/uikit/tooltip.js";
 import { addDays, weekOf } from "#/helpers/dates.js";
 import { dayLabel } from "#/models/course.js";
 import { FoodLog, foodWeek } from "#/models/food.js";
-import { addEaten, editFood, editMarks, removeEaten, setFoodNote } from "#/controllers/food.js";
+import {
+  addEaten, editFood, editMarks, pickTrainingTask, removeEaten, setFoodNote,
+} from "#/controllers/food.js";
 
 const props = defineProps({ state: { type: Object, required: true } });
 const d = computed(() => props.state.data);
@@ -23,7 +25,7 @@ const short = date => dayLabel(date).split(",")[0];
 const step = n => { monday.value = n ? addDays(monday.value, 7 * n) : weekOf(d.value.today)[0]; };
 
 const rows = computed(() => foodWeek({
-  ...d.value, log: new FoodLog(d.value.log), days: days.value,
+  ...d.value, log: new FoodLog(d.value.log), days: days.value, task: d.value.task,
 }).map(r => ({ ...r, label: dayLabel(r.date), when: r.date === d.value.today ? "today" : "" })));
 const columns = computed(() => [
   { key: "label", label: "День", class: "winx-food__day" },
@@ -35,6 +37,8 @@ const columns = computed(() => [
     key: `journal:${i}`, label: j.lag ? `${j.name} +${j.lag}д` : j.name, align: "center", i,
     tip: j.lag ? `уровень через ${j.lag} дн. после еды` : "уровень в тот же день",
   })),
+  ...(d.value.task
+    ? [{ key: "trained", label: "🏋", align: "center", tip: d.value.task.name }] : []),
   { key: "courses", label: "💊", align: "center", tip: "курс лекарств в этот день" },
   { key: "note", label: "Заметка", class: "winx-food__note" },
 ]);
@@ -64,6 +68,9 @@ const act = async (write) => {
       >‹</WinxButton>
       <WinxButton kind="chip" title="this week" @click="step(0)">today</WinxButton>
       <span class="winx-grow" />
+      <WinxButton kind="text" title="the training task" @click="act(pickTrainingTask)">
+        🏋
+      </WinxButton>
       <WinxButton kind="text" title="the marks" @click="act(editMarks)">⚙</WinxButton>
     </div>
     <div class="winx-food__grid">
@@ -97,6 +104,9 @@ const act = async (write) => {
             v-tip="row.journals[col.i].reasons.join(', ')"
             class="winx-food__level"
           >{{ row.journals[col.i].level }}</span>
+          <span v-else-if="col.key === 'trained'" class="winx-food__trained">
+            {{ row.trained ? "✓" : "" }}
+          </span>
           <template v-else-if="col.key === 'courses'">
             <span v-for="c in row.courses" :key="c.path" class="winx-row winx-gap-xs">
               <WinxNoteLink :path="c.path" class="winx-food__course">💊</WinxNoteLink>
