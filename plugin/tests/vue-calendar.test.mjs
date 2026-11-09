@@ -42,13 +42,13 @@ const TASKS = () => { n = 0; return [
   task(" ", "#area/mind write [due:: 2026-11-04]"),
 ]; };
 // the tab's Vue app on made-up data; `ticked`, `placed`, `moved`, `unplanned` collect what the writes get
-function mount(over = {}) {
+function mount(over = {}, tasksApi = {}) {
   const { reactive, markRaw, createApp } = vue;
   const st = reactive({ ...state.readState(undefined), area: null, picked: null, ...over });
   const days = state.shownDays(st, TODAY), ticked = [], placed = [], moved = [], unplanned = [];
   const ctx = markRaw({
     state: st, today: TODAY, days, base: state.baseDate(st, TODAY), view: st.view,
-    shown: { open: true, ghost: true, done: st.showDone }, everything: null, TASKS: {}, infos: new Map(),
+    shown: { open: true, ghost: true, done: st.showDone }, everything: null, TASKS: tasksApi, infos: new Map(),
     model: new data.CalendarData({ tasks: TASKS(), poolLines: [], days, today: TODAY }),
     config: { areas: [{ key: "body", label: "🌺 Body", icon: "🌺", color: "#e8609a" }], areaIcons: {}, areaMap: {}, areaColors: {} },
   });
@@ -250,4 +250,19 @@ test("on the phone, a row swiped right is done (a day's row: its checkbox; a car
     fire(walk, "touchend");
     assert.equal(ticked.length, 2);
   } finally { mock.timers.reset(); document.body.classList.remove("is-mobile"); }
+});
+
+test("on the phone, a card can't be swiped while the Tasks plugin is off", async () => {
+  document.body.classList.add("is-mobile");
+  try {
+    const { el, ticked } = mount({}, null);
+    const plan = card(el, "plan trip");
+
+    touch(plan, "touchstart", 100, 100);
+    touch(plan, "touchmove", 160, 100);
+    await vue.nextTick();
+    assert.equal(plan.dataset.swipe, undefined);
+    fire(plan, "touchend");
+    assert.equal(ticked.length, 0);
+  } finally { document.body.classList.remove("is-mobile"); }
 });

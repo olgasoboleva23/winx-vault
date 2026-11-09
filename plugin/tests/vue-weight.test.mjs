@@ -121,3 +121,17 @@ test("loadWeight: every journal of the folder, by name, its reasons, lag and tod
   assert.deepEqual(logs.map(l => [l.name, l.path, l.lag, l.reasons]), [["Gut", GUT, 0, []], ["Skin", SKIN, 1, ["🍰 sweets"]]]);
   assert.deepEqual(logs[1].now, { date: "2026-11-05", level: 2, reasons: ["🍰 sweets"] });
 });
+
+test("Weight: what's typed while the save writes stays in the field; the saved one clears", async () => {
+  const { files, app } = vault({ [WEIGHT]: "- 2026-11-04 59.7\n" });
+  const w = mount(WeightCard, { props: { state: { data } } });
+  const process = app.vault.process;
+  let release;
+
+  app.vault.process = (f, fn) => new Promise(r => { release = () => r(process(f, fn)); });
+  await w.find("input").setValue("60.2");
+  await w.find("form").trigger("submit");
+  await w.find("input").setValue("60.4");   // typed while it writes
+  release(); await new Promise(r => setTimeout(r)); await nextTick();
+  assert.equal(w.find("input").element.value, "60.4");
+});

@@ -4,6 +4,7 @@ import { DashboardView, DASHBOARD_VIEW } from "./components/pages/dashboard/view
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./controllers/blocks.js";
 import { useNotify } from "./composables/notify.js";
+import { redrawNotes } from "./helpers/plugins.js";
 import { setApp } from "./helpers/app.js";
 import { installSounds } from "./helpers/sounds.js";
 import { useTaskStore } from "./store/tasks.js";
@@ -39,6 +40,7 @@ export default class WinxPlugin extends Plugin {
         const plugins = (this.app as any).plugins;
         await plugins.disablePlugin(this.manifest.id);
         await plugins.enablePlugin(this.manifest.id);
+        redrawNotes();   // the widgets already drawn were unmounted with the old code
       },
     });
     // the phone has no status bar: "✦ syncing" (the star spinning) at the top while Remotely Save

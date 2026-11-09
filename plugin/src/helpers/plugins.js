@@ -23,3 +23,7 @@ export function blockDv(sourcePath, el) {
     api,
   };
 }
+
+// the open notes' preview drawn again: their ```winx blocks are made anew (after a Winx reload)
+export const redrawNotes = () => app.workspace.getLeavesOfType("markdown")
+  .forEach(leaf => leaf.view.previewMode?.rerender(true));

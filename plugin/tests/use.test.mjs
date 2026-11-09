@@ -99,3 +99,13 @@ test("useNoteLinks: a [[link]] opens its note (Cmd/Ctrl: a new tab); other click
   assert.deepEqual(c.app.workspace.opened, [["Finance", true]]);
   assert.equal(stopped, 1);
 });
+
+test("redrawNotes: every open note's preview is rendered anew (after a Winx reload)", async () => {
+  const { redrawNotes } = await import("#/helpers/plugins.js");
+  const drawn = [];
+  const leaf = name => ({ view: { previewMode: { rerender: full => drawn.push([name, full]) } } });
+
+  setApp({ workspace: { getLeavesOfType: t => t === "markdown" ? [leaf("a"), { view: {} }, leaf("b")] : [] } });
+  redrawNotes();
+  assert.deepEqual(drawn, [["a", true], ["b", true]]);
+});

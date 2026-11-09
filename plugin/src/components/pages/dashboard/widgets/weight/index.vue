@@ -23,7 +23,12 @@ const log = computed(() => logs.value.find(l => l.path === picked.value) ?? logs
 const logging = computed(() => mode.value === "log" && !!log.value);
 
 const kg = ref("");
-const save = async () => { if (await logWeight(kg.value)) kg.value = ""; };
+// cleared once saved, unless more was typed while it wrote
+const save = async () => {
+  const typed = kg.value;
+
+  if (await logWeight(typed) && kg.value === typed) kg.value = "";
+};
 
 // a journal picked: shown, and remembered on this device
 const pick = path => {

@@ -25,7 +25,7 @@ const { swipe, ...touch } = useSwipe(view, key, t => {
   if (!view.ctx.TASKS) return;
   gone.value = true;
   view.actions.tick(t);
-});
+}, () => props.task.pool || !!view.ctx.TASKS);   // a tick needs the Tasks plugin
 </script>
 
 <template>
