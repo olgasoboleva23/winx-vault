@@ -56,7 +56,7 @@ test("key", () => {
   assert.equal(T("- [ ] #⭐easy water plants [scheduled:: 2026-10-26]").key, T("#⭐easy water plants").key);
   assert.equal(T("  - [x] Water plants [completion:: 2026-10-02]").key, "water plants");
   assert.equal(T("- [ ] #goal/x workout ![[mikasa.png|28]] [repeat:: every day] [due:: 2026-10-28]").key, "workout");
-  assert.equal(Task.keyOf("- [-] workout [repeat:: every day] [due:: 2026-10-28] [cancelled:: 2026-10-28]"), "workout");
+  assert.equal(new Task("- [-] workout [repeat:: every day] [due:: 2026-10-28] [cancelled:: 2026-10-28]").key, "workout");
 });
 
 test("setDue", () => {
@@ -108,7 +108,7 @@ test("skipLines", () => {
   const ticked = "- [ ] stretch [repeat:: every 3 days when done] [due:: 2026-10-29]\n- [x] stretch [repeat:: every 3 days when done] [due:: 2026-10-25] [completion:: 2026-10-26]";
   const skipped = Task.skipLines(ticked);
   assert.equal(skipped, "- [ ] stretch [repeat:: every 3 days when done] [due:: 2026-10-29]\n- [-] stretch [repeat:: every 3 days when done] [due:: 2026-10-25] [cancelled:: 2026-10-26]");
-  assert.equal(Task.keyOf(skipped.split("\n")[1]), Task.keyOf(ticked.split("\n")[0]));   // still the same task for history
+  assert.equal(new Task(skipped.split("\n")[1]).key, new Task(ticked.split("\n")[0]).key);   // still the same task for history
 });
 
 test("skipLines of a missed copy: the next one on the first day from today its rule allows, today included", () => {

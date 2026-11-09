@@ -12,13 +12,13 @@ import { parseNote } from "#/models/taskFile.js";
 import { Task } from "#/models/task.js";
 import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 
-const byPath = new Map();   // path → its items
+let items = [];   // Master.md's items
 
 const refresh = () => {
   const recs = taskStore.records;
   const rec = i => recs.get(new Task(`- ${i.text}`).id) ?? null;
 
-  taskStore.tasks = [...byPath.values()].flat().filter(i => i.status !== null)
+  taskStore.tasks = items.filter(i => i.status !== null)
     .map(i => ({ ...i, rec: rec(i) }));
   taskStore.pool = [...recs].filter(([, r]) => r.pool)
     .map(([id, r]) => ({ id, pool: true, rec: r, path: TASK_RECORDS }));
@@ -28,13 +28,13 @@ const refresh = () => {
 export const taskStore = {
   tasks: [], pool: [], records: new Map(), ready: false, version: ref(0),
   // the note's items set from its text (a test's, or a write the plugin just made)
-  put(path, text) { byPath.set(path, parseNote(path, text)); refresh(); },
+  put(path, text) { items = parseNote(path, text); refresh(); },
   // the records set from tasks.json's object
   putRecords(json) { taskStore.records = new Map(Object.entries(json)); refresh(); },
   drop(path) {
     reads.delete(path);
     if (path === TASK_RECORDS) taskStore.putRecords({});
-    else if (byPath.delete(path)) refresh();
+    else { items = []; refresh(); }
   },
 };
 
@@ -90,7 +90,7 @@ export function useTaskStore(plugin) {
     started = true;
     const files = [MASTER, TASK_RECORDS].map(p => app.vault.getFileByPath(p)).filter(Boolean);
 
-    byPath.clear();
+    items = [];
     try {
       for (const f of files) {
         const text = await fresh(f);   // the same guard as a change's read

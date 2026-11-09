@@ -21,7 +21,7 @@ export const fieldsOf = line =>
   Object.fromEntries([...line.matchAll(FIELD)].map(m => [m[1], m[2]]));
 
 // a line with one field set (replaced in place, or added at the end); null drops it
-export function withField(line, key, value) {
+function withField(line, key, value) {
   const re = new RegExp(`\\s*\\[${key}:: [^\\]]*\\]`);
   const text = value === null ? "" : ` [${key}:: ${value}]`;
 
@@ -82,7 +82,6 @@ export class Task {
   // identity across copies (open, done, skipped) of the same task, for history and for finding its
   // line again: its id, else its words lowercased
   get key() { return this.id ?? this.words.toLowerCase(); }
-  static keyOf = line => new Task(line).key;
   // a name compared with another: its words (not an id, even if it looks like one), lowercased
   static nameKey = name => new Task(`- [ ] ${name}`).words.toLowerCase();
   // a new open line: its text (an id, or a name for the Tasks dialog) and the day it was made
@@ -114,7 +113,7 @@ export class Task {
   get picks() {
     return {
       difficulty: this.difficulty, area: this.area,
-      daytime: this.daytime, sticker: this.stickers[0] ?? null,
+      daytime: this.daytime, sticker: this.rec?.sticker ?? null,
     };
   }
   // the line with its id swapped for `name`: what the Tasks plugin's dialog shows and edits
@@ -194,10 +193,7 @@ export function taskChoices(tasks, records, areaOrder) {
 
   return [...records].map(([id, r]) => ({
     id, name: r.name ?? id, area: r.area ?? null,
-    picks: {
-      difficulty: r.difficulty ?? null, area: r.area ?? null,
-      daytime: r.daytime ?? null, sticker: r.sticker ?? null,
-    },
+    picks: new Task("", null, r).picks,
     done: done[id]?.done ?? 0, last: done[id]?.last ?? null,
   })).sort((a, b) => rank(a.area) - rank(b.area) || b.done - a.done
     || (b.last ?? "").localeCompare(a.last ?? ""));
