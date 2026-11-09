@@ -55,3 +55,19 @@ test("meditation: its own length (10 min by default), one session that stops whe
   const data = addStats({ stats: { date: "2026-11-08", sessions: 1, minutes: 25 } }, 10, "2026-11-08", "meditation");
   assert.deepEqual(data.stats, { date: "2026-11-08", sessions: 1, minutes: 25, meditation: { sessions: 1, minutes: 10 } });
 });
+
+test("the meditation's music: which track plays for a running meditation, none paused, muted or off", async () => {
+  const { musicKey } = await import("#/controllers/widgets/pomodoro.js");
+  let now = 1_000;
+  const t = new Timer({ music: "bells" }, null, () => now);
+  t.reset("meditation");
+  assert.equal(musicKey(t, false), null);   // stopped
+  t.play();
+  assert.equal(musicKey(t, false), "bells|1000");
+  assert.equal(musicKey(t, true), null);   // muted
+  now = 5_000; t.pause(); t.play();
+  assert.equal(musicKey(t, false), "bells|5000");   // played again: a new start
+  assert.equal(musicKey(Object.assign(t, { settings: { ...t.settings, music: null } }), false), null);
+  t.settings.music = "bells"; t.reset("focus"); t.play();
+  assert.equal(musicKey(t, false), null);   // a pomodoro: no music
+});

@@ -4,7 +4,7 @@
 // models/timer.js through a remount; the ticking stops when the block goes).
 import { todayYmd } from "#/helpers/dates.js";
 import { readJson } from "#/helpers/files.js";
-import { AudioEngine } from "#/helpers/sounds.js";
+import { AudioEngine, isMuted } from "#/helpers/sounds.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { app } from "#/helpers/app.js";
 import { addStats } from "#/models/timer.js";
@@ -39,21 +39,55 @@ export const ding = rate => sparkle.play({ rate });
 
 export const bell = () => chime.play({ rate: 0.7, gain: 0.35, duration: 3 });
 
-// ⚙: the lengths of the mode on (the pomodoro's focus and break, or the meditation's) in the
-// shared window; the settings with them, null when closed or one isn't above zero
+// the meditation's music (00 System/Assets/winx music/meditation-<name>.flac, seamless loops):
+// the one to play now — "<name>|<start>" for a running meditation with music, not muted — or null
+export const MUSIC = { pad: "Pad", bells: "Bells", harp: "Harp" };
+
+export const musicKey = (timer, muted = isMuted()) =>
+  timer.type === "meditation" && timer.running && MUSIC[timer.settings.music] && !muted
+    ? `${timer.settings.music}|${timer.start}` : null;
+
+// the music to the timer: started (from the session's remaining time, so it fades out at the
+// end, before the bell) or stopped; one track at a time, whatever the pomodoros shown
+let music = null;   // { key, handle }
+
+export async function syncMusic(timer) {
+  const key = musicKey(timer);
+
+  if (music?.key === key) return;
+  music?.handle?.stop();
+  music = key && { key, handle: null };
+  if (!key) return;
+  const handle = await new AudioEngine(`${SOUNDS}/meditation-${timer.settings.music}.flac`)
+    .loop(timer.remaining);
+
+  if (music?.key === key) music.handle = handle; else handle?.stop();
+}
+
+// ⚙: the lengths of the mode on (the pomodoro's focus and break, or the meditation's and its
+// music) in the shared window; the settings with them, null when closed or a length isn't above
+// zero
 export async function askLengths(settings, meditation = false) {
   const rows = meditation
-    ? [{ name: "Meditation", key: "meditationMin", text: "minutes", number: true }]
+    ? [
+      { name: "Meditation", key: "meditationMin", text: "minutes", number: true },
+      { name: "Music", key: "music", options: [
+        { label: "—", value: null },
+        ...Object.entries(MUSIC).map(([value, label]) => ({ label, value })),
+      ] },
+    ]
     : [
       { name: "Focus", key: "focusMin", text: "minutes", number: true },
       { name: "Break", key: "breakMin", text: "minutes", number: true },
     ];
   const keys = rows.map(r => r.key);
   const v = await Form.ask(app, meditation ? "✦ Meditation" : "✦ Pomodoro", rows,
-    { values: settings, required: keys, submit: "Save" });
+    { values: settings, required: keys.filter(k => k.endsWith("Min")), submit: "Save" });
 
-  return v && keys.every(k => v[k] > 0)
-    ? { ...settings, ...Object.fromEntries(keys.map(k => [k, v[k]])) } : null;
+  const minutes = keys.filter(k => k.endsWith("Min"));
+
+  return v && minutes.every(k => v[k] > 0)
+    ? { ...settings, ...Object.fromEntries(keys.map(k => [k, v[k] ?? null])) } : null;
 }
 
 // the save: settings, the current session, mini and today's stats (a finished focus session adds

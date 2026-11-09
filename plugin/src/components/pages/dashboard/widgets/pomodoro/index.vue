@@ -8,7 +8,9 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { Notice } from "obsidian";
 import { Timer, listen } from "#/models/timer.js";
-import { askLengths, bell, ding, save as write } from "#/controllers/widgets/pomodoro.js";
+import {
+  askLengths, bell, ding, save as write, syncMusic,
+} from "#/controllers/widgets/pomodoro.js";
 import { keepAwake } from "#/helpers/wakeLock.js";
 import PomodoroMini from "./PomodoroMini.vue";
 import PomodoroRing from "./PomodoroRing.vue";
@@ -42,6 +44,7 @@ function tick() {
     sets: sets > 0 ? `×${sets}` : "",
   });
   void keepAwake(timer.running);   // a running session keeps the screen on, the Mac awake
+  void syncMusic(timer);   // a running meditation's music on, else off
 }
 
 let ending = 0, every = 0, unlisten;

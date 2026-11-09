@@ -45,6 +45,38 @@ export class AudioEngine {
     src.start();
     src.stop(ctx.currentTime + duration);
   }
+
+  // on repeat for `left` ms (the meditation's music): in over 2 s, out over its last `fade` s;
+  // null while muted. The handle's stop() ends it now, with a short fade (no click)
+  async loop(left, { gain = 0.25, fade = 8 } = {}) {
+    if (isMuted()) return null;
+    const buffer = await this.#buffer();
+
+    if (!buffer) return null;
+    const ctx = _ctx(), src = ctx.createBufferSource(), g = ctx.createGain();
+    const t = ctx.currentTime, end = t + left / 1000;
+
+    if (ctx.state === "suspended") ctx.resume();
+    src.buffer = buffer;
+    src.loop = true;
+    src.connect(g).connect(ctx.destination);
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + 2);
+    g.gain.setValueAtTime(gain, Math.max(t + 2, end - fade));
+    g.gain.linearRampToValueAtTime(0, end);
+    src.start();
+    src.stop(end);
+    return {
+      stop: () => {
+        const n = ctx.currentTime;
+
+        g.gain.cancelScheduledValues(n);
+        g.gain.setValueAtTime(g.gain.value, n);
+        g.gain.linearRampToValueAtTime(0, n + 0.3);
+        try { src.stop(n + 0.3); } catch { /* it has ended already */ }
+      },
+    };
+  }
 }
 
 
