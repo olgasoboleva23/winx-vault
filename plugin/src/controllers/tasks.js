@@ -84,15 +84,16 @@ export const editTaskModal = async (t, ask = taskWindow) => {
 };
 
 // A new task from the New task command: `name` (a past task's, or a typed one), the window's
-// picks, the Tasks dialog's result line. A past task (`oldId`) whose name is unchanged (case and
-// spaces aside) reuses its id and record, and so does a typed name some record
-// already has; any other name is a new task: a new id and a record.
-// To the pool (pick.pool): a record with pool: true, no line; else the line (id, dates)
+// picks, the Tasks dialog's result line. The name is the dialog's (its words may have been changed
+// there). A past task (`oldId`) whose name is unchanged (case and spaces aside) reuses its id and
+// record, and so does a name some record already has; any other name is a new task: a new id and
+// a record. To the pool (pick.pool): a record with pool: true, no line; else the line (id, dates)
 // on top of Master.md (false when Master.md is missing).
 export async function saveNewTask(name, pick, result, oldId = null) {
   const { records } = taskStore;
+  const final = Task.unnamed(result, "t0").name || name;
   const key = n => Task.keyOf(`- [ ] ${n}`);
-  const same = id => key(records.get(id)?.name ?? "") === key(name);
+  const same = id => key(records.get(id)?.name ?? "") === key(final);
   const old = same(oldId) ? oldId : [...records.keys()].find(same) ?? null;
   const id = old ?? newId(records, taskStore.tasks);
   const back = Task.unnamed(result, id);
@@ -100,7 +101,7 @@ export async function saveNewTask(name, pick, result, oldId = null) {
   await saveRecords({
     [id]: {
       ...old ? {} : { goal: null, tags: [], after: null },
-      ...recOf(pick), name: back.name || name, ...pick.pool ? { pool: true } : {},
+      ...recOf(pick), name: final, ...pick.pool ? { pool: true } : {},
     },
   });
   return pick.pool ? true : addTask(back.line);

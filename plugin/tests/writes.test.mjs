@@ -126,9 +126,9 @@ test("a new task: a new name gets a new id, a past name its old one; the line go
   assert.equal(Object.keys(json(files)).length, 2);
 });
 
-test("a new task from a past one under another name: a new task, the past one keeps its name", async () => {
+test("a past task picked, its words changed in the Tasks dialog: a new task, the past one keeps its name", async () => {
   const files = vault({ [MASTER]: "- [ ] t4\n" }, { t4: { name: "walk", goal: null, tags: [] } });
-  await saveNewTask("walk the dog", PICK, "- [ ] walk the dog [created:: 2026-11-02]", "t4");
+  await saveNewTask("walk", PICK, "- [ ] walk the dog [created:: 2026-11-02]", "t4");
   assert.match(files[MASTER], /^- \[ \] t5 /);
   assert.equal(json(files).t4.name, "walk");
   assert.equal(json(files).t5.name, "walk the dog");
