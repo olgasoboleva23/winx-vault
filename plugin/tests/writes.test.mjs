@@ -134,6 +134,13 @@ test("a new task from a past one under another name: a new task, the past one ke
   assert.equal(json(files).t5.name, "walk the dog");
 });
 
+test("a new task typed with a name a record already has (no pick): reuses its id", async () => {
+  const files = vault({ [MASTER]: "- [ ] t4\n" }, { t4: { name: "Walk", goal: null, tags: [] } });
+  await saveNewTask("walk", PICK, "- [ ] walk [created:: 2026-11-02]");
+  assert.match(files[MASTER], /^- \[ \] t4 \[created:: 2026-11-02\]\n/);
+  assert.deepEqual(Object.keys(json(files)), ["t4"]);
+});
+
 test("a new task to the pool: a record with pool: true, no line", async () => {
   const files = vault({ [MASTER]: "- [ ] t1\n" });
   assert.equal(await saveNewTask("water herbs", { ...PICK, pool: true }, "- [ ] water herbs [created:: 2026-11-02]"), true);
