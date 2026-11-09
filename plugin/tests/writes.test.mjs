@@ -108,6 +108,17 @@ test("a cancelled Tasks dialog writes nothing", async () => {
   assert.deepEqual(json(files), { t1: { name: "walk" } });
 });
 
+test("the line changed while the dialogs were open: nothing saved, record and line as they were", async () => {
+  const files = vault({ [MASTER]: "- [ ] t1 [due:: 2026-11-03]\n" }, { t1: { name: "walk" } });
+  globalThis.__app.plugins.plugins["obsidian-tasks-plugin"] = { apiV1: { editTaskLineModal: async () => {
+    files[MASTER] = "- [x] t1 [due:: 2026-11-03]\n";   // ticked on another device meanwhile
+    return "- [ ] walk far [due:: 2026-11-05]";
+  } } };
+  await editTaskModal(taskStore.tasks[0], async () => PICK);
+  assert.deepEqual(json(files), { t1: { name: "walk" } });
+  assert.equal(files[MASTER], "- [x] t1 [due:: 2026-11-03]\n");
+});
+
 test("a pool item: the window's picks and name go to its record, no line", async () => {
   const files = vault({ [MASTER]: "- [ ] t2\n" }, { t1: { name: "water herbs", pool: true } });
   await editTaskModal(taskStore.pool[0], async was => (assert.equal(was.name, "water herbs"), { ...PICK, name: "feed herbs" }));

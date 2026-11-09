@@ -48,7 +48,8 @@ export const newId = (records, tasks = []) => {
 // Edit a task: the task window (difficulty, area, time, sticker: to its record), then the Tasks
 // plugin's own edit dialog on its line with the name in place of the id (name: to the record,
 // dates: to the line; works on the phone). Cancelling either changes nothing. A pool item has no
-// line: the window alone, with its name. `ask` is the window (a test gives its own).
+// line: the window alone, with its name. `ask` is the window (a test gives its own). A line changed
+// meanwhile (another device): nothing saved.
 export const editTaskModal = async (t, ask = taskWindow) => {
   const task = Task.of(t), id = task.id, api = tasksApi();
   let line = null;
@@ -79,8 +80,9 @@ export const editTaskModal = async (t, ask = taskWindow) => {
     next = back.line;
   }
 
+  // the line first: changed meanwhile, it is left alone (editLine's notice) and so is the record
+  if (next !== line && !await editTaskLine(t, () => next)) return;
   await saveRecords({ [id]: patch });
-  if (next !== line) await editTaskLine(t, () => next);
 };
 
 // A new task from the New task command: `name` (a past task's, or a typed one), the window's
