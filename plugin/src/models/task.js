@@ -123,11 +123,12 @@ export class Task {
     return [`${this.line.match(/^\s*- \[.\]/)[0]} ${name}`, ...this.line.match(FIELD) ?? []]
       .join(" ");
   }
-  // the dialog's result back: its words are the new name, the line gets `id` again
-  static unnamed(line, id) {
-    const t = new Task(line);
+  // the dialog's result back: its words are the new name, the line gets `id` again (a 🔁 task
+  // set to done there comes back as two lines, the next copy and the done one: each gets it)
+  static unnamed(result, id) {
+    const lines = result.split("\n").filter(l => ANY.test(l)).map(l => new Task(l));
 
-    return { name: t.words, line: t.named(id) };
+    return { name: lines[0].words, line: lines.map(t => t.named(id)).join("\n") };
   }
 
   // the first day from `today` its rule allows: a weekday rule ("every week on Monday, …") its

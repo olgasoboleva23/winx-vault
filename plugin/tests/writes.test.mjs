@@ -189,3 +189,13 @@ test("a drop renumbers the day's group 0…n in the records", async () => {
   assert.deepEqual(Object.fromEntries(Object.entries(json(files)).map(([k, r]) => [k, r.order])),
     { t1: 1, t2: 2, t3: 0, t4: undefined });
 });
+
+test("a 🔁 task set to done in the Tasks dialog: both lines get the id, the name stays clean", async () => {
+  const files = vault({ [MASTER]: "- [ ] t1 [repeat:: every day] [due:: 2026-11-02]\n" }, { t1: { name: "walk" } });
+  withTasksApi("- [ ] walk [repeat:: every day] [due:: 2026-11-03]\n"
+    + "- [x] walk [repeat:: every day] [due:: 2026-11-02] [completion:: 2026-11-02]");
+  await editTaskModal(taskStore.tasks[0], async () => PICK);
+  assert.equal(json(files).t1.name, "walk");
+  assert.equal(files[MASTER], "- [ ] t1 [repeat:: every day] [due:: 2026-11-03]\n"
+    + "- [x] t1 [repeat:: every day] [due:: 2026-11-02] [completion:: 2026-11-02]\n");
+});
