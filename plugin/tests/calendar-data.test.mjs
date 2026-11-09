@@ -11,7 +11,7 @@ const task = (status, spec) => ({ status, ...idTask(spec), path: "Tasks/Master.m
 const poolItem = spec => { const { text, rec } = idTask(spec); return { id: text, pool: true, rec, path: "tasks.json" }; };
 const texts = list => list.map(t => T(t).text);
 const TODAY = "2026-10-28";   // a Wednesday
-const AREAS = ["#area/body", "#area/mind", "#area/base"];
+const AREAS = ["body", "mind", "base"];
 const data = (tasks, { poolLines = [], days = weekOf(TODAY) } = {}) => new CalendarData({ tasks, poolLines, days, today: TODAY, areaOrder: AREAS });
 
 test("days: open on their date, done on their ✅ date, 🔁 repeats faded in the future only", () => {
@@ -50,7 +50,7 @@ test("pool records become pool items with their own Task", () => {
   assert.equal(m.pool.length, 1);
   assert.ok(m.pool[0].pool);
   assert.equal(T(m.pool[0]).text, "take out trash");
-  assert.equal(T(m.pool[0]).area, "#area/base");
+  assert.equal(T(m.pool[0]).area, "base");
   assert.equal(T(m.pool[0]).line, `- ${item.id}`);
   assert.ok(m.all.includes(m.pool[0]));   // a data-task key finds pool items too
 });
@@ -130,10 +130,10 @@ test("balance: each area's tasks on the shown days (open + done, no 🔁 ghosts)
     task(" ", "#⭐easy #area/body stretch [repeat:: every day] [due:: 2026-10-28]"),   // today + ghosts after it
     task("x", "#⭐easy #area/body old [completion:: 2026-10-19]"),                    // last week
   ]);
-  assert.deepEqual(m.balance(["#area/body", "#area/mind", "#area/base"]), [
-    { area: "#area/body", planned: 3, done: 1 },
-    { area: "#area/mind", planned: 1, done: 1 },
-    { area: "#area/base", planned: 0, done: 0 },
+  assert.deepEqual(m.balance(["body", "mind", "base"]), [
+    { area: "body", planned: 3, done: 1 },
+    { area: "mind", planned: 1, done: 1 },
+    { area: "base", planned: 0, done: 0 },
   ]);
 });
 
@@ -194,9 +194,9 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
     metadataCache: { getFirstLinkpathDest: (name, from) => (lookups++, name === "fist.webp" ? { path: `Assets/${name}` } : null) },
     vault: { getResourcePath: f => `app://${f.path}` },
   };
-  const ctx = { infos: new Map(), config: { areaIcons: { "#area/body": "🌺" } }, actions: { canSkip: () => true } };
+  const ctx = { infos: new Map(), config: { areaIcons: { "body": "🌺" } }, actions: { canSkip: () => true } };
   const i = taskInfo(t, ctx, app);
-  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "#⭐easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
+  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
 });

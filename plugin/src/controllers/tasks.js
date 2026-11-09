@@ -15,9 +15,9 @@ import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 export const editTaskLine = (t, fn) =>
   editLine(t.path, t.line, line => new Task(line).sameAs(Task.of(t)), fn);
 
-// The task window's picks as record fields: daytime "#time/morning" → "morning".
+// The task window's picks as record fields.
 const recOf = p => ({
-  difficulty: p.difficulty ?? null, area: p.area ?? null, daytime: p.daytime?.slice(6) ?? null,
+  difficulty: p.difficulty ?? null, area: p.area ?? null, daytime: p.daytime ?? null,
   sticker: p.sticker ?? null,
 });
 

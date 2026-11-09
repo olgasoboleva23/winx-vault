@@ -50,7 +50,7 @@ function mount(over = {}) {
     state: st, today: TODAY, days, base: state.baseDate(st, TODAY), view: st.view,
     shown: { open: true, ghost: true, done: st.showDone }, everything: null, TASKS: {}, infos: new Map(),
     model: new data.CalendarData({ tasks: TASKS(), poolLines: [], days, today: TODAY }),
-    config: { areas: [{ tag: "#area/body", label: "🌺 Body" }], areaIcons: {}, areaMap: {} },
+    config: { areas: [{ key: "body", label: "🌺 Body" }], areaIcons: {}, areaMap: {} },
   });
   const text = data.T;
   ctx.actions = { ...actions.makeActions(ctx), tick: t => ticked.push(t),
@@ -75,7 +75,7 @@ test("its state goes into Obsidian's layout and comes back; area and the phone's
     unfolded: ["2026-11-04"], unfoldedDay: null, backlogOpen: false });
   await vue.nextTick();
   const before = saves;
-  v.state.area = "#area/body"; v.state.picked = "2026-11-06";
+  v.state.area = "body"; v.state.picked = "2026-11-06";
   await vue.nextTick();
   assert.equal(saves, before);   // not saved
   v.state.unfolded = [...v.state.unfolded, "2026-11-05"];
@@ -153,7 +153,7 @@ test("the panel's tab redraws only the panel: the header's elements stay the sam
 test("the area filter: a piece of the balance bar picks its area, again: all", async () => {
   const { el, st } = mount();
   el.querySelector(".winx-cal__area").click();
-  assert.equal(st.area, "#area/body");
+  assert.equal(st.area, "body");
   el.querySelector(".winx-cal__area").click();
   assert.equal(st.area, null);
 });

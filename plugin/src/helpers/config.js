@@ -1,18 +1,19 @@
-// Areas, difficulties, XP and gold, levels, market categories: the numbers the widgets share.
+// Areas, difficulties, XP and gold, levels, market categories: the numbers the widgets share. A
+// task's record names its difficulty and area by `key`.
 const difficulties = [
-  { label: "⭐ Easy", tag: "#⭐easy", xp: 5, gold: 2, prop: "easy" },
-  { label: "⭐⭐ Medium", tag: "#⭐⭐medium", xp: 10, gold: 5, prop: "medium" },
-  { label: "⭐⭐⭐ Hard", tag: "#⭐⭐⭐hard", xp: 20, gold: 10, prop: "hard" },
-  { label: "⭐⭐⭐⭐ Epic", tag: "#⭐⭐⭐⭐epic", xp: 50, gold: 25, prop: "epic" },
+  { label: "⭐ Easy", key: "easy", xp: 5, gold: 2 },
+  { label: "⭐⭐ Medium", key: "medium", xp: 10, gold: 5 },
+  { label: "⭐⭐⭐ Hard", key: "hard", xp: 20, gold: 10 },
+  { label: "⭐⭐⭐⭐ Epic", key: "epic", xp: 50, gold: 25 },
 ];
 
 const areas = [
-  { label: "🌺 Body", tag: "#area/body", name: "Vitality" },
-  { label: "🔮 Mind", tag: "#area/mind", name: "Knowledge" },
-  { label: "💎 Wealth", tag: "#area/wealth", name: "Resources" },
-  { label: "🏰 Base", tag: "#area/base", name: "Sanctuary" },
-  { label: "🌠 Occasions", tag: "#area/occasions", name: "Memory" },
-  { label: "🌙 Rest", tag: "#area/rest", name: "Serenity" },
+  { label: "🌺 Body", key: "body", name: "Vitality" },
+  { label: "🔮 Mind", key: "mind", name: "Knowledge" },
+  { label: "💎 Wealth", key: "wealth", name: "Resources" },
+  { label: "🏰 Base", key: "base", name: "Sanctuary" },
+  { label: "🌠 Occasions", key: "occasions", name: "Memory" },
+  { label: "🌙 Rest", key: "rest", name: "Serenity" },
 ];
 
 
@@ -22,12 +23,12 @@ export default {
   areas,
 
   // derived maps — ready to use in widgets
-  xpMap: Object.fromEntries(difficulties.map((d) => [d.tag, d.xp])),
-  areaMap: Object.fromEntries(areas.map((a) => [a.tag, a.name])),
-  // icon per #area/ tag, incl. tags without a Life Areas row
+  xpMap: Object.fromEntries(difficulties.map((d) => [d.key, d.xp])),
+  areaMap: Object.fromEntries(areas.map((a) => [a.key, a.name])),
+  // icon per area key, incl. areas without a Life Areas row
   areaIcons: {
-    ...Object.fromEntries(areas.map((a) => [a.tag, a.label.split(" ")[0]])),
-    "#area/learning": "📜", "#area/work": "🪄", "#area/personal": "🦋", "#area/health": "🧪",
+    ...Object.fromEntries(areas.map((a) => [a.key, a.label.split(" ")[0]])),
+    learning: "📜", work: "🪄", personal: "🦋", health: "🧪",
   },
 
   levels: [

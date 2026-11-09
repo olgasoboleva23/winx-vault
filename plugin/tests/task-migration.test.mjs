@@ -15,7 +15,7 @@ test("an emoji line with every field becomes an id and Dataview fields in order"
   assert.equal(master, "- [x] t1 [repeat:: every day when done] [due:: 2026-11-08] "
     + "[created:: 2026-11-07] [completion:: 2026-11-08]");
   assert.deepEqual(records, { t1: {
-    name: "stretch a bit", difficulty: "#⭐⭐medium", area: "#area/body", daytime: "morning",
+    name: "stretch a bit", difficulty: "medium", area: "body", daytime: "morning",
     goal: null, tags: [], sticker: "cat.webp", after: null,
   } });
 });
@@ -42,7 +42,7 @@ test("two spellings of one task get one id; the record from the latest copy", ()
   assert.equal(master, "- [x] t1 [due:: 2026-11-01] [completion:: 2026-11-01]\n"
     + "- [ ] t1 [due:: 2026-11-05]\n- [x] t2 [completion:: 2026-11-02]");
   assert.equal(records.t1.name, "water plants");
-  assert.equal(records.t1.difficulty, "#⭐⭐medium");
+  assert.equal(records.t1.difficulty, "medium");
   assert.deepEqual(Object.keys(records), ["t1", "t2"]);
 });
 
@@ -55,7 +55,7 @@ test("a pool line and a Master line with the same words share the id, with pool:
   assert.equal(records.t1.pool, true);
   assert.equal(records.t1.name, "feed the fish");
   assert.deepEqual(records.t2, {
-    name: "dust shelves", difficulty: "#⭐easy", area: "#area/home", daytime: null, goal: null,
+    name: "dust shelves", difficulty: "easy", area: "home", daytime: null, goal: null,
     tags: [], sticker: null, after: null, pool: true,
   });
 });

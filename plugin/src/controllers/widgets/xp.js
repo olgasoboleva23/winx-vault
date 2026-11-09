@@ -46,7 +46,7 @@ export async function loadLifeAreas({ dv }) {
     .filter(t => t.isDone && t.doneOn && t.doneOn >= since && t.doneOn <= until);
 
   for (const t of done) {
-    const area = Object.entries(areaMap).find(([tag]) => t.tags.includes(tag))?.[1];
+    const area = areaMap[t.area];
 
     if (area) scores[area] += taskXp(t, xpMap);
   }

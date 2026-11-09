@@ -41,8 +41,8 @@ function recordOf({ words, tags, sticker }) {
   const goal = tag("#goal/");
 
   return {
-    name: words, difficulty: tag("#⭐"), area: tag("#area/"),
-    daytime: tag("#time/")?.slice(6) ?? null,
+    name: words, difficulty: tag("#⭐")?.replace(/^#⭐+/u, "") ?? null,
+    area: tag("#area/")?.slice(6) ?? null, daytime: tag("#time/")?.slice(6) ?? null,
     goal, tags: [...new Set(tags.filter(t => t !== goal && !/^#(⭐|area\/|time\/|id\/|after\/)/u
       .test(t)))],
     sticker, after: tag("#after/id/")?.slice(10) ?? null,

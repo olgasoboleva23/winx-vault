@@ -18,7 +18,7 @@ export function earned() {
   let gold = 0;
 
   for (const t of taskStore.tasks.map(T)) {
-    if (t.isDone) gold += config.difficulties.find(d => t.tags.includes(d.tag))?.gold ?? 0;
+    if (t.isDone) gold += config.difficulties.find(d => d.key === t.difficulty)?.gold ?? 0;
   }
 
   return gold;

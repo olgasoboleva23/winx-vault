@@ -16,7 +16,8 @@ export function idTask(spec) {
   return {
     text: [id, ...spec.match(FIELD) ?? []].join(" "),
     rec: {
-      name, difficulty: tag("#⭐"), area: tag("#area/"), daytime: tag("#time/")?.slice(6) ?? null,
+      name, difficulty: tag("#⭐")?.replace(/^#⭐+/u, "") ?? null, area: tag("#area/")?.slice(6) ?? null,
+      daytime: tag("#time/")?.slice(6) ?? null,
       goal: tag("#goal/"), tags: tags.filter(t => !/^#(⭐|area\/|time\/|goal\/)/u.test(t)),
       sticker: spec.match(/!\[\[([^\]|]+)/)?.[1] ?? null, after: null,
     },

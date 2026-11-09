@@ -5,17 +5,17 @@ import { Task, fieldsOf, taskChoices } from "#/models/task.js";
 const T = line => new Task(line);
 
 test("what a line is: its dates from the line, its own part from the record of its id", () => {
-  const rec = { name: "gym", difficulty: "#⭐⭐medium", area: "#area/body", daytime: "evening", goal: "#goal/workout", tags: ["#old"], sticker: "fairy.webp", after: "t3" };
+  const rec = { name: "gym", difficulty: "medium", area: "body", daytime: "evening", goal: "#goal/workout", tags: ["#old"], sticker: "fairy.webp", after: "t3" };
   const t = new Task("- [ ] t12 [repeat:: every week on Monday, Friday when done] [due:: 2026-10-28] [created:: 2026-05-01]", null, rec);
   assert.equal(t.status, " ");
   assert.ok(t.isOpen && !t.isDone && !t.isSkipped);
   assert.equal(t.id, "t12");
   assert.equal(t.rec, rec);
-  assert.equal(t.area, "#area/body");
-  assert.equal(t.difficulty, "#⭐⭐medium");
+  assert.equal(t.area, "body");
+  assert.equal(t.difficulty, "medium");
   assert.equal(t.daytime, "evening");
   assert.equal(t.after, "t3");
-  assert.deepEqual(t.tags, ["#⭐⭐medium", "#area/body", "#time/evening", "#goal/workout", "#old"]);
+  assert.deepEqual(t.tags, ["#goal/workout", "#old"]);
   assert.equal(t.rule, "every week on Monday, Friday when done");
   assert.ok(t.isRecurring && t.whenDone && !t.isBirthday && !t.isPaused);
   assert.equal(t.date, "2026-10-28");
@@ -24,7 +24,7 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.equal(t.text, "gym");
   assert.equal(t.key, "t12");
   assert.equal(Task.of({ status: "x", text: "t12 [completion:: 2026-10-29]", rec }).text, "gym");
-  assert.deepEqual(new Task("- [ ] t12", null, { name: "gym", difficulty: "#⭐easy", area: null, daytime: null, goal: null, tags: [], sticker: null, after: null }).tags, ["#⭐easy"]);
+  assert.deepEqual(new Task("- [ ] t12", null, { name: "gym", difficulty: "easy", area: null, daytime: null, goal: null, tags: [], sticker: null, after: null }).tags, []);
 
   const plain = T("- [x] call bank [scheduled:: 2026-10-20] [due:: 2026-10-22] [completion:: 2026-10-21]");
   assert.ok(plain.isDone && !plain.isRecurring);
@@ -77,8 +77,8 @@ test("place", () => {
 
 test("picks, named, unnamed", () => {
   const t = new Task("- [ ] t7 [repeat:: every day]", null,
-    { name: "meditate", difficulty: "#⭐easy", area: "#area/mind", daytime: "morning", sticker: "bloom.gif" });
-  assert.deepEqual(t.picks, { difficulty: "#⭐easy", area: "#area/mind", daytime: "#time/morning", sticker: "bloom.gif" });
+    { name: "meditate", difficulty: "easy", area: "mind", daytime: "morning", sticker: "bloom.gif" });
+  assert.deepEqual(t.picks, { difficulty: "easy", area: "mind", daytime: "morning", sticker: "bloom.gif" });
   const line = "- [x] t7 [repeat:: every week on Monday when done] [due:: 2026-11-02] [completion:: 2026-11-02]";
   const named = T(line).named("meditate daily");
   assert.equal(named, "- [x] meditate daily [repeat:: every week on Monday when done] [due:: 2026-11-02] [completion:: 2026-11-02]");
@@ -143,21 +143,21 @@ test("pause state, skipping and overdue are the task's own", () => {
 
 test("taskChoices: one per task, by area, the most done first; the picks of its record", () => {
   const recs = {
-    t1: { name: "Wash dishes", difficulty: "#⭐⭐medium", area: "#area/base", daytime: "evening", sticker: "cat.png" },
-    t2: { name: "stretch", difficulty: "#⭐easy", area: "#area/body" },
-    t3: { name: "take out trash", difficulty: "#⭐⭐medium", area: "#area/base", pool: true },
+    t1: { name: "Wash dishes", difficulty: "medium", area: "base", daytime: "evening", sticker: "cat.png" },
+    t2: { name: "stretch", difficulty: "easy", area: "body" },
+    t3: { name: "take out trash", difficulty: "medium", area: "base", pool: true },
   };
   const c = taskChoices([
     "- [x] t1 [completion:: 2026-10-01]", "- [x] t1 [completion:: 2026-10-20]",
     "- [ ] t2 [due:: 2026-11-01]", "- [x] t2 [completion:: 2026-09-01]",
   ].map(l => new Task(l, null, recs[l.match(/t\d+/)[0]])), new Map(Object.entries(recs)),
-  ["#area/body", "#area/base"]);
+  ["body", "base"]);
   assert.deepEqual(c.map(x => [x.id, x.name, x.area, x.done, x.last]), [
-    ["t2", "stretch", "#area/body", 1, "2026-09-01"],
-    ["t1", "Wash dishes", "#area/base", 2, "2026-10-20"],
-    ["t3", "take out trash", "#area/base", 0, null],
+    ["t2", "stretch", "body", 1, "2026-09-01"],
+    ["t1", "Wash dishes", "base", 2, "2026-10-20"],
+    ["t3", "take out trash", "base", 0, null],
   ]);
-  assert.deepEqual(c[1].picks, { difficulty: "#⭐⭐medium", area: "#area/base", daytime: "#time/evening", sticker: "cat.png" });
+  assert.deepEqual(c[1].picks, { difficulty: "medium", area: "base", daytime: "evening", sticker: "cat.png" });
 });
 
 test("a line whose id has no record (hand-typed, or a stale tasks.json): its id is its name", () => {
@@ -180,11 +180,11 @@ test("sameAs: the same copy of a task (words, status, day), not its done copy or
 });
 
 test("Task.of a pool item (a record with pool: true): its id as the line, its record", () => {
-  const rec = { name: "take out trash", area: "#area/base", pool: true };
+  const rec = { name: "take out trash", area: "base", pool: true };
   const t = Task.of({ id: "t3", pool: true, rec, path: "tasks.json" });
   assert.equal(t.line, "- t3");
   assert.equal(t.text, "take out trash");
-  assert.equal(t.area, "#area/base");
+  assert.equal(t.area, "base");
 });
 
 test("fieldsOf reads every field, a rule with words up to its ]", () => {

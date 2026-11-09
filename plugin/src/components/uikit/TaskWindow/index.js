@@ -20,14 +20,14 @@ export const taskWindow = async (preset = {}, required = false) => {
     ...("name" in preset ? [{ name: "Name", key: "name", text: "name" }] : []),
     {
       name: "Difficulty", key: "difficulty",
-      options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.tag })),
+      options: difficulties.map(d => ({ label: `${d.label} (${d.xp} XP)`, value: d.key })),
     },
-    { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.tag })) },
+    { name: "Area", key: "area", options: areas.map(a => ({ label: a.label, value: a.key })) },
     // any task's time of day: a one-off goes morning / evening in its day, a 🔁 box groups by it
     { name: "Time of day", key: "daytime", options: [
       { label: "—", value: null },
-      { label: "🌅 morning", value: "#time/morning" },
-      { label: "🌙 evening", value: "#time/evening" },
+      { label: "🌅 morning", value: "morning" },
+      { label: "🌙 evening", value: "evening" },
     ] },
     { name: "Sticker", key: "sticker", options: [
       { label: "—", value: null },

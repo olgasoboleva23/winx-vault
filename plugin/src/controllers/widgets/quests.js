@@ -8,7 +8,7 @@ import { T, taskKey, daytimeMark, daytimeRank } from "#/models/calendarData.js";
 import { taskStore } from "#/store/tasks.js";
 
 export async function loadQuests({ dv }) {
-  const day = ymd(pageDay(dv)), order = config.areas.map(a => a.tag);
+  const day = ymd(pageDay(dv)), order = config.areas.map(a => a.key);
   const rank = task => (i => i < 0 ? order.length : i)(order.indexOf(task.area));
   const rows = (pick, done) => taskStore.tasks.map(t => [t, T(t)]).filter(([, k]) => pick(k))
     .sort(([, a], [, b]) => daytimeRank(a.daytime) - daytimeRank(b.daytime) || rank(a) - rank(b)

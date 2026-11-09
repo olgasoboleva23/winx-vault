@@ -52,10 +52,10 @@ export class Task {
   get tags() {
     const r = this.rec ?? {};
 
-    return [r.difficulty, r.area, r.daytime && `#time/${r.daytime}`, r.goal, ...r.tags ?? []]
+    return [r.goal, ...r.tags ?? []]
       .filter(Boolean);
   }
-  get area()       { return this.rec?.area ?? null; }   // "#area/body"
+  get area()       { return this.rec?.area ?? null; }   // "body"
   get difficulty() { return this.rec?.difficulty ?? null; }
   // the id it follows
   get after()      { return this.rec?.after ?? null; }
@@ -115,11 +115,11 @@ export class Task {
 
     return done ? withField(base, "completion", date) : new Task(base).setDue(date);
   }
-  // what the task window shows and sets: difficulty, area, daytime ("#time/…") and the sticker
+  // what the task window shows and sets: difficulty, area, daytime and the sticker
   get picks() {
     return {
       difficulty: this.difficulty, area: this.area,
-      daytime: this.daytime && `#time/${this.daytime}`, sticker: this.stickers[0] ?? null,
+      daytime: this.daytime, sticker: this.stickers[0] ?? null,
     };
   }
   // the line with its id swapped for `name`: what the Tasks plugin's dialog shows and edits
@@ -182,7 +182,7 @@ export class Task {
 }
 
 // Every record of tasks.json (pool ones too) once, for the "New task" search: its name and picks,
-// how many lines with its id are done and when last; by `areaOrder` (["#area/…"], the rest after),
+// how many lines with its id are done and when last; by `areaOrder` (area keys, the rest after),
 // then the most done and the most recent first.
 export function taskChoices(tasks, records, areaOrder) {
   const done = {};
@@ -201,7 +201,7 @@ export function taskChoices(tasks, records, areaOrder) {
     id, name: r.name ?? id, area: r.area ?? null,
     picks: {
       difficulty: r.difficulty ?? null, area: r.area ?? null,
-      daytime: r.daytime ? `#time/${r.daytime}` : null, sticker: r.sticker ?? null,
+      daytime: r.daytime ?? null, sticker: r.sticker ?? null,
     },
     done: done[id]?.done ?? 0, last: done[id]?.last ?? null,
   })).sort((a, b) => rank(a.area) - rank(b.area) || b.done - a.done

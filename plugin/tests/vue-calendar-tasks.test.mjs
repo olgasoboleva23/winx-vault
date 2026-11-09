@@ -11,7 +11,7 @@ before(async () => {
   const load = async n => (await import(`../src/components/pages/calendar/${n}`)).default;
   [TaskText, TaskRow, TaskCard] = await Promise.all(["TaskText.vue", "TaskRow.vue", "TaskCard/index.vue"].map(load));
 });
-const info = over => ({ key: "k7", area: "body", difficulty: "#⭐⭐medium", text: "walk <fast>", label: "🌺 walk <fast>",
+const info = over => ({ key: "k7", area: "body", difficulty: "medium", text: "walk <fast>", label: "🌺 walk <fast>",
   stickers: ["app://x/levi.png"], canSkip: false, ...over });
 const global = { provide: { calendar: { task: () => null } } };
 const html = (C, props) => mount(C, { props, global }).html({ raw: true }).replace(/<!--[^]*?-->/g, "");
@@ -19,7 +19,7 @@ const html = (C, props) => mount(C, { props, global }).html({ raw: true }).repla
 test("TaskText: stars (none without a difficulty), the text, the stickers", () => {
   assert.equal(mount({ components: { TaskText }, template: "<div><TaskText :task='t' /></div>", data: () => ({ t: info() }) })
     .element.innerHTML.replace(/<!--[^]*?-->/g, ""),
-    '<span class="tag" data-tag-name="#⭐⭐medium" aria-label="difficulty" data-tip="winx-tooltip"></span> walk &lt;fast&gt; ' +
+    '<span class="tag" data-difficulty="medium" aria-label="difficulty" data-tip="winx-tooltip"></span> walk &lt;fast&gt; ' +
     '<img class="winx-cal__sticker" src="app://x/levi.png" alt="">');
 });
 

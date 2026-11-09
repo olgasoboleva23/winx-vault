@@ -5,7 +5,7 @@ export const SHOWN = 8;   // No date: the first 8 until "show all"
 
 // a group card's title, as on the Life Areas chart
 export function areaTitle({ areaIcons, areaMap }, g) {
-  const name = areaMap[g] ?? (g ? g.slice(6) : "other");
+  const name = areaMap[g] ?? g ?? "other";
 
   return `${areaIcons[g] ?? "✦"} ${name[0].toUpperCase()}${name.slice(1)}`;
 }

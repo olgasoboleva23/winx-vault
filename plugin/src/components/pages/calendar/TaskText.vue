@@ -18,7 +18,7 @@ const text = computed(() =>
     v-if="task.difficulty"
     v-tip="'difficulty'"
     class="tag"
-    :data-tag-name="task.difficulty"
+    :data-difficulty="task.difficulty"
   />
   {{ text }}
   <img

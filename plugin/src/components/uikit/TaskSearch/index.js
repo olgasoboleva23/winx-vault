@@ -10,10 +10,10 @@ import { app } from "#/helpers/app.js";
 
 export function pickTask() {
   const choices = taskChoices(
-    taskStore.tasks.map(t => Task.of(t)), taskStore.records, config.areas.map(a => a.tag),
+    taskStore.tasks.map(t => Task.of(t)), taskStore.records, config.areas.map(a => a.key),
   );
   const label = area => area
-    ? `${config.areaIcons[area] ?? "✦"} ${config.areaMap[area] ?? area.slice(6)}`
+    ? `${config.areaIcons[area] ?? "✦"} ${config.areaMap[area] ?? area}`
     : "✦ other";
   const find = q => findChoices(choices, q)
     .map((c, i, all) => ({ ...c, header: !c.isNew && (i === 0 || c.area !== all[i - 1].area) }));

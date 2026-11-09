@@ -32,29 +32,29 @@ On a phone the same dashboard and calendar tabs are used (📅 / ✦ switch betw
 
 ## 🎮 XP & Levels
 
-Completing a task awards XP and gold by its difficulty:
+Completing a task awards XP and gold by its difficulty (the `difficulty` of its record in `tasks.json`):
 
-| Tag | XP | Gold |
+| Difficulty | XP | Gold |
 |---|---|---|
-| `#⭐easy` | 5 | 2 |
-| `#⭐⭐medium` | 10 | 5 |
-| `#⭐⭐⭐hard` | 20 | 10 |
-| `#⭐⭐⭐⭐epic` | 50 | 25 |
+| ⭐ `easy` | 5 | 2 |
+| ⭐⭐ `medium` | 10 | 5 |
+| ⭐⭐⭐ `hard` | 20 | 10 |
+| ⭐⭐⭐⭐ `epic` | 50 | 25 |
 
 Level `n` costs `100 + (n-1) × 25` XP.
 
 ## Life areas
 
-| Area | Tag | Radar name |
+| Area | Key | Radar name |
 |---|---|---|
-| 🌺 Body | `#area/body` | Vitality |
-| 🔮 Mind | `#area/mind` | Knowledge |
-| 💎 Wealth | `#area/wealth` | Resources |
-| 🏰 Base | `#area/base` | Sanctuary |
-| 🌠 Occasions | `#area/occasions` | Memory |
-| 🌙 Rest | `#area/rest` | Serenity |
+| 🌺 Body | `body` | Vitality |
+| 🔮 Mind | `mind` | Knowledge |
+| 💎 Wealth | `wealth` | Resources |
+| 🏰 Base | `base` | Sanctuary |
+| 🌠 Occasions | `occasions` | Memory |
+| 🌙 Rest | `rest` | Serenity |
 
-Tags without a radar row still get an icon: `#area/learning` 📜, `#area/work` 🪄, `#area/personal` 🦋, `#area/health` 🧪. All of it is in `plugin/src/helpers/config.js`.
+Areas without a radar row still get an icon: `learning` 📜, `work` 🪄, `personal` 🦋, `health` 🧪. All of it is in `plugin/src/helpers/config.js`.
 
 ---
 

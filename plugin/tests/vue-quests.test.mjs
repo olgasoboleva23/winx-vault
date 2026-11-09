@@ -25,8 +25,8 @@ const NOTE = [
 const seed = () => {
   taskStore.put(MASTER, NOTE);
   taskStore.putRecords({
-    t1: { name: "later" }, t2: { name: "Walk", area: "#area/body" },
-    t3: { name: "Read", area: "#area/mind" }, t4: { name: "Tea", area: "#area/rest" },
+    t1: { name: "later" }, t2: { name: "Walk", area: "body" },
+    t3: { name: "Read", area: "mind" }, t4: { name: "Tea", area: "rest" },
   });
 };
 
