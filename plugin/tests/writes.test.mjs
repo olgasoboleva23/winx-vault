@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { Notice } from "obsidian";
 import { setApp } from "#/helpers/app.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
 import { addTask, saveRecords, newId, editTaskModal, saveNewTask } from "#/controllers/tasks.js";
@@ -224,6 +225,25 @@ test("a drop renumbers the day's group 0…n in the records", async () => {
   await makeActions({ today: day, model }).reorder(tasks[2], tasks[0], false, day);   // c before a
   assert.deepEqual(Object.fromEntries(Object.entries(json(files)).map(([k, r]) => [k, r.order])),
     { t1: 1, t2: 2, t3: 0, t4: undefined });
+});
+
+test("a drop on a task outside the group does nothing", async () => {
+  const day = "2026-11-02", recs = { t1: { name: "a" }, t2: { name: "b" }, t3: { name: "c" } };
+  const lines = ["t1", "t2", "t3 [repeat:: every day]"].map(l => `- [ ] ${l} [due:: ${day}]`);
+  const files = vault({ [MASTER]: lines.join("\n") }, recs);
+  const tasks = taskStore.tasks.map((t, i) => ({ ...t, line: i }));
+  const model = new CalendarData({ tasks, poolLines: [], days: [day], today: day, areaOrder: [] });
+  const before = files[RECORDS];
+  await makeActions({ today: day, model }).reorder(tasks[0], tasks[2], false, day);
+  assert.equal(files[RECORDS], before);
+});
+
+test("a tasks.json that isn't valid JSON: New task says so and saves nothing", async () => {
+  const files = vault({ [MASTER]: "- [ ] t1\n", [RECORDS]: "{oops" });
+  await saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02]");
+  assert.match(Notice.last, /tasks\.json isn't valid JSON — task not saved/);
+  assert.equal(files[MASTER], "- [ ] t1\n");
+  assert.equal(files[RECORDS], "{oops");
 });
 
 test("a 🔁 task set to done in the Tasks dialog: both lines get the id, the name stays clean", async () => {

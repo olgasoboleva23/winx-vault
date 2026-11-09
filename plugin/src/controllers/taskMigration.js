@@ -113,16 +113,18 @@ export async function migrateTasks() {
     const masterText = await vault.read(master), poolText = pool ? await vault.read(pool) : "";
     const { master: next, records } = migrate(masterText, poolText);
     // Master.md or Pool.md changed since they were read (a sync, Tasks): migrating would lose it
-    const changed = async () => await vault.read(master) !== masterText
-      || (pool ? await vault.read(pool) : "") !== poolText;
-    const stopped = "✦ migration stopped: Master.md changed while migrating";
+    const changed = async () => await vault.read(master) !== masterText ? "Master.md"
+      : (pool ? await vault.read(pool) : "") !== poolText ? "Pool.md" : "";
+    let was = await changed();
+    const stopped = () => `✦ migration stopped: ${was} changed while migrating`;
 
-    if (await changed()) return void new Notice(`${stopped} — run it again`);
+    if (was) return void new Notice(`${stopped()} — run it again`);
     await vault.create(MASTER_OLD, masterText);
     if (pool) await vault.create(POOL_OLD, poolText);
     await vault.create(TASK_RECORDS, JSON.stringify(records, null, 2));
-    if (await changed())
-      return void new Notice(`${stopped} — delete tasks.json and the (old) copies, run it again`);
+    was = await changed();
+    if (was)
+      return void new Notice(`${stopped()} — delete tasks.json and the (old) copies, run it again`);
 
     await vault.modify(master, next);
     const goals = vault.getFileByPath(`${GOALS}.md`);

@@ -159,6 +159,20 @@ test("Master.md changed while migrating, before its rewrite: Master.md not overw
   assert.match(Notice.last, /migration stopped: Master\.md changed while migrating/);
 });
 
+test("Pool.md changed while migrating: the notice names Pool.md", async () => {
+  const { files, app } = vault({ [MASTER]: "- [ ] #⭐easy walk", [POOL]: "Pool.\n\n- #⭐easy nap\n" });
+  const read = app.vault.read;
+
+  app.vault.read = async f => {
+    const text = await read(f);
+
+    if (f.path === POOL) app.vault.read = read, files[POOL] += "- #⭐easy tea\n";
+    return text;
+  };
+  await migrateTasks();
+  assert.match(Notice.last, /migration stopped: Pool\.md changed while migrating/);
+});
+
 test("Goals.md: a goal's tag:: #goal/x becomes key:: x, the rest stays", () => {
   assert.equal(migrateGoals("# Goals\n\n- name:: Walk\n  tag:: #goal/walk\n  days:: пн\n- name:: Read\n  key:: read\n"),
     "# Goals\n\n- name:: Walk\n  key:: walk\n  days:: пн\n- name:: Read\n  key:: read\n");

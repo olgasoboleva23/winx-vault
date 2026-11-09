@@ -119,7 +119,10 @@ export class Task {
   }
   // the line with its id swapped for `name`: what the Tasks plugin's dialog shows and edits
   named(name) {
-    return [`${this.line.match(/^\s*- \[.\]/)[0]} ${name}`, ...this.line.match(FIELD) ?? []]
+    const box = this.line.match(/^\s*- \[.\]/)?.[0];
+
+    if (!box) return this.line;   // no checkbox: nothing to name
+    return [`${box} ${name}`, ...this.line.match(FIELD) ?? []]
       .join(" ");
   }
   // the dialog's result back: its words are the new name, the line gets `id` again (a 🔁 task

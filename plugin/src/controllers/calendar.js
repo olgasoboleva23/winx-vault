@@ -47,6 +47,7 @@ export function makeActions(ctx) {
     const group = ctx.model.byDay[day].filter(e => e.kind === "open" && canReorder(t, e.t))
       .map(e => e.t);
 
+    if (!group.includes(to)) return;   // a target outside the group: nothing moves
     group.splice(group.indexOf(to) + (after ? 1 : 0), 0, t);
     return saveRecords(Object.fromEntries(group.map((x, i) => [T(x).id, { order: i }])));
   };

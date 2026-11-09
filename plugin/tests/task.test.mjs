@@ -85,6 +85,10 @@ test("picks, named, unnamed", () => {
   assert.deepEqual(Task.unnamed("- [ ] meditate more [due:: 2026-11-03]", "t7"), { name: "meditate more", line: "- [ ] t7 [due:: 2026-11-03]" });
 });
 
+test("named on a line without a checkbox gives the line back", () => {
+  assert.equal(T("just a note").named("x"), "just a note");
+});
+
 test("pause / resume", () => {
   const line = "- [ ] mask [repeat:: every 3 days when done] [scheduled:: 2026-10-20] [due:: 2026-10-22] [created:: 2026-05-01]";
   assert.equal(T(line).pause(), "- [ ] mask [repeat:: every 3 days when done] [created:: 2026-05-01]");

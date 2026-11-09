@@ -110,7 +110,15 @@ const fromDisk = async path => {
 };
 
 async function saveNew(name, pick, result, oldId = null) {
-  const records = new Map(Object.entries(JSON.parse(await fromDisk(TASK_RECORDS) || "{}")));
+  let parsed;
+
+  try {
+    parsed = JSON.parse(await fromDisk(TASK_RECORDS) || "{}");
+  } catch {
+    return void new Notice("✦ tasks.json isn't valid JSON — task not saved");
+  }
+
+  const records = new Map(Object.entries(parsed));
   const tasks = parseNote(MASTER, await fromDisk(MASTER)).filter(i => i.status !== null);
   const final = Task.unnamed(result, "t0").name || name;
   const same = id => Task.nameKey(records.get(id)?.name ?? "") === Task.nameKey(final);
