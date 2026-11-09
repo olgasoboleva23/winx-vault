@@ -118,15 +118,29 @@ export const editTaskLineWithUndo = async (t, fn, mark) => {
   });
   if (before === null) return;
   const added = after === null ? [] : after.split("\n");
-  const frag  = document.createDocumentFragment();
-  frag.append(`${mark} ${Task.of(t).text.slice(0, 40)}  `);
-  const undo = frag.appendChild(document.createElement("button"));
-  undo.textContent = "Undo";
-  undo.onclick = undoLines(t.path, t.line, added, before, around);
-  new Notice(frag, 8000);
+
+  undoNotice(t, mark, undoLines(t.path, t.line, added, before, around));
 };
 
-export const deleteTaskLine = t => editTaskLineWithUndo(t, () => null, "🗑");
+// the notice "<mark> <task>  Undo" for 8 s
+function undoNotice(t, mark, undo) {
+  const frag = document.createDocumentFragment();
+
+  frag.append(`${mark} ${Task.of(t).text.slice(0, 40)}  `);
+  const button = frag.appendChild(document.createElement("button"));
+
+  button.textContent = "Undo";
+  button.onclick = undo;
+  new Notice(frag, 8000);
+}
+
+// 🗑: the line deleted; a pool item (no line) taken out of the pool, its record and history kept
+// (an undefined field is left out of the JSON)
+export async function deleteTaskLine(t) {
+  if (!t.pool) return editTaskLineWithUndo(t, () => null, "🗑");
+  await saveRecords({ [t.id]: { pool: undefined } });
+  undoNotice(t, "🗑", () => saveRecords({ [t.id]: { pool: true } }));
+}
 
 // a new task: the line on top of Master.md (false when Master.md is missing: nothing written); one
 // place for the New task command and the calendar's pool drop

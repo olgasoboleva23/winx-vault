@@ -206,14 +206,32 @@ test("a new id skips the ids of lines whose record is gone (lost to a sync confl
   assert.match(files[MASTER], /^- \[ \] t8 /);
 });
 
-test("the undo notice names the task, not its id", async () => {
+// the notices' texts, and their Undo buttons (a document just big enough for undoNotice)
+const notices = () => {
   const parts = [];
   globalThis.document = {
-    createDocumentFragment: () => ({ append: (...x) => parts.push(...x), appendChild: el => el }),
+    createDocumentFragment: () => ({ append: (...x) => parts.push(...x), appendChild: el => (parts.push(el), el) }),
     createElement: () => ({}),
   };
+  return parts;
+};
+
+test("the undo notice names the task, not its id", async () => {
+  const parts = notices();
   vault({ [MASTER]: "- [ ] t1\n" }, { t1: { name: "walk" } });
   await makeActions({ today: "2026-11-02" }).remove({ ...taskStore.tasks[0], line: 0 });
   assert.equal(parts[0], "🗑 walk  ");
+  delete globalThis.document;
+});
+
+test("🗑 on a pool card: out of the pool, its record and history kept; undo puts it back", async () => {
+  const parts = notices();
+  const files = vault({ [MASTER]: "- [x] t1\n" }, { t1: { name: "water herbs", pool: true } });
+  await makeActions({ today: "2026-11-02" }).remove(taskStore.pool[0]);
+  assert.deepEqual(json(files), { t1: { name: "water herbs" } });
+  assert.equal(files[MASTER], "- [x] t1\n");
+  assert.equal(parts[0], "🗑 water herbs  ");
+  await parts[1].onclick();
+  assert.deepEqual(json(files), { t1: { name: "water herbs", pool: true } });
   delete globalThis.document;
 });
