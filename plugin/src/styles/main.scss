@@ -43,5 +43,6 @@
 @use "../components/uikit/WinxCheckbox";
 @use "../components/uikit/WinxChart";
 @use "../components/pages/meds";
+@use "../components/pages/food";
 @use "../components/pages/dashboard/widgets/finance";
 @use "helpers";   // global .winx-is-* helpers, after the blocks

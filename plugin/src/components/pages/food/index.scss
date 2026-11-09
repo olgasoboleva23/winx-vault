@@ -1,0 +1,31 @@
+@use "mixins" as *;
+/* ===== The food journal (block winx-food): inside its card; the grid is a WinxTable ===== */
+.winx-food {
+  color: var(--winx-text-dark);
+
+  &__head { margin-bottom: $space-l; }
+  &__week { font-family: $font-deco; font-size: $text-xl; color: var(--winx-purple-deep); }
+  &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: white(40%); }
+  & .winx-table &__day { white-space: nowrap; }
+  & .winx-table &__items { min-width: 12em; }
+  & .winx-table &__note { min-width: 8em; font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
+  &__row--today {
+    background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%));
+  }
+  &__row--today &__day { font-weight: 600; color: var(--winx-purple-deep); }
+
+  /* an eaten food: a chip, its name opens the food, × takes it off */
+  &__item {
+    @include row;
+    gap: $space-xs; padding: $space-2xs $space-s; border: $border; border-radius: $pill;
+    background: white(70%); font-size: $text-l; white-space: nowrap;
+  }
+  &__item-name { cursor: pointer; }
+  &__off { cursor: pointer; opacity: 0.45; &:hover { opacity: 1; color: var(--winx-pink-deep); } }
+  &__count, &__level { font-variant-numeric: tabular-nums; }
+  &__med {
+    font-family: $font-deco; font-size: $text-s; letter-spacing: 0.06em; color: var(--winx-purple-deep);
+    &--not { opacity: 0.35; }   /* no ✅ that day */
+  }
+  &__level { font-weight: 600; color: var(--winx-pink-deep); }
+}

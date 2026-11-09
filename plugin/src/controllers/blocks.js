@@ -12,11 +12,13 @@ import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
 import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
-  CYCLE, GOALS, JOURNALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS, WEIGHT,
+  CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS,
+  WEIGHT,
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
 import { loadMeds } from "#/controllers/meds.js";
+import { loadFood } from "#/controllers/food.js";
 // the widgets' markup: components/pages/dashboard/widgets/
 import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
 import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";
@@ -36,6 +38,7 @@ import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/index.v
 // the pages on notes of their own: components/pages/<page>/
 import MedsCourse from "#/components/pages/meds/index.vue";
 import MedsEdit from "#/components/pages/meds/EditButton.vue";
+import FoodPage from "#/components/pages/food/index.vue";
 
 // the widgets: name → { view: the .vue, load(ctx): its data, cardButton: a .vue next to the
 // card's title, bodyClass: a class on the card's body, watches: the files it reads (a folder:
@@ -71,6 +74,8 @@ export const blocks = {
   },
   // a medication course's own note: its table is the block's text
   meds: { view: MedsCourse, load: loadMeds, cardButton: MedsEdit, watches: [] },
+  // the food journal's own note (00 System/Data/Food/Food.md)
+  food: { view: FoodPage, load: loadFood, watches: [FOODS, FOOD_LOG, `${JOURNALS}/`] },
 };
 
 // a widget on its block: its VueHost, with the card when the block has a "card:" line

@@ -14,6 +14,7 @@ A tab of its own: the ✨ icon on the left (it opens the dashboard and the calen
 | **Life Areas** | Radar chart — XP earned per area this month |
 | **Cycle** | Cycle day, next start forecast, "started today" button |
 | **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight; the second pill shows a free journal (`00 System/Data/Journals/`, a note each: a level 0–3 a day and its reasons; with more than one, a select under the pills picks it): a click on a level or a reason saves the day |
+| **Pages** | links to the notes with a page of their own: Finance, Shop, Supplies, Medication (the courses' base), Food (the food journal: a week, a row a day: what was eaten with its marks, the marks counted, each free journal's level after its lag, 💊 a course on that day, a note; ＋ a fuzzy search of the foods or a new one, ✎ a food, ⚙ the marks) |
 | **XP Today** | XP earned today, level name, streak heatmap |
 | **Quests** | Tasks due today, grouped by life area |
 | **Celestial Market** | Pending shopping items grouped by category |
