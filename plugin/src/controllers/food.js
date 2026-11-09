@@ -25,8 +25,9 @@ const read = async path => {
 };
 
 const marksOf = () => app.metadataCache.getCache(FOODS)?.frontmatter?.marks ?? DEFAULT_MARKS;
+const taskIdOf = () => app.metadataCache.getCache(FOODS)?.frontmatter?.task ?? null;
 
-// a note missing is made (an empty log, the foods with the default marks)
+// a note missing is made, empty
 async function made(path, text) {
   if (app.vault.getFileByPath(path)) return;
   const dir = path.slice(0, path.lastIndexOf("/"));
@@ -35,17 +36,14 @@ async function made(path, text) {
   await app.vault.create(path, text);
 }
 
-const taskIdOf = () => app.metadataCache.getCache(FOODS)?.frontmatter?.task ?? null;
+// one property of Foods.md set (Obsidian writes the YAML, the others stay): `marks`, or `task`
+// (the training task's id)
+const setFoodsProp = (key, value) =>
+  app.fileManager.processFrontMatter(app.vault.getFileByPath(FOODS), fm => { fm[key] = value; });
 
-// the properties: the marks, and the training task's id when one is picked
-const marksHead = (marks, task = null) => {
-  const list = marks.map(m => `  - ${JSON.stringify(m)}`).join("\n");
-
-  return `---\nmarks:\n${list}\n${task ? `task: ${task}\n` : ""}---\n`;
-};
-
+// the notes made when missing; Foods.md without `marks` shows the default ones
 const ready = async () => {
-  await made(FOODS, marksHead(DEFAULT_MARKS));
+  await made(FOODS, "");
   await made(FOOD_LOG, "");
 };
 
@@ -153,7 +151,7 @@ export async function editMarks() {
   const next = v.marks
     .map(m => ({ tag: m.tag ?? `m${++n}`, icon: m.icon.trim(), name: m.name.trim() }));
 
-  await edit(FOODS, t => marksHead(next, taskIdOf()) + t.replace(/^---\n[\s\S]*?\n---\n/, ""));
+  await setFoodsProp("marks", next);
 }
 
 // 🏋 the training task: a past one from the search (its id goes to Foods.md), not a new name
@@ -163,5 +161,5 @@ export async function pickTrainingTask() {
 
   if (!pick) return;
   if (pick.isNew) return void new Notice("✦ pick a task you already have");
-  await edit(FOODS, t => marksHead(marksOf(), pick.id) + t.replace(/^---\n[\s\S]*?\n---\n/, ""));
+  await setFoodsProp("task", pick.id);
 }
