@@ -1,0 +1,13 @@
+/* Tabs (WinxTabs), block winx-tabs: words in Cinzel, the picked one underlined in gold */
+@use "mixins" as *;
+
+.winx-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xs $space-2xl;
+  margin-bottom: $space-xs;
+  & button#{&}__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: $font-deco; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
+  & button#{&}__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
+  // in an Obsidian window (a Form's tabs): the theme's text colour, so it reads on a dark one too
+  .modal & button#{&}__tab { color: var(--text-normal); }
+}

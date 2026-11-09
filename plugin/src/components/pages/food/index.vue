@@ -93,7 +93,7 @@ const act = async (write) => {
               <span class="winx-food__off" @click="act(() => removeEaten(row.date, n))">×</span>
             </span>
             <WinxButton
-              kind="text"
+              kind="add"
               title="add what was eaten"
               @click="act(() => addEaten(row.date))"
             >＋</WinxButton>

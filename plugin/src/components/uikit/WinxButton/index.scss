@@ -75,9 +75,11 @@ button.winx-btn {
     letter-spacing: inherit;
     cursor: pointer;
   }
-  // add: a white + in a pink glowing circle (the market's ＋, the course's ✎, a new journal)
+  // add: a white icon (the slot: ＋, ✎, the market's ✓ …) in a pink glowing circle; on hover the
+  // icon glows and sparkles fly out; jump: it also grows a little (the market's bought)
   &.winx-btn--add {
     @include center;
+    position: relative;
     flex-shrink: 0;
     width: $btn-m;
     height: $btn-m;
@@ -92,6 +94,25 @@ button.winx-btn {
     line-height: 1;
     letter-spacing: 0;
     cursor: pointer;
+    transition: transform $fast ease, box-shadow $fast ease;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='26' viewBox='0 0 40 26'%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-16 -8' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.4Q0 0 2.4 0Q0 0 0 2.4Q0 0 -2.4 0Q0 0 0 -2.4Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;15 -9' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.2Q0 0 2.2 0Q0 0 0 2.2Q0 0 -2.2 0Q0 0 0 -2.2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-17 7' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2Q0 0 2 0Q0 0 0 2Q0 0 -2 0Q0 0 0 -2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;16 7' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.2Q0 0 2.2 0Q0 0 0 2.2Q0 0 -2.2 0Q0 0 0 -2.2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-5 -11' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Cpath d='M0 -1.8Q0 0 1.8 0Q0 0 0 1.8Q0 0 -1.8 0Q0 0 0 -1.8Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;6 11' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2Q0 0 2 0Q0 0 0 2Q0 0 -2 0Q0 0 0 -2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center / 30px 19.5px no-repeat;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &:hover {
+      box-shadow: 0 0 14px alpha(--winx-pink-deep, 80%), 0 0 4px #fff inset;
+      text-shadow: 0 0 6px #fff, 0 0 2px #fff;
+      & > svg { filter: drop-shadow(0 0 3px #fff); }
+      &::after { opacity: 1; }
+    }
+
+    &.winx-btn--jump:hover { transform: scale(1.08); }
   }
 }
 

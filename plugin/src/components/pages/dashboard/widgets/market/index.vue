@@ -6,6 +6,7 @@ import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import WinxGroupHeader from "#/components/uikit/WinxGroupHeader.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import { MARKET, SUPPLIES } from "#/helpers/paths.js";
 import { buyMarketItem } from "#/controllers/widgets/market.js";
 
@@ -54,12 +55,23 @@ watch(() => props.state.data.groups, groups => {
           :class="{ 'winx-market__item--bought': bought.has(key(r)) }"
         >
           <span class="winx-market__text winx-grow">{{ r.name }}</span>
-          <button
-            class="winx-market__buy"
-            aria-label="bought"
+          <WinxButton
+            kind="add"
+            jump
             title="bought"
             @click="buy(r)"
-          />
+          >
+            <svg class="winx-market__tick" viewBox="0 0 40 26" aria-hidden="true">
+              <path
+                d="M14 13.5l4 4 8-8.5"
+                fill="none"
+                stroke="#fff"
+                stroke-width="2.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </WinxButton>
         </div>
       </template>
     </div>

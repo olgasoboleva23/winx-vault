@@ -146,7 +146,7 @@ test("the panel's tab redraws only the panel: the header's elements stay the sam
   await vue.nextTick();
   assert.equal(el.querySelector(".winx-cal__top"), top);
   assert.equal(el.querySelector(".winx-cal__day"), day);
-  assert.match(el.querySelector(".winx-cal__tab--on").textContent, /^Regulars/);
+  assert.match(el.querySelector(".winx-tabs__tab--on").textContent, /^Regulars/);
   assert.match(el.querySelector(".winx-cal__backlog-grid").textContent, /stretch/);
 });
 

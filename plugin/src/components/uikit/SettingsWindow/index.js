@@ -4,24 +4,27 @@
 import { app } from "#/helpers/app.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 
+const D = "Difficulties", A = "Areas", X = "XP Today & Level";
+const number = (tab, name, key, text) => ({ tab, name, key, text, number: true });
+
 export const settingsWindow = (config, values) => Form.ask(app, "✦ Settings", [
   ...config.difficulties.flatMap(d => [
-    { name: `${d.label} · XP`, key: `xp_${d.key}`, text: String(d.xp), number: true },
-    { name: `${d.label} · gold`, key: `gold_${d.key}`, text: String(d.gold), number: true },
+    number(D, `${d.label} · XP`, `xp_${d.key}`, String(d.xp)),
+    number(D, `${d.label} · gold`, `gold_${d.key}`, String(d.gold)),
   ]),
-  { name: "Areas", key: "areas", required: ["key", "icon", "title"], list: [
-    { name: "Key (in the tasks)", key: "key", text: "body" },
+  { tab: A, name: "Areas", key: "areas", required: ["key", "icon", "title"], list: [
+    { name: "Key", key: "key", text: "body" },
     { name: "Icon", key: "icon", text: "🌺" },
     { name: "Name", key: "title", text: "Body" },
-    { name: "Life Areas name", key: "name", text: "Vitality" },
-    { name: "Colour", key: "color", text: "#e8609a" },
+    { name: "On the radar", key: "name", text: "Vitality" },
+    { name: "Colour", key: "color", text: "#e8609a", color: true },
     { name: "Apply", key: "apply", check: "a changed key: move its tasks to it" },
   ] },
-  { name: "XP Today · SPARK up to", key: "spark", text: "10", number: true },
-  { name: "XP Today · GLOW up to", key: "glow", text: "20", number: true },
-  { name: "XP Today · AURA up to (above: TRANSFORMATION)", key: "aura", text: "30", number: true },
-  { name: "Level · first one costs", key: "base", text: "100", number: true },
-  { name: "Level · each next one more by", key: "step", text: "25", number: true },
+  number(X, "XP Today · SPARK up to", "spark", "10"),
+  number(X, "XP Today · GLOW up to", "glow", "20"),
+  number(X, "XP Today · AURA up to (above: TRANSFORMATION)", "aura", "30"),
+  number(X, "Level · the first one costs", "base", "100"),
+  number(X, "Level · each next one costs more by", "step", "25"),
 ], {
   values,
   required: ["areas", ...config.difficulties.flatMap(d => [`xp_${d.key}`, `gold_${d.key}`]),
