@@ -138,6 +138,19 @@ test("a note deleted while its read is still on the way: the late read is droppe
   assert.deepEqual(taskStore.tasks, []);
 });
 
+test("a note deleted and made again while its old read is on the way: the old read lands last, the new text stays", async () => {
+  const { files, fire, app } = vault({});
+  useTaskStore(plugin()); await settle();
+  let release;
+  app.vault.cachedRead = f => release ? Promise.resolve(files[f.path])
+    : new Promise(r => { release = () => r("- [ ] old"); });
+  files[P] = "- [ ] old"; fire("create", P); await settle();
+  delete files[P]; fire("delete", P); await settle();
+  files[P] = "- [ ] new"; fire("create", P); await settle();
+  release(); await settle();
+  assert.deepEqual(taskStore.tasks.map(t => t.text), ["new"]);
+});
+
 test("parseNote: a ~~~ block and an indented fence are examples too", () => {
   const text = "- [ ] a\n~~~\n- [x] b\n~~~\n  ```\n- [x] c\n  ```\n- [ ] d";
   assert.deepEqual(parseNote(P, text).map(i => i.text), ["a", "d"]);

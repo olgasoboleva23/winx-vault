@@ -41,9 +41,11 @@ export const taskStore = {
 const ours = path => path === MASTER || path === TASK_RECORDS;
 const reads = new Map();   // path → its last read's number: an older read, or one of a note dropped
                            // since, is not put
+let lastRead = 0;          // one count for every read, never reused (a note made again starts no
+                           // new count that an old read's number could match)
 // the note's text, or null when a newer read began or the note was dropped meanwhile
 const fresh = async file => {
-  const n = (reads.get(file.path) ?? 0) + 1;
+  const n = ++lastRead;
 
   reads.set(file.path, n);
   const text = await app.vault.cachedRead(file);
