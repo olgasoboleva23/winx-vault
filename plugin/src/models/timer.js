@@ -5,8 +5,8 @@ import { todayYmd } from "#/helpers/dates.js";
 const DEFAULTS = { focusMin: 25, breakMin: 5, meditationMin: 10 };
 const LENGTH = { focus: "focusMin", break: "breakMin", meditation: "meditationMin" };
 
-// the running session: { sessionType, baseElapsed, startedAt }, in memory only (gone after a
-// restart or a reload)
+// the running session: { sessionType, sessions, baseElapsed, startedAt }, in memory only (gone
+// after a restart or a reload); shared by every pomodoro shown (two tabs)
 let live = null;
 
 // focus or break and its time: a stopped session counts `elapsed` (ms), a running one also the time
@@ -51,7 +51,21 @@ export class Timer {
   play() {
     if (this.running) return;
     this.start = this.now();
-    live = { sessionType: this.type, baseElapsed: this.elapsed, startedAt: this.start };
+    live = {
+      sessionType: this.type, sessions: this.sessions, baseElapsed: this.elapsed,
+      startedAt: this.start,
+    };
+  }
+  // another pomodoro shown ended this running session (and runs the next) or stopped it
+  get ended() { return this.running && live?.startedAt !== this.start; }
+  // the session that one runs, without counting this one again
+  follow() {
+    this.start = 0;
+    if (!live) return;
+    this.type = live.sessionType;
+    this.sessions = live.sessions;
+    this.elapsed = live.baseElapsed;
+    this.start = live.startedAt;
   }
   pause() { if (!this.running) return; this.elapsed += this.now() - this.start; this.stop(); }
   // a session of `type` from zero, stopped

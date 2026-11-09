@@ -150,3 +150,23 @@ test("a save that fails: a finished session says its minutes weren't saved; a cl
   quiet.mock.restore();
   w.unmount();
 });
+
+test("two pomodoros at once (two tabs): a finished focus counts once; one closed, the other runs on", async () => {
+  const { w, json } = draw();
+  await w.find(".winx-pomodoro__mini-play").trigger("click"); await saved();
+  // counted from here (a test before left minutes unsaved: this first save wrote them)
+  const { sessions, minutes } = json().stats, counted = () => {
+    const { stats } = json();
+    return [stats.sessions - sessions, stats.minutes - minutes];
+  };
+  const props = { state: { data: { saved: json(), current: json().current } } };
+  const other = mount(PomodoroTimer, { props });   // the second tab: picks up the running focus
+  mock.timers.tick(25 * 60_000); await nextTick(); await nextTick(); await saved();
+  assert.deepEqual(counted(), [1, 25]);
+  assert.equal(other.find(".winx-pomodoro__mode-text").text(), "Break");   // follows the first
+  w.unmount();
+  mock.timers.tick(5 * 60_000); await saved();   // the break ends: the next focus
+  mock.timers.tick(25 * 60_000); await saved();
+  assert.deepEqual(counted(), [2, 50]);
+  other.unmount();
+});

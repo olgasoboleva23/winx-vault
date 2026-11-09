@@ -58,6 +58,9 @@ function arm() {
 
 // a meditation ends with the bell and stops; a pomodoro's session starts the next
 async function finish() {
+  // another pomodoro shown (a second tab) ended it first and counted it
+  if (timer.ended) return void (timer.follow(), arm(), tick());
+
   const was = timer.type, min = was === "break" ? 0 : timer.duration / 60_000;
 
   timer.next();
