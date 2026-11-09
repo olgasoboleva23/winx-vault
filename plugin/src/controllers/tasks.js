@@ -136,24 +136,30 @@ export async function addTask(line) {
 export const tickTask = t =>
   editTaskLineWithUndo(t, line => tasksApi().executeToggleTaskDoneCommand(line, t.path), "✓");
 
-// The one-off move to the id format (the Migrate tasks command): not when tasks.json is there or
-// Master.md is missing. The old notes kept as copies (Master.md is not renamed: a rename would
-// rewrite links to it), then Master.md rewritten, tasks.json written, Pool.md to the trash.
+// The one-off move to the id format (the Migrate tasks command): not when tasks.json or an old
+// copy is there, or Master.md is missing. The old notes kept as copies (Master.md is not renamed:
+// a rename would rewrite links to it), then tasks.json, then Master.md rewritten last (a failed
+// write before it leaves the old Master.md as it was), then Pool.md to the trash.
 export async function migrateTasks() {
   const { vault, fileManager } = app;
   const master = vault.getFileByPath(MASTER), pool = vault.getFileByPath(POOL);
+  const there = [TASK_RECORDS, MASTER_OLD, POOL_OLD].find(p => vault.getFileByPath(p));
 
-  if (vault.getFileByPath(TASK_RECORDS)) return void new Notice(`✦ ${TASK_RECORDS} exists`);
+  if (there) return void new Notice(`✦ ${there} exists`);
   if (!master) return void new Notice(`✦ ${MASTER} not found`);
-  const masterText = await vault.read(master), poolText = pool ? await vault.read(pool) : "";
-  const { master: next, records } = migrate(masterText, poolText);
+  try {
+    const masterText = await vault.read(master), poolText = pool ? await vault.read(pool) : "";
+    const { master: next, records } = migrate(masterText, poolText);
 
-  await vault.create(MASTER_OLD, masterText);
-  if (pool) await vault.create(POOL_OLD, poolText);
-  await vault.modify(master, next);
-  await vault.create(TASK_RECORDS, JSON.stringify(records, null, 2));
-  if (pool) await fileManager.trashFile(pool);
-  const n = Object.keys(records).length;
+    await vault.create(MASTER_OLD, masterText);
+    if (pool) await vault.create(POOL_OLD, poolText);
+    await vault.create(TASK_RECORDS, JSON.stringify(records, null, 2));
+    await vault.modify(master, next);
+    if (pool) await fileManager.trashFile(pool);
+    const n = Object.keys(records).length;
 
-  new Notice(`✦ ${n} tasks migrated: switch Tasks → Task format → Dataview`);
+    new Notice(`✦ ${n} tasks migrated: switch Tasks → Task format → Dataview`);
+  } catch (e) {
+    new Notice(`✦ migration stopped: ${e.message} — your old notes are in Master (old).md`);
+  }
 }

@@ -109,3 +109,26 @@ test("the command keeps old copies, rewrites Master.md, writes tasks.json, trash
   assert.equal(POOL in files, false);
   assert.equal(Notice.last, "✦ 2 tasks migrated: switch Tasks → Task format → Dataview");
 });
+
+test("the command refuses when Master (old).md is already there: nothing written", async () => {
+  const before = { [MASTER]: "- [ ] #⭐easy walk", [`${DIR}/Master (old).md`]: "old" };
+  const { files } = vault({ ...before });
+
+  await migrateTasks();
+  assert.deepEqual(files, before);
+  assert.match(Notice.last, /Master \(old\)\.md/);
+});
+
+test("a failing tasks.json write leaves Master.md untouched and says so", async () => {
+  const { files, app } = vault({ [MASTER]: "- [ ] #⭐easy walk" });
+  const create = app.vault.create;
+
+  app.vault.create = async (p, text) => {
+    if (p === RECORDS) throw new Error("disk full");
+    return create(p, text);
+  };
+  await migrateTasks();
+  assert.equal(files[MASTER], "- [ ] #⭐easy walk");
+  assert.equal(Notice.last,
+    "✦ migration stopped: disk full — your old notes are in Master (old).md");
+});
