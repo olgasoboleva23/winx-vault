@@ -35,9 +35,9 @@ export function registerCommands(plugin: Plugin) {
     const api = tasksApi();
 
     if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
-    // ➕ shows how long it waits on the board
+    // created shows how long it waits on the board
     const words = [pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ");
-    const result = await api.editTaskLineModal(`- [ ] ${words}  ➕ ${todayYmd()}`);
+    const result = await api.editTaskLineModal(`- [ ] ${words} [created:: ${todayYmd()}]`);
 
     if (!result) return;
     // after the text typed in the Tasks modal

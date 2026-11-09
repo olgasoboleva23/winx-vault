@@ -33,11 +33,11 @@ before(async () => {
 let n = 0;
 const task = (status, text) => ({ status, text, path: "00 System/Data/Tasks/Master.md", line: n++ });
 const TASKS = () => { n = 0; return [
-  task(" ", "#area/body walk 📅 2026-11-04"),
-  task(" ", "#area/body #time/morning stretch 🔁 every day 📅 2026-11-04"),
+  task(" ", "#area/body walk [due:: 2026-11-04]"),
+  task(" ", "#area/body #time/morning stretch [repeat:: every day] [due:: 2026-11-04]"),
   task(" ", "#area/base plan trip"),
-  task(" ", "#area/mind read 🔁 every week on Friday 📅 2026-11-06"),
-  task(" ", "#area/mind write 📅 2026-11-04"),
+  task(" ", "#area/mind read [repeat:: every week on Friday] [due:: 2026-11-06]"),
+  task(" ", "#area/mind write [due:: 2026-11-04]"),
 ]; };
 // the tab's Vue app on made-up data; `ticked`, `placed`, `moved`, `unplanned` collect what the writes get
 function mount(over = {}) {

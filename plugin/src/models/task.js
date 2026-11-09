@@ -1,9 +1,9 @@
-// One task line in the Tasks plugin's emoji format: what it is (getters) and how to change it
+// One task line in the Tasks plugin's Dataview format: what it is (getters) and how to change it
 // (methods that return the new line; widgets write it). The only place that knows the format:
 //   - [ ] / [x] done / [-] skipped · #⭐… difficulty · #area/… · #time/morning|evening
 //   · #id/<id> · #after/id/<id> · ![[sticker]]
-//   🔁 rule (up to the next field) · 📅 due (an old ⏳ still counts) · ✅ done · ❌ skipped
-//   · ➕ created · 🛫 start
+//   fields [key:: value]: repeat (the rule, up to its ]) · due · scheduled (wins over due) · start
+//   · completion · cancelled · created
 // No Obsidian globals (tested by tests/task.test.mjs).
 // Wrap a Dataview task (or a pool item, { text, pool: true }) with Task.of(t) (t is kept as .src,
 // for its path and line) or a raw line with new Task(line).
@@ -14,14 +14,27 @@ import { addDays, diffDays } from "#/helpers/dates.js";
 import { projectRepeats } from "./repeats.js";
 
 const DATE   = "\\d{4}-\\d{2}-\\d{2}";
-// a date field starts with one of these; a 🔁 rule runs up to the next one
-const FIELDS = "📅⏳✅❌🛫➕";
-const field  = (line, emoji) => line.match(new RegExp(`${emoji}\\s*(${DATE})`, "u"))?.[1] ?? null;
-const drop   = (line, emojis) => line.replace(new RegExp(`\\s*[${emojis}]\\s*${DATE}`, "gu"), "");
+const FIELD  = /\[(\w+):: ([^\]]*)\]/g;
+
+// every [key:: value] of a line, by key
+export const fieldsOf = line =>
+  Object.fromEntries([...line.matchAll(FIELD)].map(m => [m[1], m[2]]));
+
+// a line with one field set (replaced in place, or added at the end); null drops it
+export function withField(line, key, value) {
+  const re = new RegExp(`\\s*\\[${key}:: [^\\]]*\\]`);
+  const text = value === null ? "" : ` [${key}:: ${value}]`;
+
+  return re.test(line) ? line.replace(re, text) : line.trimEnd() + text;
+}
+
+const dropFields = (line, keys) => keys.reduce((l, k) => withField(l, k, null), line);
+
 const OPEN   = /^\s*- \[ \]/, ANY = /^\s*- \[.\]/, DONE = /^\s*- \[[xX]\]/;
 
 export class Task {
   constructor(line, src = null) { this.line = line; this.src = src; }
+  get fields()     { return fieldsOf(this.line); }
   // a pool item: no checkbox
   static of(t) { return new Task(t.pool ? `- ${t.text}` : `- [${t.status}] ${t.text}`, t); }
 
@@ -38,16 +51,14 @@ export class Task {
   get after()      { return this.tags.find(t => t.startsWith("#after/id/"))?.slice(10) ?? null; }
   // "morning" | "evening"
   get time()       { return this.tags.find(t => t.startsWith("#time/"))?.slice(6) ?? null; }
-  get rule() {
-    return this.line.match(new RegExp(`🔁\\s*([^${FIELDS}]+)`, "u"))?.[1].trim() ?? null;
-  }
+  get rule()       { return this.fields.repeat ?? null; }
   get isRecurring(){ return this.rule !== null; }
   get whenDone()   { return /when done$/.test(this.rule ?? ""); }
   get isBirthday() { return this.rule === "every year"; }
-  get date()       { return field(this.line, "⏳") ?? field(this.line, "📅"); }   // the day it's on
-  get doneOn()     { return field(this.line, "✅"); }
-  get skippedOn()  { return field(this.line, "❌"); }
-  get created()    { return field(this.line, "➕"); }
+  get date()       { return this.fields.scheduled ?? this.fields.due ?? null; }   // the day it's on
+  get doneOn()     { return this.fields.completion ?? null; }
+  get skippedOn()  { return this.fields.cancelled ?? null; }
+  get created()    { return this.fields.created ?? null; }
   // a 🔁 task with its dates dropped
   get isPaused()   { return this.isOpen && this.isRecurring && !this.date; }
   // ⏭ this time: a dated open 🔁 task
@@ -58,11 +69,8 @@ export class Task {
   get stickers()   { return [...this.line.matchAll(/!\[\[([^\]|]+)/g)].map(m => m[1]); }
   // the words alone: no checkbox, sticker, tags, rule or date fields
   get text() {
-    const words = this.line.replace(ANY, "").replace(/^\s*- /, "")
-      .replace(/!\[\[[^\]]*\]\]/g, "").replace(/#[^\s]+/g, "")
-      .replace(new RegExp(`🔁[^${FIELDS}]*`, "u"), "");
-
-    return drop(words, FIELDS).replace(/\s+/g, " ").trim();
+    return this.line.replace(ANY, "").replace(/^\s*- /, "").replace(FIELD, "")
+      .replace(/!\[\[[^\]]*\]\]/g, "").replace(/#[^\s]+/g, "").replace(/\s+/g, " ").trim();
   }
   // identity across copies (open, done, skipped) of the same task, for history and for finding its
   // line again
@@ -74,21 +82,22 @@ export class Task {
   }
 
   // ── edits: each returns the new line ──
-  // set or clear the date of an open task: one date, 📅 (an old ⏳ goes)
+  // set or clear the date of an open task: one date, due (an old scheduled goes)
   setDue(date) {
     if (!OPEN.test(this.line)) return this.line;
-    const base = drop(this.line, "⏳📅").trimEnd();
+    const base = withField(this.line, "scheduled", null);
 
-    return date ? `${base} 📅 ${date}` : base;
+    return withField(base, "due", date || null);
   }
-  // put it on `date` as done (✅ date) or open and due that day (📅, none for null). A 🔁 rule is left
-  // as is: no next copy is made here. To tick an open 🔁 task, go through the Tasks plugin's toggle,
-  // then backdateDone.
+  // put it on `date` as done (completion) or open and due that day (due, none for null). A 🔁
+  // rule is left as is: no next copy is made here. To tick an open 🔁 task, go through the Tasks
+  // plugin's toggle, then backdateDone.
   place(date, done) {
     if (!ANY.test(this.line)) return this.line;
-    const base = drop(this.line, "✅").replace(/^(\s*- \[)./, `$1${done ? "x" : " "}`).trimEnd();
+    const base = withField(this.line, "completion", null)
+      .replace(/^(\s*- \[)./, `$1${done ? "x" : " "}`);
 
-    return done ? `${base} ✅ ${date}` : new Task(base).setDue(date);
+    return done ? withField(base, "completion", date) : new Task(base).setDue(date);
   }
   // set or clear (null) a tag a line has once, by its prefix ("#area/", "#time/"): swapped in
   // place, or added after the tags that open the line
@@ -105,9 +114,8 @@ export class Task {
 
     if (re.test(this.line)) return this.line.replace(re, name ? ` ![[${name}|28]]` : "");
     if (!name) return this.line;
-    const beforeFields = new RegExp(`\\s*(?=[🔁${FIELDS}⏫🔼🔽🔺⏬🆔⛔🏁]|$)`, "u");
 
-    return this.line.replace(beforeFields, ` ![[${name}|28]] `).trimEnd();
+    return this.line.replace(/\s*(?=\[\w+:: |$)/, ` ![[${name}|28]] `).trimEnd();
   }
   // what the task window shows and sets: difficulty, area, time ("#time/…") tags and the first
   // sticker
@@ -127,13 +135,12 @@ export class Task {
 
   // as a pool line: no checkbox, rule or date fields
   get poolLine() {
-    const noBox = this.line.replace(/^(\s*)- \[.\]\s*/, "$1- ");
-
-    return drop(noBox.replace(new RegExp(`\\s*🔁[^${FIELDS}]*`, "u"), ""), FIELDS).trimEnd();
+    return this.line.replace(/^(\s*)- \[.\]\s*/, "$1- ").replace(/\s*\[\w+:: [^\]]*\]/g, "")
+      .trimEnd();
   }
   // a pool line's new copy: an open task, created `today`
   static fromPool(line, today) {
-    return `${line.trimEnd().replace(/^(\s*)- /, "$1- [ ] ")} ➕ ${today}`;
+    return `${line.trimEnd().replace(/^(\s*)- /, "$1- [ ] ")} [created:: ${today}]`;
   }
 
   // the first day from `today` its rule allows: a weekday rule ("every week on Monday, …") its
@@ -146,30 +153,35 @@ export class Task {
       return projectRepeats(rule, addDays(today, -1), addDays(today, 30))[0] ?? today;
     return /^every (\d+ )?(day|week|month)s?( when done)?$/i.test(rule) ? today : null;
   }
-  // pause: drop its ⏳ 📅 🛫 dates (it leaves the calendar). Resume: due on the first day from today
-  // its rule allows (firstDay; none: today. ponytail: "every month on the 1st" resumes today too)
-  pause() { return drop(this.line, "📅⏳🛫"); }
+  // pause: drop its scheduled, due and start dates (it leaves the calendar). Resume: due on the
+  // first day from today its rule allows (firstDay; none: today. ponytail: "every month on the
+  // 1st" resumes today too)
+  pause() { return dropFields(this.line, ["due", "scheduled", "start"]); }
   togglePause(today) { return this.isPaused ? this.resume(today) : this.pause(); }
-  resume(today) { return `${this.pause().trimEnd()} 📅 ${this.firstDay(today) ?? today}`; }
+  resume(today) { return withField(this.pause(), "due", this.firstDay(today) ?? today); }
 
   // ── the Tasks plugin's output of ticking a task today (the done line, plus the next copy of a 🔁
-  // task) ── as if ticked on `date`: ✅ moves there, and a "when done" next copy moves back with it
+  // task) ── as if ticked on `date`: completion moves there, and a "when done" next copy moves back
+  // with it
   static backdateDone(toggled, date, today) {
     const shift = diffDays(date, today);
 
     return toggled.split("\n").map(l =>
       DONE.test(l) ? new Task(l).place(date, true)
       : /when done/.test(l)
-        ? l.replace(/([📅⏳🛫])\s*(\d{4}-\d{2}-\d{2})/gu, (_, e, d) => `${e} ${addDays(d, shift)}`)
+        ? l.replace(new RegExp(`\\[(due|scheduled|start):: (${DATE})\\]`, "g"),
+          (_, k, d) => `[${k}:: ${addDays(d, shift)}]`)
       : l).join("\n");
   }
-  // as a skip of this time: the done line turns cancelled ("- [-] … ❌ date"), so the rule moves on
-  // but nothing counts as done. `from` (today, for a missed copy): the next copy is due on the
-  // first day from it the rule allows, not the one after the missed date (could be in the past)
+  // as a skip of this time: the done line turns cancelled ("- [-] … [cancelled:: date]"),
+  // so the rule
+  // moves on but nothing counts as done. `from` (today, for a missed copy): the next copy is due
+  // on the first day from it the rule allows, not the one after the missed date (could be in the
+  // past)
   static skipLines(toggled, from = null) {
     return toggled.split("\n").map(l => {
       if (/^\s*- \[x\]/.test(l))
-        return l.replace(/^(\s*- \[)x/, "$1-").replace(/✅(\s*\d{4}-\d{2}-\d{2})/u, "❌$1");
+        return l.replace(/^(\s*- \[)x/, "$1-").replace("[completion:: ", "[cancelled:: ");
       const day = from && OPEN.test(l) && new Task(l).firstDay(from);
 
       return day ? new Task(l).setDue(day) : l;
