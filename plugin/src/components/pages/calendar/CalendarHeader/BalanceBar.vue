@@ -10,13 +10,13 @@ const state = view.state;
 
 const balance = computed(() => {
   const { config: { areas }, everything, model } = view.ctx;
-  const b = (everything ?? model).balance(areas.map(a => a.tag));
-  const name = tag => areas.find(a => a.tag === tag).label;
-  const icon = tag => name(tag).split(" ")[0];
+  const b = (everything ?? model).balance(areas.map(a => a.key));
+  const name = key => areas.find(a => a.key === key).label;
+  const icon = key => name(key).split(" ")[0];
 
   return {
     pieces: b.filter(x => x.planned).map(x => ({
-      on: x.area === state.area, area: x.area.slice(6), style: `flex: ${x.planned}`,
+      on: x.area === state.area, area: x.area, style: `flex: ${x.planned}`,
       icon: icon(x.area),
       title: `${name(x.area)}: ${x.done} of ${x.planned} done`, count: `${x.done}/${x.planned}`,
       fill: `width: ${Math.round(x.done / x.planned * 100)}%`,
@@ -26,7 +26,7 @@ const balance = computed(() => {
   };
 });
 
-const pickArea = a => { const tag = `#area/${a}`; state.area = tag === state.area ? null : tag; };
+const pickArea = a => { state.area = a === state.area ? null : a; };
 </script>
 
 <template>

@@ -1,40 +1,51 @@
-// The tasks of 00 System/Data/Tasks, read by the plugin itself and kept up to date: `tasks` (every
-// task of every note there, Master.md's first), `pool` (the plain lines of Pool.md), `ready` (the
-// first read is done), `version` (a Vue ref, bumped on every change: a computed that reads it is
-// worked out again). useTaskStore(plugin) starts it once the vault is loaded; a note of the folder
-// saved, made, deleted or renamed is read again on Obsidian's own event, at once (Dataview's index
-// comes a second later, and only once it's built).
+// The tasks, read by the plugin itself and kept up to date: `tasks` (every task of Master.md, each
+// with its record as `rec`, null when its id has none), `records` (tasks.json: Winx's part of every
+// task, by id), `pool` (the records with pool: true, as { id, pool: true, rec, path }), `ready`
+// (the first read is done), `version` (a Vue ref, bumped on every change: a computed that reads it
+// is worked out again). useTaskStore(plugin) starts it once the vault is loaded; Master.md or
+// tasks.json saved, made, deleted or renamed is read again on Obsidian's own event, at once
+// (Dataview's index comes a second later, and only once it's built). The folder's other files
+// (backups) are not read.
 import { ref } from "vue";
 import { app } from "#/helpers/app.js";
 import { parseNote } from "#/models/taskFile.js";
-import { POOL, TASKS } from "#/helpers/paths.js";
+import { Task } from "#/models/task.js";
+import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 
-const FOLDER = `${TASKS}/`;
 const byPath = new Map();   // path → its items
 
 const refresh = () => {
-  const paths = [...byPath.keys()]
-    .sort((a, b) => (a === POOL) - (b === POOL) || a.localeCompare(b));
-  const items = paths.flatMap(p => byPath.get(p));
+  const recs = taskStore.records;
+  const rec = i => recs.get(new Task(`- ${i.text}`).id) ?? null;
 
-  taskStore.tasks = items.filter(i => i.status !== null);
-  taskStore.pool = items.filter(i => i.status === null && i.path === POOL);
+  taskStore.tasks = [...byPath.values()].flat().filter(i => i.status !== null)
+    .map(i => ({ ...i, rec: rec(i) }));
+  taskStore.pool = [...recs].filter(([, r]) => r.pool)
+    .map(([id, r]) => ({ id, pool: true, rec: r, path: TASK_RECORDS }));
   taskStore.version.value++;
 };
 
 export const taskStore = {
-  tasks: [], pool: [], ready: false, version: ref(0),
+  tasks: [], pool: [], records: new Map(), ready: false, version: ref(0),
   // the note's items set from its text (a test's, or a write the plugin just made)
   put(path, text) { byPath.set(path, parseNote(path, text)); refresh(); },
-  drop(path) { reads.delete(path); if (byPath.delete(path)) refresh(); },
+  // the records set from tasks.json's object
+  putRecords(json) { taskStore.records = new Map(Object.entries(json)); refresh(); },
+  drop(path) {
+    reads.delete(path);
+    if (path === TASK_RECORDS) taskStore.putRecords({});
+    else if (byPath.delete(path)) refresh();
+  },
 };
 
-const inFolder = path => path.startsWith(FOLDER) && path.endsWith(".md");
+const ours = path => path === MASTER || path === TASK_RECORDS;
 const reads = new Map();   // path → its last read's number: an older read, or one of a note dropped
                            // since, is not put
+let lastRead = 0;          // one count for every read, never reused (a note made again starts no
+                           // new count that an old read's number could match)
 // the note's text, or null when a newer read began or the note was dropped meanwhile
 const fresh = async file => {
-  const n = (reads.get(file.path) ?? 0) + 1;
+  const n = ++lastRead;
 
   reads.set(file.path, n);
   const text = await app.vault.cachedRead(file);
@@ -42,20 +53,31 @@ const fresh = async file => {
   return reads.get(file.path) === n ? text : null;
 };
 
+// a file's text into the store: tasks.json as records (one that isn't JSON leaves them as they
+// were), Master.md as its items
+const take = (path, text) => {
+  if (path !== TASK_RECORDS) return taskStore.put(path, text);
+  try {
+    taskStore.putRecords(JSON.parse(text));
+  } catch (e) {
+    console.error("winx: tasks.json isn't JSON, the records stay as they were", e);
+  }
+};
+
 const read = async file => {
   const text = await fresh(file);
 
-  if (text !== null) taskStore.put(file.path, text);
+  if (text !== null) take(file.path, text);
 };
 
 export function useTaskStore(plugin) {
-  const changed = f => { if (inFolder(f.path)) void read(f); };
+  const changed = f => { if (ours(f.path)) void read(f); };
 
   plugin.registerEvent(app.vault.on("modify", changed));
   plugin.registerEvent(app.vault.on("create", changed));
-  plugin.registerEvent(app.vault.on("delete", f => inFolder(f.path) && taskStore.drop(f.path)));
+  plugin.registerEvent(app.vault.on("delete", f => ours(f.path) && taskStore.drop(f.path)));
   plugin.registerEvent(app.vault.on("rename", (f, old) => {
-    if (inFolder(old)) taskStore.drop(old);
+    if (ours(old)) taskStore.drop(old);
     changed(f);
   }));
   // the first read, once the vault's files are there: now when the layout is ready (the plugin
@@ -66,15 +88,14 @@ export function useTaskStore(plugin) {
   const start = async () => {
     if (started) return;
     started = true;
-    const notes = (app.vault.getFolderByPath(TASKS)?.children ?? [])
-      .filter(f => f.extension === "md");
+    const files = [MASTER, TASK_RECORDS].map(p => app.vault.getFileByPath(p)).filter(Boolean);
 
     byPath.clear();
     try {
-      for (const f of notes) {
+      for (const f of files) {
         const text = await fresh(f);   // the same guard as a change's read
 
-        if (text !== null) byPath.set(f.path, parseNote(f.path, text));
+        if (text !== null) take(f.path, text);
       }
     } catch (e) {
       started = false;   // the next "resolved" reads again

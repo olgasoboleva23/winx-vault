@@ -97,10 +97,10 @@ export class CalendarView extends ItemView {
     if (!taskStore.ready) return { say: "✦ reading the tasks…" };   // the store's first read draws
     const { state } = this, today = todayYmd(), days = shownDays(state, today);
     const { tasks, pool: poolLines } = taskStore;
-    // the data, all of it or one area's tasks and pool lines
+    // the data, all of it or one area's tasks and pool items
     const data = (area: string | null) => new CalendarData({
       tasks: area ? tasks.filter((t: any) => T(t).area === area) : tasks,
-      poolLines: area ? poolLines.filter((l: any) => l.text.includes(area)) : poolLines,
+      poolLines: area ? poolLines.filter((l: any) => l.rec.area === area) : poolLines,
       days, today, areaOrder: Object.keys(config.areaIcons),
     });
     const ctx: any = {

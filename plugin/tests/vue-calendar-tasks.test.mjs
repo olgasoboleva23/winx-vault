@@ -11,7 +11,7 @@ before(async () => {
   const load = async n => (await import(`../src/components/pages/calendar/${n}`)).default;
   [TaskText, TaskRow, TaskCard] = await Promise.all(["TaskText.vue", "TaskRow.vue", "TaskCard/index.vue"].map(load));
 });
-const info = over => ({ key: "k7", area: "body", difficulty: "#⭐⭐medium", text: "walk <fast>", label: "🌺 walk <fast>",
+const info = over => ({ key: "k7", area: "body", difficulty: "medium", text: "walk <fast>", label: "🌺 walk <fast>",
   stickers: ["app://x/levi.png"], canSkip: false, ...over });
 const global = { provide: { calendar: { task: () => null } } };
 const html = (C, props) => mount(C, { props, global }).html({ raw: true }).replace(/<!--[^]*?-->/g, "");
@@ -19,8 +19,15 @@ const html = (C, props) => mount(C, { props, global }).html({ raw: true }).repla
 test("TaskText: stars (none without a difficulty), the text, the stickers", () => {
   assert.equal(mount({ components: { TaskText }, template: "<div><TaskText :task='t' /></div>", data: () => ({ t: info() }) })
     .element.innerHTML.replace(/<!--[^]*?-->/g, ""),
-    '<span class="tag" data-tag-name="#⭐⭐medium" aria-label="difficulty" data-tip="winx-tooltip"></span> walk &lt;fast&gt; ' +
+    '<span class="tag" data-difficulty="medium" aria-label="difficulty" data-tip="winx-tooltip"></span> walk &lt;fast&gt; ' +
     '<img class="winx-cal__sticker" src="app://x/levi.png" alt="">');
+});
+
+test("TaskText: 🌅 / 🌙 before a one-off's label", () => {
+  const t = time => mount(TaskText, { props: { task: info({ daytime: time }), withIcon: true } }).text();
+  assert.equal(t("morning"), "🌅 🌺 walk <fast>");
+  assert.equal(t("evening"), "🌙 🌺 walk <fast>");
+  assert.equal(t(null), "🌺 walk <fast>");
 });
 
 test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons for an open one", () => {
@@ -36,6 +43,8 @@ test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons 
   assert.doesNotMatch(month, /checkbox|winx-task-btns/);
   const after = html(TaskRow, { task: info(), kind: "open", tick: true, after: true });
   assert.match(after, /draggable="true"><span class="winx-cal__after">↳<\/span><input type="checkbox"/);
+  // a goal's task: its row says so (the tick plays the goal's sound)
+  assert.match(html(TaskRow, { task: info({ goal: true }), kind: "open", tick: true }), /^<div class="winx-cal__task winx-cal__task--open" data-area="body" data-goal="true"/);
 });
 
 test("TaskCard: a panel card, its meta line, its buttons (a pool item: ✏️ 🗑 only)", () => {

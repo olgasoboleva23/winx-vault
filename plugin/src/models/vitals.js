@@ -1,8 +1,10 @@
 // HP and MP (tested by tests/logic.test.mjs). HP, Habitica-style: of 50, every missed task (open,
 // its day gone by) costs 2 a star of its difficulty, every task done today gives 1 a star back. MP:
 // of 4, the strength the day of the cycle usually brings.
+import config from "#/helpers/config.js";
+
 const HP_MAX = 50, MP_MAX = 4;
-const stars = t => (t.difficulty ?? "").match(/⭐/gu)?.length ?? 0;
+const stars = t => config.difficulties.findIndex(d => d.key === t.difficulty) + 1;
 const sum = (list, f) => list.reduce((a, t) => a + f(t), 0);
 
 export function vitals({ missed, doneToday }) {

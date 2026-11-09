@@ -6,7 +6,7 @@ import { addMarketItem } from "#/controllers/widgets/market.js";
 
 <template>
   <WinxButton
-    kind="text"
+    kind="add"
     title="add item"
     class="winx-widget__add"
     @click="addMarketItem()"

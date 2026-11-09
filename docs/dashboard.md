@@ -13,9 +13,10 @@ A tab of its own: the ✨ icon on the left (it opens the dashboard and the calen
 | **Goals** | Per goal "X of Y this week", Mon–Sun dots, the minimum version |
 | **Life Areas** | Radar chart — XP earned per area this month |
 | **Cycle** | Cycle day, next start forecast, "started today" button |
-| **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight |
+| **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight; the second pill shows a free journal (`00 System/Data/Journals/`, a note each: a level 0–3 a day and its reasons; with more than one, a select under the pills picks it): a click on a level or a reason saves the day |
+| **Pages** | links to the notes with a page of their own: Finance, Shop, Supplies, Medication (the courses' base), Food (the food journal: a week, a row a day: what was eaten with its marks, the marks counted, each free journal's level after its lag, 💊 a course on that day, a note; ＋ a fuzzy search of the foods or a new one, ✎ a food, ⚙ the marks) |
 | **XP Today** | XP earned today, level name, streak heatmap |
-| **Quests** | Tasks due today, grouped by life area |
+| **Quests** | Tasks due today, grouped by life area (a `winx` block: `quests`) |
 | **Celestial Market** | Pending shopping items grouped by category |
 
 Any note can show a widget too, with a `winx` block: the widget's name, then `key: value` lines. `card: Title` draws it inside a dashboard card (`meta: scroll` / `scroll tall` for the scrolling ones):
@@ -31,29 +32,29 @@ On a phone the same dashboard and calendar tabs are used (📅 / ✦ switch betw
 
 ## 🎮 XP & Levels
 
-Completing a task awards XP and gold by its difficulty:
+Completing a task awards XP and gold by its difficulty (the `difficulty` of its record in `tasks.json`):
 
-| Tag | XP | Gold |
+| Difficulty | XP | Gold |
 |---|---|---|
-| `#⭐easy` | 5 | 2 |
-| `#⭐⭐medium` | 10 | 5 |
-| `#⭐⭐⭐hard` | 20 | 10 |
-| `#⭐⭐⭐⭐epic` | 50 | 25 |
+| ⭐ `easy` | 5 | 2 |
+| ⭐⭐ `medium` | 10 | 5 |
+| ⭐⭐⭐ `hard` | 20 | 10 |
+| ⭐⭐⭐⭐ `epic` | 50 | 25 |
 
 Level `n` costs `100 + (n-1) × 25` XP.
 
 ## Life areas
 
-| Area | Tag | Radar name |
+| Area | Key | Radar name |
 |---|---|---|
-| 🌺 Body | `#area/body` | Vitality |
-| 🔮 Mind | `#area/mind` | Knowledge |
-| 💎 Wealth | `#area/wealth` | Resources |
-| 🏰 Base | `#area/base` | Sanctuary |
-| 🌠 Occasions | `#area/occasions` | Memory |
-| 🌙 Rest | `#area/rest` | Serenity |
+| 🌺 Body | `body` | Vitality |
+| 🔮 Mind | `mind` | Knowledge |
+| 💎 Wealth | `wealth` | Resources |
+| 🏰 Base | `base` | Sanctuary |
+| 🌠 Occasions | `occasions` | Memory |
+| 🌙 Rest | `rest` | Serenity |
 
-Tags without a radar row still get an icon: `#area/learning` 📜, `#area/work` 🪄, `#area/personal` 🦋, `#area/health` 🧪. All of it is in `plugin/src/helpers/config.js`.
+Areas without a radar row still get an icon: `learning` 📜, `work` 🪄, `personal` 🦋, `health` 🧪. All of it is in `plugin/src/helpers/config.js`.
 
 ---
 
@@ -67,17 +68,18 @@ A shopping list card. Items are checkbox lines in `00 System/Data/Celestial Mark
 
 ## 🎯 Goals
 
-A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any task. `00 System/Data/Goals.md` describes each one:
+A goal is a recurring task whose record in `tasks.json` has `"goal": "<key>"`, ticked like any task. `00 System/Data/Goals.md` describes each one:
 
 ```
 - name:: Stretching
-  tag:: #goal/stretch
+  key:: stretch
   days:: tue, thu, sat
   min:: 5 minutes on the mat
   plan:: when I shut the laptop in the evening, I roll out the mat
 ```
 
-- `days` sets the weekly plan; otherwise `perWeek:: N` (`days` wins if both are given). A day counts when a done task with the tag has its `✅` on that day. Weeks start on Monday.
+- `key` is the goal's key: a task counts for it when its record says `"goal": "stretch"`. **Winx: Migrate tasks** turns an old `tag:: #goal/stretch` into `key:: stretch`.
+- `days` sets the weekly plan; otherwise `perWeek:: N` (`days` wins if both are given). A day counts when a done task of the goal has its `✅` on that day. Weeks start on Monday.
 - A missed goal task stays on its day: the calendar's **Missed?** lists it, to tick it for that day or move it to today.
 
 ## 📝 Daily Note

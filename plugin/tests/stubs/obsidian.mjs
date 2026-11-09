@@ -18,6 +18,12 @@ export const debounce = fn => Object.assign(fn, { cancel() {} });
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };
 export const Keymap = { isModEvent: () => false };
+// fuzzy: the letters of the query in order
+export const prepareFuzzySearch = q => text => {
+  let i = 0;
+  for (const c of text.toLowerCase()) if (c === q.toLowerCase()[i]) i++;
+  return i === q.length ? { score: 0, matches: [] } : null;
+};
 // a tooltip: its text as aria-label, its classes noted
 export const setTooltip = (el, text, o = {}) => { el.setAttribute("aria-label", text); if (o.classes) el.dataset.tip = o.classes.join(" "); };
 export class Modal { constructor(app) { this.app = app; } open() {} close() {} }

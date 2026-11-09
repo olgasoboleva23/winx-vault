@@ -1,20 +1,23 @@
-<!-- the body log: a level 0–3 and today's reasons (v-model:level, v-model:reasons), Save / Update
-     today (@save), the 30 days' bars, ✦ list -->
+<!-- a free journal: a level 0–3 and today's reasons (v-model:level, v-model:reasons), each click
+     saved (@save), the 30 days' bars, ✦ list (its note), 🗑 (@delete) -->
 <script setup>
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxChart from "#/components/uikit/WinxChart/index.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
-import { BODY_LOG } from "#/helpers/paths.js";
 
 defineProps({ log: { type: Object, required: true } });
-defineEmits(["save"]);
+const emit = defineEmits(["save", "delete"]);
 const level = defineModel("level", { type: Number, default: null });
 const reasons = defineModel("reasons", { type: Array, default: () => [] });
 
-// a reason: on, again: off
+// a level, a reason (on, again: off): saved at once
+const set = n => { level.value = n; emit("save"); };
+
 const pick = r => {
   const list = reasons.value;
+
   reasons.value = list.includes(r) ? list.filter(x => x !== r) : [...list, r];
+  emit("save");
 };
 </script>
 
@@ -26,7 +29,7 @@ const pick = r => {
         :key="n"
         kind="toggle"
         :on="level === n"
-        @click="level = n"
+        @click="set(n)"
       >{{ n }}</WinxButton>
     </div>
     <div class="winx-weight__log-row winx-flex winx-wrap winx-gap-s">
@@ -38,9 +41,14 @@ const pick = r => {
         @click="pick(r)"
       >{{ r }}</WinxButton>
     </div>
-    <WinxButton kind="pill" @click="$emit('save')">{{
-      log.now ? "Update today" : "Save today" }}</WinxButton>
   </div>
   <WinxChart :config="log.chart" />
-  <WinxNoteLink :path="BODY_LOG" class="winx-weight__list">✦ list</WinxNoteLink>
+  <div class="winx-row winx-gap-s">
+    <WinxNoteLink :path="log.path" class="winx-weight__list">✦ list</WinxNoteLink>
+    <WinxButton
+      title="delete the journal"
+      class="winx-weight__delete"
+      @click="$emit('delete')"
+    >🗑</WinxButton>
+  </div>
 </template>

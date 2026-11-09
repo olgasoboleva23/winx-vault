@@ -12,7 +12,7 @@
   "globalQuery": "hide toolbar",
   "globalFilter": "",
   "removeGlobalFilter": true,
-  "taskFormat": "tasksPluginEmoji",
+  "taskFormat": "dataview",
   "setCreatedDate": false,
   "setDoneDate": true,
   "setCancelledDate": true,

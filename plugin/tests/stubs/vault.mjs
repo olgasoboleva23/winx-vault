@@ -10,7 +10,19 @@ export function vault(files = {}, { folders = [], props = {}, dataview = null } 
   const app = {
     vault: {
       getFileByPath: byPath,
-      getFolderByPath: p => dirs.has(p) ? { path: p } : null,
+      getAbstractFileByPath: byPath,
+      // a folder: made, or holding files; its children the files right in it
+      getFolderByPath: p => {
+        const inIt = Object.keys(files).filter(f => f.startsWith(`${p}/`) && !f.slice(p.length + 1).includes("/"));
+
+        return dirs.has(p) || inIt.length ? { path: p, children: inIt.map(f => {
+          const name = f.split("/").pop();
+
+          return { path: f, name, basename: name.replace(/\.[^.]+$/, ""), extension: name.split(".").pop() };
+        }) } : null;
+      },
+      getMarkdownFiles: () => Object.keys(files).filter(f => f.endsWith(".md"))
+        .map(f => ({ path: f, basename: f.split("/").pop().replace(/\.md$/, ""), extension: "md" })),
       read: async f => files[f.path],
       cachedRead: async f => files[f.path],
       process: async (f, fn) => { files[f.path] = fn(files[f.path]); },
@@ -31,6 +43,7 @@ export function vault(files = {}, { folders = [], props = {}, dataview = null } 
       getFileCache: f => ({ frontmatter: props[f.path] ?? {} }),
       getFirstLinkpathDest: p => byPath(p) ?? byPath(`${p}.md`),
     },
+    fileManager: { trashFile: async f => { delete files[f.path]; } },
     loadLocalStorage: k => local[k] ?? null,
     saveLocalStorage: (k, v) => { local[k] = v; },
     plugins: { plugins: dataview ? { dataview: { api: dataview } } : {} },

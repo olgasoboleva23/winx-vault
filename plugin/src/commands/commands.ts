@@ -1,10 +1,10 @@
 import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
-import { Task } from "#/models/task.js";
 import { KINDS } from "#/models/kinds.js";
 import { mirrorMobileConfig } from "#/controllers/mobileConfig.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { todayYmd } from "#/helpers/dates.js";
-import { addPoolLine, addTask } from "#/controllers/tasks.js";
+import { saveNewTask } from "#/controllers/tasks.js";
+import { migrateTasks } from "#/controllers/taskMigration.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { addMarketItem } from "#/controllers/widgets/market.js";
@@ -13,6 +13,7 @@ import { createNote } from "#/controllers/notes.js";
 import { editCourse } from "#/controllers/meds.js";
 import { tasksApi } from "#/helpers/plugins.js";
 import { MASTER } from "#/helpers/paths.js";
+import { Task } from "#/models/task.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
@@ -35,17 +36,13 @@ export function registerCommands(plugin: Plugin) {
     const api = tasksApi();
 
     if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
-    // ➕ shows how long it waits on the board
-    const words = [pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ");
-    const result = await api.editTaskLineModal(`- [ ] ${words}  ➕ ${todayYmd()}`);
+    // created shows how long it waits on the board
+    const result = await api.editTaskLineModal(Task.created(found.name, todayYmd()).line);
 
     if (!result) return;
-    // after the text typed in the Tasks modal
-    const line = new Task(result).setSticker(pick.sticker);
-
-    // a pool line (no checkbox, no dates) to the end of Pool.md; a task to the top of Master.md
-    if (pick.pool) return void await addPoolLine(new Task(line).poolLine);
-    if (!await addTask(line)) new Notice(`✦ ${MASTER} not found — task not saved`);
+    if (!await saveNewTask(found.name, pick, result, found.id)) {
+      new Notice(`✦ ${MASTER} not found — task not saved`);
+    }
   });
 
   // a watch / read / game / recipe / work task note (models/kinds.js), in its folder, opened in a
@@ -87,6 +84,9 @@ export function registerCommands(plugin: Plugin) {
   // the phone: the synced obsidian-mobile/ copied into the real config folder .obsidian-mobile
   // (then restart)
   if (Platform.isMobile) add("update-mobile-config", "Update mobile config", mirrorMobileConfig);
+
+  // once: the old emoji Master.md and Pool.md to ids, Dataview fields and tasks.json
+  add("migrate-tasks", "Migrate tasks", migrateTasks);
 
   // every Winx command in one list to pick from (Alt+T in this vault's hotkeys.json)
   plugin.addCommand({

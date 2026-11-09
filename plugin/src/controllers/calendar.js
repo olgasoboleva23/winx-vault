@@ -2,10 +2,9 @@
 // text); most come with an undo notice. A 🔁 task ticked goes through the Tasks plugin, so it gets
 // its next copy.
 import { Task } from "#/models/task.js";
-import { T } from "#/models/calendarData.js";
-import { moveLine } from "#/helpers/files.js";
+import { T, canReorder } from "#/models/calendarData.js";
 import {
-  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal,
+  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal, saveRecords, tickTask,
 } from "./tasks.js";
 
 
@@ -18,14 +17,12 @@ export function makeActions(ctx) {
   // a missed copy skipped: the next one from today on (skipLines)
   const skip    = t => editTaskLineWithUndo(t, line => Task.skipLines(
     TASKS.executeToggleTaskDoneCommand(line, t.path), T(t).isOverdue(today) ? today : null), "⏭");
-  const tick    = t =>
-    editTaskLineWithUndo(t, line => TASKS.executeToggleTaskDoneCommand(line, t.path), "✓");
   const unplan  = t =>
     editTaskLineWithUndo(t, line => new Task(line).place(null, false), "↩ no date");
-  // a pool item's copy goes to the top of Master.md, like a new task: open on `day` (no date for
-  // null), or done that day
+  // a pool item's copy (its id, created today) goes to the top of Master.md, like a new task:
+  // open on `day` (no date for null), or done that day
   const fromPool = (t, day, done) =>
-    addTask(new Task(Task.fromPool(T(t).line, today)).place(day, done));
+    addTask(Task.created(t.id, today).place(day, done));
   // a task dropped on `day` (null: the backlog): open and due that day, or done that day. An open 🔁
   // task done on a day goes through the Tasks plugin (so it gets its next copy), then back to that
   // day
@@ -44,12 +41,19 @@ export function makeActions(ctx) {
   // ⏸ pause: drop its dates; ▶ resume: from today, on the first day its rule allows
   const pauseOrResume = t =>
     editTaskLineWithUndo(t, line => new Task(line).togglePause(today), T(t).isPaused ? "▶" : "⏸");
-  // a task dropped on another of its day (canReorder): its line before / after that one's
-  const same    = t => line => new Task(line).sameAs(Task.of(t));
-  const reorder = (t, to, after) => moveLine(t.path, t.line, same(t), to.line, same(to), after);
+  // a task dropped on another of `day` (canReorder): it goes before / after that one among the
+  // day's open tasks of its group, and the group is numbered 0…n in the records
+  const reorder = (t, to, after, day) => {
+    const group = ctx.model.byDay[day].filter(e => e.kind === "open" && canReorder(t, e.t))
+      .map(e => e.t);
+
+    group.splice(group.indexOf(to) + (after ? 1 : 0), 0, t);
+    return saveRecords(Object.fromEntries(group.map((x, i) => [T(x).id, { order: i }])));
+  };
 
   return {
-    canSkip, skip, tick, unplan, fromPool, place, reorder, doneOnItsDay, toToday, pauseOrResume,
+    canSkip, skip, tick: tickTask, unplan, fromPool, place, reorder, doneOnItsDay, toToday,
+    pauseOrResume,
     remove: deleteTaskLine, edit: editTaskModal,
   };
 }

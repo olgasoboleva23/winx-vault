@@ -60,6 +60,7 @@ function onTick(e) {
     ]"
     :style="swipe.dx ? { '--winx-swipe': `${swipe.dx}px` } : null"
     :data-area="task.area"
+    :data-goal="task.goal || null"
     :data-swipe="swipe.kind"
     :draggable="drags ? 'true' : null"
     @dragstart="drag.start"

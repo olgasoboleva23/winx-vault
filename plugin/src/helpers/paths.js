@@ -7,6 +7,12 @@ export const TASKS = `${DATA}/Tasks`;
 
 export const MASTER = `${TASKS}/Master.md`, POOL = `${TASKS}/Pool.md`;
 
+// the old notes kept by the Migrate tasks command
+export const MASTER_OLD = `${TASKS}/Master (old).md`, POOL_OLD = `${TASKS}/Pool (old).md`;
+
+// Winx's part of every task (name, difficulty, area…), an object by id
+export const TASK_RECORDS = `${TASKS}/tasks.json`;
+
 export const GOALS = `${DATA}/Goals`;
 
 export const LEDGER = `${DATA}/Finance/Ledger`, RULES = `${DATA}/Finance/rules.json`;
@@ -17,7 +23,13 @@ export const MARKET = `${DATA}/Celestial Market`, SUPPLIES = `${DATA}/Supplies`;
 
 export const SAVINGS = `${DATA}/Savings`;
 
-export const WEIGHT = `${DATA}/Weight.md`, BODY_LOG = `${DATA}/Body log.md`;
+// the free journals: a note each (a level 0–3 a day and its reasons; Высыпания the first)
+export const WEIGHT = `${DATA}/Weight.md`, JOURNALS = `${DATA}/Journals`;
+
+// the food journal: the page (its block), the foods with their marks, what was eaten a day
+export const FOOD = `${DATA}/Food/Food.md`, FOODS = `${DATA}/Food/Foods.md`;
+
+export const FOOD_LOG = `${DATA}/Food/Log.md`;
 
 export const CYCLE = `${DATA}/Cycle.md`;
 

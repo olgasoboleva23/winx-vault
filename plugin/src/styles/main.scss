@@ -10,6 +10,7 @@
 @use "../components/pages/dashboard/widgets/market";
 @use "fonts";
 @use "../components/pages/dashboard/widgets/xp/XpToday";
+@use "../components/pages/dashboard/widgets/quests";
 @use "kanban";
 @use "layout";
 @use "../components/pages/dashboard/widgets/pomodoro";
@@ -43,5 +44,6 @@
 @use "../components/uikit/WinxCheckbox";
 @use "../components/uikit/WinxChart";
 @use "../components/pages/meds";
+@use "../components/pages/food";
 @use "../components/pages/dashboard/widgets/finance";
 @use "helpers";   // global .winx-is-* helpers, after the blocks

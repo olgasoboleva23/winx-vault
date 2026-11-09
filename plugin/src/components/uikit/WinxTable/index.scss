@@ -15,4 +15,8 @@
   }
   & &__head--center, & &__cell--center { text-align: center; }
   & &__row:last-child > * { border-bottom: none; }
+  /* bordered: a dashed line between the columns too */
+  &#{&}--bordered :is(&__head, &__cell) + :is(&__head, &__cell) {
+    border-left: 1px dashed fade(var(--winx-gold-deep), 30%);
+  }
 }

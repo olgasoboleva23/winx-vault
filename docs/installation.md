@@ -25,7 +25,7 @@ Copy the plugin and what it reads:
 |---|---|
 | `plugin/dist/*` (after `npm run build`) | `.obsidian/plugins/winx/` — then turn **Winx** on in Community plugins |
 | the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
-| `00 System/Data/` (`Tasks/Master.md`, `Tasks/Pool.md`, `Goals.md`, the widgets' notes), `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
+| `00 System/Data/` (`Tasks/Master.md`, `Tasks/tasks.json`, `Goals.md`, the widgets' notes), `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
 
 The paths the widgets read are in `plugin/src/helpers/paths.js` (and constants at the top of the controllers, `plugin/src/controllers/*.js`); the areas, difficulties and levels in `plugin/src/helpers/config.js`.
 
@@ -68,6 +68,19 @@ A sync tool can bring deleted or renamed notes back: Remotely Save decides delet
 |---|---|---|
 | **Winx** | this repo, `plugin/` | Widgets, task window, commands, all styles |
 | **Dataview** | 0.5.68 | Data for the widgets (its index of pages and lists; the tasks the plugin reads itself) |
-| **Tasks** | 7.23.1 | Task format, the edit dialog, ticking 🔁 tasks |
+| **Tasks** | 7.23.1 | Task format (set to Dataview), the edit dialog, ticking 🔁 tasks |
 | **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
 | **Meta Bind** | 1.4.8 | `INPUT[slider]` in old daily notes (optional) |
+
+## Upgrading from the old task format
+
+For a vault whose `Master.md` has `#area/…` tags and 📅 / 🔁 dates in the text (and maybe a `Pool.md`):
+
+1. **Before you migrate: make a full backup of the vault** — a copy of the folder, or a git commit / branch of it. Don't skip this. At the very least keep `00 System/Data/Tasks/` and `.obsidian/plugins/obsidian-tasks-plugin/data.json`; the whole vault is best.
+2. Update the plugin (build, copy `plugin/dist/*`) and reload.
+3. Turn the sync plugin off, or let it finish, so the phone can't send the old files back mid-way. Then run **Winx: Migrate tasks** from the command palette. It gives every task an id (`t12`; a task and its done copies the same one), writes `00 System/Data/Tasks/tasks.json` (name, difficulty, area, daytime, goal, sticker… by id), rewrites `Master.md` as id + Tasks' Dataview fields, moves `Pool.md` to the trash (its tasks become records with `pool: true`) and keeps `Master (old).md` and `Pool (old).md`. It refuses to run when `tasks.json` or either `(old)` copy exists.
+4. Settings → Tasks → Task format → **Dataview**, on every device (each one keeps its own Tasks settings, the phone too). A device left on the emoji format writes `✅` when a task is ticked there and makes no next copy of a 🔁 task.
+5. Reload and check the calendar.
+6. With a sync plugin: sync the desktop first, then the phone before editing there.
+
+To go back: restore `Master (old).md` as `Master.md` (and `Pool (old).md` as `Pool.md`), delete `tasks.json`, switch Tasks' format back to the emoji one, and use the previous plugin build.

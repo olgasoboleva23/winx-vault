@@ -10,13 +10,21 @@ const ORDER = { open: 0, ghost: 1, done: 2 };
 
 // a day's group: one-offs, or a 🔁 task by its time of day (morning, evening, other)
 export const dayGroup = t => !T(t).isRecurring ? "one"
-  : ["morning", "evening"].includes(T(t).time) ? T(t).time : "other";
+  : ["morning", "evening"].includes(T(t).daytime) ? T(t).daytime : "other";
+
+// the mark of a task's time of day, "" without one
+export const daytimeMark = time => ({ morning: "🌅 ", evening: "🌙 " })[time] ?? "";
+
+// morning → none → evening
+export const daytimeRank = time => ["morning", null, "evening"].indexOf(time);
+// a one-off's place by time; a 🔁 task keeps its box's groups, so counts as none
+const slot = t => daytimeRank(T(t).isRecurring ? null : T(t).daytime);
 
 // a task dragged onto another of its day: it moves before or after it only within its group and
-// its file (a line moves), among its siblings (a subtask under its parent), and neither follows a
-// lead (#after: it stays under it)
-export const canReorder = (a, b) => a !== b && a.path === b.path && a.parent === b.parent
-  && dayGroup(a) === dayGroup(b) && !T(a).after && !T(b).after;
+// (the order is the record's), among its siblings (a subtask under its parent), and neither follows
+// a lead (#after: it stays under it); both need an id
+export const canReorder = (a, b) => a !== b && !!T(a).id && !!T(b).id && a.parent === b.parent
+  && dayGroup(a) === dayGroup(b) && T(a).daytime === T(b).daytime && !T(a).after && !T(b).after;
 // a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its
 // earlier followers), with .follows set to it; the rest in their order
 const chain = list => {
@@ -49,7 +57,7 @@ const historyOf = list => {
   return by;
 };
 
-// What the calendar shows, worked out once per draw from the tasks, Pool.md's lines, the shown
+// What the calendar shows, worked out once per draw from the tasks, the pool's records, the shown
 // days, today and the areas' order (tags; unknown areas last):
 //   byDay    day → entries { t, kind: open | ghost | done }: open ones on their date (today and
 //            later; the overdue ones are in missed), done ones on their ✅ date, a 🔁 task's next
@@ -57,8 +65,8 @@ const historyOf = list => {
 //   missed   "Missed?": open tasks whose day has passed, the latest first
 //   backlog  No date: open one-offs with no date, by area, then the longest waiting (➕ created)
 //            first
-//   pool     Pool.md's lines (no checkbox), each { text, path, line, pool: true } with its Task: by
-//            area, then the longest since last done (never done first)
+//   pool     the pool's records, each { id, pool: true, rec, path } with its Task: by area, then
+//            the longest since last done (never done first)
 //   regulars open 🔁 tasks (an undated one is paused) but dated birthdays (a yearly rule, in Ahead):
 //            by area, dated before paused, the longest overdue, then the longest since last done
 //   ahead    open dated tasks (no 🔁, but birthdays) after today's week, by month:
@@ -109,14 +117,16 @@ export class CalendarData {
       this.ahead.at(-1).items.push(t);
     }
 
-    for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
+    for (const d of days) this.byDay[d].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]
+      || slot(a.t) - slot(b.t)
+      || (T(a.t).rec?.order ?? Infinity) - (T(b.t).rec?.order ?? Infinity) || 0);
     this.doneBy = historyOf(tasks.map(T).filter(t => t.isDone && t.doneOn));
     this.skipsBy = historyOf(tasks.map(T).filter(t => t.isSkipped));
     this.missed = tasks.filter(t => T(t).isOverdue(today))
       .sort((a, b) => T(b).date.localeCompare(T(a).date));
-    const pool = poolLines.map(l => {
-      const p = { text: l.text, path: l.path, line: l.line, pool: true };
-      p.winxTask = new Task(`- ${l.text}`, p);
+    const pool = poolLines.map(({ id, rec, path }) => {
+      const p = { id, pool: true, rec, path };
+      p.winxTask = new Task(`- ${id}`, p, rec);
       return p;
     });
     this.all = [...tasks, ...pool];
@@ -127,7 +137,7 @@ export class CalendarData {
     this.regulars = this.sortRegulars(tasks.filter(t => T(t).isOpen && T(t).isRecurring));
   }
 
-  // the week's balance: for each of `areas` (tags), its tasks on the shown days (open + done; a 🔁
+  // the week's balance: for each of `areas` (keys), its tasks on the shown days (open + done; a 🔁
   // task's faded repeats don't count) and how many of them are done
   balance(areas) {
     const entries = Object.values(this.byDay).flat().filter(e => e.kind !== "ghost");
@@ -188,11 +198,11 @@ export class CalendarData {
   }
 }
 
-// A task's key in the calendar's rows (TaskRow, TaskCard, Missed): its file, line, status and
-// words. It names the same task in every draw: findTask() takes the task at that line if it still
-// has those words and that status, else the nearest one in the file that has them (lines move when
-// a task is added on top), else none — never another task.
-const words = t => t.pool ? Task.keyOf(`- ${t.text}`) : T(t).key;
+// A task's key in the calendar's rows (TaskRow, TaskCard, Missed): its file, line, status and id
+// (its words without one). It names the same task in every draw: findTask() takes the task at that
+// line if it still has that id and that status, else the nearest one in the file that has them
+// (lines move when a task is added on top), else none — never another task.
+const words = t => T(t).key;
 const stateOf = t => t.pool ? "p" : t.status;
 
 export const taskKey = t => [t.path, t.line, stateOf(t), words(t)].join("|");
@@ -215,8 +225,9 @@ export function taskInfo(t, ctx, app) {
   if (known) return known;
   const task = T(t), area = task.area;
   const i = {
-    key: taskKey(t), area: area?.slice(6) ?? null, difficulty: task.difficulty, text: task.text,
+    key: taskKey(t), area, difficulty: task.difficulty, goal: !!task.goal, text: task.text,
     pool: !!t.pool,
+    daytime: task.isRecurring ? null : task.daytime,   // a 🔁 task's is its box heading's
     label: `${ctx.config.areaIcons[area] ?? ""} ${task.text}`.trim(),
     stickers: task.stickers.map(name => app.metadataCache.getFirstLinkpathDest(name, t.path))
       .filter(Boolean)

@@ -37,10 +37,6 @@
   &__row--today &__date { font-weight: 600; color: var(--winx-purple-deep); }
   &__tick { margin: 0 auto; }
   &__note-input { width: 100%; min-width: 6em; }
-  &__row--past &__date, &__row--future &__date { color: alpha(--winx-text-dark, 60%); }
-  &__row--today { background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%)); }
-  &__row--today &__date { font-weight: 600; color: var(--winx-purple-deep); }
-  &__tick { margin: 0 auto; }
   &__legend { margin-top: $space-l; font-size: $text-m; color: alpha(--winx-purple-deep, 70%); }
   &__legend span { @include row; gap: $space-s; }
   &__legend b { color: var(--winx-purple-deep); font-family: $font-deco; font-size: $text-s; letter-spacing: 0.06em; }

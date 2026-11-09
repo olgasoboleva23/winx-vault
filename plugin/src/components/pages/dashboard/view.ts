@@ -7,7 +7,7 @@ import { useBusy, useNewDay, useNoteLinks } from "#/composables/use.js";
 import { DATA, POMODORO } from "#/helpers/paths.js";
 import DashboardDate from "./DashboardDate.vue";
 
-// The dashboard tab: layout.md (the grid of cards, its ```winx blocks and the Quests query) drawn
+// The dashboard tab: layout.md (the grid of cards, its ```winx blocks) drawn
 // by Obsidian's markdown renderer, as a note in reading view would be, for the tab's date. The date
 // is the tab's own (no date: today, and it moves on at midnight); Obsidian saves it with the
 // layout. After a write to the tasks or the data, the tab dims with the calendar's ✦ pill until a
@@ -15,9 +15,6 @@ import DashboardDate from "./DashboardDate.vue";
 export const DASHBOARD_VIEW = "winx-dashboard";
 const WATCHED = [`${DATA}/`];
 const QUIET = POMODORO;   // the timer saves itself all the time
-// layout.md: the grid, then the Quests card's Tasks query (drawn into the card on its own: a new
-// day redraws only it)
-const [GRID, QUESTS] = layout.split(/\n%%.*%%\n/);
 
 export class DashboardView extends ItemView {
   private date: string | null = null;
@@ -47,8 +44,7 @@ export class DashboardView extends ItemView {
   }
   async onClose() { this.page?.unload(); this.page = null; }
 
-  // another day: the cards draw again in place (the pomodoro isn't touched), the date row and
-  // Quests anew
+  // another day: the cards draw again in place (the pomodoro isn't touched), the date row anew
   private go(date: string | null) {
     this.date = date === todayYmd() ? null : date;
     this.app.workspace.requestSaveLayout();
@@ -56,7 +52,6 @@ export class DashboardView extends ItemView {
     this.shownDate = this.date ?? todayYmd();
     this.body.dataset.date = this.shownDate;
     Object.assign(this.shown, { date: this.shownDate, today: todayYmd() });
-    this.quests();
     this.app.workspace.trigger("winx:date");
   }
 
@@ -75,10 +70,9 @@ export class DashboardView extends ItemView {
     const body = this.body = this.contentEl.createDiv({
       cls: "markdown-preview-sizer markdown-preview-section", attr: { "data-date": date },
     });
-    void MarkdownRenderer.render(this.app, GRID, body, "", page).then(() => {
+    void MarkdownRenderer.render(this.app, layout, body, "", page).then(() => {
       if (this.page !== page) return;   // closed, or drawn again, meanwhile
       this.dateRow();
-      this.quests();
     });
   }
 
@@ -100,21 +94,6 @@ export class DashboardView extends ItemView {
         date: shown.date, today: shown.today, phone, onGo: go, onCalendar: calendar,
       }),
     });
-  }
-
-  // Quests: the Tasks query of layout.md for the day, in its card (drawn on its own, so a new day
-  // redraws only it)
-  private questsPart: Component | null = null;
-  private quests() {
-    const slot = this.body?.querySelector(".winx-dash__quests") as HTMLElement | null;
-
-    if (!slot) return;
-    if (this.questsPart) this.page!.removeChild(this.questsPart);
-    this.questsPart = this.page!.addChild(new Component());
-    slot.empty();
-    const query = QUESTS.replaceAll("{{date}}", this.shownDate);
-
-    void MarkdownRenderer.render(this.app, query, slot, "", this.questsPart);
   }
 
   private listen() {

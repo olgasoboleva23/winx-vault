@@ -4,6 +4,7 @@ import { blockDv } from "#/helpers/plugins.js";
 import { app } from "#/helpers/app.js";
 import { VueHost } from "#/composables/vueHost.ts";
 import { loadLevelToday, loadLifeAreas, loadXpToday } from "#/controllers/widgets/xp.js";
+import { loadQuests } from "#/controllers/widgets/quests.js";
 import { loadShop } from "#/controllers/widgets/shop.js";
 import { loadCelestialMarket, loadSupplies } from "#/controllers/widgets/market.js";
 import { loadGoals } from "#/controllers/widgets/goals.js";
@@ -12,15 +13,18 @@ import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
 import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
-  BODY_LOG, CYCLE, GOALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS, WEIGHT,
+  CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS,
+  WEIGHT,
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
 import { loadMeds } from "#/controllers/meds.js";
+import { loadFood } from "#/controllers/food.js";
 // the widgets' markup: components/pages/dashboard/widgets/
 import XpToday from "#/components/pages/dashboard/widgets/xp/XpToday/index.vue";
 import LevelToday from "#/components/pages/dashboard/widgets/xp/LevelToday/index.vue";
 import LifeAreas from "#/components/pages/dashboard/widgets/xp/LifeAreas/index.vue";
+import QuestsCard from "#/components/pages/dashboard/widgets/quests/index.vue";
 import ShopWidget from "#/components/pages/shop/index.vue";
 import SuppliesWidget from "#/components/pages/supplies/index.vue";
 import CelestialMarket from "#/components/pages/dashboard/widgets/market/index.vue";
@@ -36,6 +40,7 @@ import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/index.v
 // the pages on notes of their own: components/pages/<page>/
 import MedsCourse from "#/components/pages/meds/index.vue";
 import MedsEdit from "#/components/pages/meds/EditButton.vue";
+import FoodPage from "#/components/pages/food/index.vue";
 
 // the widgets: name → { view: the .vue, load(ctx): its data, cardButton: a .vue next to the
 // card's title, bodyClass: a class on the card's body, watches: the files it reads (a folder:
@@ -46,6 +51,7 @@ const TASK_FILES = `${TASKS}/`, MARKET_NOTE = `${MARKET}.md`, LEDGER_FILES = `${
 
 export const blocks = {
   xpToday: { view: XpToday, load: loadXpToday, watches: [TASK_FILES] },
+  quests: { view: QuestsCard, load: loadQuests, watches: [TASK_FILES] },
   levelToday: { view: LevelToday, load: loadLevelToday, watches: [TASK_FILES, CYCLE] },
   lifeAreas: { view: LifeAreas, load: loadLifeAreas, watches: [TASK_FILES] },
   shop: {
@@ -59,7 +65,7 @@ export const blocks = {
   finance: { view: FinanceMonths, load: loadFinance, watches: [LEDGER_FILES, RULES] },
   financeMonth: { view: FinanceLine, load: loadFinanceLine, watches: [LEDGER_FILES, RULES] },
   // a reload keeps the typed picks
-  weight: { view: WeightCard, load: loadWeight, watches: [WEIGHT, BODY_LOG, CYCLE] },
+  weight: { view: WeightCard, load: loadWeight, watches: [WEIGHT, `${JOURNALS}/`, CYCLE] },
   // the tab's date only (useTabDate)
   dailyNote: { view: DailyNoteOpen, load: loadDailyNote, watches: [] },
   pomodoro: { view: PomodoroTimer, load: loadPomodoro, follows: false },
@@ -71,6 +77,8 @@ export const blocks = {
   },
   // a medication course's own note: its table is the block's text
   meds: { view: MedsCourse, load: loadMeds, cardButton: MedsEdit, watches: [] },
+  // the food journal's own note (00 System/Data/Food/Food.md)
+  food: { view: FoodPage, load: loadFood, watches: [FOODS, FOOD_LOG, `${JOURNALS}/`, TASK_FILES] },
 };
 
 // a widget on its block: its VueHost, with the card when the block has a "card:" line

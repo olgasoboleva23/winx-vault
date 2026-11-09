@@ -76,6 +76,8 @@ test("WinxTable: the columns' heads and classes, a row per item named by row-cla
     slots: { cell: `<template #cell="{ row, col }"><b v-if="col.key === 'n'">{{ row.n * 10 }}</b><template v-else>{{ row[col.key] }}</template></template>` },
   });
 
+  draws(mount(ui.WinxTable, { props: { columns: [{ key: "a", label: "A" }], rows: [], bordered: true } }),
+    '<table class="winx-table winx-table--bordered"><thead><tr><th class="winx-table__head">A</th></tr></thead><tbody></tbody></table>');
   draws(w, '<table class="winx-table"><thead><tr><th class="winx-table__head x-name" aria-label="the medicine" data-tip="winx-tooltip">Код</th><th class="winx-table__head winx-table__head--center">N</th></tr></thead>'
     + '<tbody><tr class="winx-table__row x-past"><td class="winx-table__cell x-name">АЕ</td><td class="winx-table__cell winx-table__cell--center"><b>10</b></td></tr>'
     + '<tr class="winx-table__row x-today"><td class="winx-table__cell x-name">МА</td><td class="winx-table__cell winx-table__cell--center"><b>20</b></td></tr></tbody></table>');

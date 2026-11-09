@@ -2,13 +2,15 @@
      icon in front) -->
 <script setup>
 import { vTip } from "#/components/uikit/tooltip.js";
+import { daytimeMark } from "#/models/calendarData.js";
 import { computed } from "vue";
 
 const props = defineProps({
   task: { type: Object, required: true },
   withIcon: { type: Boolean, default: false },
 });
-const text = computed(() => props.withIcon ? props.task.label : props.task.text);
+const text = computed(() =>
+  daytimeMark(props.task.daytime) + (props.withIcon ? props.task.label : props.task.text));
 </script>
 
 <template>
@@ -16,7 +18,7 @@ const text = computed(() => props.withIcon ? props.task.label : props.task.text)
     v-if="task.difficulty"
     v-tip="'difficulty'"
     class="tag"
-    :data-tag-name="task.difficulty"
+    :data-difficulty="task.difficulty"
   />
   {{ text }}
   <img

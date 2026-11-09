@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { createRequire } from "node:module";
 import { setApp } from "#/helpers/app.js";
+import { idTask } from "./stubs/idTask.mjs";
 
 // The calendar tab on Vue: its state through Obsidian's layout, a tick's 2 s, the folds, the panel's tab
 const require = createRequire(import.meta.url);
@@ -31,13 +32,14 @@ before(async () => {
 });
 
 let n = 0;
-const task = (status, text) => ({ status, text, path: "00 System/Data/Tasks/Master.md", line: n++ });
+// the store's tasks, from a readable spec (idTask)
+const task = (status, spec) => ({ status, ...idTask(spec), path: "00 System/Data/Tasks/Master.md", line: n++ });
 const TASKS = () => { n = 0; return [
-  task(" ", "#area/body walk 📅 2026-11-04"),
-  task(" ", "#area/body #time/morning stretch 🔁 every day 📅 2026-11-04"),
+  task(" ", "#area/body walk [due:: 2026-11-04]"),
+  task(" ", "#area/body #time/morning stretch [repeat:: every day] [due:: 2026-11-04]"),
   task(" ", "#area/base plan trip"),
-  task(" ", "#area/mind read 🔁 every week on Friday 📅 2026-11-06"),
-  task(" ", "#area/mind write 📅 2026-11-04"),
+  task(" ", "#area/mind read [repeat:: every week on Friday] [due:: 2026-11-06]"),
+  task(" ", "#area/mind write [due:: 2026-11-04]"),
 ]; };
 // the tab's Vue app on made-up data; `ticked`, `placed`, `moved`, `unplanned` collect what the writes get
 function mount(over = {}) {
@@ -48,7 +50,7 @@ function mount(over = {}) {
     state: st, today: TODAY, days, base: state.baseDate(st, TODAY), view: st.view,
     shown: { open: true, ghost: true, done: st.showDone }, everything: null, TASKS: {}, infos: new Map(),
     model: new data.CalendarData({ tasks: TASKS(), poolLines: [], days, today: TODAY }),
-    config: { areas: [{ tag: "#area/body", label: "🌺 Body" }], areaIcons: {}, areaMap: {} },
+    config: { areas: [{ key: "body", label: "🌺 Body" }], areaIcons: {}, areaMap: {} },
   });
   const text = data.T;
   ctx.actions = { ...actions.makeActions(ctx), tick: t => ticked.push(t),
@@ -73,7 +75,7 @@ test("its state goes into Obsidian's layout and comes back; area and the phone's
     unfolded: ["2026-11-04"], unfoldedDay: null, backlogOpen: false });
   await vue.nextTick();
   const before = saves;
-  v.state.area = "#area/body"; v.state.picked = "2026-11-06";
+  v.state.area = "body"; v.state.picked = "2026-11-06";
   await vue.nextTick();
   assert.equal(saves, before);   // not saved
   v.state.unfolded = [...v.state.unfolded, "2026-11-05"];
@@ -151,7 +153,7 @@ test("the panel's tab redraws only the panel: the header's elements stay the sam
 test("the area filter: a piece of the balance bar picks its area, again: all", async () => {
   const { el, st } = mount();
   el.querySelector(".winx-cal__area").click();
-  assert.equal(st.area, "#area/body");
+  assert.equal(st.area, "body");
   el.querySelector(".winx-cal__area").click();
   assert.equal(st.area, null);
 });

@@ -75,6 +75,24 @@ button.winx-btn {
     letter-spacing: inherit;
     cursor: pointer;
   }
+  // add: a white + in a pink glowing circle (the market's ＋, the course's ✎, a new journal)
+  &.winx-btn--add {
+    @include center;
+    flex-shrink: 0;
+    width: $btn-m;
+    height: $btn-m;
+    padding: 0;
+    border: none;
+    border-radius: $round;
+    background: alpha(--winx-pink-deep, 85%);
+    box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
+    color: #fff;
+    font-family: var(--font-text);
+    font-size: $text-3xl;
+    line-height: 1;
+    letter-spacing: 0;
+    cursor: pointer;
+  }
 }
 
 // pill: a word on the pink Cinzel ticket (✦ Open, running low, dates); the date fields (the calendar's, the

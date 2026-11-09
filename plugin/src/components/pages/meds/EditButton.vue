@@ -9,7 +9,7 @@ const sourcePath = inject("sourcePath");
 
 <template>
   <WinxButton
-    kind="text"
+    kind="add"
     title="edit course"
     class="winx-widget__add"
     @click="editCourse(sourcePath)"
