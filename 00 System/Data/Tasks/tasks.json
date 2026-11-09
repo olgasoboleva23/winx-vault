@@ -1,0 +1,337 @@
+{
+  "t1": {
+    "name": "stretching",
+    "difficulty": "easy",
+    "area": "body",
+    "daytime": "evening",
+    "goal": "stretch",
+    "sticker": "aot-fist.webp",
+    "after": null
+  },
+  "t2": {
+    "name": "reading",
+    "difficulty": "easy",
+    "area": "mind",
+    "daytime": "evening",
+    "goal": "reading",
+    "sticker": null,
+    "after": null
+  },
+  "t3": {
+    "name": "make the bed",
+    "difficulty": "easy",
+    "area": "base",
+    "daytime": "morning",
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t4": {
+    "name": "workout",
+    "difficulty": "medium",
+    "area": "body",
+    "daytime": null,
+    "goal": null,
+    "sticker": "mikasa-blades.webp",
+    "after": null
+  },
+  "t5": {
+    "name": "wash hair",
+    "difficulty": "easy",
+    "area": "body",
+    "daytime": null,
+    "goal": null,
+    "sticker": "kiruko-hair.webp",
+    "after": "t4"
+  },
+  "t6": {
+    "name": "tidy the desk",
+    "difficulty": "easy",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": "levi-cleaning.webp",
+    "after": null
+  },
+  "t7": {
+    "name": "video games",
+    "difficulty": "easy",
+    "area": "rest",
+    "daytime": null,
+    "goal": null,
+    "sticker": "anders.webp",
+    "after": null
+  },
+  "t8": {
+    "name": "pay the internet bill",
+    "difficulty": "medium",
+    "area": "wealth",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t9": {
+    "name": "reply to emails",
+    "difficulty": "easy",
+    "area": "mind",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t10": {
+    "name": "finish the chapter 3 draft",
+    "difficulty": "hard",
+    "area": "mind",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t11": {
+    "name": "buy groceries",
+    "difficulty": "easy",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t12": {
+    "name": "review notes 18:30",
+    "difficulty": "medium",
+    "area": "mind",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t13": {
+    "name": "dentist 10:00",
+    "difficulty": "medium",
+    "area": "body",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t14": {
+    "name": "call grandma",
+    "difficulty": "easy",
+    "area": "occasions",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t15": {
+    "name": "fix the bike",
+    "difficulty": "medium",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": "rings.webp",
+    "after": null
+  },
+  "t16": {
+    "name": "movie night",
+    "difficulty": "easy",
+    "area": "rest",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t17": {
+    "name": "plan the monthly budget",
+    "difficulty": "medium",
+    "area": "wealth",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t18": {
+    "name": "meal prep",
+    "difficulty": "medium",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t19": {
+    "name": "renew the library card",
+    "difficulty": "easy",
+    "area": "wealth",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t20": {
+    "name": "return the parcel",
+    "difficulty": "medium",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t21": {
+    "name": "read an article on habits",
+    "difficulty": "medium",
+    "area": "mind",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t22": {
+    "name": "laundry",
+    "difficulty": "easy",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t23": {
+    "name": "update the CV",
+    "difficulty": "hard",
+    "area": "wealth",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t24": {
+    "name": "send a postcard",
+    "difficulty": "easy",
+    "area": "occasions",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t25": {
+    "name": "long walk in the park",
+    "difficulty": "medium",
+    "area": "rest",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t26": {
+    "name": "water the plants",
+    "difficulty": "easy",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null,
+    "pool": true
+  },
+  "t27": {
+    "name": "finish the online course module",
+    "difficulty": "medium",
+    "area": "mind",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t28": {
+    "name": "bake cookies",
+    "difficulty": "easy",
+    "area": "rest",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t29": {
+    "name": "book train tickets",
+    "difficulty": "medium",
+    "area": "occasions",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t30": {
+    "name": "file the tax form",
+    "difficulty": "hard",
+    "area": "wealth",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t31": {
+    "name": "buy a gift for Mia",
+    "difficulty": "easy",
+    "area": "occasions",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t32": {
+    "name": "🎂 Mia's birthday",
+    "difficulty": "easy",
+    "area": "occasions",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t33": {
+    "name": "🎂 Leo's birthday",
+    "difficulty": "easy",
+    "area": "occasions",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t34": {
+    "name": "learn ten Japanese words",
+    "difficulty": "medium",
+    "area": "mind",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t35": {
+    "name": "sort the bookshelf",
+    "difficulty": "easy",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t36": {
+    "name": "run 5 km",
+    "difficulty": "hard",
+    "area": "body",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null
+  },
+  "t37": {
+    "name": "clean the windows",
+    "difficulty": "medium",
+    "area": "base",
+    "daytime": null,
+    "goal": null,
+    "sticker": null,
+    "after": null,
+    "pool": true
+  }
+}

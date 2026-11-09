@@ -1,45 +1,45 @@
-- [ ] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-11-03
-- [x] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-31 ✅ 2026-10-31
-- [x] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-29 ✅ 2026-10-29
-- [x] #⭐easy #area/body #goal/stretch #time/evening stretching ![[aot-fist.webp|28]] 🔁 every week on Tuesday, Thursday, Saturday 📅 2026-10-27 ✅ 2026-10-27
-- [ ] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-11-02
-- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-11-01 ✅ 2026-11-01
-- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-10-31 ✅ 2026-10-31
-- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-10-29 ✅ 2026-10-29
-- [x] #⭐easy #area/mind #goal/reading #time/evening reading 🔁 every day 📅 2026-10-28 ✅ 2026-10-28
-- [ ] #⭐easy #area/base #time/morning make the bed 🔁 every day 📅 2026-11-03
-- [x] #⭐easy #area/base #time/morning make the bed 🔁 every day 📅 2026-11-02 ✅ 2026-11-02
-- [ ] #⭐⭐medium #area/body #id/workout workout ![[mikasa-blades.webp|28]] 🔁 every week on Monday, Wednesday, Friday when done 📅 2026-11-02
-- [x] #⭐⭐medium #area/body #id/workout workout ![[mikasa-blades.webp|28]] 🔁 every week on Monday, Wednesday, Friday when done 📅 2026-10-30 ✅ 2026-10-30
-- [ ] #⭐easy #area/body #after/id/workout wash hair ![[kiruko-hair.webp|28]] 🔁 every week on Monday, Wednesday, Friday when done 📅 2026-11-02
-- [ ] #⭐easy #area/base tidy the desk ![[levi-cleaning.webp|28]] 🔁 every week on Sunday 📅 2026-11-08
-- [ ] #⭐easy #area/rest video games ![[anders.webp|28]] 🔁 every week on Saturday 📅 2026-11-07
-- [x] #⭐⭐medium #area/wealth pay the internet bill 📅 2026-11-02 ✅ 2026-11-02
-- [x] #⭐easy #area/mind reply to emails 📅 2026-11-02 ✅ 2026-11-02
-- [x] #⭐⭐⭐hard #area/mind finish the chapter 3 draft 📅 2026-11-02 ✅ 2026-11-02
-- [ ] #⭐easy #area/base buy groceries 📅 2026-11-02
-- [ ] #⭐⭐medium #area/mind review notes 18:30 📅 2026-11-02
-- [ ] #⭐⭐medium #area/body dentist 10:00 📅 2026-11-03
-- [ ] #⭐easy #area/occasions call grandma 📅 2026-11-04
-- [ ] #⭐⭐medium #area/base fix the bike ![[rings.webp|28]] 📅 2026-11-05
-- [ ] #⭐easy #area/rest movie night 📅 2026-11-06
-- [ ] #⭐⭐medium #area/wealth plan the monthly budget 📅 2026-11-07
-- [ ] #⭐⭐medium #area/base meal prep 📅 2026-11-08
-- [ ] #⭐easy #area/wealth renew the library card 📅 2026-10-30
-- [ ] #⭐⭐medium #area/base return the parcel 📅 2026-10-29
-- [x] #⭐⭐medium #area/mind read an article on habits 📅 2026-10-26 ✅ 2026-10-26
-- [x] #⭐easy #area/base laundry 📅 2026-10-27 ✅ 2026-10-27
-- [x] #⭐⭐⭐hard #area/wealth update the CV 📅 2026-10-27 ✅ 2026-10-27
-- [x] #⭐easy #area/occasions send a postcard 📅 2026-10-28 ✅ 2026-10-28
-- [x] #⭐⭐medium #area/rest long walk in the park 📅 2026-10-29 ✅ 2026-10-29
-- [x] #⭐easy #area/base water the plants 📅 2026-10-30 ✅ 2026-10-30
-- [x] #⭐⭐medium #area/mind finish the online course module 📅 2026-10-31 ✅ 2026-10-31
-- [x] #⭐easy #area/rest bake cookies 📅 2026-11-01 ✅ 2026-11-01
-- [ ] #⭐⭐medium #area/occasions book train tickets 📅 2026-11-20
-- [ ] #⭐⭐⭐hard #area/wealth file the tax form 📅 2026-12-10
-- [ ] #⭐easy #area/occasions buy a gift for Mia 📅 2026-12-18
-- [ ] #⭐easy #area/occasions 🎂 Mia's birthday 🔁 every year 📅 2026-12-20
-- [ ] #⭐easy #area/occasions 🎂 Leo's birthday 🔁 every year 📅 2027-01-14
-- [ ] #⭐⭐medium #area/mind learn ten Japanese words
-- [ ] #⭐easy #area/base sort the bookshelf
-- [ ] #⭐⭐⭐hard #area/body run 5 km
+- [ ] t1 [repeat:: every week on Tuesday, Thursday, Saturday] [due:: 2026-11-03]
+- [x] t1 [repeat:: every week on Tuesday, Thursday, Saturday] [due:: 2026-10-31] [completion:: 2026-10-31]
+- [x] t1 [repeat:: every week on Tuesday, Thursday, Saturday] [due:: 2026-10-29] [completion:: 2026-10-29]
+- [x] t1 [repeat:: every week on Tuesday, Thursday, Saturday] [due:: 2026-10-27] [completion:: 2026-10-27]
+- [ ] t2 [repeat:: every day] [due:: 2026-11-02]
+- [x] t2 [repeat:: every day] [due:: 2026-11-01] [completion:: 2026-11-01]
+- [x] t2 [repeat:: every day] [due:: 2026-10-31] [completion:: 2026-10-31]
+- [x] t2 [repeat:: every day] [due:: 2026-10-29] [completion:: 2026-10-29]
+- [x] t2 [repeat:: every day] [due:: 2026-10-28] [completion:: 2026-10-28]
+- [ ] t3 [repeat:: every day] [due:: 2026-11-03]
+- [x] t3 [repeat:: every day] [due:: 2026-11-02] [completion:: 2026-11-02]
+- [ ] t4 [repeat:: every week on Monday, Wednesday, Friday when done] [due:: 2026-11-02]
+- [x] t4 [repeat:: every week on Monday, Wednesday, Friday when done] [due:: 2026-10-30] [completion:: 2026-10-30]
+- [ ] t5 [repeat:: every week on Monday, Wednesday, Friday when done] [due:: 2026-11-02]
+- [ ] t6 [repeat:: every week on Sunday] [due:: 2026-11-08]
+- [ ] t7 [repeat:: every week on Saturday] [due:: 2026-11-07]
+- [x] t8 [due:: 2026-11-02] [completion:: 2026-11-02]
+- [x] t9 [due:: 2026-11-02] [completion:: 2026-11-02]
+- [x] t10 [due:: 2026-11-02] [completion:: 2026-11-02]
+- [ ] t11 [due:: 2026-11-02]
+- [ ] t12 [due:: 2026-11-02]
+- [ ] t13 [due:: 2026-11-03]
+- [ ] t14 [due:: 2026-11-04]
+- [ ] t15 [due:: 2026-11-05]
+- [ ] t16 [due:: 2026-11-06]
+- [ ] t17 [due:: 2026-11-07]
+- [ ] t18 [due:: 2026-11-08]
+- [ ] t19 [due:: 2026-10-30]
+- [ ] t20 [due:: 2026-10-29]
+- [x] t21 [due:: 2026-10-26] [completion:: 2026-10-26]
+- [x] t22 [due:: 2026-10-27] [completion:: 2026-10-27]
+- [x] t23 [due:: 2026-10-27] [completion:: 2026-10-27]
+- [x] t24 [due:: 2026-10-28] [completion:: 2026-10-28]
+- [x] t25 [due:: 2026-10-29] [completion:: 2026-10-29]
+- [x] t26 [due:: 2026-10-30] [completion:: 2026-10-30]
+- [x] t27 [due:: 2026-10-31] [completion:: 2026-10-31]
+- [x] t28 [due:: 2026-11-01] [completion:: 2026-11-01]
+- [ ] t29 [due:: 2026-11-20]
+- [ ] t30 [due:: 2026-12-10]
+- [ ] t31 [due:: 2026-12-18]
+- [ ] t32 [repeat:: every year] [due:: 2026-12-20]
+- [ ] t33 [repeat:: every year] [due:: 2027-01-14]
+- [ ] t34
+- [ ] t35
+- [ ] t36
