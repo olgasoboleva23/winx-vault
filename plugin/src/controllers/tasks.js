@@ -7,8 +7,8 @@ import { tasksApi } from "#/helpers/plugins.js";
 import { Task } from "#/models/task.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { app } from "#/helpers/app.js";
-import { taskStore } from "#/store/tasks.js";
 import { migrate } from "#/models/taskMigration.js";
+import { parseNote } from "#/models/taskFile.js";
 import { MASTER, MASTER_OLD, POOL, POOL_OLD, TASK_RECORDS } from "#/helpers/paths.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
@@ -88,14 +88,33 @@ export const editTaskModal = async (t, ask = taskWindow) => {
 // there). A past task (`oldId`) whose name is unchanged (case and spaces aside) reuses its id and
 // record, and so does a name some record already has; any other name is a new task: a new id and
 // a record. To the pool (pick.pool): a record with pool: true, no line; else the line (id, dates)
-// on top of Master.md (false when Master.md is missing).
-export async function saveNewTask(name, pick, result, oldId = null) {
-  const { records } = taskStore;
+// on top of Master.md (false when Master.md is missing). One save at a time, the ids worked out
+// from tasks.json and Master.md as they are on disk now (the store sees a write a moment later), so
+// two saves at once never get one id.
+let saving = Promise.resolve();
+
+export function saveNewTask(...args) {
+  const run = saving.then(() => saveNew(...args));
+
+  saving = run.catch(() => {});
+  return run;
+}
+
+// a note's text from disk ("" when it's missing)
+const fromDisk = async path => {
+  const file = app.vault.getFileByPath(path);
+
+  return file ? app.vault.read(file) : "";
+};
+
+async function saveNew(name, pick, result, oldId = null) {
+  const records = new Map(Object.entries(JSON.parse(await fromDisk(TASK_RECORDS) || "{}")));
+  const tasks = parseNote(MASTER, await fromDisk(MASTER)).filter(i => i.status !== null);
   const final = Task.unnamed(result, "t0").name || name;
   const key = n => Task.keyOf(`- [ ] ${n}`);
   const same = id => key(records.get(id)?.name ?? "") === key(final);
   const old = same(oldId) ? oldId : [...records.keys()].find(same) ?? null;
-  const id = old ?? newId(records, taskStore.tasks);
+  const id = old ?? newId(records, tasks);
   const back = Task.unnamed(result, id);
 
   await saveRecords({

@@ -206,6 +206,16 @@ test("a new id skips the ids of lines whose record is gone (lost to a sync confl
   assert.match(files[MASTER], /^- \[ \] t8 /);
 });
 
+test("two new tasks saved at once: two ids, two lines, two records", async () => {
+  const files = vault({ [MASTER]: "" });
+  await Promise.all([
+    saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02]"),
+    saveNewTask("read", PICK, "- [ ] read [created:: 2026-11-02]"),
+  ]);
+  assert.equal(files[MASTER], "- [ ] t2 [created:: 2026-11-02]\n- [ ] t1 [created:: 2026-11-02]\n");
+  assert.deepEqual(Object.entries(json(files)).map(([id, r]) => [id, r.name]), [["t1", "stretch"], ["t2", "read"]]);
+});
+
 // the notices' texts, and their Undo buttons (a document just big enough for undoNotice)
 const notices = () => {
   const parts = [];
