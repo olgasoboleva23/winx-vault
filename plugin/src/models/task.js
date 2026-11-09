@@ -88,6 +88,10 @@ export class Task {
   // line again: its id, else its words lowercased
   get key() { return this.id ?? this.words.toLowerCase(); }
   static keyOf = line => new Task(line).key;
+  // a name compared with another: its words (not an id, even if it looks like one), lowercased
+  static nameKey = name => new Task(`- [ ] ${name}`).words.toLowerCase();
+  // a new open line: its text (an id, or a name for the Tasks dialog) and the day it was made
+  static created = (text, today) => new Task(`- [ ] ${text} [created:: ${today}]`);
   // the same copy: its words, status and day (not its done copy, nor another day's)
   sameAs(other) {
     return this.key === other.key && this.status === other.status && this.date === other.date;

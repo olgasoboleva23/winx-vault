@@ -12,6 +12,7 @@ import { createNote } from "#/controllers/notes.js";
 import { editCourse } from "#/controllers/meds.js";
 import { tasksApi } from "#/helpers/plugins.js";
 import { MASTER } from "#/helpers/paths.js";
+import { Task } from "#/models/task.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
@@ -35,7 +36,7 @@ export function registerCommands(plugin: Plugin) {
 
     if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
     // created shows how long it waits on the board
-    const result = await api.editTaskLineModal(`- [ ] ${found.name} [created:: ${todayYmd()}]`);
+    const result = await api.editTaskLineModal(Task.created(found.name, todayYmd()).line);
 
     if (!result) return;
     if (!await saveNewTask(found.name, pick, result, found.id)) {

@@ -22,7 +22,7 @@ export function makeActions(ctx) {
   // a pool item's copy (its id, created today) goes to the top of Master.md, like a new task:
   // open on `day` (no date for null), or done that day
   const fromPool = (t, day, done) =>
-    addTask(new Task(`- [ ] ${t.id} [created:: ${today}]`).place(day, done));
+    addTask(Task.created(t.id, today).place(day, done));
   // a task dropped on `day` (null: the backlog): open and due that day, or done that day. An open 🔁
   // task done on a day goes through the Tasks plugin (so it gets its next copy), then back to that
   // day

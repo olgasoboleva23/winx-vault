@@ -191,3 +191,13 @@ test("fieldsOf reads every field, a rule with words up to its ]", () => {
   assert.deepEqual(fieldsOf("- [ ] t1 [repeat:: every week on Monday, Friday] [due:: 2026-11-09]"),
     { repeat: "every week on Monday, Friday", due: "2026-11-09" });
 });
+
+test("Task.created: an open line with its text and the day it was made", () => {
+  assert.equal(Task.created("t5", "2026-11-09").line, "- [ ] t5 [created:: 2026-11-09]");
+});
+
+test("Task.nameKey: a name's words, lowercased, spaces folded (an id-like name stays a name)", () => {
+  assert.equal(Task.nameKey("  Wash   Dishes "), "wash dishes");
+  assert.equal(Task.nameKey("t12"), "t12");
+  assert.notEqual(Task.nameKey("t12"), Task.nameKey("t12 run"));
+});

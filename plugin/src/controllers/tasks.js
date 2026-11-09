@@ -114,8 +114,7 @@ async function saveNew(name, pick, result, oldId = null) {
   const records = new Map(Object.entries(JSON.parse(await fromDisk(TASK_RECORDS) || "{}")));
   const tasks = parseNote(MASTER, await fromDisk(MASTER)).filter(i => i.status !== null);
   const final = Task.unnamed(result, "t0").name || name;
-  const key = n => Task.keyOf(`- [ ] ${n}`);
-  const same = id => key(records.get(id)?.name ?? "") === key(final);
+  const same = id => Task.nameKey(records.get(id)?.name ?? "") === Task.nameKey(final);
   const old = same(oldId) ? oldId : [...records.keys()].find(same) ?? null;
   const id = old ?? newId(records, tasks);
   const back = Task.unnamed(result, id);
