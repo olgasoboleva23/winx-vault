@@ -52,7 +52,7 @@
 ├── 📁 00 System
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)
 │   └── 📁 Data                   — everything Winx reads and writes (paths: plugin/src/helpers/paths.js):
-│                                   Tasks/ (Master.md: all tasks, Pool.md), Goals.md, Finance/ (Ledger/, rules.json),
+│                                   Tasks/ (Master.md: the lines, tasks.json: Winx's fields by id), Goals.md, Finance/ (Ledger/, rules.json),
 │                                   Shop.md, Celestial Market.md, Supplies.md, Cycle.md, Weight.md, Body log.md, Savings/
 ├── 📁 02 Areas/Personal/Daily Notes — daily notes (the folder set in Obsidian's Daily notes)
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)

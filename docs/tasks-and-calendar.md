@@ -6,20 +6,32 @@
 
 ![Task window](images/task-window.webp)
 
-Tasks live in `00 System/Data/Tasks/Master.md` in the Tasks plugin's format, tagged with a difficulty and a life area:
+Every task has an id (`t12`). `00 System/Data/Tasks/Master.md` holds the Tasks plugin's part, one line per task, in Tasks' **Dataview format** (Settings → Tasks → Task format → Dataview): the id as the text, then the rule and the dates:
 
 ```
-- [ ] #⭐⭐medium #area/mind #time/evening read a chapter ![[rings.webp|28]] 🔁 every week on Tuesday, Thursday 📅 2026-11-03
+- [ ] t12 [repeat:: every week on Tuesday, Thursday] [due:: 2026-11-03]
+```
+
+Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `difficulty`, `area`, `time` (morning / evening), `goal`, `tags`, `sticker`, `after` (the task it follows), `order` (the place in its day), `pool`. A rename or a new sticker changes only the record: the done lines keep the id, so the history stays. A line whose id has no record shows the id as its name.
+
+```
+"t12": { "name": "read a chapter", "difficulty": "#⭐⭐medium", "area": "#area/mind", "time": "evening", "sticker": "rings.webp" }
 ```
 
 **Winx: New task** (Cmd+P, or **＋ task** in the calendar):
-1. One window: difficulty and area (both needed), time of day, sticker; or tick **To pool** to keep it in `Pool.md` instead
-2. Text and dates in the Tasks dialog
-3. The task goes to the top of `Master.md` (a pool item to the end of `Pool.md`)
+1. One window: difficulty and area (both needed), time of day, sticker; or tick **To pool** to keep it only as a record
+2. Rule and dates in the Tasks dialog
+3. A new id (an existing name reuses its id), a record in `tasks.json`, a line at the top of `Master.md` (none for the pool)
+
+The pool is the records with `pool: true`: tasks to pick when it's time. Dragging one onto a day makes a line with the same id (there is no `Pool.md`).
+
+**Winx: Migrate tasks** is a one-off command for a vault in the old format (`#area/…` tags and 📅 / 🔁 dates in the text, plus `Pool.md`): it gives every task an id (a task and its done copies the same one), writes `tasks.json`, rewrites `Master.md` in the Dataview format and keeps the old notes as `Master (old).md` and `Pool (old).md`. It refuses to run when `tasks.json` exists. Afterwards switch Tasks' format to Dataview.
+
+**Sync:** `tasks.json` and `Master.md` are two files. Sync the desktop first, then the phone, before editing there; a record is written whole, the last writer wins.
 
 | Command (Cmd+P) | Creates |
 |---|---|
-| **Winx: New task** | a task in `Tasks/Master.md` |
+| **Winx: New task** | a task: a record in `Tasks/tasks.json` and a line in `Tasks/Master.md` |
 | **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
 | **Winx: New recipe** | a note in `03 Resources/Collections/Recipes` |
 | **Winx: New work task** | a note in `01 Projects/Work/tasks` (another folder: `"workTasks"` in the plugin's `data.json`), named `<next number>_<title in lower case with underscores>` |
@@ -36,11 +48,12 @@ A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (w
 
 ![Calendar](images/calendar.webp)
 
-- **Days** show one-off tasks, and a day's 🔁 tasks folded into one pill "🔁 2/5"; a click unfolds them, grouped by time of day (`#time/morning`, `#time/evening`).
+- **Days** show one-off tasks, and a day's 🔁 tasks folded into one pill "🔁 2/5"; a click unfolds them, grouped by time of day (morning / evening, which any task can have). The order inside a day is dragged and kept in the records' `order`.
 - **Drag** a task onto a day: open and due that day, or ✓ done that day. While dragging, a bar of 7 days sticks to the top of the screen.
 - **Missed?** lists open tasks whose day has passed: ✓ done that day, or ☀️ move to today.
-- **Bottom tabs:** **No date** (open tasks without a date), **Ahead** (dated tasks after this week and the birthdays, a card per month), **Regulars** (🔁 tasks), **Pool** (tasks to pick when it's time, from `Tasks/Pool.md`: drag one onto a day to make a copy).
+- **Bottom tabs:** **No date** (open tasks without a date), **Ahead** (dated tasks after this week and the birthdays, a card per month), **Regulars** (🔁 tasks), **Pool** (tasks to pick when it's time, the records with `pool: true`: drag one onto a day to make a line).
 
   ![Ahead](images/calendar-ahead.webp)
 - **On a task:** ⭐ change difficulty, ✏️ edit (the task window, then the Tasks dialog), ⏭ skip a 🔁 task this time, 🗑 delete (click twice). On the phone, swipe right = done, swipe left = skip / take the date off.
-- **Stickers:** `![[name.gif|28]]` in a task's text (files in `00 System/Assets/stickers/`); hover to see one big.
+- **Stickers:** a task's `sticker` (files in `00 System/Assets/stickers/`); hover to see one big.
+- **Quests** (the dashboard card, or a ```` ```winx ```` block named `quests` in any note): today's tasks by life area. The food page has a 🏋 training column: pick one task once under ⚙, ✓ on the days it was done.

@@ -25,7 +25,7 @@ Copy the plugin and what it reads:
 |---|---|
 | `plugin/dist/*` (after `npm run build`) | `.obsidian/plugins/winx/` — then turn **Winx** on in Community plugins |
 | the plugins from the table below | Community plugins (or copy `.obsidian/plugins/<name>/` from here) |
-| `00 System/Data/` (`Tasks/Master.md`, `Tasks/Pool.md`, `Goals.md`, the widgets' notes), `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
+| `00 System/Data/` (`Tasks/Master.md`, `Tasks/tasks.json`, `Goals.md`, the widgets' notes), `00 System/Assets/` | the same paths: the widgets and the calendar read them there |
 
 The paths the widgets read are in `plugin/src/helpers/paths.js` (and constants at the top of the controllers, `plugin/src/controllers/*.js`); the areas, difficulties and levels in `plugin/src/helpers/config.js`.
 
@@ -68,6 +68,6 @@ A sync tool can bring deleted or renamed notes back: Remotely Save decides delet
 |---|---|---|
 | **Winx** | this repo, `plugin/` | Widgets, task window, commands, all styles |
 | **Dataview** | 0.5.68 | Data for the widgets (its index of pages and lists; the tasks the plugin reads itself) |
-| **Tasks** | 7.23.1 | Task format, the edit dialog, ticking 🔁 tasks |
+| **Tasks** | 7.23.1 | Task format (set to Dataview), the edit dialog, ticking 🔁 tasks |
 | **Charts** | 3.9.0 | Radar, bar & line charts in widgets |
 | **Meta Bind** | 1.4.8 | `INPUT[slider]` in old daily notes (optional) |
