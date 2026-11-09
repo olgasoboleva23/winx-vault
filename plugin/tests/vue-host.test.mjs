@@ -15,7 +15,7 @@ before(async () => {
   GlobalRegistrator.register();
   // Obsidian's own: shown unless it or a parent is marked hidden here, or has no box (display: contents)
   HTMLElement.prototype.isShown = function () { return !this.closest("[data-hidden]") && this.style.display !== "contents"; };
-  setApp({ workspace: bus, metadataCache: bus, plugins: { plugins: { dataview: { api: { index: { initialized: true } } } } } });
+  setApp({ workspace: bus, metadataCache: bus, vault: bus, plugins: { plugins: { dataview: { api: { index: { initialized: true } } } } } });
   ({ VueHost } = await import("#/composables/vueHost.ts"));
   ({ defineComponent, h, nextTick } = await import("vue"));
 });
@@ -174,6 +174,16 @@ test("watches: the task files reload it from the plugin's store, at once, not th
   bus.fire("dataview:metadata-change", "update", { path: "00 System/Data/Tasks/Master.md" });
   assert.equal(s.loads.length, 1);
   taskStore.put("00 System/Data/Tasks/Master.md", "- [ ] a"); await settle();
+  assert.equal(s.loads.length, 2);
+  host.unload();
+});
+
+test("a watched JSON file (Dataview doesn't index it) reloads on the vault's own events, another doesn't", async () => {
+  const s = slow(), { host } = mount({ load: s.load, watches: ["x/rules.json"] });
+  s.loads[0].ok({ n: 1 }); await settle();
+  bus.fire("modify", { path: "x/other.json" });
+  assert.equal(s.loads.length, 1);
+  bus.fire("modify", { path: "x/rules.json" });
   assert.equal(s.loads.length, 2);
   host.unload();
 });

@@ -9,7 +9,9 @@
 import { MarkdownRenderChild } from "obsidian";
 import { h, nextTick, reactive, watch, type Component as VueComponent } from "vue";
 import { useVueApp } from "./vueApp.ts";
-import { useDataviewChanges, useRedraw, useTabDate, useWhenIndexed } from "./use.js";
+import {
+  useDataviewChanges, useFileChanges, useRedraw, useTabDate, useWhenIndexed,
+} from "./use.js";
 import { app } from "#/helpers/app.js";
 import { taskStore } from "#/store/tasks.js";
 import { TASKS } from "#/helpers/paths.js";
@@ -28,7 +30,7 @@ export interface HostOptions<D> {
   cardButton?: VueComponent;                   // a button next to the card's title
   // its files (a folder: ending in /): only their changes reload it; none given: any file's. The
   // task files (`${TASKS}/`) reload it from the plugin's own store, at once; the rest through
-  // Dataview's index
+  // Dataview's index (a .json file through the vault's own events)
   watches?: string[];
   follows?: boolean;   // false: loaded once (no vault data, like the pomodoro)
 }
@@ -78,6 +80,10 @@ export class VueHost<D = unknown> extends MarkdownRenderChild {
 
     if (watches?.includes(TASK_FILES)) this.register(watch(taskStore.version, redraw));
     useDataviewChanges(this, redraw, { watched, note: this.opts.note, delay: 1000 });
+    // Dataview doesn't index a watched file that isn't a note (.json): Obsidian's own events
+    const plain = others?.filter(w => !w.endsWith("/") && !w.endsWith(".md"));
+
+    if (plain?.length) useFileChanges(this, redraw, plain);
     useTabDate(this, this.el, () => void this.refresh());
     useWhenIndexed(this, () => void this.refresh());
   }

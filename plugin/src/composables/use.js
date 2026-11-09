@@ -65,6 +65,20 @@ export function useDataviewChanges(c, fn, options = {}) {
 export const useIndexReady = (c, fn) =>
   c.registerEvent(c.app.metadataCache.on("dataview:index-ready", fn));
 
+// fn() a moment (delay ms) after Obsidian's own event for a file in `paths` (exact paths):
+// for the files Dataview doesn't index, like .json
+export function useFileChanges(c, fn, paths, delay = 1000) {
+  const later = debounce(fn, delay, true);
+  c.register(() => later.cancel());
+
+  for (const ev of ["modify", "create", "delete"]) {
+    c.registerEvent(c.app.vault.on(ev, f => paths.includes(f.path) && later()));
+  }
+
+  c.registerEvent(c.app.vault.on("rename", (f, old) =>
+    (paths.includes(f.path) || paths.includes(old)) && later()));
+}
+
 // fn() once Dataview's index is there: now (or now when Dataview is off: fn shows what's missing),
 // else when it's built; only the first time (Dataview builds it again when it reloads)
 export function useWhenIndexed(c, fn) {
