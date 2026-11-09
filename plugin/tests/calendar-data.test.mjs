@@ -196,7 +196,7 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
   };
   const ctx = { infos: new Map(), config: { areaIcons: { "body": "🌺" } }, actions: { canSkip: () => true } };
   const i = taskInfo(t, ctx, app);
-  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "easy", text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
+  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "easy", goal: false, text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
 });

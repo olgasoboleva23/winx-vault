@@ -38,13 +38,11 @@ function parse(rest) {
 // a record from a copy's parts (after: the #after/id/x tag, resolved once every task is known)
 function recordOf({ words, tags, sticker }) {
   const tag = prefix => tags.find(t => t.startsWith(prefix)) ?? null;
-  const goal = tag("#goal/");
 
   return {
     name: words, difficulty: tag("#⭐")?.replace(/^#⭐+/u, "") ?? null,
     area: tag("#area/")?.slice(6) ?? null, daytime: tag("#time/")?.slice(6) ?? null,
-    goal, tags: [...new Set(tags.filter(t => t !== goal && !/^#(⭐|area\/|time\/|id\/|after\/)/u
-      .test(t)))],
+    goal: tag("#goal/")?.slice(6) ?? null,
     sticker, after: tag("#after/id/")?.slice(10) ?? null,
   };
 }

@@ -39,7 +39,7 @@ export function useNotify(plugin, open) {
   const schedule = () => {
     clear();
     const d = todayYmd();
-    const tasks = dueTasks().filter(t => t.date === d).map(t => ({ text: t.text, tags: t.tags }));
+    const tasks = dueTasks().filter(t => t.date === d).map(t => ({ text: t.text, goal: t.goal }));
     const goals = dataview().pages(`"${GOALS}"`).file.lists
       .map(i => Goal.parse(i.text)).where(Boolean).array();
 
@@ -57,8 +57,7 @@ export function useNotify(plugin, open) {
     if (app.loadLocalStorage("winx-notify-summary") === d) return;
     app.saveLocalStorage("winx-notify-summary", d);
     const due = dueTasks().filter(t => t.date === d).length;
-    const goal = t => t.tags.some(tag => tag.startsWith("#goal"));
-    const overdue = dueTasks().filter(t => t.date < d && !goal(t)).length;
+    const overdue = dueTasks().filter(t => t.date < d && !t.goal).length;
 
     notify(
       `✦ ${due} task${due === 1 ? "" : "s"} today`,

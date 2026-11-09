@@ -68,17 +68,18 @@ A shopping list card. Items are checkbox lines in `00 System/Data/Celestial Mark
 
 ## 🎯 Goals
 
-A goal is a recurring task in `Master.md` tagged `#goal/<slug>`, ticked like any task. `00 System/Data/Goals.md` describes each one:
+A goal is a recurring task whose record in `tasks.json` has `"goal": "<key>"`, ticked like any task. `00 System/Data/Goals.md` describes each one:
 
 ```
 - name:: Stretching
-  tag:: #goal/stretch
+  tag:: stretch
   days:: tue, thu, sat
   min:: 5 minutes on the mat
   plan:: when I shut the laptop in the evening, I roll out the mat
 ```
 
-- `days` sets the weekly plan; otherwise `perWeek:: N` (`days` wins if both are given). A day counts when a done task with the tag has its `✅` on that day. Weeks start on Monday.
+- `tag` is the goal's key (an old `#goal/stretch` is read as `stretch`).
+- `days` sets the weekly plan; otherwise `perWeek:: N` (`days` wins if both are given). A day counts when a done task of the goal has its `✅` on that day. Weeks start on Monday.
 - A missed goal task stays on its day: the calendar's **Missed?** lists it, to tick it for that day or move it to today.
 
 ## 📝 Daily Note

@@ -225,7 +225,7 @@ export function taskInfo(t, ctx, app) {
   if (known) return known;
   const task = T(t), area = task.area;
   const i = {
-    key: taskKey(t), area, difficulty: task.difficulty, text: task.text,
+    key: taskKey(t), area, difficulty: task.difficulty, goal: !!task.goal, text: task.text,
     pool: !!t.pool,
     daytime: task.isRecurring ? null : task.daytime,   // a 🔁 task's is its box heading's
     label: `${ctx.config.areaIcons[area] ?? ""} ${task.text}`.trim(),

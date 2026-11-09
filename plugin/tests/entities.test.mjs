@@ -13,10 +13,11 @@ const w = Goal.parse("name:: Stretching\n  tag:: #goal/stretch\n  days:: пн, �
 const l = Goal.parse("name:: Reading\n  tag:: #goal/read\n  perWeek:: 5");
 
 test("Goal.parse and its weekly target", () => {
-  assert.deepEqual([w.name, w.tag, w.days, w.perWeek], ["Stretching", "#goal/stretch", [1, 3, 5], null]);
+  assert.deepEqual([w.name, w.key, w.days, w.perWeek], ["Stretching", "stretch", [1, 3, 5], null]);
   assert.equal(l.weeklyTarget, 5); assert.equal(w.weeklyTarget, 3);
   assert.equal(Goal.parse("name:: X\n days:: пн\n perWeek:: 4\n tag:: #goal/x").perWeek, null);
   assert.equal(Goal.parse("name:: no tag"), null);
+  assert.equal(Goal.parse("name:: X\n tag:: x").key, "x");   // a plain key works too
   assert.deepEqual(Goal.parse("name:: X\n tag:: #goal/x\n days:: Mon, wed, Friday").days, [1, 3, 5]);
 });
 
@@ -36,11 +37,11 @@ test("reminders", () => {
   assert.equal(goals[0].remind, "18:00");                 // default
   assert.equal(goals[1].remind, "20:30");
   const tasks = [
-    { text: "stretch #goal/stretch", tags: ["#goal/stretch"] },
-    { text: "read #goal/read", tags: ["#goal/read"] },
-    { text: "#⭐easy meeting 10:00", tags: ["#⭐easy"] },
-    { text: "call 0:15 at night", tags: [] },
-    { text: "buy apples", tags: [] },
+    { text: "stretch", goal: "stretch" },
+    { text: "read", goal: "read" },
+    { text: "meeting 10:00", goal: null },
+    { text: "call 0:15 at night", goal: null },
+    { text: "buy apples", goal: null },
   ];
   assert.deepEqual(reminders(tasks, goals), [
     { at: "00:00", title: "In 30 minutes", body: "call 0:15 at night" },

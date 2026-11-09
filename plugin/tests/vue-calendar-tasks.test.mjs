@@ -43,6 +43,8 @@ test("TaskRow: a day's row — checkbox in the week, 🔁 for a repeat, buttons 
   assert.doesNotMatch(month, /checkbox|winx-task-btns/);
   const after = html(TaskRow, { task: info(), kind: "open", tick: true, after: true });
   assert.match(after, /draggable="true"><span class="winx-cal__after">↳<\/span><input type="checkbox"/);
+  // a goal's task: its row says so (the tick plays the goal's sound)
+  assert.match(html(TaskRow, { task: info({ goal: true }), kind: "open", tick: true }), /^<div class="winx-cal__task winx-cal__task--open" data-area="body" data-goal="true"/);
 });
 
 test("TaskCard: a panel card, its meta line, its buttons (a pool item: ✏️ 🗑 only)", () => {

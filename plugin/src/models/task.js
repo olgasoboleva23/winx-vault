@@ -1,5 +1,5 @@
 // One task: its line in the Tasks plugin's Dataview format (status, rule, dates) and Winx's own
-// part, its record in tasks.json (name, difficulty, area, daytime, goal, tags, sticker, after),
+// part, its record in tasks.json (name, difficulty, area, daytime, goal, sticker, after),
 // found by the line's id. What it is (getters) and how to change its line (methods that return
 // the new line; widgets write it). The only place that knows the format:
 //   - [ ] / [x] done / [-] skipped · t12 (its id: the record's key)
@@ -48,19 +48,14 @@ export class Task {
   get isSkipped()  { return this.status === "-"; }
   // its id: the first word of the line, "t12"
   get id()         { return this.words.match(ID)?.[0] ?? null; }
-  // its record's tags in one list, as xp, shop, goals and reminders read them
-  get tags() {
-    const r = this.rec ?? {};
-
-    return [r.goal, ...r.tags ?? []]
-      .filter(Boolean);
-  }
   get area()       { return this.rec?.area ?? null; }   // "body"
   get difficulty() { return this.rec?.difficulty ?? null; }
   // the id it follows
   get after()      { return this.rec?.after ?? null; }
   // "morning" | "evening"
   get daytime()    { return this.rec?.daytime ?? null; }
+  // the key of its goal in Goals.md ("workout")
+  get goal()       { return this.rec?.goal ?? null; }
   get rule()       { return this.fields.repeat ?? null; }
   get isRecurring(){ return this.rule !== null; }
   get whenDone()   { return /when done$/.test(this.rule ?? ""); }

@@ -16,7 +16,7 @@ test("an emoji line with every field becomes an id and Dataview fields in order"
     + "[created:: 2026-11-07] [completion:: 2026-11-08]");
   assert.deepEqual(records, { t1: {
     name: "stretch a bit", difficulty: "medium", area: "body", daytime: "morning",
-    goal: null, tags: [], sticker: "cat.webp", after: null,
+    goal: null, sticker: "cat.webp", after: null,
   } });
 });
 
@@ -28,7 +28,6 @@ test("start and scheduled are kept; priority, 🆔, ⛔ and a dateless ✅ go", 
 
   assert.equal(master, "- [ ] t1 [start:: 2026-04-01] [scheduled:: 2026-04-02]");
   assert.equal(records.t1.name, "tidy desk");
-  assert.deepEqual(records.t1.tags, ["#health", "#easy"]);
 });
 
 test("two spellings of one task get one id; the record from the latest copy", () => {
@@ -56,7 +55,7 @@ test("a pool line and a Master line with the same words share the id, with pool:
   assert.equal(records.t1.name, "feed the fish");
   assert.deepEqual(records.t2, {
     name: "dust shelves", difficulty: "easy", area: "home", daytime: null, goal: null,
-    tags: [], sticker: null, after: null, pool: true,
+    sticker: null, after: null, pool: true,
   });
 });
 
@@ -69,9 +68,7 @@ test("#after/id/x points at the task carrying #id/x; #id itself is not kept; goa
   const { records } = migrate(old, "");
 
   assert.equal(records.t1.after, "t2");
-  assert.deepEqual(records.t1.tags, []);
-  assert.equal(records.t2.goal, "#goal/run");
-  assert.deepEqual(records.t2.tags, ["#goal/legs"]);
+  assert.equal(records.t2.goal, "run");   // the first goal tag
   assert.equal(records.t3.after, null);
 });
 

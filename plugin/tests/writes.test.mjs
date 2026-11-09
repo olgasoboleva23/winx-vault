@@ -82,7 +82,7 @@ const withTasksApi = (edited, seen = []) => {
 const PICK = { difficulty: "easy", area: "body", daytime: "evening", sticker: "a.webp" };
 
 test("editing a task: the picks and the new name go to its record, its dates to its line", async () => {
-  const rec = { name: "walk", difficulty: null, area: null, daytime: null, goal: null, tags: [], sticker: null, after: null };
+  const rec = { name: "walk", difficulty: null, area: null, daytime: null, goal: null, sticker: null, after: null };
   const files = vault({ [MASTER]: "- [ ] t1 [due:: 2026-11-03]\n" }, { t1: rec });
   const seen = withTasksApi("- [ ] walk far [due:: 2026-11-05]");
   const item = taskStore.tasks[0];
@@ -152,10 +152,10 @@ test("a pool item: the window's picks and name go to its record, no line", async
 });
 
 test("a new task: a new name gets a new id, a past name its old one; the line goes on top", async () => {
-  const files = vault({ [MASTER]: "- [ ] t4 [due:: 2026-11-03]\n" }, { t4: { name: "walk", goal: null, tags: [] } });
+  const files = vault({ [MASTER]: "- [ ] t4 [due:: 2026-11-03]\n" }, { t4: { name: "walk", goal: null } });
   await saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02] [due:: 2026-11-06]");
   assert.equal(files[MASTER], "- [ ] t5 [created:: 2026-11-02] [due:: 2026-11-06]\n- [ ] t4 [due:: 2026-11-03]\n");
-  assert.deepEqual(json(files).t5, { name: "stretch", difficulty: "easy", area: "body", daytime: "evening", goal: null, tags: [], sticker: "a.webp", after: null });
+  assert.deepEqual(json(files).t5, { name: "stretch", difficulty: "easy", area: "body", daytime: "evening", goal: null, sticker: "a.webp", after: null });
   taskStore.putRecords(json(files));
   await saveNewTask("Walk ", PICK, "- [ ] Walk  [created:: 2026-11-02]", "t4");
   assert.match(files[MASTER], /^- \[ \] t4 \[created:: 2026-11-02\]\n/);
@@ -163,7 +163,7 @@ test("a new task: a new name gets a new id, a past name its old one; the line go
 });
 
 test("a past task picked, its words changed in the Tasks dialog: a new task, the past one keeps its name", async () => {
-  const files = vault({ [MASTER]: "- [ ] t4\n" }, { t4: { name: "walk", goal: null, tags: [] } });
+  const files = vault({ [MASTER]: "- [ ] t4\n" }, { t4: { name: "walk", goal: null } });
   await saveNewTask("walk", PICK, "- [ ] walk the dog [created:: 2026-11-02]", "t4");
   assert.match(files[MASTER], /^- \[ \] t5 /);
   assert.equal(json(files).t4.name, "walk");
@@ -171,7 +171,7 @@ test("a past task picked, its words changed in the Tasks dialog: a new task, the
 });
 
 test("a new task typed with a name a record already has (no pick): reuses its id", async () => {
-  const files = vault({ [MASTER]: "- [ ] t4\n" }, { t4: { name: "Walk", goal: null, tags: [] } });
+  const files = vault({ [MASTER]: "- [ ] t4\n" }, { t4: { name: "Walk", goal: null } });
   await saveNewTask("walk", PICK, "- [ ] walk [created:: 2026-11-02]");
   assert.match(files[MASTER], /^- \[ \] t4 \[created:: 2026-11-02\]\n/);
   assert.deepEqual(Object.keys(json(files)), ["t4"]);

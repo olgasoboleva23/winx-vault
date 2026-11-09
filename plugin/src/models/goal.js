@@ -5,16 +5,16 @@ import { weekday } from "#/helpers/dates.js";
 const DAY_NAMES = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 const DAY_NAMES_EN = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
-// A goal of Goals.md (Shop.md format: "name:: …" plus continuation lines): its name, tag (the tasks
-// that count), planned weekdays (days, ISO 1–7) or a number per week, the minimum version, a plan
-// and a reminder time.
+// A goal of Goals.md (Shop.md format: "name:: …" plus continuation lines): its name, key (its `tag`
+// without "#goal/": the tasks whose record's goal it is count), planned weekdays (days, ISO 1–7)
+// or a number per week, the minimum version, a plan and a reminder time.
 export class Goal {
   static parse(text) {
     const field = k =>
       text.match(new RegExp(`(?:^|\\s)${k}::[ \\t]*(.*)`, "m"))?.[1].trim() || null;
-    const name = field("name"), tag = field("tag");
+    const name = field("name"), key = field("tag")?.replace(/^#goal\//, "");
 
-    if (!name || !tag) return null;
+    if (!name || !key) return null;
     const daysRaw = field("days");
     const days = daysRaw
       ? daysRaw.toLowerCase().split(/[,\s]+/)
@@ -23,7 +23,7 @@ export class Goal {
       : null;
 
     return Object.assign(new Goal(), {
-      name, tag, days, perWeek: days ? null : Number(field("perWeek")) || null,
+      name, key, days, perWeek: days ? null : Number(field("perWeek")) || null,
       min: field("min"), plan: field("plan"), remind: field("remind") ?? "18:00",
     });
   }
@@ -45,7 +45,7 @@ export const reminders = function (tasks, goals) {
   const out = [];
 
   for (const t of tasks) {
-    const goal = goals.find(g => t.tags.includes(g.tag));
+    const goal = t.goal && goals.find(g => g.key === t.goal);
 
     if (goal) {
       out.push({ at: goal.remind, title: goal.name, body: goal.plan || goal.min || goal.name });

@@ -120,7 +120,7 @@ async function saveNew(name, pick, result, oldId = null) {
 
   await saveRecords({
     [id]: {
-      ...old ? {} : { goal: null, tags: [], after: null },
+      ...old ? {} : { goal: null, after: null },
       ...recOf(pick), name: final, ...pick.pool ? { pool: true } : {},
     },
   });

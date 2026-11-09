@@ -76,7 +76,7 @@ export function installSounds(plugin) {
     if (!box) return;
     // unticked: the same gem, slowed down
     if (!box.checked) return gems[0].play({ rate: 0.6, gain: 0.2 });
-    const goal = (box.closest("li")?.textContent ?? "").includes("#goal/");
+    const goal = !!box.closest("[data-goal]");   // a calendar row of a goal's task
     (goal ? flower : gems[Math.floor(Math.random() * gems.length)]).play({ gain: 0.25 });
   }, true);
 }

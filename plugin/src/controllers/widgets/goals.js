@@ -18,7 +18,7 @@ export async function loadGoals({ dv, app }) {
 
   return {
     goals: goals.map(goal => {
-      const done = tasks.filter(t => t.isDone && t.doneOn && t.tags.includes(goal.tag))
+      const done = tasks.filter(t => t.isDone && t.doneOn && t.goal === goal.key)
         .map(t => t.doneOn);
       const doneSet = new Set(done), last = [...done].sort().at(-1);
       // "I've done this before": total and last time, from the ✅ dates already in the tasks

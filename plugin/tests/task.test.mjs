@@ -5,7 +5,7 @@ import { Task, fieldsOf, taskChoices } from "#/models/task.js";
 const T = line => new Task(line);
 
 test("what a line is: its dates from the line, its own part from the record of its id", () => {
-  const rec = { name: "gym", difficulty: "medium", area: "body", daytime: "evening", goal: "#goal/workout", tags: ["#old"], sticker: "fairy.webp", after: "t3" };
+  const rec = { name: "gym", difficulty: "medium", area: "body", daytime: "evening", goal: "workout", sticker: "fairy.webp", after: "t3" };
   const t = new Task("- [ ] t12 [repeat:: every week on Monday, Friday when done] [due:: 2026-10-28] [created:: 2026-05-01]", null, rec);
   assert.equal(t.status, " ");
   assert.ok(t.isOpen && !t.isDone && !t.isSkipped);
@@ -15,7 +15,7 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.equal(t.difficulty, "medium");
   assert.equal(t.daytime, "evening");
   assert.equal(t.after, "t3");
-  assert.deepEqual(t.tags, ["#goal/workout", "#old"]);
+  assert.equal(t.goal, "workout");
   assert.equal(t.rule, "every week on Monday, Friday when done");
   assert.ok(t.isRecurring && t.whenDone && !t.isBirthday && !t.isPaused);
   assert.equal(t.date, "2026-10-28");
@@ -24,7 +24,6 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.equal(t.text, "gym");
   assert.equal(t.key, "t12");
   assert.equal(Task.of({ status: "x", text: "t12 [completion:: 2026-10-29]", rec }).text, "gym");
-  assert.deepEqual(new Task("- [ ] t12", null, { name: "gym", difficulty: "easy", area: null, daytime: null, goal: null, tags: [], sticker: null, after: null }).tags, []);
 
   const plain = T("- [x] call bank [scheduled:: 2026-10-20] [due:: 2026-10-22] [completion:: 2026-10-21]");
   assert.ok(plain.isDone && !plain.isRecurring);
@@ -165,7 +164,7 @@ test("a line whose id has no record (hand-typed, or a stale tasks.json): its id 
   assert.equal(t.id, "t99");
   assert.equal(t.text, "t99");
   assert.equal(t.key, "t99");
-  assert.deepEqual(t.tags, []);
+  assert.equal(t.goal, null);
   assert.deepEqual(t.stickers, []);
   assert.deepEqual([t.area, t.difficulty, t.daytime, t.after, t.rec], [null, null, null, null, null]);
   assert.equal(T("- [ ] t12x walk").id, null);   // not an id: its words lowercased are its key
