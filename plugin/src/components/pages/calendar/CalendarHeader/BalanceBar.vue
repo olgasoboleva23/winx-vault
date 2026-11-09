@@ -12,11 +12,13 @@ const balance = computed(() => {
   const { config: { areas }, everything, model } = view.ctx;
   const b = (everything ?? model).balance(areas.map(a => a.key));
   const name = key => areas.find(a => a.key === key).label;
-  const icon = key => name(key).split(" ")[0];
+  const icon = key => areas.find(a => a.key === key).icon;
+  const color = key => areas.find(a => a.key === key).color ?? "transparent";
 
   return {
     pieces: b.filter(x => x.planned).map(x => ({
-      on: x.area === state.area, area: x.area, style: `flex: ${x.planned}`,
+      on: x.area === state.area, area: x.area,
+      style: `flex: ${x.planned}; --area: ${color(x.area)}`,
       icon: icon(x.area),
       title: `${name(x.area)}: ${x.done} of ${x.planned} done`, count: `${x.done}/${x.planned}`,
       fill: `width: ${Math.round(x.done / x.planned * 100)}%`,

@@ -57,7 +57,10 @@ const toToday = r => act(r, sounds.today, t => view.actions.toToday(t));
       v-for="r in rows"
       :key="r.task.key"
       class="winx-missed__row winx-row winx-gap-s"
-      :style="r.sw.swipe.dx ? { '--winx-swipe': `${r.sw.swipe.dx}px` } : null"
+      :style="{
+        '--area': r.task.color ?? undefined,
+        '--winx-swipe': r.sw.swipe.dx ? `${r.sw.swipe.dx}px` : undefined,
+      }"
       :data-area="r.task.area ?? undefined"
       :data-swipe="r.sw.swipe.kind"
       draggable="true"

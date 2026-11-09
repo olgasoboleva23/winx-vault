@@ -5,6 +5,7 @@ import { Form } from "#/components/uikit/Form/index.ts";
 import { todayYmd } from "#/helpers/dates.js";
 import { saveNewTask } from "#/controllers/tasks.js";
 import { migrateTasks } from "#/controllers/taskMigration.js";
+import { openSettings } from "#/controllers/settings.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { addMarketItem } from "#/controllers/widgets/market.js";
@@ -84,6 +85,11 @@ export function registerCommands(plugin: Plugin) {
   // the phone: the synced obsidian-mobile/ copied into the real config folder .obsidian-mobile
   // (then restart)
   if (Platform.isMobile) add("update-mobile-config", "Update mobile config", mirrorMobileConfig);
+
+  // ⚙ the numbers and areas (config.json); the dashboard's ✦ Menu opens it through its link
+  // obsidian://winx-settings
+  add("settings", "Settings", openSettings);
+  plugin.registerObsidianProtocolHandler("winx-settings", () => void openSettings());
 
   // once: the old emoji Master.md and Pool.md to ids, Dataview fields and tasks.json
   add("migrate-tasks", "Migrate tasks", migrateTasks);

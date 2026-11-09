@@ -194,9 +194,9 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
     metadataCache: { getFirstLinkpathDest: (name, from) => (lookups++, name === "fist.webp" ? { path: `Assets/${name}` } : null) },
     vault: { getResourcePath: f => `app://${f.path}` },
   };
-  const ctx = { infos: new Map(), config: { areaIcons: { "body": "🌺" } }, actions: { canSkip: () => true } };
+  const ctx = { infos: new Map(), config: { areaIcons: { "body": "🌺" }, areaColors: { body: "#e8609a" } }, actions: { canSkip: () => true } };
   const i = taskInfo(t, ctx, app);
-  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", difficulty: "easy", goal: false, text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
+  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", color: "#e8609a", difficulty: "easy", goal: false, text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
 });
@@ -249,7 +249,7 @@ test("a day's one-offs go morning, none, evening, then by order; the 🔁 box ke
 test("taskInfo: a one-off's time is shown, a 🔁 task's is left to its box heading", async () => {
   const { taskInfo } = await import("#/models/calendarData.js");
   const app = { metadataCache: { getFirstLinkpathDest: () => null }, vault: {} };
-  const ctx = { infos: new Map(), config: { areaIcons: {} }, actions: { canSkip: () => false } };
+  const ctx = { infos: new Map(), config: { areaIcons: {}, areaColors: {} }, actions: { canSkip: () => false } };
   assert.equal(taskInfo(task(" ", "tea #time/evening [due:: 2026-10-28]"), ctx, app).daytime, "evening");
   assert.equal(taskInfo(task(" ", "run #time/evening [repeat:: every day] [due:: 2026-10-28]"), ctx, app).daytime, null);
 });

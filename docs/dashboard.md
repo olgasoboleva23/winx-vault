@@ -14,7 +14,7 @@ A tab of its own: the ✨ icon on the left (it opens the dashboard and the calen
 | **Life Areas** | Radar chart — XP earned per area this month |
 | **Cycle** | Cycle day, next start forecast, "started today" button |
 | **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight; the second pill shows a free journal (`00 System/Data/Journals/`, a note each: a level 0–3 a day and its reasons; with more than one, a select under the pills picks it): a click on a level or a reason saves the day |
-| **Pages** | links to the notes with a page of their own: Finance, Shop, Supplies, Medication (the courses' base), Food (the food journal: a week, a row a day: what was eaten with its marks, the marks counted, each free journal's level after its lag, 💊 a course on that day, a note; ＋ a fuzzy search of the foods or a new one, ✎ a food, ⚙ the marks) |
+| **✦ Menu** | **⚙ Settings** (XP, gold, areas, XP Today, the level cost) and links to the notes with a page of their own: Finance, Shop, Supplies, Medication (the courses' base), Food (the food journal: a week, a row a day: what was eaten with its marks, the marks counted, each free journal's level after its lag, 💊 a course on that day, a note; ＋ a fuzzy search of the foods or a new one, ✎ a food, ⚙ the marks) |
 | **XP Today** | XP earned today, level name, streak heatmap |
 | **Quests** | Tasks due today, grouped by life area (a `winx` block: `quests`) |
 | **Celestial Market** | Pending shopping items grouped by category |
@@ -32,7 +32,7 @@ On a phone the same dashboard and calendar tabs are used (📅 / ✦ switch betw
 
 ## 🎮 XP & Levels
 
-Completing a task awards XP and gold by its difficulty (the `difficulty` of its record in `tasks.json`):
+Completing a task awards XP and gold by its difficulty (the `difficulty` of its record in `tasks.json`). The defaults below; **⚙ Settings** (in the dashboard's **✦ Menu** card, or **Winx: Settings**) changes them, the areas, XP Today's thresholds (SPARK 10 / GLOW 20 / AURA 30) and the level cost, saved in `00 System/Data/config.json`:
 
 | Difficulty | XP | Gold |
 |---|---|---|
@@ -41,9 +41,11 @@ Completing a task awards XP and gold by its difficulty (the `difficulty` of its 
 | ⭐⭐⭐ `hard` | 20 | 10 |
 | ⭐⭐⭐⭐ `epic` | 50 | 25 |
 
-Level `n` costs `100 + (n-1) × 25` XP.
+Level `n` costs `100 + (n-1) × 25` XP (base and step in ⚙ Settings).
 
 ## Life areas
+
+The default areas; in ⚙ Settings each has a key (what a task's record says), an icon, a name, a radar name and a colour (the calendar's stripe and balance bar). A changed key with ☑ **Apply** moves its tasks to the new key; an area that still has tasks can't be removed.
 
 | Area | Key | Radar name |
 |---|---|---|
@@ -54,7 +56,7 @@ Level `n` costs `100 + (n-1) × 25` XP.
 | 🌠 Occasions | `occasions` | Memory |
 | 🌙 Rest | `rest` | Serenity |
 
-Areas without a radar row still get an icon: `learning` 📜, `work` 🪄, `personal` 🦋, `health` 🧪. All of it is in `plugin/src/helpers/config.js`.
+A task whose area isn't in the list (an old one) shows no icon or colour and counts for no area.
 
 ---
 

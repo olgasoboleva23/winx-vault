@@ -58,7 +58,9 @@ function onTick(e) {
       onto.mark && `winx-cal__task--drop-${onto.mark}`,
       { 'winx-cal__task--ticking': ticking, 'winx-cal__task--done': done },
     ]"
-    :style="swipe.dx ? { '--winx-swipe': `${swipe.dx}px` } : null"
+    :style="{
+      '--area': task.color ?? undefined, '--winx-swipe': swipe.dx ? `${swipe.dx}px` : undefined,
+    }"
     :data-area="task.area"
     :data-goal="task.goal || null"
     :data-swipe="swipe.kind"

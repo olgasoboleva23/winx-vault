@@ -2,15 +2,17 @@
 // with its record as `rec`, null when its id has none), `records` (tasks.json: Winx's part of every
 // task, by id), `pool` (the records with pool: true, as { id, pool: true, rec, path }), `ready`
 // (the first read is done), `version` (a Vue ref, bumped on every change: a computed that reads it
-// is worked out again). useTaskStore(plugin) starts it once the vault is loaded; Master.md or
-// tasks.json saved, made, deleted or renamed is read again on Obsidian's own event, at once
-// (Dataview's index comes a second later, and only once it's built). The folder's other files
-// (backups) are not read.
+// is worked out again). useTaskStore(plugin) starts it once the vault is loaded; Master.md,
+// tasks.json or config.json (the ⚙ Settings: XP, gold, areas, put into helpers/config.js) saved,
+// made, deleted or renamed is read again on Obsidian's own event, at once (Dataview's index comes a
+// second later, and only once it's built), so everything drawn from the tasks draws again. The
+// folder's other files (backups) are not read.
 import { ref } from "vue";
 import { app } from "#/helpers/app.js";
 import { parseNote } from "#/models/taskFile.js";
 import { Task } from "#/models/task.js";
-import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
+import { applyConfig } from "#/helpers/config.js";
+import { CONFIG, MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 
 let items = [];   // Master.md's items
 
@@ -34,11 +36,12 @@ export const taskStore = {
   drop(path) {
     reads.delete(path);
     if (path === TASK_RECORDS) taskStore.putRecords({});
+    else if (path === CONFIG) { applyConfig(); refresh(); }
     else { items = []; refresh(); }
   },
 };
 
-const ours = path => path === MASTER || path === TASK_RECORDS;
+const ours = path => path === MASTER || path === TASK_RECORDS || path === CONFIG;
 const reads = new Map();   // path → its last read's number: an older read, or one of a note dropped
                            // since, is not put
 let lastRead = 0;          // one count for every read, never reused (a note made again starts no
@@ -53,14 +56,16 @@ const fresh = async file => {
   return reads.get(file.path) === n ? text : null;
 };
 
-// a file's text into the store: tasks.json as records (one that isn't JSON leaves them as they
-// were), Master.md as its items
+// a file's text into the store: tasks.json as records, config.json as the settings over the
+// defaults (a file that isn't JSON leaves them as they were), Master.md as its items
 const take = (path, text) => {
-  if (path !== TASK_RECORDS) return taskStore.put(path, text);
+  if (path === MASTER) return taskStore.put(path, text);
   try {
-    taskStore.putRecords(JSON.parse(text));
+    if (path === TASK_RECORDS) return taskStore.putRecords(JSON.parse(text));
+    applyConfig(JSON.parse(text));
+    refresh();
   } catch (e) {
-    console.error("winx: tasks.json isn't JSON, the records stay as they were", e);
+    console.error(`winx: ${path} isn't JSON, it's left as it was`, e);
   }
 };
 
@@ -88,7 +93,8 @@ export function useTaskStore(plugin) {
   const start = async () => {
     if (started) return;
     started = true;
-    const files = [MASTER, TASK_RECORDS].map(p => app.vault.getFileByPath(p)).filter(Boolean);
+    const files = [MASTER, TASK_RECORDS, CONFIG].map(p => app.vault.getFileByPath(p))
+      .filter(Boolean);
 
     items = [];
     try {

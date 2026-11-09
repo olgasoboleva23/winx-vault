@@ -22,7 +22,8 @@ export async function loadLevelToday({ dv }) {
     missed: all.filter(t => t.isOverdue(today)),
     doneToday: all.filter(t => t.doneOn === today),
   });
-  const { level, progress, cost } = levelInfo(total), mp = mana(cycleLog(dv)?.on(today));
+  const { base, step } = config.levelCost, mp = mana(cycleLog(dv)?.on(today));
+  const { level, progress, cost } = levelInfo(total, base, step);
   const vital = (name, value, max, title) =>
     ({ name, mod: name.toLowerCase(), value, max, width: value / max * 100, title });
 

@@ -50,7 +50,7 @@ function mount(over = {}) {
     state: st, today: TODAY, days, base: state.baseDate(st, TODAY), view: st.view,
     shown: { open: true, ghost: true, done: st.showDone }, everything: null, TASKS: {}, infos: new Map(),
     model: new data.CalendarData({ tasks: TASKS(), poolLines: [], days, today: TODAY }),
-    config: { areas: [{ key: "body", label: "🌺 Body" }], areaIcons: {}, areaMap: {} },
+    config: { areas: [{ key: "body", label: "🌺 Body", icon: "🌺", color: "#e8609a" }], areaIcons: {}, areaMap: {}, areaColors: {} },
   });
   const text = data.T;
   ctx.actions = { ...actions.makeActions(ctx), tick: t => ticked.push(t),

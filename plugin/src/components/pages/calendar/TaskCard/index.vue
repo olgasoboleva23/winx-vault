@@ -32,7 +32,9 @@ const { swipe, ...touch } = useSwipe(view, key, t => {
   <div
     v-if="!gone"
     :class="['winx-task-card', { 'winx-task-card--paused': paused }]"
-    :style="swipe.dx ? { '--winx-swipe': `${swipe.dx}px` } : null"
+    :style="{
+      '--area': task.color ?? undefined, '--winx-swipe': swipe.dx ? `${swipe.dx}px` : undefined,
+    }"
     :data-area="task.area ?? undefined"
     :data-swipe="swipe.kind"
     draggable="true"

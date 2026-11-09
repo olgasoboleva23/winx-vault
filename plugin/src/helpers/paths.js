@@ -35,6 +35,8 @@ export const CYCLE = `${DATA}/Cycle.md`;
 
 export const POMODORO = `${DATA}/pomodoro.json`;
 
+export const CONFIG = `${DATA}/config.json`;
+
 export const ASSETS = "00 System/Assets", STICKERS = `${ASSETS}/stickers`;
 
 export const SOUNDS = `${ASSETS}/winx music`;

@@ -6,17 +6,7 @@
     margin-bottom: $space-l;
     & button.winx-cal__mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
   }
-  /* the areas' colours: the balance bar's pieces and a stripe before each task */
-  [data-area="body"]      { --area: #e8609a; }
-  [data-area="mind"]      { --area: #9b6bd6; }
-  [data-area="wealth"]    { --area: #e0a12e; }
-  [data-area="base"]      { --area: #4fb59a; }
-  [data-area="occasions"] { --area: #f08a5d; }
-  [data-area="rest"]      { --area: #6aa6e0; }
-  [data-area="learning"]  { --area: #7b8be0; }
-  [data-area="work"]      { --area: #8a7f9e; }
-  [data-area="personal"]  { --area: #e88fc0; }
-  [data-area="health"]    { --area: #5ec4c4; }
+  /* a stripe before each task in its area's colour (--area: set from the settings on the row) */
   :is(.winx-cal__task, .winx-missed__row, .winx-task-card)[data-area] { border-left: 3px solid var(--area); }
   /* the week's balance: one thin bar split by area (its share of the week's tasks), the done part brighter;
      the areas with nothing this week as grey icons after it */
