@@ -205,3 +205,15 @@ test("a new id skips the ids of lines whose record is gone (lost to a sync confl
   await saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02]");
   assert.match(files[MASTER], /^- \[ \] t8 /);
 });
+
+test("the undo notice names the task, not its id", async () => {
+  const parts = [];
+  globalThis.document = {
+    createDocumentFragment: () => ({ append: (...x) => parts.push(...x), appendChild: el => el }),
+    createElement: () => ({}),
+  };
+  vault({ [MASTER]: "- [ ] t1\n" }, { t1: { name: "walk" } });
+  await makeActions({ today: "2026-11-02" }).remove({ ...taskStore.tasks[0], line: 0 });
+  assert.equal(parts[0], "🗑 walk  ");
+  delete globalThis.document;
+});
