@@ -57,7 +57,7 @@ export const editTaskModal = async (t, ask = taskWindow) => {
     const text = await app.vault.cachedRead(app.vault.getAbstractFileByPath(t.path));
 
     line = text.split("\n")[t.line];
-    if (!api || !id || Task.keyOf(line ?? "") !== task.key) return;
+    if (!api || !id || new Task(line ?? "").key !== task.key) return;
   }
 
   const pick = await ask(t.pool ? { ...task.picks, name: task.text } : task.picks);

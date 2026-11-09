@@ -10,7 +10,7 @@ import { DEFAULT_MARKS, FoodLog, Foods } from "#/models/food.js";
 import { readJournals } from "#/controllers/journals.js";
 import { codeOf, nameOf } from "#/models/kinds.js";
 import { parseCourse } from "#/models/course.js";
-import { Task } from "#/models/task.js";
+import { T } from "#/models/calendarData.js";
 import { Notice } from "obsidian";
 import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { taskStore } from "#/store/tasks.js";
@@ -73,7 +73,7 @@ export async function loadFood() {
     await Promise.all([read(FOODS), read(FOOD_LOG), readJournals(), courses()]);
 
   const id = taskIdOf(), rec = id && taskStore.records.get(id);
-  const done = id ? taskStore.tasks.map(t => Task.of(t)).filter(t => t.id === id && t.isDone) : [];
+  const done = id ? taskStore.tasks.map(T).filter(t => t.id === id && t.isDone) : [];
   const task = id && { id, name: rec?.name ?? id, days: new Set(done.map(t => t.doneOn)) };
 
   return {
