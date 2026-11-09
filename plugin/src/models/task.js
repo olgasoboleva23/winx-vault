@@ -111,48 +111,23 @@ export class Task {
 
     return done ? withField(base, "completion", date) : new Task(base).setDue(date);
   }
-  // set or clear (null) a tag a line has once, by its prefix ("#area/", "#time/"): swapped in
-  // place, or added after the tags that open the line
-  setTag(prefix, tag) {
-    const re = new RegExp(`(^|\\s)${prefix}\\S*`, "u");
-
-    if (re.test(this.line)) return this.line.replace(re, tag ? `$1${tag}` : "");
-    return tag ? this.line.replace(/^(\s*- \[.\](?:\s+#\S+)*)/u, `$1 ${tag}`) : this.line;
-  }
-  // the first sticker swapped for `name` (a file in the stickers folder) or dropped (null); without
-  // one, it goes at the end of the text, before the rule and the date fields
-  setSticker(name) {
-    const re = /\s*!\[\[[^\]]*\]\]/;
-
-    if (re.test(this.line)) return this.line.replace(re, name ? ` ![[${name}|28]]` : "");
-    if (!name) return this.line;
-
-    return this.line.replace(/\s*(?=\[\w+:: |$)/, ` ![[${name}|28]] `).trimEnd();
-  }
-  // what the task window shows and sets: difficulty, area, time ("#time/…") tags and the first
-  // sticker
+  // what the task window shows and sets: difficulty, area, time ("#time/…") and the sticker
   get picks() {
     return {
       difficulty: this.difficulty, area: this.area,
       time: this.time && `#time/${this.time}`, sticker: this.stickers[0] ?? null,
     };
   }
-  withPicks(p) {   // a key left out of p stays as it is
-    let line = this.line;
-
-    for (const [key, prefix] of [["difficulty", "#⭐"], ["area", "#area/"], ["time", "#time/"]])
-      if (key in p) line = new Task(line).setTag(prefix, p[key]);
-    return "sticker" in p ? new Task(line).setSticker(p.sticker) : line;
+  // the line with its id swapped for `name`: what the Tasks plugin's dialog shows and edits
+  named(name) {
+    return [`${this.line.match(/^\s*- \[.\]/)[0]} ${name}`, ...this.line.match(FIELD) ?? []]
+      .join(" ");
   }
+  // the dialog's result back: its words are the new name, the line gets `id` again
+  static unnamed(line, id) {
+    const t = new Task(line);
 
-  // as a pool line: no checkbox, rule or date fields
-  get poolLine() {
-    return this.line.replace(/^(\s*)- \[.\]\s*/, "$1- ").replace(/\s*\[\w+:: [^\]]*\]/g, "")
-      .trimEnd();
-  }
-  // a pool line's new copy: an open task, created `today`
-  static fromPool(line, today) {
-    return `${line.trimEnd().replace(/^(\s*)- /, "$1- [ ] ")} [created:: ${today}]`;
+    return { name: t.words, line: t.named(id) };
   }
 
   // the first day from `today` its rule allows: a weekday rule ("every week on Monday, …") its

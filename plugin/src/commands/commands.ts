@@ -1,10 +1,9 @@
 import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
-import { Task } from "#/models/task.js";
 import { KINDS } from "#/models/kinds.js";
 import { mirrorMobileConfig } from "#/controllers/mobileConfig.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { todayYmd } from "#/helpers/dates.js";
-import { addPoolLine, addTask } from "#/controllers/tasks.js";
+import { saveNewTask } from "#/controllers/tasks.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { addMarketItem } from "#/controllers/widgets/market.js";
@@ -36,16 +35,12 @@ export function registerCommands(plugin: Plugin) {
 
     if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
     // created shows how long it waits on the board
-    const words = [pick.difficulty, pick.area, pick.time, found.name].filter(Boolean).join(" ");
-    const result = await api.editTaskLineModal(`- [ ] ${words} [created:: ${todayYmd()}]`);
+    const result = await api.editTaskLineModal(`- [ ] ${found.name} [created:: ${todayYmd()}]`);
 
     if (!result) return;
-    // after the text typed in the Tasks modal
-    const line = new Task(result).setSticker(pick.sticker);
-
-    // a pool line (no checkbox, no dates) to the end of Pool.md; a task to the top of Master.md
-    if (pick.pool) return void await addPoolLine(new Task(line).poolLine);
-    if (!await addTask(line)) new Notice(`✦ ${MASTER} not found — task not saved`);
+    if (!await saveNewTask(found.name, pick, result)) {
+      new Notice(`✦ ${MASTER} not found — task not saved`);
+    }
   });
 
   // a watch / read / game / recipe / work task note (models/kinds.js), in its folder, opened in a

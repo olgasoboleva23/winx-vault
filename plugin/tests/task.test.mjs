@@ -75,32 +75,15 @@ test("place", () => {
   assert.equal(T("not a task").place("2026-10-25", true), "not a task");
 });
 
-test("setTag, setSticker, picks", () => {
-  const line = "- [ ] #⭐easy #area/base wash windows [repeat:: every month] [due:: 2026-11-01] [created:: 2026-10-29]";
-  assert.equal(T(line).setTag("#time/", "#time/morning"), "- [ ] #⭐easy #area/base #time/morning wash windows [repeat:: every month] [due:: 2026-11-01] [created:: 2026-10-29]");
-  assert.equal(T(line).setTag("#area/", "#area/body"), "- [ ] #⭐easy #area/body wash windows [repeat:: every month] [due:: 2026-11-01] [created:: 2026-10-29]");
-  assert.equal(T(line).setTag("#area/", null), "- [ ] #⭐easy wash windows [repeat:: every month] [due:: 2026-11-01] [created:: 2026-10-29]");
-  assert.equal(T(line).setSticker("levi.png"), "- [ ] #⭐easy #area/base wash windows ![[levi.png|28]] [repeat:: every month] [due:: 2026-11-01] [created:: 2026-10-29]");
-  assert.equal(T("- [ ] call bank").setSticker("levi.png"), "- [ ] call bank ![[levi.png|28]]");
-  assert.equal(T("- [ ] call bank [created:: 2026-10-29]").setSticker("levi.png"), "- [ ] call bank ![[levi.png|28]] [created:: 2026-10-29]");
-  const two = "- [ ] gym ![[a.png|28]] ![[b.gif|28]] [due:: 2026-10-30]";
-  assert.equal(T(two).setSticker("c.png"), "- [ ] gym ![[c.png|28]] ![[b.gif|28]] [due:: 2026-10-30]");   // only the first
-  assert.equal(T(two).setSticker(null), "- [ ] gym ![[b.gif|28]] [due:: 2026-10-30]");
-  const t = new Task("- [ ] #⭐easy #area/mind #time/morning meditate ![[bloom.gif|28]] [repeat:: every day]", null,
+test("picks, named, unnamed", () => {
+  const t = new Task("- [ ] t7 [repeat:: every day]", null,
     { name: "meditate", difficulty: "#⭐easy", area: "#area/mind", time: "morning", sticker: "bloom.gif" });
   assert.deepEqual(t.picks, { difficulty: "#⭐easy", area: "#area/mind", time: "#time/morning", sticker: "bloom.gif" });
-  assert.equal(t.withPicks({ time: null, sticker: "rings.gif" }), "- [ ] #⭐easy #area/mind meditate ![[rings.gif|28]] [repeat:: every day]");
-  assert.equal(t.withPicks({}), t.line);
-});
-
-test("pool lines", () => {
-  const pool = "- #⭐easy #area/base take out trash ![[levi.png|28]]";
-  assert.equal(T(pool).text, "take out trash");
-  assert.equal(T(pool).key, T("- [x] #⭐easy take out trash [completion:: 2026-10-27]").key);   // its copies share its history
-  assert.equal(T("- [ ] #⭐easy #area/base take out trash ![[levi.png|28]] [repeat:: every day] [due:: 2026-10-30]  [created:: 2026-10-29]").poolLine, pool);
-  const copy = Task.fromPool(pool, "2026-10-29");
-  assert.equal(copy, "- [ ] #⭐easy #area/base take out trash ![[levi.png|28]] [created:: 2026-10-29]");
-  assert.equal(T(copy).place("2026-10-30", false), copy + " [due:: 2026-10-30]");
+  const line = "- [x] t7 [repeat:: every week on Monday when done] [due:: 2026-11-02] [completion:: 2026-11-02]";
+  const named = T(line).named("meditate daily");
+  assert.equal(named, "- [x] meditate daily [repeat:: every week on Monday when done] [due:: 2026-11-02] [completion:: 2026-11-02]");
+  assert.deepEqual(Task.unnamed(named, "t7"), { name: "meditate daily", line });
+  assert.deepEqual(Task.unnamed("- [ ] meditate more [due:: 2026-11-03]", "t7"), { name: "meditate more", line: "- [ ] t7 [due:: 2026-11-03]" });
 });
 
 test("pause / resume", () => {

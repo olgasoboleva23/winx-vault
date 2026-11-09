@@ -22,10 +22,10 @@ export function makeActions(ctx) {
     editTaskLineWithUndo(t, line => TASKS.executeToggleTaskDoneCommand(line, t.path), "✓");
   const unplan  = t =>
     editTaskLineWithUndo(t, line => new Task(line).place(null, false), "↩ no date");
-  // a pool item's copy goes to the top of Master.md, like a new task: open on `day` (no date for
-  // null), or done that day
+  // a pool item's copy (its id, created today) goes to the top of Master.md, like a new task:
+  // open on `day` (no date for null), or done that day
   const fromPool = (t, day, done) =>
-    addTask(new Task(Task.fromPool(T(t).line, today)).place(day, done));
+    addTask(new Task(`- [ ] ${t.id} [created:: ${today}]`).place(day, done));
   // a task dropped on `day` (null: the backlog): open and due that day, or done that day. An open 🔁
   // task done on a day goes through the Tasks plugin (so it gets its next copy), then back to that
   // day
