@@ -119,6 +119,31 @@ test("the line changed while the dialogs were open: nothing saved, record and li
   assert.equal(files[MASTER], "- [x] t1 [due:: 2026-11-03]\n");
 });
 
+// the Tasks dialog: rewrites Master.md to `meanwhile` (another device), then answers `edited`
+const changedMeanwhile = (files, meanwhile, edited) => {
+  globalThis.__app.plugins.plugins["obsidian-tasks-plugin"] = { apiV1: { editTaskLineModal: async () => {
+    files[MASTER] = meanwhile;
+    return edited;
+  } } };
+};
+
+test("the 🔁 rule changed meanwhile, the date edited: line and record untouched", async () => {
+  const files = vault({ [MASTER]: "- [ ] t1 [repeat:: every day] [due:: 2026-11-03]\n" }, { t1: { name: "walk" } });
+  const meanwhile = "- [ ] t1 [repeat:: every week] [due:: 2026-11-03]\n";
+  changedMeanwhile(files, meanwhile, "- [ ] walk [repeat:: every day] [due:: 2026-11-05]");
+  await editTaskModal(taskStore.tasks[0], async () => PICK);
+  assert.equal(files[MASTER], meanwhile);
+  assert.deepEqual(json(files), { t1: { name: "walk" } });
+});
+
+test("the line ticked meanwhile, only the picks changed: the record untouched", async () => {
+  const files = vault({ [MASTER]: "- [ ] t1 [due:: 2026-11-03]\n" }, { t1: { name: "walk" } });
+  changedMeanwhile(files, "- [x] t1 [due:: 2026-11-03]\n", "- [ ] walk [due:: 2026-11-03]");
+  await editTaskModal(taskStore.tasks[0], async () => PICK);
+  assert.deepEqual(json(files), { t1: { name: "walk" } });
+  assert.equal(files[MASTER], "- [x] t1 [due:: 2026-11-03]\n");
+});
+
 test("a pool item: the window's picks and name go to its record, no line", async () => {
   const files = vault({ [MASTER]: "- [ ] t2\n" }, { t1: { name: "water herbs", pool: true } });
   await editTaskModal(taskStore.pool[0], async was => (assert.equal(was.name, "water herbs"), { ...PICK, name: "feed herbs" }));

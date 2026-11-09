@@ -80,8 +80,9 @@ export const editTaskModal = async (t, ask = taskWindow) => {
     next = back.line;
   }
 
-  // the line first: changed meanwhile, it is left alone (editLine's notice) and so is the record
-  if (next !== line && !await editTaskLine(t, () => next)) return;
+  // the line first, only over the very text read before the window (a 🔁 rule changed or a tick
+  // meanwhile: nothing saved, editLine's notice); an unchanged line is checked the same way
+  if (!t.pool && !await editLine(t.path, t.line, l => l === line, () => next)) return;
   await saveRecords({ [id]: patch });
 };
 
