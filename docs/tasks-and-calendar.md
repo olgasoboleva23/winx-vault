@@ -27,7 +27,7 @@ The pool is the records with `pool: true`: tasks to pick when it's time. Draggin
 
 **Winx: Migrate tasks** is a one-off command for a vault in the old format (`#area/…` tags and 📅 / 🔁 dates in the text, plus `Pool.md`): it gives every task an id (a task and its done copies the same one), writes `tasks.json`, rewrites `Master.md` in the Dataview format and keeps the old notes as `Master (old).md` and `Pool (old).md`. It refuses to run when `tasks.json` exists. Afterwards switch Tasks' format to Dataview.
 
-**Sync:** `tasks.json` and `Master.md` are two files. Sync the desktop first, then the phone, before editing there; a record is written whole, the last writer wins.
+**Sync:** `tasks.json` and `Master.md` are two files. A record edit rewrites the whole `tasks.json`, so between syncs the last writer wins for the whole file: one device's record edits since the last sync can be lost. Sync the desktop first, then the phone, before editing there.
 
 | Command (Cmd+P) | Creates |
 |---|---|
