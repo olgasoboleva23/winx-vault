@@ -13,7 +13,7 @@ const TASK = /^(\s*)- \[(.)\]\s*(.*)$/, POOL = /^\s*- (?!\[.\])(.*)$/;
 
 // an old line's parts: its fields (repeat, dates), tags, first sticker and words
 function parse(rest) {
-  const text = rest.replace(/️/g, "");
+  const text = rest.replace(/\uFE0F/g, "");
   const fields = { repeat: text.match(RULE)?.[1].trim() || null };
 
   for (const [emoji, key] of Object.entries(DATES))
