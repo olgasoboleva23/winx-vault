@@ -7,9 +7,8 @@ import { tasksApi } from "#/helpers/plugins.js";
 import { Task } from "#/models/task.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { app } from "#/helpers/app.js";
-import { migrate } from "#/models/taskMigration.js";
 import { parseNote } from "#/models/taskFile.js";
-import { MASTER, MASTER_OLD, POOL, POOL_OLD, TASK_RECORDS } from "#/helpers/paths.js";
+import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 
 // Rewrite a Dataview task's line in its file (fn returns the new line, null deletes it),
 // only if that line is still the same copy of the task.
@@ -175,40 +174,3 @@ export async function addTask(line) {
 // Tick (or untick) a task through the Tasks plugin, so a 🔁 one gets its next copy
 export const tickTask = t =>
   editTaskLineWithUndo(t, line => tasksApi().executeToggleTaskDoneCommand(line, t.path), "✓");
-
-// The one-off move to the id format (the Migrate tasks command): not when tasks.json or an old
-// copy is there, or Master.md is missing. The old notes kept as copies (Master.md is not renamed:
-// a rename would rewrite links to it), then tasks.json, then Master.md rewritten last (a failed
-// write before it leaves the old Master.md as it was), then Pool.md to the trash. Master.md or
-// Pool.md changed meanwhile: it stops before the first write, or before the rewrite.
-export async function migrateTasks() {
-  const { vault, fileManager } = app;
-  const master = vault.getFileByPath(MASTER), pool = vault.getFileByPath(POOL);
-  const there = [TASK_RECORDS, MASTER_OLD, POOL_OLD].find(p => vault.getFileByPath(p));
-
-  if (there) return void new Notice(`✦ ${there} exists`);
-  if (!master) return void new Notice(`✦ ${MASTER} not found`);
-  try {
-    const masterText = await vault.read(master), poolText = pool ? await vault.read(pool) : "";
-    const { master: next, records } = migrate(masterText, poolText);
-    // Master.md or Pool.md changed since they were read (a sync, Tasks): migrating would lose it
-    const changed = async () => await vault.read(master) !== masterText
-      || (pool ? await vault.read(pool) : "") !== poolText;
-    const stopped = "✦ migration stopped: Master.md changed while migrating";
-
-    if (await changed()) return void new Notice(`${stopped} — run it again`);
-    await vault.create(MASTER_OLD, masterText);
-    if (pool) await vault.create(POOL_OLD, poolText);
-    await vault.create(TASK_RECORDS, JSON.stringify(records, null, 2));
-    if (await changed())
-      return void new Notice(`${stopped} — delete tasks.json and the (old) copies, run it again`);
-
-    await vault.modify(master, next);
-    if (pool) await fileManager.trashFile(pool);
-    const n = Object.keys(records).length;
-
-    new Notice(`✦ ${n} tasks migrated: switch Tasks → Task format → Dataview`);
-  } catch (e) {
-    new Notice(`✦ migration stopped: ${e.message} — your old notes are in Master (old).md`);
-  }
-}

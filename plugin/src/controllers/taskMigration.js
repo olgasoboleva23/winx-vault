@@ -1,7 +1,11 @@
 // The one-off move from the old emoji notes to the id format: Master.md's lines become
 // `- [s] tN [field:: …]`, Winx's part of each task (tags, sticker, name) a record of tasks.json,
-// Pool.md's lines records with pool: true. Pure (the Migrate tasks command writes the result).
+// Pool.md's lines records with pool: true: migrate() pure (tested), migrateTasks() the command.
 // The old emoji parsing lives here only.
+import { Notice } from "obsidian";
+import { app } from "#/helpers/app.js";
+import { MASTER, MASTER_OLD, POOL, POOL_OLD, TASK_RECORDS } from "#/helpers/paths.js";
+
 const DATE = "\\d{4}-\\d{2}-\\d{2}";
 // the old date emojis and their Dataview fields, in the order the new line writes them
 const DATES = { "🛫": "start", "⏳": "scheduled", "📅": "due", "➕": "created", "✅": "completion",
@@ -9,7 +13,7 @@ const DATES = { "🛫": "start", "⏳": "scheduled", "📅": "due", "➕": "crea
 // every emoji that starts a field: a 🔁 rule runs up to the next one
 const STOPS = "📅⏳✅❌🛫➕⏫🔼🔽🔺⏬🆔⛔🏁";
 const RULE = new RegExp(`🔁\\s*([^${STOPS}]*)`, "u");
-const TASK = /^(\s*)- \[(.)\]\s*(.*)$/, POOL = /^\s*- (?!\[.\])(.*)$/;
+const TASK = /^(\s*)- \[(.)\]\s*(.*)$/, POOL_LINE = /^\s*- (?!\[.\])(.*)$/;
 
 // an old line's parts: its fields (repeat, dates), tags, first sticker and words
 function parse(rest) {
@@ -75,7 +79,7 @@ export function migrate(masterText, poolText) {
   }).join("\n");
 
   for (const line of poolText.split("\n")) {
-    const m = line.match(POOL);
+    const m = line.match(POOL_LINE);
 
     if (m) see(parse(m[1]), true);
   }
@@ -89,4 +93,41 @@ export function migrate(masterText, poolText) {
   }
 
   return { master, records };
+}
+
+// The one-off move to the id format (the Migrate tasks command): not when tasks.json or an old
+// copy is there, or Master.md is missing. The old notes kept as copies (Master.md is not renamed:
+// a rename would rewrite links to it), then tasks.json, then Master.md rewritten last (a failed
+// write before it leaves the old Master.md as it was), then Pool.md to the trash. Master.md or
+// Pool.md changed meanwhile: it stops before the first write, or before the rewrite.
+export async function migrateTasks() {
+  const { vault, fileManager } = app;
+  const master = vault.getFileByPath(MASTER), pool = vault.getFileByPath(POOL);
+  const there = [TASK_RECORDS, MASTER_OLD, POOL_OLD].find(p => vault.getFileByPath(p));
+
+  if (there) return void new Notice(`✦ ${there} exists`);
+  if (!master) return void new Notice(`✦ ${MASTER} not found`);
+  try {
+    const masterText = await vault.read(master), poolText = pool ? await vault.read(pool) : "";
+    const { master: next, records } = migrate(masterText, poolText);
+    // Master.md or Pool.md changed since they were read (a sync, Tasks): migrating would lose it
+    const changed = async () => await vault.read(master) !== masterText
+      || (pool ? await vault.read(pool) : "") !== poolText;
+    const stopped = "✦ migration stopped: Master.md changed while migrating";
+
+    if (await changed()) return void new Notice(`${stopped} — run it again`);
+    await vault.create(MASTER_OLD, masterText);
+    if (pool) await vault.create(POOL_OLD, poolText);
+    await vault.create(TASK_RECORDS, JSON.stringify(records, null, 2));
+    if (await changed())
+      return void new Notice(`${stopped} — delete tasks.json and the (old) copies, run it again`);
+
+    await vault.modify(master, next);
+    if (pool) await fileManager.trashFile(pool);
+    const n = Object.keys(records).length;
+
+    new Notice(`✦ ${n} tasks migrated: switch Tasks → Task format → Dataview`);
+  } catch (e) {
+    new Notice(`✦ migration stopped: ${e.message} — your old notes are in Master (old).md`);
+  }
 }

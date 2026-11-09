@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { migrate } from "#/models/taskMigration.js";
-import { migrateTasks } from "#/controllers/tasks.js";
+import { migrate, migrateTasks } from "#/controllers/taskMigration.js";
 import { vault } from "./stubs/vault.mjs";
 import { Notice } from "obsidian";
 
