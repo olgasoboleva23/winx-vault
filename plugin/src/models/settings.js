@@ -45,6 +45,10 @@ export function settingsProblem(v, records, config) {
   }
 
   if (!(v.spark < v.glow && v.glow < v.aura)) return "XP Today: SPARK < GLOW < AURA";
+  if (!Number.isFinite(v.base) || v.base <= 0)
+    return "the first level must cost a finite number greater than zero";
+  if (!Number.isFinite(v.step) || v.step < 0)
+    return "the level increase must be a finite number, zero or more";
   return null;
 }
 

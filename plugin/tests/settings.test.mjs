@@ -2,6 +2,37 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import config, { applyConfig } from "#/helpers/config.js";
 import { settingsValues, settingsProblem, toConfig, areaMoves } from "#/models/settings.js";
+import { levelInfo } from "#/models/xp.js";
+
+test("level settings reject invalid costs and allow a constant positive cost", () => {
+  applyConfig();
+  const v = settingsValues(config), records = new Map();
+
+  for (const base of [0, -1, NaN, Infinity, -Infinity, null, "100"])
+    assert.match(settingsProblem({ ...v, base }, records, config), /first level/);
+  for (const step of [-1, NaN, Infinity, -Infinity, null, "25"])
+    assert.match(settingsProblem({ ...v, step }, records, config), /level increase/);
+  assert.equal(settingsProblem({ ...v, base: 50, step: 0 }, records, config), null);
+});
+
+test("invalid level costs from config.json use defaults; a zero increase stays zero", () => {
+  try {
+    for (const value of [0, -1, NaN, Infinity, -Infinity, null, "0"]) {
+      applyConfig({ levelCost: { base: value, step: 0 } });
+      assert.deepEqual(config.levelCost, { base: 100, step: 0 });
+      assert.deepEqual(levelInfo(250, config.levelCost.base, config.levelCost.step),
+        { level: 3, progress: 50, cost: 100 });
+    }
+    for (const value of [-1, NaN, Infinity, -Infinity, null, "0"]) {
+      applyConfig({ levelCost: { base: 50, step: value } });
+      assert.deepEqual(config.levelCost, { base: 50, step: 25 });
+      assert.deepEqual(levelInfo(125, config.levelCost.base, config.levelCost.step),
+        { level: 3, progress: 0, cost: 100 });
+    }
+  } finally {
+    applyConfig();
+  }
+});
 
 test("applyConfig: config.json's numbers over the defaults, the maps again; {} puts the defaults back", () => {
   applyConfig({ difficulties: { easy: { xp: 7 } }, levels: { glow: 40 }, levelCost: { step: 50 },

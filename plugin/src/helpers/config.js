@@ -63,7 +63,9 @@ export function applyConfig(json = {}) {
     { name: "TRANSFORMATION", max: Infinity, cls: "v4" },
   ];
   config.levelCost = {
-    base: num(cost.base, LEVEL_COST.base), step: num(cost.step, LEVEL_COST.step),
+    // Non-positive costs can leave levelInfo subtracting zero or a negative number forever.
+    base: cost.base > 0 ? num(cost.base, LEVEL_COST.base) : LEVEL_COST.base,
+    step: cost.step >= 0 ? num(cost.step, LEVEL_COST.step) : LEVEL_COST.step,
   };
   config.xpMap = Object.fromEntries(config.difficulties.map(x => [x.key, x.xp]));
   config.areaMap = Object.fromEntries(config.areas.map(a => [a.key, a.name]));
