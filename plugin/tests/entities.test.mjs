@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { Task } from "#/models/task.js";
 import { weekOf } from "#/helpers/dates.js";
 import { Goal, reminders } from "#/models/goal.js";
 import { CycleLog } from "#/models/cycleLog.js";
@@ -179,4 +180,12 @@ test("CycleLog.recent: the current cycle so far, then the finished ones, newest 
     { start: "2026-09-27", end: "2026-10-26", days: 30, period: 7, ovulation: 16, current: false },
     { start: "2026-08-27", end: "2026-09-26", days: 31, period: 10, ovulation: 17, current: false },
   ]);
+});
+
+test("the morning summary: today's open tasks and the overdue ones as the calendar's Missed? counts them", async () => {
+  const { dayCounts } = await import("#/models/goal.js");
+  const t = (status, due, goal = null) => new Task(`- [${status}] t1 [due:: ${due}]`, null, { goal });
+  const tasks = [t(" ", "2026-11-10"), t(" ", "2026-11-08"), t(" ", "2026-11-07", "workout"),
+    t("-", "2026-11-06"), t("x", "2026-11-05"), t(" ", "2026-11-12")];
+  assert.deepEqual(dayCounts(tasks, "2026-11-10"), { due: 1, overdue: 2 });   // a skipped copy isn't overdue
 });

@@ -63,3 +63,10 @@ export const reminders = function (tasks, goals) {
 
   return out.sort((a, b) => a.at.localeCompare(b.at));
 };
+
+// the morning summary's numbers: today's open tasks and the overdue ones, counted as the
+// calendar's Missed? does (open, their day gone by; a skipped or done copy isn't)
+export const dayCounts = (tasks, today) => ({
+  due: tasks.filter(t => t.isOpen && t.date === today).length,
+  overdue: tasks.filter(t => t.isOverdue(today)).length,
+});

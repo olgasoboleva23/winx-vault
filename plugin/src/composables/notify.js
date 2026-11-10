@@ -2,7 +2,7 @@ import { Platform } from "obsidian";
 import { dataview } from "#/helpers/plugins.js";
 import { useDataviewChanges, useNewDay, useWhenIndexed } from "./use.js";
 import { todayYmd } from "#/helpers/dates.js";
-import { Goal, reminders } from "#/models/goal.js";
+import { Goal, reminders, dayCounts } from "#/models/goal.js";
 import { GOALS, TASKS } from "#/helpers/paths.js";
 import { T } from "#/models/calendarData.js";
 import { taskStore } from "#/store/tasks.js";
@@ -34,7 +34,7 @@ export function useNotify(plugin, open) {
     };
   };
 
-  const dueTasks = () => taskStore.tasks.map(T).filter(t => !t.isDone && t.date);
+  const dueTasks = () => taskStore.tasks.map(T).filter(t => t.isOpen && t.date);
 
   const schedule = () => {
     clear();
@@ -56,8 +56,7 @@ export function useNotify(plugin, open) {
 
     if (app.loadLocalStorage("winx-notify-summary") === d) return;
     app.saveLocalStorage("winx-notify-summary", d);
-    const due = dueTasks().filter(t => t.date === d).length;
-    const overdue = dueTasks().filter(t => t.date < d && !t.goal).length;
+    const { due, overdue } = dayCounts(taskStore.tasks.map(T), d);
 
     notify(
       `✦ ${due} task${due === 1 ? "" : "s"} today`,
