@@ -4,8 +4,7 @@
 import { Notice } from "obsidian";
 import { edit, editLine, undoLines } from "#/helpers/files.js";
 import { tasksApi } from "#/helpers/plugins.js";
-import { Task } from "#/models/task.js";
-import { VariantProblem, nextVariantAfter, variantsProblem } from "#/models/taskAlternation.js";
+import { Task, VariantProblem, nextVariantAfter, variantsProblem } from "#/models/task.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { app } from "#/helpers/app.js";
 import { parseNote } from "#/models/taskFile.js";

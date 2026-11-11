@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { migrateMarketText, migrateMarket } from "#/controllers/marketMigration.js";
+import { migrateMarketText, migrateMarket } from "#/migrations/market.js";
 import { MARKET, MARKET_RECORDS, MARKET_OLD } from "#/helpers/paths.js";
 import { vault } from "./stubs/vault.mjs";
 import { supplyStats } from "#/models/market.js";

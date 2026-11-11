@@ -2,7 +2,7 @@
 // sticker), in the shared Form window. Used to edit a task (controllers/tasks.js) and for a new one
 // (the New task command).
 import { Notice } from "obsidian";
-import { variantNames, variantsProblem } from "#/models/taskAlternation.js";
+import { variantNames, variantsProblem } from "#/models/task.js";
 import config from "#/helpers/config.js";
 import { app } from "#/helpers/app.js";
 import { STICKERS } from "#/helpers/paths.js";

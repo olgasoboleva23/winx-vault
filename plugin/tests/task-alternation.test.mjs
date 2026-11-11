@@ -1,7 +1,6 @@
 import { test, before as beforeTests } from "node:test";
 import assert from "node:assert/strict";
-import { nextVariantAfter } from "#/models/taskAlternation.js";
-import { Task } from "#/models/task.js";
+import { Task, nextVariantAfter } from "#/models/task.js";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { vault } from "./stubs/vault.mjs";
 import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
