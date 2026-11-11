@@ -186,7 +186,7 @@ test("a day's parts: a task whose record has after: <id> stands right under the 
   assert.equal(m.dayParts("2026-10-29", shown).routineRows[0].follows, undefined);
 });
 
-test("taskInfo: what a part shows of a task — its key, area, text, label, stickers as images, whether it can be skipped; once per draw", async () => {
+test("taskInfo: what a part shows of a task — its key, area, text, label, its sticker as an image, whether it can be skipped; once per draw", async () => {
   const { taskInfo } = await import("#/models/calendarData.js");
   const t = { ...idTask("#⭐easy #area/body stretch ![[fist.webp|28]] [repeat:: every day] [due:: 2026-11-03]"), status: " ", path: "Tasks/Master.md", line: 4 };
   let lookups = 0;
@@ -196,7 +196,7 @@ test("taskInfo: what a part shows of a task — its key, area, text, label, stic
   };
   const ctx = { infos: new Map(), config: { areaIcons: { "body": "🌺" }, areaColors: { body: "#e8609a" } }, actions: { canSkip: () => true } };
   const i = taskInfo(t, ctx, app);
-  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", color: "#e8609a", difficulty: "easy", goal: false, text: "stretch", pool: false, label: "🌺 stretch", stickers: ["app://Assets/fist.webp"], canSkip: true, daytime: null });
+  assert.deepEqual({ ...i, key: typeof i.key }, { key: "string", area: "body", color: "#e8609a", difficulty: "easy", goal: false, text: "stretch", pool: false, label: "🌺 stretch", sticker: "app://Assets/fist.webp", canSkip: true, daytime: null });
   assert.equal(taskInfo(t, ctx, app), i);   // the same object again, no new lookups
   assert.equal(lookups, 1);
 });

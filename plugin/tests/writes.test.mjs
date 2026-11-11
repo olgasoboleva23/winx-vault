@@ -59,14 +59,13 @@ test("a new task goes to the top of Master.md; none is made when Master.md is mi
 
 const json = (files) => JSON.parse(files[RECORDS]);
 
-test("saveRecords merges a patch into a record, null deletes one, a missing file is made", async () => {
+test("saveRecords merges a patch into a record, a missing file is made", async () => {
   const files = vault({});
   await saveRecords({ t1: { name: "walk", area: null } });
   assert.deepEqual(json(files), { t1: { name: "walk", area: null } });
   await saveRecords({ t1: { area: "body" }, t2: { name: "read" } });
-  assert.deepEqual(json(files), { t1: { name: "walk", area: "body" }, t2: { name: "read" } });
-  await saveRecords({ t1: null });
-  assert.equal(files[RECORDS], JSON.stringify({ t2: { name: "read" } }, null, 2));
+  assert.equal(files[RECORDS], JSON.stringify({ t1: { name: "walk", area: "body" }, t2: { name: "read" } }, null, 2));
+
 });
 
 test("a new id is the biggest one plus one", () => {
@@ -300,4 +299,13 @@ test("🗑 on a pool card: out of the pool, its record and history kept; undo pu
   await parts[1].onclick();
   assert.deepEqual(json(files), { t1: { name: "water herbs", pool: true } });
   delete globalThis.document;
+});
+
+test("Missed? done on its own day: the Tasks plugin gets the task's note", async () => {
+  const day = "2026-11-01", seen = [];
+  vault({ [MASTER]: `- [ ] t1 [repeat:: every day] [due:: ${day}]\n` }, { t1: { name: "walk" } });
+  const t = { ...taskStore.tasks[0], line: 0 };
+  const TASKS = { executeToggleTaskDoneCommand: (line, path) => (seen.push(path), line) };
+  await makeActions({ today: "2026-11-02", TASKS }).doneOnItsDay(t);
+  assert.deepEqual(seen, [MASTER]);
 });

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { appendLine, edit, editLine, readJson, undoLines } from "#/helpers/files.js";
+import { appendLine, edit, editJson, editLine, readJson, serial, undoLines } from "#/helpers/files.js";
+
 import { setApp } from "#/helpers/app.js";
 import { Notice } from "obsidian";
 
@@ -89,4 +90,28 @@ test("undoLines leaves lines that changed since", async () => {
   const { files } = vault({ "a.md": "a\nB2\nc" });
   await undoLines("a.md", 1, ["B"], "b")();
   assert.equal(files["a.md"], "a\nB2\nc");
+});
+
+test("editJson: a missing file is made from {} (its folder too), null writes nothing, a broken one throws untouched", async () => {
+  const { files, dirs } = vault();
+  await editJson("x/a.json", o => ({ ...o, n: 1 }));
+  assert.ok(dirs.has("x"));
+  await editJson("x/a.json", o => ({ ...o, m: 2 }));
+  assert.equal(files["x/a.json"], JSON.stringify({ n: 1, m: 2 }, null, 2));
+  await editJson("x/a.json", () => null);
+  await editJson("x/b.json", () => null);
+  assert.deepEqual(Object.keys(files), ["x/a.json"]);
+  files["x/a.json"] = "broken";
+  await assert.rejects(() => editJson("x/a.json", o => o), SyntaxError);
+  assert.equal(files["x/a.json"], "broken");
+});
+
+test("serial runs one job at a time, a failed one doesn't stop the next", async () => {
+  const queue = serial(), seen = [];
+  const job = (n, ms, fail) => () => new Promise((ok, no) =>
+    setTimeout(() => (seen.push(n), fail ? no(new Error("x")) : ok(n)), ms));
+  const runs = [queue(job(1, 10)), queue(job(2, 0, true)), queue(job(3, 0))];
+  assert.deepEqual(await Promise.allSettled(runs).then(r => r.map(x => x.status)),
+    ["fulfilled", "rejected", "fulfilled"]);
+  assert.deepEqual(seen, [1, 2, 3]);
 });

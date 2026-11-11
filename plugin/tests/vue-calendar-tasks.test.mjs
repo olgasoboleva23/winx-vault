@@ -12,11 +12,11 @@ before(async () => {
   [TaskText, TaskRow, TaskCard] = await Promise.all(["TaskText.vue", "TaskRow.vue", "TaskCard/index.vue"].map(load));
 });
 const info = over => ({ key: "k7", area: "body", difficulty: "medium", text: "walk <fast>", label: "🌺 walk <fast>",
-  stickers: ["app://x/levi.png"], canSkip: false, ...over });
+  sticker: "app://x/levi.png", canSkip: false, ...over });
 const global = { provide: { calendar: { task: () => null } } };
 const html = (C, props) => mount(C, { props, global }).html({ raw: true }).replace(/<!--[^]*?-->/g, "");
 
-test("TaskText: stars (none without a difficulty), the text, the stickers", () => {
+test("TaskText: stars (none without a difficulty), the text, the sticker", () => {
   assert.equal(mount({ components: { TaskText }, template: "<div><TaskText :task='t' /></div>", data: () => ({ t: info() }) })
     .element.innerHTML.replace(/<!--[^]*?-->/g, ""),
     '<span class="tag" data-difficulty="medium" aria-label="difficulty" data-tip="winx-tooltip"></span> walk &lt;fast&gt; ' +

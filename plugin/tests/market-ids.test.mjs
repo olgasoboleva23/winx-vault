@@ -101,6 +101,12 @@ test("Market migration takes the first tag that is a category", () => {
 test("A new vault's first market item starts the catalog", async () => {
   const { files } = vault({});
   await addToMarket("Tea", "#food");
-  assert.deepEqual(JSON.parse(files[MARKET_RECORDS]), { m1: { name: "Tea", tag: "#food", tags: ["#food"] } });
+  assert.deepEqual(JSON.parse(files[MARKET_RECORDS]), { m1: { name: "Tea", tag: "#food" } }
+);
   assert.equal(files[note], "- [ ] m1\n");
+});
+
+test("Market migration takes non-Latin tags out of the name", () => {
+  const { records } = migrateMarketText("- [ ] Чай #еда");
+  assert.equal(records.m1.name, "Чай");
 });

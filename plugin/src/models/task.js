@@ -14,9 +14,8 @@ import { addDays, diffDays } from "#/helpers/dates.js";
 import { projectRepeats } from "./repeats.js";
 import { ANY, FIELD, LineItem, lineOf, withField } from "./lineItem.js";
 
-const dropFields = (line, keys) => keys.reduce((l, k) => withField(l, k, null), line);
-
-const OPEN = /^\s*- \[ \]/;
+// the fields that put a task on a day
+const DATES = ["due", "scheduled", "start"];
 
 export class Task extends LineItem {
   static ID = /^t\d+(?=\s|$)/;   // the line's first word
@@ -45,8 +44,8 @@ export class Task extends LineItem {
   get canSkip()    { return this.isOpen && this.isRecurring && !!this.date; }
   // open, its day gone by
   isOverdue(today) { return this.isOpen && !!this.date && this.date < today; }
-  // its sticker's file name, in a list
-  get stickers()   { return this.rec?.sticker ? [this.rec.sticker] : []; }
+  // its sticker's file name
+  get sticker()    { return this.rec?.sticker ?? null; }
   get currVariant(){
     return this.variants.length ? this.rec?.currVariant ?? this.variants[0] : null;
   }
@@ -66,7 +65,7 @@ export class Task extends LineItem {
   // ── edits: each returns the new line ──
   // set or clear the date of an open task: one date, due (an old scheduled goes)
   setDue(date) {
-    if (!OPEN.test(this.line)) return this.line;
+    if (!this.isOpen) return this.line;
     const base = withField(this.line, "scheduled", null);
 
     return withField(base, "due", date || null);
@@ -85,14 +84,14 @@ export class Task extends LineItem {
   get picks() {
     return {
       difficulty: this.difficulty, area: this.area,
-      daytime: this.daytime, sticker: this.rec?.sticker ?? null,
+      daytime: this.daytime, sticker: this.sticker,
       ...this.variants.length ? { variants: [...this.variants],
         currVariant: this.currVariant } : {},
     };
   }
   // the line with its id swapped for `name`: what the Tasks plugin's dialog shows and edits
   named(name) {
-    const box = this.line.match(/^\s*- \[.\]/)?.[0];
+    const box = this.line.match(ANY)?.[0];
 
     if (!box) return this.line;   // no checkbox: nothing to name
     return [`${box} ${name}`, ...this.line.match(FIELD) ?? []]
@@ -119,7 +118,7 @@ export class Task extends LineItem {
   // pause: drop its scheduled, due and start dates (it leaves the calendar). Resume: due on the
   // first day from today its rule allows (firstDay; none: today. ponytail: "every month on the
   // 1st" resumes today too)
-  pause() { return dropFields(this.line, ["due", "scheduled", "start"]); }
+  pause() { return DATES.reduce((l, k) => withField(l, k, null), this.line); }
   togglePause(today) { return this.isPaused ? this.resume(today) : this.pause(); }
   resume(today) { return withField(this.pause(), "due", this.firstDay(today) ?? today); }
 
@@ -140,7 +139,7 @@ export class Task extends LineItem {
       const delta = weekday ? diffDays(task.firstDay(addDays(date, 1)), task.date) : shift;
 
       return l.replace(FIELD, (m, k, d) =>
-        ["due", "scheduled", "start"].includes(k) ? `[${k}:: ${addDays(d, delta)}]` : m);
+        DATES.includes(k) ? `[${k}:: ${addDays(d, delta)}]` : m);
     }).join("\n");
   }
   // as a skip of this time: the done line turns cancelled ("- [-] … [cancelled:: date]"),
@@ -152,33 +151,38 @@ export class Task extends LineItem {
     return toggled.split("\n").map(l => {
       if (/^\s*- \[x\]/.test(l))
         return l.replace(/^(\s*- \[)x/, "$1-").replace("[completion:: ", "[cancelled:: ");
-      const day = from && OPEN.test(l) && new Task(l).firstDay(from);
+      const day = from && new Task(l).isOpen && new Task(l).firstDay(from);
 
       return day ? new Task(l).setDue(day) : l;
     }).join("\n");
   }
 }
 
+// { count, last } by task key over `list` (Tasks): done copies by their completion date, skipped by
+// their cancelled one
+export const historyOf = list => {
+  const by = new Map();
+
+  for (const t of list) {
+    const h = by.get(t.key) ?? { count: 0, last: "" }, on = t.doneOn ?? t.skippedOn ?? "";
+
+    by.set(t.key, { count: h.count + 1, last: on > h.last ? on : h.last });
+  }
+
+  return by;
+};
+
 // Every record of tasks.json (pool ones too) once, for the "New task" search: its name and picks,
 // how many lines with its id are done and when last; by `areaOrder` (area keys, the rest after),
 // then the most done and the most recent first.
 export function taskChoices(tasks, records, areaOrder) {
-  const done = {};
-
-  for (const t of tasks) {
-    if (!t.id || !t.isDone) continue;
-    const c = done[t.id] ??= { done: 0, last: null };
-
-    c.done++;
-    if (!c.last || t.doneOn > c.last) c.last = t.doneOn;
-  }
-
+  const done = historyOf(tasks.filter(t => t.id && t.isDone));
   const rank = area => areaOrder.indexOf(area) >>> 0;
 
   return [...records].map(([id, r]) => ({
     id, name: r.name ?? id, area: r.area ?? null,
     picks: new Task("", null, r).picks,
-    done: done[id]?.done ?? 0, last: done[id]?.last ?? null,
+    done: done.get(id)?.count ?? 0, last: done.get(id)?.last || null,
   })).sort((a, b) => rank(a.area) - rank(b.area) || b.done - a.done
     || (b.last ?? "").localeCompare(a.last ?? ""));
 }

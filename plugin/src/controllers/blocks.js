@@ -13,7 +13,7 @@ import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
 import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
-  CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET, MARKET_RECORDS, PURCHASES, RULES,
+  CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET_NOTE, MARKET_RECORDS, PURCHASES, RULES,
   SAVINGS, SHOP, TASKS, WEIGHT,
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
@@ -47,7 +47,7 @@ import FoodPage from "#/components/pages/food/index.vue";
 // ending in /): only their changes load it again (any other note's doesn't), follows: false to
 // load once }, where ctx is { dv, app, args, sourcePath, source: the block's own text } (dv:
 // blockDv)
-const TASK_FILES = `${TASKS}/`, MARKET_NOTE = `${MARKET}.md`, LEDGER_FILES = `${LEDGER}/`;
+const TASK_FILES = `${TASKS}/`, LEDGER_FILES = `${LEDGER}/`;
 
 export const blocks = {
   xpToday: { view: XpToday, load: loadXpToday, watches: [TASK_FILES] },

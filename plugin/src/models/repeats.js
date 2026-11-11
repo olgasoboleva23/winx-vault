@@ -41,7 +41,7 @@ export const projectRepeats = (rule, from, until) => {
     return out;
   }
 
-  const dom = on.match(/(\d+)/) ? +on.match(/(\d+)/)[1] : +from.slice(8, 10);
+  const dom = +(on.match(/\d+/)?.[0] ?? from.slice(8, 10));
 
   for (let k = 1; k < 1000; k++) {
     const d = unit === "day" ? addDays(from, k * n)

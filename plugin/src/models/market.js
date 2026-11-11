@@ -30,12 +30,6 @@ export class MarketItem extends LineItem {
     return this.isOpen ? withField(this.line.replace("- [ ]", "- [x]"), "completion", date)
       : this.line;
   }
-  // back on the list: open, without its date
-  unbought() {
-    if (!this.isDone) return this.line;
-    return withField(this.line.replace(/- \[x\]/i, "- [ ]"), "completion", null)
-      .replace(CHECKED, "").trimEnd();
-  }
 }
 
 // what was bought and when (a legacy line has no id), and the keys on the list now
@@ -48,15 +42,18 @@ export const openKeys = items => new Set(items.filter(i => i.isOpen).map(i => i.
 export const nextMarketId = ids =>
   `m${Math.max(0, ...ids.filter(k => /^m\d+$/.test(k ?? "")).map(k => +k.slice(1))) + 1}`;
 
+// history oldest first, with each buy's item key: its id, else its lowercased name
+const byItem = history => [...history].sort((a, b) => a.date.localeCompare(b.date))
+  .map(h => [h.id ?? h.name.trim().toLowerCase(), h]);
+
 // Staples from purchase history: anything bought at least twice.
 // history: [{name, tag, date}] of completed market items. A forecast (avg days
 // between buys) needs 3+ buys; due when 85% of the usual interval has passed.
 export const supplyStats = function (history, today) {
   const by = {};
 
-  for (const h of [...history].sort((a, b) => a.date.localeCompare(b.date))) {
-    const key = h.id ?? h.name.trim().toLowerCase();
-    (by[key] ??= { id: h.id, name: h.id ? h.name : key, dates: [], tag: h.tag }).dates.push(h.date);
+  for (const [key, h] of byItem(history)) {
+    (by[key] ??= { id: h.id, name: h.id ? h.name : key, dates: [] }).dates.push(h.date);
     by[key].tag = h.tag;
   }
 
@@ -78,15 +75,17 @@ export const supplyStats = function (history, today) {
 
 // Everything bought before, for the search: one per name (its last spelling and category), by
 // category, then the most bought and the most recent first; onList when it's on the list now
-// (`open`: lowercased names).
-export function marketChoices(history, open, records = {}) {
-  const by = Object.fromEntries(Object.entries(records).map(([id, r]) => [id, {
+// (`open`: lowercased names). `records`: the catalog by id (null: none yet).
+
+export function marketChoices(history, open, records) {
+  const by = Object.fromEntries(Object.entries(records ?? {}).map(
+([id, r]) => [id, {
     id, name: r.name, tag: r.tag, buys: 0, last: "", onList: open.has(id),
   }]));
 
-  for (const h of [...history].sort((a, b) => a.date.localeCompare(b.date))) {
-    const key = h.id ?? h.name.trim().toLowerCase();
+  for (const [key, h] of byItem(history)) {
     by[key] = {
+
       ...h.id ? { id: h.id } : {},
       name: h.name.trim(),
       tag: h.tag,

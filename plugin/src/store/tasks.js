@@ -98,11 +98,7 @@ export function useTaskStore(plugin) {
 
     items = [];
     try {
-      for (const f of files) {
-        const text = await fresh(f);   // the same guard as a change's read
-
-        if (text !== null) take(f.path, text);
-      }
+      for (const f of files) await read(f);   // the same guard as a change's read
     } catch (e) {
       started = false;   // the next "resolved" reads again
 

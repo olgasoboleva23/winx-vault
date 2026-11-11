@@ -10,6 +10,9 @@
 //   lines above may have come or gone since). Returns whether it restored the line.
 // appendLine: a line at the end (unique: not when it's already there); a missing note is made with
 // `header` on top.
+// editJson: a JSON file through fn(parsed) → the new object (null: nothing written); a missing or
+// empty file is {}, a missing one made (its folder too). A file that isn't JSON throws, untouched.
+// serial: a queue that runs its jobs one at a time (a failed one doesn't stop the next).
 import { Notice } from "obsidian";
 import { app } from "./app.js";
 
@@ -69,15 +72,42 @@ export function undoLines(path, at, added, before, around = null) {
   };
 }
 
+// a new file at `path`, its folder made first when missing
+async function create(path, text) {
+  const folder = path.slice(0, path.lastIndexOf("/"));
+
+  if (folder && !app.vault.getFolderByPath(folder)) await app.vault.createFolder(folder);
+  await app.vault.create(path, text);
+}
+
 export async function appendLine(path, line, { header = "", unique = false } = {}) {
   const file = app.vault.getFileByPath(path);
 
   if (file) return app.vault.process(file, c =>
     unique && c.split("\n").includes(line) ? c : `${c.replace(/\s+$/, "")}\n${line}\n`);
-  const folder = path.slice(0, path.lastIndexOf("/"));
+  await create(path, `${header}${line}\n`);
+}
 
-  if (folder && !app.vault.getFolderByPath(folder)) await app.vault.createFolder(folder);
-  await app.vault.create(path, `${header}${line}\n`);
+export async function editJson(path, fn) {
+  const file = app.vault.getFileByPath(path);
+  const json = x => x === null ? null : JSON.stringify(x, null, 2);
+
+  if (file) return app.vault.process(file, text => json(fn(JSON.parse(text || "{}"))) ?? text);
+  const text = json(fn({}));
+
+  if (text !== null) await create(path, text);
+}
+
+/** @returns {<T>(fn: () => Promise<T>) => Promise<T>} */
+export function serial() {
+  let last = Promise.resolve();
+
+  return fn => {
+    const run = last.then(fn);
+
+    last = run.catch(() => {});
+    return run;
+  };
 }
 
 // a JSON file (by the adapter: any file, not only notes), parsed; `fallback` when it's missing. A

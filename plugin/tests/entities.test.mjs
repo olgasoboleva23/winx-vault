@@ -111,15 +111,11 @@ test("MarketItem: a line bought before the Dataview date: its ✅ date read, not
   assert.deepEqual([i.id, i.name, i.doneOn], ["m1", "m1", "2026-10-01"]);
 });
 
-test("MarketItem: bought / unbought, the way the Tasks plugin marks a line", () => {
+test("MarketItem: bought, the way the Tasks plugin marks a line", () => {
   assert.equal(new MarketItem("- [ ] m1").bought("2026-10-23"), "- [x] m1 [completion:: 2026-10-23]");
   assert.equal(new MarketItem("  - [ ] m1  ").bought("2026-10-23"), "  - [x] m1 [completion:: 2026-10-23]");
   assert.equal(new MarketItem("- [x] m1 ✅ 2026-10-01").bought("2026-10-23"), "- [x] m1 ✅ 2026-10-01");   // already bought
   assert.equal(new MarketItem("просто текст").bought("2026-10-23"), "просто текст");
-  assert.equal(new MarketItem("- [x] m1 [completion:: 2026-10-23]").unbought(), "- [ ] m1");
-  assert.equal(new MarketItem("  - [x] m1 ✅ 2026-10-23 ").unbought(), "  - [ ] m1");
-  assert.equal(new MarketItem("- [ ] m1").unbought(), "- [ ] m1");
-  assert.equal(new MarketItem(new MarketItem("- [ ] m1").bought("2026-10-23")).unbought(), "- [ ] m1");
 });
 
 test("Market: the next id, the history and what is on the list, from the lines", () => {

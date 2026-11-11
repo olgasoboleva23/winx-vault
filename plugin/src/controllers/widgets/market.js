@@ -11,13 +11,11 @@ import {
 import { Notice } from "obsidian";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { Form } from "#/components/uikit/Form/index.ts";
-import { appendLine, editLine, readJson } from "#/helpers/files.js";
+import { appendLine, editJson, editLine, readJson, serial } from "#/helpers/files.js";
 import { findChoices } from "#/helpers/find.js";
 import { parseNote } from "#/models/taskFile.js";
 import { app } from "#/helpers/app.js";
-import { MARKET, MARKET_RECORDS } from "#/helpers/paths.js";
-
-const MARKET_NOTE = `${MARKET}.md`;
+import { MARKET_NOTE, MARKET_RECORDS } from "#/helpers/paths.js";
 
 // Read the log and catalog together, without waiting for Dataview's index. Missing records show
 // their ID instead of another item.
@@ -29,26 +27,29 @@ async function marketState() {
     .map(t => ({ ...t, rec: records?.[MarketItem.of(t).id] ?? null }));
   const items = tasks.map(MarketItem.of);
 
-  return { missing: !file, records, tasks, history: historyOf(items), open: openKeys(items) };
+  return {
+    missing: !file, records, tasks, items, history: historyOf(items), open: openKeys(items),
+  };
 }
+
+// the categories with their rows, in order, the empty ones left out
+const byCategory = (list, catOfOne, row) => marketCats
+  .map(cat => ({ label: cat.label, rows: list.filter(x => catOfOne(x) === cat.tag).map(row) }))
+  .filter(g => g.rows.length);
 
 export async function loadCelestialMarket() {
   const mkt = await marketState();
 
   if (mkt.missing) return { missing: true, path: MARKET_NOTE };
-  const tasks = mkt.tasks.filter(t => MarketItem.of(t).isOpen);
+  const items = mkt.items.filter(i => i.isOpen);
   // a row: its line (to find it again) and its name (shown, and to check it's the same item)
-  const row = t => ({ line: t.line, id: MarketItem.of(t).id, name: MarketItem.of(t).name });
-  const n = tasks.length;
+  const row = i => ({ line: i.src.line, id: i.id, name: i.name });
+  const n = items.length;
 
   return {
     empty: !n,
     left: `${n} item${n === 1 ? "" : "s"} left`,
-    groups: marketCats
-      .map(cat => ({
-        label: cat.label, rows: tasks.filter(t => MarketItem.of(t).category === cat.tag).map(row),
-      }))
-      .filter(g => g.rows.length),
+    groups: byCategory(items, i => i.category, row),
     soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.id ?? s.name))
       .map(s => s.name).join(", "),
   };
@@ -68,29 +69,16 @@ export async function loadSupplies() {
     return { id: s.id, name: s.name, tag: s.tag, due: s.due, listed, info };
   };
 
-  return {
-    empty: !stats.length,
-    groups: marketCats
-      .map(cat => ({
-        label: cat.label, rows: stats.filter(s => catOf(s.tag) === cat.tag).map(row),
-      }))
-      .filter(g => g.rows.length),
-  };
+  return { empty: !stats.length, groups: byCategory(stats, s => catOf(s.tag), row) };
 }
 
 export async function addMarketItem() {
   const { history, open, records } = await marketState();
-  const choices = marketChoices(history, open, records ?? {});
-  // a category header over the first row of each category
-  const find = q => findChoices(choices, q)
-    .map((c, i, all) => ({ ...c, header: !c.isNew && c.tag !== all[i - 1]?.tag }));
-  const pick = await Search.pick(app, "Find or add an item…", find, (c, el) => {
-    if (c.header) el.createDiv({ cls: "winx-search__group", text: catLabel(c.tag) });
-    const row = el.createDiv({ cls: "winx-search__row winx-row winx-between winx-gap-l" });
-    row.createSpan({ text: c.isNew ? `+ new: ${c.name}` : c.name });
-    const note = c.isNew ? "" : c.onList ? "on the list"
-      : c.buys ? `×${c.buys} · ${dm(c.last)}` : "not bought yet";
-    row.createSpan({ cls: "winx-search__note winx-nowrap", text: note });
+  const choices = marketChoices(history, open, records);
+  const pick = await Search.pickGrouped(app, "Find or add an item…", q => findChoices(choices, q), {
+    groupOf: c => c.tag,
+    label: catLabel,
+    note: c => c.onList ? "on the list" : c.buys ? `×${c.buys} · ${dm(c.last)}` : "not bought yet",
   });
 
   if (!pick) return;
@@ -107,33 +95,24 @@ export async function addMarketItem() {
 }
 
 // Serialize additions so two clicks cannot allocate the same ID or append two open copies.
-let adding = Promise.resolve();
+const adding = serial();
 
-export function addToMarket(name, tag, id = null) {
-  const run = adding.then(() => addItem(name, tag, id));
+export const addToMarket = (name, tag, id = null) => adding(() => addItem(name, tag, id));
 
-  adding = run.catch(() => {});
-  return run;
-}
-
+// the first item of a new vault starts the catalog (its folder too)
 async function addItem(name, tag, id) {
   const state = await marketState();
 
-  if (!state.records && id) throw new Error("Market catalog is missing");
-  // the first item of a new vault starts the catalog (its folder too)
-  if (!state.records) await appendLine(MARKET_RECORDS, "{}");
-  await app.vault.process(app.vault.getFileByPath(MARKET_RECORDS), text => {
-    const records = JSON.parse(text);
-
+  await editJson(MARKET_RECORDS, records => {
     if (id && !records[id]) throw new Error(`Market record ${id} is missing`);
     id ??= Object.keys(records)
       .find(k => records[k].name.trim().toLowerCase() === name.trim().toLowerCase());
     if (!id) {
-      id = nextMarketId([...Object.keys(records), ...state.tasks.map(t => MarketItem.of(t).id)]);
-      records[id] = { name, tag, tags: [tag] };
+      id = nextMarketId([...Object.keys(records), ...state.items.map(i => i.id)]);
+      records[id] = { name, tag };
     }
 
-    return JSON.stringify(records, null, 2);
+    return records;
   });
   const file = app.vault.getFileByPath(MARKET_NOTE);
 

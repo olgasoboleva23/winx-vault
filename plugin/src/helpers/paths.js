@@ -21,6 +21,8 @@ export const SHOP = `${DATA}/Shop`, PURCHASES = `${DATA}/Purchases`;
 
 export const MARKET = `${DATA}/Celestial Market`, SUPPLIES = `${DATA}/Supplies`;
 
+export const MARKET_NOTE = `${MARKET}.md`;
+
 // Market catalog and the untouched pre-migration log.
 export const MARKET_RECORDS = `${DATA}/Market/items.json`;
 

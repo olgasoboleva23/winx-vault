@@ -1,4 +1,4 @@
-<!-- a task's difficulty stars (in the area's colour), its text, its stickers (withIcon: the area's
+<!-- a task's difficulty stars (in the area's colour), its text, its sticker (withIcon: the area's
      icon in front) -->
 <script setup>
 import { vTip } from "#/components/uikit/tooltip.js";
@@ -22,10 +22,9 @@ const text = computed(() =>
   />
   {{ text }}
   <img
-    v-for="(src, i) in task.stickers"
-    :key="i"
+    v-if="task.sticker"
     class="winx-cal__sticker"
-    :src="src"
+    :src="task.sticker"
     alt=""
   >
 </template>

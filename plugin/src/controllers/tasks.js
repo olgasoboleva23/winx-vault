@@ -2,7 +2,7 @@
 // notice; the task window (components/uikit/TaskWindow) and the Tasks plugin's edit dialog; a
 // task's record in tasks.json; a new task on top of Master.md (to the pool: a record alone).
 import { Notice } from "obsidian";
-import { edit, editLine, undoLines } from "#/helpers/files.js";
+import { edit, editJson, editLine, serial, undoLines } from "#/helpers/files.js";
 import { tasksApi } from "#/helpers/plugins.js";
 import { Task, VariantProblem, nextVariantAfter, variantsProblem } from "#/models/task.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
@@ -11,14 +11,7 @@ import { parseNote } from "#/models/taskFile.js";
 import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 
 // One write at a time, including its queue change and undo; dialogs do not hold the queue.
-let saving = Promise.resolve();
-/** @template T @param {() => Promise<T>} fn @returns {Promise<T>} */
-const writeTask = fn => {
-  const run = saving.then(fn);
-
-  saving = run.then(() => {}, () => {});
-  return run;
-};
+const writeTask = serial();
 
 export const editTaskLine = (t, fn) => writeTask(() => changeTaskLine(t, fn));
 
@@ -110,37 +103,26 @@ async function changeTaskLine(t, fn, patch = {}, expected = null) {
 const recOf = p => ({
   difficulty: p.difficulty ?? null, area: p.area ?? null, daytime: p.daytime ?? null,
   sticker: p.sticker ?? null,
-  ..."variants" in p ? { variants: p.variants,
-    currVariant: p.variants.length ? p.currVariant ?? p.variants[0] : null } : {},
+  ..."variants" in p ? { variants: p.variants, currVariant: p.currVariant } : {},
 });
 
-// Merge a patch into tasks.json ({ id: fields } merges into the record, { id: null } deletes it),
-// one write; an optional snapshot rejects stale modal edits. The file is made when missing.
+// Merge a patch into tasks.json ({ id: fields } merges into the record), one write; an optional
+// snapshot rejects stale modal edits. The file is made when missing.
 // Between devices, Remotely Save still uses last writer wins.
 export async function saveRecords(patch, expected = null) {
   let saved = false;
-  const apply = text => {
-    const all = text ? JSON.parse(text) : {};
 
+  await editJson(TASK_RECORDS, all => {
     if (expected && Object.entries(expected).some(([id, rec]) =>
       JSON.stringify(all[id]) !== JSON.stringify(rec))) {
       new Notice("✦ task record changed, try again");
-      return text;
+      return null;
     }
 
     saved = true;
-    for (const [id, p] of Object.entries(patch))
-      if (p === null) delete all[id]; else all[id] = { ...all[id], ...p };
-    return JSON.stringify(all, null, 2);
-  };
-
-  if (app.vault.getFileByPath(TASK_RECORDS)) await edit(TASK_RECORDS, apply);
-  else {
-    const text = apply("");
-
-    if (saved) await app.vault.create(TASK_RECORDS, text);
-  }
-
+    for (const [id, p] of Object.entries(patch)) all[id] = { ...all[id], ...p };
+    return all;
+  });
   return saved;
 }
 
@@ -178,10 +160,6 @@ export const editTaskModal = async (t, ask = taskWindow) => {
 
   if (!pick) return;
   const patch = { ...recOf(pick) };
-  const variant = patch.currVariant;
-  const problem = "variants" in pick ? variantsProblem(pick.variants, variant) : null;
-
-  if (problem) return void new Notice(problem);
   let next = line;
 
   if (t.pool) {

@@ -1,6 +1,6 @@
 // The calendar's model, no DOM (CalendarData), and the keys that name a task in its markup.
 // Tasks are Dataview tasks ({ status, text, path, line }), each with its Task.
-import { Task } from "./task.js";
+import { Task, historyOf } from "./task.js";
 import { addDays, diffDays, dm, weekday } from "#/helpers/dates.js";
 import { projectRepeats } from "./repeats.js";
 
@@ -46,20 +46,6 @@ const chain = list => {
 };
 
 const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
-
-// { count, last } by task key over `list` (Tasks): done copies by their completion date, skipped by
-// their cancelled one
-const historyOf = list => {
-  const by = new Map();
-
-  for (const t of list) {
-    const h = by.get(t.key) ?? { count: 0, last: "" }, on = t.doneOn ?? t.skippedOn ?? "";
-
-    by.set(t.key, { count: h.count + 1, last: on > h.last ? on : h.last });
-  }
-
-  return by;
-};
 
 // What the calendar shows, worked out once per draw from the tasks, the pool's records, the shown
 // days, today and the areas' order (keys; unknown areas last):
@@ -221,21 +207,21 @@ export function findTask(key, tasks) {
 }
 
 // what a part shows of a task, with its key; made once per draw (ctx.infos). `app`
-// finds the stickers' pictures, ctx.actions whether it can be skipped
+// finds the sticker's picture, ctx.actions whether it can be skipped
 export function taskInfo(t, ctx, app) {
   const known = ctx.infos.get(t);
 
   if (known) return known;
   const task = T(t), area = task.area;
+  const stickerFile = task.sticker && app.metadataCache.getFirstLinkpathDest(task.sticker, t.path);
   const i = {
     key: taskKey(t), area, color: ctx.config.areaColors[area] ?? null,
     difficulty: task.difficulty, goal: !!task.goal, text: task.text,
     pool: !!t.pool,
     daytime: task.isRecurring ? null : task.daytime,   // a 🔁 task's is its box heading's
     label: `${ctx.config.areaIcons[area] ?? ""} ${task.text}`.trim(),
-    stickers: task.stickers.map(name => app.metadataCache.getFirstLinkpathDest(name, t.path))
-      .filter(Boolean)
-      .map(f => app.vault.getResourcePath(f)),
+    sticker: stickerFile ? app.vault.getResourcePath(stickerFile) : null,
+
     canSkip: ctx.actions.canSkip(t),
   };
   ctx.infos.set(t, i);

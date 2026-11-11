@@ -8,10 +8,8 @@ import {
   saveRecords, tickTask,
 } from "./tasks.js";
 
-
 export function makeActions(ctx) {
-  const { today } = ctx;
-  const TASKS = ctx.TASKS;
+  const { today, TASKS } = ctx;
   // ⏭ skip a dated 🔁 task this time: the rule moves on (Tasks makes the next copy), this one stays
   // as cancelled "- [-] … [cancelled:: date]", which counts as neither done nor missed
   const canSkip = t => !!TASKS && T(t).canSkip;
@@ -37,7 +35,7 @@ export function makeActions(ctx) {
 
   // "Missed?": done on its own day, or moved to today
   const doneOnItsDay = t => editTaskLine(t,
-    line => Task.backdateDone(TASKS.executeToggleTaskDoneCommand(line, ""), T(t).date, today));
+    line => Task.backdateDone(TASKS.executeToggleTaskDoneCommand(line, t.path), T(t).date, today));
   const toToday      = t => editTaskLine(t, line => new Task(line).setDue(today));
   // ⏸ pause: drop its dates; ▶ resume: from today, on the first day its rule allows
   const pauseOrResume = t =>

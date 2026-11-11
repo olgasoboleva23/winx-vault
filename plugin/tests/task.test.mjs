@@ -21,7 +21,7 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.ok(t.isRecurring && t.whenDone && !t.isBirthday && !t.isPaused);
   assert.equal(t.date, "2026-10-28");
   assert.equal(t.created, "2026-05-01");
-  assert.deepEqual(t.stickers, ["fairy.webp"]);
+  assert.equal(t.sticker, "fairy.webp");
   assert.equal(t.text, "gym");
   assert.equal(t.key, "t12");
   assert.equal(Task.of({ status: "x", text: "t12 [completion:: 2026-10-29]", rec }).text, "gym");
@@ -33,7 +33,7 @@ test("what a line is: its dates from the line, its own part from the record of i
   assert.equal(plain.area, null);
   assert.equal(plain.difficulty, null);
   assert.equal(plain.daytime, null);
-  assert.deepEqual(plain.stickers, []);
+  assert.equal(plain.sticker, null);
 
   assert.ok(T("- [ ] stretch [repeat:: every day] [created:: 2026-05-01]").isPaused);
   assert.ok(T("- [ ] #area/occasions birthday [repeat:: every year] [due:: 2027-04-23]").isBirthday);
@@ -170,7 +170,7 @@ test("a line whose id has no record (hand-typed, or a stale tasks.json): its id 
   assert.equal(t.text, "t99");
   assert.equal(t.key, "t99");
   assert.equal(t.goal, null);
-  assert.deepEqual(t.stickers, []);
+  assert.equal(t.sticker, null);
   assert.deepEqual([t.area, t.difficulty, t.daytime, t.after, t.rec], [null, null, null, null, null]);
   assert.equal(T("- [ ] t12x walk").id, null);   // not an id: its words lowercased are its key
   assert.equal(T("- [ ] t12x walk").key, "t12x walk");

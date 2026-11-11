@@ -82,3 +82,17 @@ test("WinxTable: the columns' heads and classes, a row per item named by row-cla
     + '<tbody><tr class="winx-table__row x-past"><td class="winx-table__cell x-name">АЕ</td><td class="winx-table__cell winx-table__cell--center"><b>10</b></td></tr>'
     + '<tr class="winx-table__row x-today"><td class="winx-table__cell x-name">МА</td><td class="winx-table__cell winx-table__cell--center"><b>20</b></td></tr></tbody></table>');
 });
+
+test("Search.pickGrouped: a header over each group's first row, the name and its note; a new one has neither", async () => {
+  const { Search } = await import("#/components/uikit/Search/index.ts");
+  const pick = Search.pick, drawn = [];
+  const el = { createDiv: o => (drawn.push(o.text ?? o.cls), el), createSpan: o => drawn.push(o.text) };
+  Search.pick = async (app, placeholder, find, render) => find("q").forEach(c => render(c, el));
+  try {
+    await Search.pickGrouped(null, "", () => [
+      { name: "a", g: 1 }, { name: "b", g: 1 }, { name: "c", g: 2 }, { name: "d", isNew: true },
+    ], { groupOf: c => c.g, label: g => `#${g}`, note: c => c.name.toUpperCase() });
+  } finally { Search.pick = pick; }
+  const row = "winx-search__row winx-row winx-between winx-gap-l";
+  assert.deepEqual(drawn, ["#1", row, "a", "A", row, "b", "B", "#2", row, "c", "C", row, "+ new: d", ""]);
+});

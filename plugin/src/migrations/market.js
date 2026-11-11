@@ -1,18 +1,18 @@
 // Market's names and tags move to items.json; its lines keep their status and date syntax.
 import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
-import { MARKET, MARKET_RECORDS, MARKET_OLD } from "#/helpers/paths.js";
-import { readJson } from "#/helpers/files.js";
+import { MARKET_NOTE, MARKET_RECORDS, MARKET_OLD } from "#/helpers/paths.js";
+import { editJson, readJson } from "#/helpers/files.js";
 import { MarketItem, catOf } from "#/models/market.js";
 import { parseNote } from "#/models/taskFile.js";
 
-const NOTE = `${MARKET}.md`;
+const TAG = /#[^\s#]+/gu;
 
 // a line before the catalog, "- [ ] green tea #food ✅ date": its words, its tags and the first
 // of them that is a category
 function legacy(line) {
-  const tags = line.match(/#[^\s#]+/gu) ?? [];
-  const name = line.replace(/^\s*- \[.\]\s*/, "").replace(/#[\w/]+/g, "")
+  const tags = line.match(TAG) ?? [];
+  const name = line.replace(/^\s*- \[.\]\s*/, "").replace(TAG, "")
     .replace(/\[\w+:: [^\]]*\]/g, "").replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
 
   return { name, tags, tag: tags.map(catOf).find(t => t !== "#other") ?? "#other" };
@@ -26,7 +26,7 @@ export function migrateMarketText(text, existing = {}) {
     .map(id => +id.slice(1)));
   const latest = new Map();
 
-  for (const t of parseNote(NOTE, text).filter(t => t.status !== null)) {
+  for (const t of parseNote(MARKET_NOTE, text).filter(t => t.status !== null)) {
     const item = new MarketItem(lines[t.line]);
 
     if (item.id && records[item.id]) continue;
@@ -60,9 +60,9 @@ export function migrateMarketText(text, existing = {}) {
 // Explicit command only. Catalog first, log last under vault.process's content check. A failed
 // last write can be retried: the backup stays the log as it was at the first run.
 export async function migrateMarket() {
-  const { vault } = app, file = vault.getFileByPath(NOTE);
+  const { vault } = app, file = vault.getFileByPath(MARKET_NOTE);
 
-  if (!file) return void new Notice(`✦ ${NOTE} not found`);
+  if (!file) return void new Notice(`✦ ${MARKET_NOTE} not found`);
   try {
     const text = await vault.read(file), existing = await readJson(MARKET_RECORDS, {});
     const { log, records } = migrateMarketText(text, existing);
@@ -70,19 +70,13 @@ export async function migrateMarket() {
     if (log === text && vault.getFileByPath(MARKET_RECORDS))
       return void new Notice("✦ market is already in ID format");
     if (!vault.getFileByPath(MARKET_OLD)) await vault.create(MARKET_OLD, text);
-    const folder = MARKET_RECORDS.slice(0, MARKET_RECORDS.lastIndexOf("/"));
-
-    if (!vault.getFolderByPath(folder)) await vault.createFolder(folder);
-    const catalog = vault.getFileByPath(MARKET_RECORDS);
-    const json = JSON.stringify(records, null, 2);
-
-    if (catalog) await vault.process(catalog, current => {
-      if (JSON.stringify(JSON.parse(current)) !== JSON.stringify(existing))
+    await editJson(MARKET_RECORDS, current => {
+      if (JSON.stringify(current) !== JSON.stringify(existing))
         throw new Error("Market catalog changed while migrating");
-      return json;
+      return records;
     });
-    else await vault.create(MARKET_RECORDS, json);
     await vault.process(file, current => {
+
       if (current !== text) throw new Error("Market log changed while migrating");
       return log;
     });
