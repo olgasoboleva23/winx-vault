@@ -1,3 +1,4 @@
+// @ts-check
 // The pomodoro's controller: its state in 00 System/Data/pomodoro.json (settings, the current
 // session, the mini row, today's stats); the end-of-session sound, the lengths' window and the
 // save. The markup and the ticking: widgets/pomodoro (a running session lives on in
@@ -9,6 +10,10 @@ import { Form } from "#/components/uikit/Form/index.ts";
 import { app } from "#/helpers/app.js";
 import { addStats } from "#/models/timer.js";
 import { ASSETS, POMODORO, SOUNDS } from "#/helpers/paths.js";
+
+/** @typedef {import("#/models/timer.js").Timer} Timer */
+/** @typedef {import("#/models/timer.js").PomodoroData} PomodoroData */
+/** @typedef {import("#/models/timer.js").PomodoroSettings} PomodoroSettings */
 
 export const ICON = {
   play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
@@ -22,6 +27,7 @@ export const ICON = {
   skip: `<svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-3.5 6L4 6v12z"/></svg>`,
 };
 
+/** @returns {Promise<PomodoroData>} */
 export const load = () => readJson(POMODORO, {});
 
 // the saved settings, mini and stats, and today's session (another day's starts over)
@@ -35,28 +41,33 @@ export async function loadPomodoro() {
 const sparkle = new AudioEngine(`${ASSETS}/sparkle.wav`);
 const chime = new AudioEngine(`${SOUNDS}/snd_pressure_chime.wav`);
 
+/** @param {number} rate */
 export const ding = rate => sparkle.play({ rate });
 
 export const bell = () => chime.play({ rate: 0.7, gain: 0.35, duration: 3 });
 
 // the meditation's music (00 System/Assets/winx music/meditation-<name>.flac, seamless loops):
 // the one to play now — "<name>|<start>" for a running meditation with music, not muted — or null
+/** @type {Record<string, string>} */
 export const MUSIC = { pad: "Pad", bells: "Bells", harp: "Harp" };
 
+/** @param {Timer} timer @param {boolean} muted */
 export const musicKey = (timer, muted = isMuted()) =>
-  timer.type === "meditation" && timer.running && MUSIC[timer.settings.music] && !muted
+  timer.type === "meditation" && timer.running && MUSIC[timer.settings.music ?? ""] && !muted
     ? `${timer.settings.music}|${timer.start}` : null;
 
 // the music to the timer: started (from the session's remaining time, so it fades out at the
 // end, before the bell) or stopped; one track at a time, whatever the pomodoros shown
+/** @type {{ key: string, handle: { stop(): void } | null } | null} */
 let music = null;   // { key, handle }
 
+/** @param {Timer} timer */
 export async function syncMusic(timer) {
   const key = musicKey(timer);
 
   if (music?.key === key) return;
   music?.handle?.stop();
-  music = key && { key, handle: null };
+  music = key ? { key, handle: null } : null;
   if (!key) return;
   const handle = await new AudioEngine(`${SOUNDS}/meditation-${timer.settings.music}.flac`)
     .loop(timer.remaining);
@@ -67,6 +78,7 @@ export async function syncMusic(timer) {
 // ⚙: the lengths of the mode on (the pomodoro's focus and break, or the meditation's and its
 // music) in the shared window; the settings with them, null when closed or a length isn't above
 // zero
+/** @param {PomodoroSettings} settings @param {boolean} meditation */
 export async function askLengths(settings, meditation = false) {
   const rows = meditation
     ? [
@@ -95,8 +107,10 @@ export async function askLengths(settings, meditation = false) {
 // wrote (a finished session and the ⇄ click at once); the minutes of finished sessions a failed
 // save didn't write go with the next save
 let queue = Promise.resolve();
+/** @type {{ min: number, kind: "focus" | "meditation" }[]} */
 const unsaved = [];
 
+/** @param {PomodoroData} state @param {number} min @param {"focus" | "meditation"} kind */
 export function save({ settings, current, mini }, min = 0, kind = "focus") {
   if (min) unsaved.push({ min, kind });
   const write = queue.then(async () => {

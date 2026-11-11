@@ -1,21 +1,44 @@
+// @ts-check
 // The pomodoro's clock, without markup (tested by tests/pomodoro.test.mjs). `now` is the clock
 // (Date.now; a test's own).
 import { todayYmd } from "#/helpers/dates.js";
 
+/** @typedef {"focus" | "break" | "meditation"} SessionType */
+/** @typedef {{ focusMin: number, breakMin: number, meditationMin: number, music?: string | null }}
+ *  PomodoroSettings */
+/** @typedef {{ sessionType: SessionType, elapsed: number, sessions: number, date: string,
+ *  savedAt: number }} PomodoroCurrent */
+/** @typedef {{ sessions: number, minutes: number }} PomodoroTally */
+/** @typedef {PomodoroTally & { date: string, meditation?: PomodoroTally }} PomodoroStats */
+/** The shape of `00 System/Data/pomodoro.json` (every key may be missing).
+ *  @typedef {{ settings?: Partial<PomodoroSettings>, current?: PomodoroCurrent | null,
+ *  mini?: boolean, stats?: PomodoroStats }} PomodoroData */
+
+/** @type {PomodoroSettings} */
 const DEFAULTS = { focusMin: 25, breakMin: 5, meditationMin: 10 };
+/** @type {Record<SessionType, "focusMin" | "breakMin" | "meditationMin">} */
 const LENGTH = { focus: "focusMin", break: "breakMin", meditation: "meditationMin" };
 
 // the running session: { sessionType, sessions, baseElapsed, startedAt }, in memory only (gone
 // after a restart or a reload); shared by every pomodoro shown (two tabs)
+/** @type {{ sessionType: SessionType, sessions: number, baseElapsed: number,
+ *  startedAt: number } | null} */
 let live = null;
 // the pomodoros shown: each hears the changes another makes (on mount; off on unmount)
+/** @type {Set<(t: Timer) => void>} */
 const listeners = new Set();
 
+/** @param {(t: Timer) => void} fn */
 export function listen(fn) { listeners.add(fn); return () => listeners.delete(fn); }
 
 // focus or break and its time: a stopped session counts `elapsed` (ms), a running one also the time
 // since `start`
 export class Timer {
+  /**
+   * @param {Partial<PomodoroSettings> | undefined} settings
+   * @param {Partial<PomodoroCurrent> | null | undefined} current
+   * @param {() => number} now
+   */
   constructor(settings, current, now = Date.now) {
     this.now      = now;
     this.settings = { ...DEFAULTS, ...settings };
@@ -37,7 +60,12 @@ export class Timer {
     return Math.max(0, this.duration - this.elapsed - now);
   }
   // focus ↔ break; a meditation stays one
-  get other()     { return { focus: "break", break: "focus" }[this.type] ?? this.type; }
+  get other() {
+    /** @type {Partial<Record<SessionType, SessionType>>} */
+    const swap = { focus: "break", break: "focus" };
+
+    return swap[this.type] ?? this.type;
+  }
   // what's left as m:ss
   get clock() {
     const rem = this.remaining;
@@ -63,6 +91,7 @@ export class Timer {
   // tell the other pomodoros shown: they take this one's session, running or not
   share() { for (const fn of listeners) fn(this); }
   // another's session: its mode, stars, clock and lengths
+  /** @param {Timer} t */
   take(t) {
     Object.assign(this, {
       type: t.type, sessions: t.sessions, elapsed: t.elapsed, start: t.start, settings: t.settings,
@@ -99,6 +128,12 @@ export class Timer {
 
 // today's stats in the saved json: a new day starts them over; a finished focus adds its minutes,
 // a finished meditation its own (stats.meditation)
+/**
+ * @param {PomodoroData} data
+ * @param {number} min
+ * @param {string} today
+ * @param {SessionType} kind
+ */
 export function addStats(data, min, today, kind = "focus") {
   if (data.stats?.date !== today) data.stats = { date: today, sessions: 0, minutes: 0 };
   if (!min) return data;

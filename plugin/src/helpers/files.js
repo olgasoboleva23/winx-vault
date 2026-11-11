@@ -113,5 +113,6 @@ export function serial() {
 // a JSON file (by the adapter: any file, not only notes), parsed; `fallback` when it's missing. A
 // file that isn't JSON throws, so nothing is saved over it (the pomodoro's stats) and the widget
 // says it couldn't draw
+/** @param {string} path @param {any} [fallback] */
 export const readJson = async (path, fallback = null) =>
   await app.vault.adapter.exists(path) ? JSON.parse(await app.vault.adapter.read(path)) : fallback;
