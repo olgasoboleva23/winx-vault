@@ -213,6 +213,7 @@ test("a day's open task goes before or after another only in its own group and f
   assert.equal(canReorder(a, b), true);
   assert.equal(canReorder(morning, morning2), true);
   assert.equal(canReorder(a, a), false);
+  assert.equal(canReorder(a, { ...a }), false);   // the same task from a later draw (by id)
   assert.equal(canReorder(a, morning), false);
   assert.equal(canReorder(morning, evening), false);
   assert.equal(canReorder(evening, other), false);
