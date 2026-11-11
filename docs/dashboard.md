@@ -69,7 +69,11 @@ Gold from tasks buys real-world rewards listed in `00 System/Data/Shop.md` (`- n
 
 ## 🌌 Celestial Market
 
-A shopping list card. Items are checkbox lines in `00 System/Data/Celestial Market.md` tagged with a category (`- [ ] Fresh bread #food`); ticking one clears it from the card. Categories: 🌿 Harvest `#food`, 🌸 Bloom `#care`, 🐾 Familiar `#pet`, 🏰 Sanctuary `#home`, ✨ Vitality `#health`; untagged items land in ✦ Other.
+A shopping list card. After **Winx: Migrate market**, `00 System/Data/Market/items.json` holds each item's name and category by ID, and `00 System/Data/Celestial Market.md` is its log (`- [ ] m12`, then `- [x] m12 ✅ 2026-11-11`). Ticking an item clears it from the card. Renaming its catalog record keeps its purchase history and Supplies estimates attached to the same ID. The add/search window also finds catalog items never bought yet; adding an already-open ID leaves one open copy.
+
+Old name/tag lines remain readable before migration. The migration is explicit, preserves the log's lines/statuses/dates and keeps `Celestial Market (old).md`. If its final write fails, running it again resumes from the catalog. If the log changed since the backup, it stops: reconcile the original and current log before retrying. To restore the pre-migration state, copy the backup over the log and remove `Market/items.json`; keep any later purchases separately before restoring.
+
+Categories: 🌿 Harvest `#food`, 🌸 Bloom `#care`, 🐾 Familiar `#pet`, 🏰 Sanctuary `#home`, ✨ Vitality `#health`; untagged items land in ✦ Other.
 
 ## 🎯 Goals
 

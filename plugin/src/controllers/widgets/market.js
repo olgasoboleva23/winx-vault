@@ -3,83 +3,92 @@
 // again, how long since the last time against the usual gap. Writes: an item on the list (＋: a
 // search of everything bought before, the most bought first, or a new one typed), an item bought
 // (✓), an item running low back on the list. The markup: widgets/market/.
-import { dm, todayYmd, ymd } from "#/helpers/dates.js";
+import { dm, todayYmd } from "#/helpers/dates.js";
 import { catOf, marketCats, marketChoices, supplyStats } from "#/models/market.js";
 import { MarketItem } from "#/models/marketItem.js";
 import { Notice } from "obsidian";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { Form } from "#/components/uikit/Form/index.ts";
-import { appendLine, editLine } from "#/helpers/files.js";
+import { appendLine, editLine, readJson } from "#/helpers/files.js";
 import { findChoices } from "#/helpers/find.js";
-import { dataview } from "#/helpers/plugins.js";
+import { parseNote } from "#/models/taskFile.js";
 import { app } from "#/helpers/app.js";
-import { MARKET } from "#/helpers/paths.js";
+import { MARKET, MARKET_RECORDS } from "#/helpers/paths.js";
 
 const MARKET_NOTE = `${MARKET}.md`;
 
-// { history: [{name, tag, date}] of bought items, open: Set of lowercased names still on the list }
-function marketState(dv) {
-  const tasks = dv.page(MARKET)?.file.tasks.array() ?? [];
+// Read the log and catalog together, without waiting for Dataview's index. Legacy lines remain
+// readable until the explicit migration. Missing records show their ID instead of another item.
+async function marketState() {
+  const file = app.vault.getFileByPath(MARKET_NOTE);
+  const records = await readJson(MARKET_RECORDS, null);
+  const text = file ? await app.vault.read(file) : "";
+  const tasks = parseNote(MARKET_NOTE, text).filter(t => t.status !== null).map(t => {
+    const raw = MarketItem.of(t);
+
+    return { ...t, tags: t.text.match(/#[^\s#]+/gu) ?? [], rec: records?.[raw.id] ?? null };
+  });
 
   return {
-    history: tasks.filter(t => t.completed && t.completion)
-      .map(t => {
-        const i = MarketItem.of(t);
-
-        return { name: i.name, tag: i.tag, date: ymd(t.completion) };
-      }),
-    open: new Set(tasks.filter(t => !t.completed).map(t => MarketItem.of(t).name.toLowerCase())),
+    missing: !file, records, tasks,
+    history: tasks.map(MarketItem.of).filter(i => i.isBought && i.doneOn)
+      .map(i => ({ id: i.rec ? i.id : undefined, name: i.name, tag: i.tag, date: i.doneOn })),
+    open: new Set(tasks.map(MarketItem.of).filter(i => i.isOpen).map(i => i.key)),
   };
 }
 
-export async function loadCelestialMarket({ dv }) {
-  const page = dv.page(MARKET);
+export async function loadCelestialMarket() {
+  const mkt = await marketState();
 
-  if (!page) return { missing: true, path: MARKET_NOTE };
-  const mkt = marketState(dv);
-  const tasks = page.file.tasks.where(t => !t.completed).array();
+  if (mkt.missing) return { missing: true, path: MARKET_NOTE };
+  const tasks = mkt.tasks.filter(t => MarketItem.of(t).isOpen);
   // a row: its line (to find it again) and its name (shown, and to check it's the same item)
-  const row = t => ({ line: t.line, name: MarketItem.of(t).name });
+  const row = t => ({ line: t.line, id: MarketItem.of(t).id, name: MarketItem.of(t).name });
+  const groupOf = t => t.rec ? category(MarketItem.of(t)) : catOf(t);
   const n = tasks.length;
 
   return {
     empty: !n,
     left: `${n} item${n === 1 ? "" : "s"} left`,
     groups: marketCats
-      .map(cat => ({ label: cat.label, rows: tasks.filter(t => catOf(t) === cat.tag).map(row) }))
+      .map(cat => ({
+        label: cat.label, rows: tasks.filter(t => groupOf(t) === cat.tag).map(row),
+      }))
       .filter(g => g.rows.length),
-    soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.name))
+    soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.id ?? s.name))
       .map(s => s.name).join(", "),
   };
 }
 
-export async function loadSupplies({ dv }) {
-  const { history, open } = marketState(dv);
+export async function loadSupplies() {
+  const { history, open } = await marketState();
   const stats = supplyStats(history, todayYmd());
-  const groupOf = s => marketCats.some(c => c.tag === s.tag) ? s.tag : "#other";
+
   // a row: how long since the last time against the usual gap, or that it's on the list already
   const row = s => {
-    const listed = open.has(s.name);
+    const listed = open.has(s.id ?? s.name);
     const info = listed ? "on the shopping list ✦"
       : s.avg ? `${s.since} of ~${s.avg} days${s.due ? " ⏳" : ""}`
       : `bought ${s.buys} times`;
 
-    return { name: s.name, tag: s.tag, due: s.due, listed, info };
+    return { id: s.id, name: s.name, tag: s.tag, due: s.due, listed, info };
   };
 
   return {
     empty: !stats.length,
     groups: marketCats
-      .map(cat => ({ label: cat.label, rows: stats.filter(s => groupOf(s) === cat.tag).map(row) }))
+      .map(cat => ({ label: cat.label, rows: stats.filter(s => category(s) === cat.tag).map(row) }))
       .filter(g => g.rows.length),
   };
 }
 
+const category = s => marketCats.some(c => c.tag === s.tag) ? s.tag : "#other";
+
 const catLabel = tag => marketCats.find(c => c.tag === tag)?.label ?? tag;
 
 export async function addMarketItem() {
-  const { history, open } = marketState(dataview());
-  const choices = marketChoices(history, open);
+  const { history, open, records } = await marketState();
+  const choices = marketChoices(history, open, records ?? {});
   // a category header over the first row of each category
   const find = q => findChoices(choices, q)
     .map((c, i, all) => ({ ...c, header: !c.isNew && c.tag !== all[i - 1]?.tag }));
@@ -87,7 +96,8 @@ export async function addMarketItem() {
     if (c.header) el.createDiv({ cls: "winx-search__group", text: catLabel(c.tag) });
     const row = el.createDiv({ cls: "winx-search__row winx-row winx-between winx-gap-l" });
     row.createSpan({ text: c.isNew ? `+ new: ${c.name}` : c.name });
-    const note = c.isNew ? "" : c.onList ? "on the list" : `×${c.buys} · ${dm(c.last)}`;
+    const note = c.isNew ? "" : c.onList ? "on the list"
+      : c.buys ? `×${c.buys} · ${dm(c.last)}` : "not bought yet";
     row.createSpan({ cls: "winx-search__note winx-nowrap", text: note });
   });
 
@@ -101,24 +111,70 @@ export async function addMarketItem() {
     },
   ], { required: ["tag"], submit: "Add" }))?.tag : pick.tag;
 
-  if (tag) await addToMarket(pick.name, tag);
+  if (tag) await addToMarket(pick.name, tag, pick.id);
 }
 
-const addToMarket = (name, tag) => appendLine(MARKET_NOTE, `- [ ] ${name} ${tag}`);
+// Serialize additions so two clicks cannot allocate the same ID or append two open copies.
+let adding = Promise.resolve();
+
+export function addToMarket(name, tag, id = null) {
+  const run = adding.then(() => addItem(name, tag, id));
+
+  adding = run.catch(() => {});
+  return run;
+}
+
+async function addItem(name, tag, id) {
+  const state = await marketState();
+
+  if (!state.records) {
+    if (id) throw new Error("Market catalog is missing");
+    return appendLine(MARKET_NOTE, `- [ ] ${name} ${tag}`, { unique: true });
+  }
+
+  const catalog = app.vault.getFileByPath(MARKET_RECORDS);
+
+  if (!catalog) throw new Error("Market catalog is missing");
+  await app.vault.process(catalog, text => {
+    const records = JSON.parse(text);
+
+    if (id && !records[id]) throw new Error(`Market record ${id} is missing`);
+    id ??= Object.keys(records)
+      .find(k => records[k].name.trim().toLowerCase() === name.trim().toLowerCase());
+    if (!id) {
+      const ids = [...Object.keys(records), ...state.tasks.map(t => MarketItem.of(t).id)]
+        .filter(k => /^m\d+$/.test(k ?? ""));
+
+      id = `m${Math.max(0, ...ids.map(k => +k.slice(1))) + 1}`;
+      records[id] = { name, tag, tags: [tag] };
+    }
+
+    return JSON.stringify(records, null, 2);
+  });
+  const file = app.vault.getFileByPath(MARKET_NOTE);
+
+  if (!file) return appendLine(MARKET_NOTE, `- [ ] ${id}`);
+  await app.vault.process(file, text => {
+    const listed = parseNote(MARKET_NOTE, text).map(MarketItem.of)
+      .some(i => i.id === id && i.isOpen);
+
+    return listed ? text : `${text.trimEnd()}\n- [ ] ${id}\n`;
+  });
+}
 
 // a row as bought, if its line is still that item
-export function buyMarketItem({ line, name }) {
+export function buyMarketItem({ line, id, name }) {
   const same = l => {
     const item = new MarketItem(l);
 
-    return !item.isBought && item.name === name;
+    return item.isOpen && (id ? item.id === id : item.name === name);
   };
 
   return editLine(MARKET_NOTE, line, same, l => new MarketItem(l).bought(todayYmd()));
 }
 
-// runsLow(name, tag): back on the Celestial Market's list
-export async function runsLow(name, tag) {
-  await addToMarket(name, tag);
+// runsLow(name, tag, id = null): back on the Celestial Market's list
+export async function runsLow(name, tag, id = null) {
+  await addToMarket(name, tag, id);
   new Notice(`✦ ${name} → Celestial Market`);
 }

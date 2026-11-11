@@ -4,6 +4,7 @@ import { mirrorMobileConfig } from "#/controllers/mobileConfig.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { todayYmd } from "#/helpers/dates.js";
 import { saveNewTask } from "#/controllers/tasks.js";
+import { migrateMarket } from "#/controllers/marketMigration.js";
 import { migrateTasks } from "#/controllers/taskMigration.js";
 import { openSettings } from "#/controllers/settings.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
@@ -93,6 +94,7 @@ export function registerCommands(plugin: Plugin) {
 
   // once: the old emoji Master.md and Pool.md to ids, Dataview fields and tasks.json
   add("migrate-tasks", "Migrate tasks", migrateTasks);
+  add("migrate-market", "Migrate market", migrateMarket);
 
   // every Winx command in one list to pick from (Alt+T in this vault's hotkeys.json)
   plugin.addCommand({

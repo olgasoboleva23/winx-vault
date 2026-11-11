@@ -18,7 +18,7 @@ const LINKS = [
 // rows being bought: sparkling from the click until the list no longer has them (written), or the
 // write didn't happen (the line moved meanwhile)
 const bought = reactive(new Set());
-const key = r => `${r.line}|${r.name}`;
+const key = r => `${r.line}|${r.id ?? r.name}`;
 
 async function buy(r) {
   if (bought.has(key(r))) return;

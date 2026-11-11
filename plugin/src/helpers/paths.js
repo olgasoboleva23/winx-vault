@@ -21,6 +21,11 @@ export const SHOP = `${DATA}/Shop`, PURCHASES = `${DATA}/Purchases`;
 
 export const MARKET = `${DATA}/Celestial Market`, SUPPLIES = `${DATA}/Supplies`;
 
+// Market catalog and the untouched pre-migration log.
+export const MARKET_RECORDS = `${DATA}/Market/items.json`;
+
+export const MARKET_OLD = `${MARKET} (old).md`;
+
 export const SAVINGS = `${DATA}/Savings`;
 
 // the free journals: a note each (a level 0–3 a day and its reasons; Высыпания the first)

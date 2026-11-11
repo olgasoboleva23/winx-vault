@@ -13,8 +13,8 @@ import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
 import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
-  CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET, PURCHASES, RULES, SAVINGS, SHOP, TASKS,
-  WEIGHT,
+  CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET, MARKET_RECORDS, PURCHASES, RULES,
+  SAVINGS, SHOP, TASKS, WEIGHT,
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
@@ -58,7 +58,7 @@ export const blocks = {
     view: ShopWidget, load: loadShop, bodyClass: "winx-shop",
     watches: [TASK_FILES, `${SHOP}.md`, `${PURCHASES}.md`],
   },
-  supplies: { view: SuppliesWidget, load: loadSupplies, watches: [MARKET_NOTE] },
+  supplies: { view: SuppliesWidget, load: loadSupplies, watches: [MARKET_NOTE, MARKET_RECORDS] },
   goals: { view: GoalsWidget, load: loadGoals, watches: [`${GOALS}.md`, TASK_FILES] },
   savings: { view: SavingsJars, load: loadSavings, watches: [`${SAVINGS}/`] },
   cycle: { view: CycleWidget, load: loadCycle, watches: [CYCLE] },
@@ -73,7 +73,7 @@ export const blocks = {
     view: CelestialMarket,
     load: loadCelestialMarket,
     cardButton: CelestialMarketAdd,
-    watches: [MARKET_NOTE],
+    watches: [MARKET_NOTE, MARKET_RECORDS],
   },
   // a medication course's own note: its table is the block's text
   meds: { view: MedsCourse, load: loadMeds, cardButton: MedsEdit, watches: [] },

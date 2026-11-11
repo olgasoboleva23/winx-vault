@@ -1,6 +1,6 @@
 // The Celestial Market (the shopping list, 00 System/Data/Celestial Market.md) and the supplies
-// bought from it, pure (supplyStats: tested by tests/logic.test.mjs); the list read from Dataview:
-// controllers/market.js. One line: models/marketItem.js.
+// bought from it, pure (supplyStats: tested by tests/logic.test.mjs); log and catalog read by:
+// controllers/widgets/market.js. One line: models/marketItem.js.
 import config from "#/helpers/config.js";
 import { diffDays } from "#/helpers/dates.js";
 
@@ -16,8 +16,8 @@ export const supplyStats = function (history, today) {
   const by = {};
 
   for (const h of [...history].sort((a, b) => a.date.localeCompare(b.date))) {
-    const key = h.name.trim().toLowerCase();
-    (by[key] ??= { name: key, dates: [], tag: h.tag }).dates.push(h.date);
+    const key = h.id ?? h.name.trim().toLowerCase();
+    (by[key] ??= { id: h.id, name: h.id ? h.name : key, dates: [], tag: h.tag }).dates.push(h.date);
     by[key].tag = h.tag;
   }
 
@@ -31,19 +31,24 @@ export const supplyStats = function (history, today) {
     const since = diffDays(today, x.dates.at(-1));
     const due   = avg !== null && since >= avg * 0.85;
 
-    return { name: x.name, tag: x.tag, buys: x.dates.length, avg, since, due };
+    return {
+      ...x.id ? { id: x.id } : {}, name: x.name, tag: x.tag, buys: x.dates.length, avg, since, due,
+    };
   });
 };
 
 // Everything bought before, for the search: one per name (its last spelling and category), by
 // category, then the most bought and the most recent first; onList when it's on the list now
 // (`open`: lowercased names).
-export function marketChoices(history, open) {
-  const by = {};
+export function marketChoices(history, open, records = {}) {
+  const by = Object.fromEntries(Object.entries(records).map(([id, r]) => [id, {
+    id, name: r.name, tag: r.tag, buys: 0, last: "", onList: open.has(id),
+  }]));
 
   for (const h of [...history].sort((a, b) => a.date.localeCompare(b.date))) {
-    const key = h.name.trim().toLowerCase();
+    const key = h.id ?? h.name.trim().toLowerCase();
     by[key] = {
+      ...h.id ? { id: h.id } : {},
       name: h.name.trim(),
       tag: h.tag,
       buys: (by[key]?.buys ?? 0) + 1,

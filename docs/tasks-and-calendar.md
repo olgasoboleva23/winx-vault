@@ -45,7 +45,8 @@ Regulars shows one **Training · Core ↔ Arms** card, the upcoming variant and 
 | **Winx: New medication course** | for a course of vitamins or medicines: a note in `00 System/Data/Medication` (`"meds"` in `data.json`): a group per medicine (+ adds one): name, dose, when (morning / morning and evening / day / evening / any), the meal (before / after / before sleep / any), its days; a start; the day by its anchors (a time of day and a meal: what to take then) and the codes' legend on cards, and a day per row up to the longest course inside a ```winx meds block that draws the course (today's doses as chips, the grid, a note per day) and ticks a cell round ☐ → ✅ → ❌ (its legend: taken, skipped on purpose, not marked) on a click, writing the table. A notes field (several lines) goes on a Заметки card. **Winx: Edit medication course** (or the ✎ by the course card's title) opens the same window with the course's values (kept in its `meds` property) and rebuilds the note: the marks and the days' notes carry over by date and column, cards written by hand stay. The courses' list: `_index.base` in the folder, linked from the dashboard's ✦ Menu card |
 | **Winx: New journal** | a free journal in `00 System/Data/Journals`: its title, its reasons (a comma list) and the days after a meal its level is looked at on the food page (a rash: 1) |
 | **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
-| **Winx: New market item** | an item in `00 System/Data/Celestial Market.md` |
+| **Winx: New market item** | a catalog item (if new) and an open ID line in `00 System/Data/Celestial Market.md` |
+| **Winx: Migrate market** | `Market/items.json`, an ID-based log, and the original `Celestial Market (old).md` backup |
 
 **Winx: Menu** (Alt+T) lists every Winx command to pick from. On the desktop Winx also sends today's reminders: a goal's task at the goal's time, a task with `HH:MM` in its text 30 minutes before, and a morning summary.
 
