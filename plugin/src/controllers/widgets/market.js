@@ -4,8 +4,10 @@
 // search of everything bought before, the most bought first, or a new one typed), an item bought
 // (✓), an item running low back on the list. The markup: widgets/market/.
 import { dm, todayYmd } from "#/helpers/dates.js";
-import { catOf, marketCats, marketChoices, supplyStats } from "#/models/market.js";
-import { MarketItem } from "#/models/marketItem.js";
+import {
+  MarketItem, catLabel, catOf, historyOf, marketCats, marketChoices, nextMarketId, openKeys,
+  supplyStats,
+} from "#/models/market.js";
 import { Notice } from "obsidian";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { Form } from "#/components/uikit/Form/index.ts";
@@ -23,18 +25,11 @@ async function marketState() {
   const file = app.vault.getFileByPath(MARKET_NOTE);
   const records = await readJson(MARKET_RECORDS, null);
   const text = file ? await app.vault.read(file) : "";
-  const tasks = parseNote(MARKET_NOTE, text).filter(t => t.status !== null).map(t => {
-    const raw = MarketItem.of(t);
+  const tasks = parseNote(MARKET_NOTE, text).filter(t => t.status !== null)
+    .map(t => ({ ...t, rec: records?.[MarketItem.of(t).id] ?? null }));
+  const items = tasks.map(MarketItem.of);
 
-    return { ...t, tags: t.text.match(/#[^\s#]+/gu) ?? [], rec: records?.[raw.id] ?? null };
-  });
-
-  return {
-    missing: !file, records, tasks,
-    history: tasks.map(MarketItem.of).filter(i => i.isBought && i.doneOn)
-      .map(i => ({ id: i.rec ? i.id : undefined, name: i.name, tag: i.tag, date: i.doneOn })),
-    open: new Set(tasks.map(MarketItem.of).filter(i => i.isOpen).map(i => i.key)),
-  };
+  return { missing: !file, records, tasks, history: historyOf(items), open: openKeys(items) };
 }
 
 export async function loadCelestialMarket() {
@@ -44,7 +39,6 @@ export async function loadCelestialMarket() {
   const tasks = mkt.tasks.filter(t => MarketItem.of(t).isOpen);
   // a row: its line (to find it again) and its name (shown, and to check it's the same item)
   const row = t => ({ line: t.line, id: MarketItem.of(t).id, name: MarketItem.of(t).name });
-  const groupOf = t => t.rec ? category(MarketItem.of(t)) : catOf(t);
   const n = tasks.length;
 
   return {
@@ -52,7 +46,7 @@ export async function loadCelestialMarket() {
     left: `${n} item${n === 1 ? "" : "s"} left`,
     groups: marketCats
       .map(cat => ({
-        label: cat.label, rows: tasks.filter(t => groupOf(t) === cat.tag).map(row),
+        label: cat.label, rows: tasks.filter(t => MarketItem.of(t).category === cat.tag).map(row),
       }))
       .filter(g => g.rows.length),
     soon: supplyStats(mkt.history, todayYmd()).filter(s => s.due && !mkt.open.has(s.id ?? s.name))
@@ -77,14 +71,12 @@ export async function loadSupplies() {
   return {
     empty: !stats.length,
     groups: marketCats
-      .map(cat => ({ label: cat.label, rows: stats.filter(s => category(s) === cat.tag).map(row) }))
+      .map(cat => ({
+        label: cat.label, rows: stats.filter(s => catOf(s.tag) === cat.tag).map(row),
+      }))
       .filter(g => g.rows.length),
   };
 }
-
-const category = s => marketCats.some(c => c.tag === s.tag) ? s.tag : "#other";
-
-const catLabel = tag => marketCats.find(c => c.tag === tag)?.label ?? tag;
 
 export async function addMarketItem() {
   const { history, open, records } = await marketState();
@@ -142,10 +134,7 @@ async function addItem(name, tag, id) {
     id ??= Object.keys(records)
       .find(k => records[k].name.trim().toLowerCase() === name.trim().toLowerCase());
     if (!id) {
-      const ids = [...Object.keys(records), ...state.tasks.map(t => MarketItem.of(t).id)]
-        .filter(k => /^m\d+$/.test(k ?? ""));
-
-      id = `m${Math.max(0, ...ids.map(k => +k.slice(1))) + 1}`;
+      id = nextMarketId([...Object.keys(records), ...state.tasks.map(t => MarketItem.of(t).id)]);
       records[id] = { name, tag, tags: [tag] };
     }
 

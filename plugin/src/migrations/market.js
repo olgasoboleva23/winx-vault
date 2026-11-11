@@ -3,8 +3,7 @@ import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
 import { MARKET, MARKET_RECORDS, MARKET_OLD } from "#/helpers/paths.js";
 import { readJson } from "#/helpers/files.js";
-import { catOf } from "#/models/market.js";
-import { MarketItem } from "#/models/marketItem.js";
+import { MarketItem } from "#/models/market.js";
 import { parseNote } from "#/models/taskFile.js";
 
 const NOTE = `${MARKET}.md`;
@@ -32,9 +31,7 @@ export function migrateMarketText(text, existing = {}) {
     const date = [...item.line.matchAll(/\d{4}-\d{2}-\d{2}/g)].map(m => m[0]).sort().at(-1) ?? "";
 
     if (!existing[id] && (!latest.has(id) || date > latest.get(id))) {
-      const tags = item.line.match(/#[^\s#]+/gu) ?? [];
-
-      records[id] = { name: item.name, tag: catOf({ tags }), tags };
+      records[id] = { name: item.name, tag: item.tag, tags: item.tags };
       latest.set(id, date);
     }
 

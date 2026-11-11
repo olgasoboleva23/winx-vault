@@ -6,7 +6,7 @@ import { Goal, reminders } from "#/models/goal.js";
 import { CycleLog } from "#/models/cycleLog.js";
 import { WeightLog } from "#/models/weightLog.js";
 import { BodyLog } from "#/models/bodyLog.js";
-import { MarketItem } from "#/models/marketItem.js";
+import { MarketItem, catLabel, historyOf, nextMarketId, openKeys } from "#/models/market.js";
 import { paydays, SavingsJar } from "#/models/savingsJar.js";
 
 // 2026-10-19 is a Monday
@@ -117,6 +117,30 @@ test("MarketItem: its name, its category tag, bought or not", () => {
   assert.equal(i.isBought, true);
   assert.equal(new MarketItem("- [ ] soap").tag, "#other");
   assert.equal(new MarketItem("- [ ] soap").isBought, false);
+});
+
+test("MarketItem: its category, the first tag that is one; a record's unknown tag is Other", () => {
+  assert.equal(new MarketItem("- [ ] tea #sale #food").tag, "#food");
+  assert.equal(new MarketItem("- [ ] m1", { name: "tea", tag: "#gone" }).category, "#other");
+  assert.equal(new MarketItem("- [ ] m1", { name: "tea", tag: "#pet" }).category, "#pet");
+  assert.equal(catLabel("#other"), "✦ Other");
+  assert.equal(catLabel("#gone"), "#gone");
+});
+
+test("Market: the next id, the history and what is on the list, from the lines", () => {
+  assert.equal(nextMarketId(["m2", "m10", null, "x7"]), "m11");
+  assert.equal(nextMarketId([]), "m1");
+  const items = [
+    new MarketItem("- [x] m1 ✅ 2026-10-02", { name: "tea", tag: "#food" }),
+    new MarketItem("- [ ] m2", { name: "soap", tag: "#care" }),
+    new MarketItem("- [x] old rice #food ✅ 2026-10-01"),
+    new MarketItem("- [x] no date #food"),
+  ];
+  assert.deepEqual(historyOf(items), [
+    { id: "m1", name: "tea", tag: "#food", date: "2026-10-02" },
+    { id: undefined, name: "old rice", tag: "#food", date: "2026-10-01" },
+  ]);
+  assert.deepEqual([...openKeys(items)], ["m2"]);
 });
 
 test("paydays: the 16th and the 30th (a short month's last day), a weekend one on the Friday before", () => {
