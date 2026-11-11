@@ -29,11 +29,12 @@
 │   │   │                           tasks.js (a task's line with undo, new tasks and pool lines),
 │   │   │                           calendar.js (what the calendar writes), notes.js, mobileConfig.js,
 │   │   │                           blocks.js (the ```winx block: names → { view, load, watches })
-│   │   ├── 📁 models             — the things and their rules, no Obsidian in them: Task, Note, Goal,
-│   │   │                           MarketItem, SavingsJar, the weight / body / cycle logs, CalendarData,
-│   │   │                           repeats (🔁 rules), ledger (finance), timer (pomodoro), vitals (HP / MP),
-│   │   │                           xp, market (supply stats), kinds (watch / read / game / recipe notes),
-│   │   │                           taskFile (a task note's lines as tasks and pool lines), Task with its variants in turn
+│   │   ├── 📁 models             — the things and their rules, no Obsidian in them: lineItem (a log's line
+│   │   │                           and its JSON record by id), Task (with its variants in turn), Note, Goal,
+│   │   │                           SavingsJar, the weight / body / cycle logs, CalendarData, repeats (🔁
+│   │   │                           rules), ledger (finance), timer (pomodoro), vitals (HP / MP), xp, market
+│   │   │                           (MarketItem, the categories, supply stats), kinds (watch / read / game /
+│   │   │                           recipe notes), taskFile (a task note's lines as tasks and pool lines)
 │   │   ├── 📁 migrations         — tasks.js and market.js: the one-off migrations (Winx: Migrate tasks /
 │   │   │                           market)
 │   │   ├── 📁 composables        — use.js (useRedraw, useDataviewChanges, useWhenIndexed, useNewDay,

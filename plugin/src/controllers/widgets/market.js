@@ -19,8 +19,8 @@ import { MARKET, MARKET_RECORDS } from "#/helpers/paths.js";
 
 const MARKET_NOTE = `${MARKET}.md`;
 
-// Read the log and catalog together, without waiting for Dataview's index. Legacy lines remain
-// readable until the explicit migration. Missing records show their ID instead of another item.
+// Read the log and catalog together, without waiting for Dataview's index. Missing records show
+// their ID instead of another item.
 async function marketState() {
   const file = app.vault.getFileByPath(MARKET_NOTE);
   const records = await readJson(MARKET_RECORDS, null);
@@ -119,15 +119,10 @@ export function addToMarket(name, tag, id = null) {
 async function addItem(name, tag, id) {
   const state = await marketState();
 
-  if (!state.records) {
-    if (id) throw new Error("Market catalog is missing");
-    return appendLine(MARKET_NOTE, `- [ ] ${name} ${tag}`, { unique: true });
-  }
-
-  const catalog = app.vault.getFileByPath(MARKET_RECORDS);
-
-  if (!catalog) throw new Error("Market catalog is missing");
-  await app.vault.process(catalog, text => {
+  if (!state.records && id) throw new Error("Market catalog is missing");
+  // the first item of a new vault starts the catalog (its folder too)
+  if (!state.records) await appendLine(MARKET_RECORDS, "{}");
+  await app.vault.process(app.vault.getFileByPath(MARKET_RECORDS), text => {
     const records = JSON.parse(text);
 
     if (id && !records[id]) throw new Error(`Market record ${id} is missing`);
@@ -143,12 +138,9 @@ async function addItem(name, tag, id) {
   const file = app.vault.getFileByPath(MARKET_NOTE);
 
   if (!file) return appendLine(MARKET_NOTE, `- [ ] ${id}`);
-  // open already by its id, or by its name on a legacy line (a migration not finished)
-  const key = name.trim().toLowerCase();
-
   await app.vault.process(file, text => {
     const listed = parseNote(MARKET_NOTE, text).map(MarketItem.of)
-      .some(i => i.isOpen && (i.id === id || i.key === key));
+      .some(i => i.isOpen && i.id === id);
 
     return listed ? text : `${text.trimEnd()}\n- [ ] ${id}\n`;
   });

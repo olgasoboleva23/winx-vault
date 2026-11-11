@@ -1,8 +1,8 @@
 
-- [x] Oat milk #food ✅ 2026-07-10
-- [x] New mug #home ✅ 2026-07-12
-- [ ] Fresh bread #food
-- [ ] Hand cream #care
-- [ ] Hay for the pets #pet
-- [ ] Fairy lights #home
-- [ ] Magnesium #health
+- [x] m1 ✅ 2026-07-10
+- [x] m2 ✅ 2026-07-12
+- [ ] m3
+- [ ] m4
+- [ ] m5
+- [ ] m6
+- [ ] m7

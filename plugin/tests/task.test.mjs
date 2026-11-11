@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Task, fieldsOf, taskChoices } from "#/models/task.js";
+import { Task, taskChoices } from "#/models/task.js";
+import { fieldsOf } from "#/models/lineItem.js";
 
 const T = line => new Task(line);
 

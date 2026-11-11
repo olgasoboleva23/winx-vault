@@ -3,57 +3,44 @@
 // catalog read by: controllers/widgets/market.js.
 import config from "#/helpers/config.js";
 import { diffDays } from "#/helpers/dates.js";
+import { LineItem, lineOf, withField } from "./lineItem.js";
 
 // the categories, and "✦ Other" for an item without one
 export const marketCats = [...config.marketCategories, { label: "✦ Other", tag: "#other" }];
 
-const isCat = tag => marketCats.some(c => c.tag === tag);
-
 // a tag as a category: an unknown one is Other
-export const catOf = tag => isCat(tag) ? tag : "#other";
+export const catOf = tag => marketCats.some(c => c.tag === tag) ? tag : "#other";
 
 export const catLabel = tag => marketCats.find(c => c.tag === tag)?.label ?? tag;
 
-// One line of the log: "- [ ] m12" (its record in items.json: name, tag), bought
-// "- [x] m12 ✅ date"; a line not migrated yet: "- [ ] green tea #food".
-export class MarketItem {
-  constructor(line, rec = null) { this.line = line; this.rec = rec; }
-  static of(t) { return new MarketItem(`- [${t.status}] ${t.text}`, t.rec ?? null); }
-  get isBought() { return /^\s*- \[x\]/i.test(this.line); }
-  get id() { return this.line.match(/^\s*- \[.\] (m\d+)(?=\s|$)/)?.[1] ?? null; }
-  get isOpen() { return /^\s*- \[ \]/.test(this.line); }
-  get doneOn() {
-    return this.line.match(/\[completion:: (\d{4}-\d{2}-\d{2})\]/)?.[1]
-      ?? this.line.match(/✅\s*(\d{4}-\d{2}-\d{2})/u)?.[1] ?? null;
-  }
-  get key() { return this.id ?? this.name.trim().toLowerCase(); }
-  // the words, as the list shows them: no checkbox, tags, date or Dataview fields
-  get name() {
-    if (this.rec) return this.rec.name;
-    return this.line.replace(/^\s*- \[.\]\s*/, "").replace(/#[\w/]+/g, "")
-      .replace(/\[\w+:: [^\]]*\]/g, "").replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
-  }
-  get tags() { return this.line.match(/#[^\s#]+/gu) ?? []; }
-  // its tag: the record's, or the line's first that is a category
-  get tag() { return this.rec ? this.rec.tag : this.tags.find(isCat) ?? "#other"; }
-  get category() { return catOf(this.tag); }
-  // bought on `date`, the way the Tasks plugin marks it; a line that isn't open comes back as it is
-  bought(date) {
-    if (!this.isOpen) return this.line;
+// a line bought before 2026-11-11 has its date as "✅ 2026-10-01"; newer ones [completion:: …]
+const CHECKED = /\s*✅\s*(\d{4}-\d{2}-\d{2})/u;
 
-    return `${this.line.replace("- [ ]", "- [x]").trimEnd()} ✅ ${date}`;
+// One line of the log: "- [ ] m12" (its record in items.json: name, tag), bought
+// "- [x] m12 [completion:: date]".
+export class MarketItem extends LineItem {
+  static ID = /^m\d+(?=\s|$)/;
+  static of(t) { return new MarketItem(lineOf(t), t, t.rec ?? null); }
+  get words()    { return super.words.replace(CHECKED, "").trim(); }
+  get doneOn()   { return super.doneOn ?? this.line.match(CHECKED)?.[1] ?? null; }
+  get tag()      { return this.rec?.tag ?? "#other"; }
+  get category() { return catOf(this.tag); }
+  // bought on `date`; a line that isn't open comes back as it is
+  bought(date) {
+    return this.isOpen ? withField(this.line.replace("- [ ]", "- [x]"), "completion", date)
+      : this.line;
   }
-  // back on the list: open, without its ✅ date
+  // back on the list: open, without its date
   unbought() {
-    if (!this.isBought) return this.line;
-    return this.line.replace(/- \[x\]/i, "- [ ]")
-      .replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/u, "").trimEnd();
+    if (!this.isDone) return this.line;
+    return withField(this.line.replace(/- \[x\]/i, "- [ ]"), "completion", null)
+      .replace(CHECKED, "").trimEnd();
   }
 }
 
 // what was bought and when (a legacy line has no id), and the keys on the list now
-export const historyOf = items => items.filter(i => i.isBought && i.doneOn)
-  .map(i => ({ id: i.rec ? i.id : undefined, name: i.name, tag: i.tag, date: i.doneOn }));
+export const historyOf = items => items.filter(i => i.isDone && i.doneOn)
+  .map(i => ({ id: i.id, name: i.name, tag: i.tag, date: i.doneOn }));
 
 export const openKeys = items => new Set(items.filter(i => i.isOpen).map(i => i.key));
 

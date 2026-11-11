@@ -7,7 +7,7 @@ import { Notice } from "obsidian";
 
 let mount, View;
 // the note: green tea on line 3, rice on line 5
-const NOTE = "# Market\n\n## 🌿 Harvest\n- [ ] green tea #food\n\n- [ ] rice #food\n";
+const NOTE = "# Market\n\n## 🌿 Harvest\n- [ ] m1\n\n- [ ] m2\n";
 before(async () => {
   GlobalRegistrator.register();
   window.moment = () => ({ format: () => "2026-11-05" });
@@ -16,7 +16,7 @@ before(async () => {
 });
 const data = {
   empty: false, left: "2 items left", soon: "salt",
-  groups: [{ label: "🌿 Harvest", rows: [{ line: 3, name: "green tea" }, { line: 5, name: "rice" }] }],
+  groups: [{ label: "🌿 Harvest", rows: [{ line: 3, id: "m1", name: "green tea" }, { line: 5, id: "m2", name: "rice" }] }],
 };
 
 test("Celestial Market: items by group, what runs low, how many are left", () => {
@@ -33,7 +33,7 @@ test("✓ sparkles the row at once and writes it as bought after the sparkle, on
   assert.ok(tea.classes().includes("winx-market__item--bought"));
   assert.equal(files[`${MARKET}.md`], NOTE);
   await new Promise(r => setTimeout(r, 700));
-  assert.equal(files[`${MARKET}.md`], NOTE.replace("- [ ] green tea #food", "- [x] green tea #food ✅ 2026-11-05"));
+  assert.equal(files[`${MARKET}.md`], NOTE.replace("- [ ] m1", "- [x] m1 [completion:: 2026-11-05]"));
 });
 
 test("Celestial Market's note missing: Create …", () => {
@@ -49,14 +49,14 @@ test("a bought item back on the list can be bought again; a line that changed me
   await w.findAll(".winx-market__item")[0].find("button").trigger("click");
   await new Promise(r => setTimeout(r, 700));
   // written: the list comes back without it, then with it again (unticked in the note)
-  state.data = { ...data, groups: [{ label: "🌿 Harvest", rows: [{ line: 5, name: "rice" }] }] }; await nextTick();
+  state.data = { ...data, groups: [{ label: "🌿 Harvest", rows: [{ line: 5, id: "m2", name: "rice" }] }] }; await nextTick();
   state.data = data; await nextTick();
   const tea = () => w.findAll(".winx-market__item")[0];
   assert.ok(!tea().classes().includes("winx-market__item--bought"));
-  files[`${MARKET}.md`] = NOTE.replace("green tea", "black tea");   // the line changed meanwhile: nothing written
+  files[`${MARKET}.md`] = NOTE.replace("m1", "m3");   // the line changed meanwhile: nothing written
   await tea().find("button").trigger("click");
   await new Promise(r => setTimeout(r, 700)); await nextTick();
-  assert.match(files[`${MARKET}.md`], /- \[ \] black tea/);
+  assert.match(files[`${MARKET}.md`], /- \[ \] m3/);
   assert.match(String(Notice.last), /changed meanwhile/);
   assert.ok(!tea().classes().includes("winx-market__item--bought"));   // free again
 });

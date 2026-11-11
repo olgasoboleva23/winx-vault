@@ -12,43 +12,18 @@
 // its id.
 import { addDays, diffDays } from "#/helpers/dates.js";
 import { projectRepeats } from "./repeats.js";
-
-const FIELD  = /\[(\w+):: ([^\]]*)\]/g;
-const SPACED = new RegExp(`\\s*${FIELD.source}`, "g");   // a field with the spaces before it
-
-// every [key:: value] of a line, by key
-export const fieldsOf = line =>
-  Object.fromEntries([...line.matchAll(FIELD)].map(m => [m[1], m[2]]));
-
-// a line with one field set (replaced in place, or added at the end); null drops it
-function withField(line, key, value) {
-  const text = value === null ? "" : ` [${key}:: ${value}]`;
-  let found = false;
-  const out = line.replace(SPACED, (m, k) => k !== key || found ? m : (found = true, text));
-
-  return found ? out : line.trimEnd() + text;
-}
+import { ANY, FIELD, LineItem, lineOf, withField } from "./lineItem.js";
 
 const dropFields = (line, keys) => keys.reduce((l, k) => withField(l, k, null), line);
 
-const OPEN   = /^\s*- \[ \]/, ANY = /^\s*- \[.\]/, DONE = /^\s*- \[[xX]\]/;
+const OPEN = /^\s*- \[ \]/;
 
-const ID = /^t\d+(?=\s|$)/;   // the line's first word
-
-export class Task {
-  constructor(line, src = null, rec = null) { this.line = line; this.src = src; this.rec = rec; }
-  get fields()     { return fieldsOf(this.line); }
+export class Task extends LineItem {
+  static ID = /^t\d+(?=\s|$)/;   // the line's first word
   // a pool item: its id, no checkbox
-  static of(t) {
-    return new Task(t.pool ? `- ${t.id}` : `- [${t.status}] ${t.text}`, t, t.rec ?? null);
-  }
+  static of(t) { return new Task(t.pool ? `- ${t.id}` : lineOf(t), t, t.rec ?? null); }
 
-  get status()     { return this.line.match(/^\s*- \[(.)\]/)?.[1] ?? null; }
-  get isOpen()     { return this.status === " "; }
-  get isDone()     { return DONE.test(this.line); }
   get isSkipped()  { return this.status === "-"; }
-  // its id: the first word of the line, "t12"
-  get id()         { return this.words.match(ID)?.[0] ?? null; }
   get area()       { return this.rec?.area ?? null; }   // "body"
   get difficulty() { return this.rec?.difficulty ?? null; }
   // the id it follows, or several ids (whichever is present on the day)
@@ -62,7 +37,6 @@ export class Task {
   get whenDone()   { return /when done$/.test(this.rule ?? ""); }
   get isBirthday() { return this.rule === "every year"; }
   get date()       { return this.fields.scheduled ?? this.fields.due ?? null; }   // the day it's on
-  get doneOn()     { return this.fields.completion ?? null; }
   get skippedOn()  { return this.fields.cancelled ?? null; }
   get created()    { return this.fields.created ?? null; }
   // a 🔁 task with its dates dropped
@@ -73,8 +47,6 @@ export class Task {
   isOverdue(today) { return this.isOpen && !!this.date && this.date < today; }
   // its sticker's file name, in a list
   get stickers()   { return this.rec?.sticker ? [this.rec.sticker] : []; }
-  // its name: the record's, else the line's words (a line whose id has no record: the id)
-  get name()       { return this.rec?.name ?? this.words; }
   get currVariant(){
     return this.variants.length ? this.rec?.currVariant ?? this.variants[0] : null;
   }
@@ -82,14 +54,6 @@ export class Task {
   get text()       {
     return this.isOpen && this.currVariant ? `${this.name} · ${this.currVariant}` : this.name;
   }
-  // the line's words alone: no checkbox, sticker, tags, rule or date fields
-  get words() {
-    return this.line.replace(ANY, "").replace(/^\s*- /, "").replace(FIELD, "")
-      .replace(/!\[\[[^\]]*\]\]/g, "").replace(/#[^\s]+/g, "").replace(/\s+/g, " ").trim();
-  }
-  // identity across copies (open, done, skipped) of the same task, for history and for finding its
-  // line again: its id, else its words lowercased
-  get key() { return this.id ?? this.words.toLowerCase(); }
   // a name compared with another: its words (not an id, even if it looks like one), lowercased
   static nameKey = name => new Task(`- [ ] ${name}`).words.toLowerCase();
   // a new open line: its text (an id, or a name for the Tasks dialog) and the day it was made

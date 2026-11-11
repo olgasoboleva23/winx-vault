@@ -48,19 +48,6 @@ test("Market migration backs up before replacing text and can resume after the c
   assert.deepEqual(files, saved);
 });
 
-test("A half-migrated market: ＋ on a catalog item adds no second open line, and the migration finishes", async () => {
-  const { files, app } = vault({ [note]: old });
-  const process = app.vault.process;
-  app.vault.process = async () => { throw new Error("disk full"); };
-  await migrateMarket();
-  app.vault.process = process;
-  await addToMarket("Tea", "#food", "m1");
-  assert.equal(files[note], old);
-  await migrateMarket();
-  assert.equal(files[note], migrateMarketText(old).log);
-  assert.equal(files[MARKET_OLD], old);
-});
-
 test("Market migration refuses a concurrent log change without losing the new line", async () => {
   const { files, app } = vault({ [note]: old });
   const process = app.vault.process;
@@ -91,7 +78,7 @@ test("Market loaders resolve catalog names and Supplies history; additions seria
   const item = market.groups.flatMap(g => g.rows).find(r => r.id === "m1");
   assert.equal(item.name, "Renamed");
   assert.equal(await buyMarketItem(item), true);
-  assert.equal(files[note].split("\n")[item.line], "- [x] m1 ✅ 2026-11-11");
+  assert.equal(files[note].split("\n")[item.line], "- [x] m1 [completion:: 2026-11-11]");
   supplies = await loadSupplies();
   assert.equal(supplies.groups[0].rows[0].info, "0 of ~21 days");
 });
@@ -104,11 +91,16 @@ test("A moved market row never buys another item, corrupt catalogs are not overw
   assert.equal(files[note], "- [ ] m2\n");
 });
 
-test("Market migration retains the displayed category when an unrelated tag comes first", async () => {
+test("Market migration takes the first tag that is a category", () => {
   const text = "- [ ] Tea #brand #food";
-  vault({ [note]: text });
-  assert.equal((await loadCelestialMarket()).groups[0].label, "🌿 Harvest");
   const { records } = migrateMarketText(text);
   assert.equal(records.m1.tag, "#food");
   assert.deepEqual(records.m1.tags, ["#brand", "#food"]);
+});
+
+test("A new vault's first market item starts the catalog", async () => {
+  const { files } = vault({});
+  await addToMarket("Tea", "#food");
+  assert.deepEqual(JSON.parse(files[MARKET_RECORDS]), { m1: { name: "Tea", tag: "#food", tags: ["#food"] } });
+  assert.equal(files[note], "- [ ] m1\n");
 });

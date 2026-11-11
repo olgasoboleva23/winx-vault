@@ -3,10 +3,20 @@ import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
 import { MARKET, MARKET_RECORDS, MARKET_OLD } from "#/helpers/paths.js";
 import { readJson } from "#/helpers/files.js";
-import { MarketItem } from "#/models/market.js";
+import { MarketItem, catOf } from "#/models/market.js";
 import { parseNote } from "#/models/taskFile.js";
 
 const NOTE = `${MARKET}.md`;
+
+// a line before the catalog, "- [ ] green tea #food ✅ date": its words, its tags and the first
+// of them that is a category
+function legacy(line) {
+  const tags = line.match(/#[^\s#]+/gu) ?? [];
+  const name = line.replace(/^\s*- \[.\]\s*/, "").replace(/#[\w/]+/g, "")
+    .replace(/\[\w+:: [^\]]*\]/g, "").replace(/[✅📅⏳🛫➕🔁].*$/u, "").trim();
+
+  return { name, tags, tag: tags.map(catOf).find(t => t !== "#other") ?? "#other" };
+}
 
 export function migrateMarketText(text, existing = {}) {
   const records = structuredClone(existing), lines = text.split("\n");
@@ -22,8 +32,10 @@ export function migrateMarketText(text, existing = {}) {
     if (item.id && records[item.id]) continue;
     if (item.id)
       throw new Error(`Market record ${item.id} is missing`);
-    if (!item.name) continue;
-    const key = item.name.trim().toLowerCase();
+    const { name, tags, tag } = legacy(item.line);
+
+    if (!name) continue;
+    const key = name.trim().toLowerCase();
     let id = names.get(key);
 
     if (!id) names.set(key, id = `m${++number}`);
@@ -31,7 +43,7 @@ export function migrateMarketText(text, existing = {}) {
     const date = [...item.line.matchAll(/\d{4}-\d{2}-\d{2}/g)].map(m => m[0]).sort().at(-1) ?? "";
 
     if (!existing[id] && (!latest.has(id) || date > latest.get(id))) {
-      records[id] = { name: item.name, tag: item.tag, tags: item.tags };
+      records[id] = { name, tag, tags };
       latest.set(id, date);
     }
 

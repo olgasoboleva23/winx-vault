@@ -1,0 +1,51 @@
+{
+  "m1": {
+    "name": "Oat milk",
+    "tag": "#food",
+    "tags": [
+      "#food"
+    ]
+  },
+  "m2": {
+    "name": "New mug",
+    "tag": "#home",
+    "tags": [
+      "#home"
+    ]
+  },
+  "m3": {
+    "name": "Fresh bread",
+    "tag": "#food",
+    "tags": [
+      "#food"
+    ]
+  },
+  "m4": {
+    "name": "Hand cream",
+    "tag": "#care",
+    "tags": [
+      "#care"
+    ]
+  },
+  "m5": {
+    "name": "Hay for the pets",
+    "tag": "#pet",
+    "tags": [
+      "#pet"
+    ]
+  },
+  "m6": {
+    "name": "Fairy lights",
+    "tag": "#home",
+    "tags": [
+      "#home"
+    ]
+  },
+  "m7": {
+    "name": "Magnesium",
+    "tag": "#health",
+    "tags": [
+      "#health"
+    ]
+  }
+}

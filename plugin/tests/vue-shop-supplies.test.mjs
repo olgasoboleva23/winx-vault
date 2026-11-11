@@ -2,7 +2,7 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { vault } from "./stubs/vault.mjs";
-import { MARKET, PURCHASES, TASKS } from "#/helpers/paths.js";
+import { MARKET, MARKET_RECORDS, PURCHASES, TASKS } from "#/helpers/paths.js";
 import { Notice } from "obsidian";
 
 let mount, h, defineComponent, ShopWidget, SuppliesWidget, taskStore;
@@ -41,7 +41,9 @@ test("Shop: the balance, an affordable reward bought with a click (a purchase li
 });
 
 test("Supplies: the rows by category, running low puts one back on the list; a listed one has no button", async () => {
-  const { files } = vault({ [`${MARKET}.md`]: "- [ ] rice #food\n" });
+  const { files } = vault({
+    [`${MARKET}.md`]: "- [ ] m1\n", [MARKET_RECORDS]: JSON.stringify({ m1: { name: "rice", tag: "#food" } }),
+  });
   const w = inBody(SuppliesWidget, { empty: false, groups: [{ label: "🌿 Harvest", rows: [
     { name: "tea", tag: "#food", due: true, listed: false, info: "9 of ~7 days ⏳" },
     { name: "milk", tag: "#food", due: false, listed: true, info: "on the shopping list ✦" },
@@ -51,6 +53,6 @@ test("Supplies: the rows by category, running low puts one back on the list; a l
   assert.ok(tea.classes().includes("winx-supplies__row--due"));
   assert.equal(milk.find("button").exists(), false);
   await tea.find("button").trigger("click"); await tick();
-  assert.equal(files[`${MARKET}.md`], "- [ ] rice #food\n- [ ] tea #food\n");
+  assert.equal(files[`${MARKET}.md`], "- [ ] m1\n- [ ] m2\n");
   assert.equal(Notice.last, "✦ tea → Celestial Market");
 });
