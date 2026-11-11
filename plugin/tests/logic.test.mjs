@@ -4,7 +4,7 @@ import { monthGrid, weekOf } from "#/helpers/dates.js";
 import { supplyStats, marketChoices } from "#/models/market.js";
 import { findChoices } from "#/helpers/find.js";
 import { projectRepeats, ruleText } from "#/models/repeats.js";
-import { levelInfo } from "#/models/xp.js";
+import { levelInfo, xpLegend } from "#/models/xp.js";
 import { vitals, mana, mpPhases, mpLine, mpTable } from "#/models/vitals.js";
 import { Task } from "#/models/task.js";
 
@@ -58,10 +58,16 @@ test("supplyStats", () => {
 });
 
 test("levelInfo", () => {
-  assert.deepEqual(levelInfo(0),   { level: 1, progress: 0,  cost: 100 });
-  assert.deepEqual(levelInfo(99),  { level: 1, progress: 99, cost: 100 });
-  assert.deepEqual(levelInfo(100), { level: 2, progress: 0,  cost: 125 });
-  assert.deepEqual(levelInfo(260), { level: 3, progress: 35, cost: 150 });
+  assert.deepEqual(levelInfo(0, 100, 25),   { level: 1, progress: 0,  cost: 100 });
+  assert.deepEqual(levelInfo(99, 100, 25),  { level: 1, progress: 99, cost: 100 });
+  assert.deepEqual(levelInfo(100, 100, 25), { level: 2, progress: 0,  cost: 125 });
+  assert.deepEqual(levelInfo(260, 100, 25), { level: 3, progress: 35, cost: 150 });
+});
+
+test("xpLegend: each level's top XP, the last one above the one before it (the Settings' numbers)", () => {
+  const levels = [{ name: "", max: 0, cls: "v0" }, { name: "SPARK", max: 20, cls: "v1" },
+    { name: "AURA", max: 60, cls: "v3" }, { name: "TRANSFORMATION", max: Infinity, cls: "v4" }];
+  assert.deepEqual(xpLegend(levels).map(l => l.max), [0, 20, 60, "60+"]);
 });
 
 test("projectRepeats", () => {

@@ -7,7 +7,7 @@ import config from "#/helpers/config.js";
 import { pageDay, todayYmd, ymd } from "#/helpers/dates.js";
 import { T } from "#/models/calendarData.js";
 import { taskStore } from "#/store/tasks.js";
-import { levelInfo, taskXp } from "#/models/xp.js";
+import { levelInfo, taskXp, xpLegend } from "#/models/xp.js";
 import { mana, mpLine, mpTable, vitals } from "#/models/vitals.js";
 import { cycleLog } from "./cycle.js";
 import { chartColor } from "#/helpers/chart.js";
@@ -87,8 +87,6 @@ export async function loadXpToday({ dv }) {
   return {
     todayXP, aura: levelOf(todayXP).name, trend: todayXP > avg ? "↑" : "↓",
     vals: days.map(d => levels.indexOf(levelOf(xpByDay.get(d) ?? 0))),
-    // the legend: each level's colour and its top XP
-    legend: levels.map(({ name, cls, max }) =>
-      ({ name, cls, max: max === Infinity ? "30+" : max })),
+    legend: xpLegend(levels),
   };
 }
