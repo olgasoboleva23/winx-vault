@@ -51,9 +51,10 @@ test("applyConfig: config.json's numbers over the defaults, the maps again; {} p
 test("the window's values and back: config.json as the window left it", () => {
   applyConfig({});
   const v = settingsValues(config);
-  assert.equal(v.xp_medium, 10);
+  assert.deepEqual(v.difficulties[1], { key: "medium", label: "⭐⭐ Medium", xp: 10, gold: 5 });
   assert.deepEqual(v.areas[0], { key: "body", icon: "🌺", title: "Body", name: "Vitality", color: "#e8609a", was: "body", apply: true });
-  const json = toConfig({ ...v, xp_medium: 12, glow: 35 });
+  const json = toConfig({ ...v, glow: 35,
+    difficulties: v.difficulties.map(d => d.key === "medium" ? { ...d, xp: 12 } : d) });
   assert.deepEqual(json.difficulties.medium, { xp: 12, gold: 5 });
   assert.deepEqual(json.levels, { spark: 10, glow: 35, aura: 30 });
   assert.deepEqual(json.areas[0], { key: "body", icon: "🌺", title: "Body", name: "Vitality", color: "#e8609a" });

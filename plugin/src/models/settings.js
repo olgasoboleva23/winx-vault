@@ -5,15 +5,14 @@ const KEY = /^[a-z0-9-]+$/;
 const AREA = ["key", "icon", "title", "name", "color"];
 const pick = a => Object.fromEntries(AREA.map(k => [k, a[k] ?? null]));
 
-// the window's starting values from `config` (helpers/config.js): a difficulty's xp_easy /
-// gold_easy, the areas (each with `was`, its key now, and ☑ apply on), XP Today's thresholds,
-// the level cost
+// the window's starting values from `config` (helpers/config.js): the difficulties (a table: key,
+// label, xp, gold), the areas (each with `was`, its key now, and ☑ apply on), XP Today's
+// thresholds, the level cost
 export function settingsValues(config) {
   const [, spark, glow, aura] = config.levels.map(l => l.max);
 
   return {
-    ...Object.fromEntries(config.difficulties
-      .flatMap(d => [[`xp_${d.key}`, d.xp], [`gold_${d.key}`, d.gold]])),
+    difficulties: config.difficulties.map(({ key, label, xp, gold }) => ({ key, label, xp, gold })),
     areas: config.areas.map(a => ({ ...pick(a), was: a.key, apply: true })),
     spark, glow, aura, base: config.levelCost.base, step: config.levelCost.step,
   };
@@ -21,8 +20,7 @@ export function settingsValues(config) {
 
 // the values as config.json
 export const toConfig = v => ({
-  difficulties: Object.fromEntries(Object.keys(v).filter(k => k.startsWith("xp_"))
-    .map(k => k.slice(3)).map(d => [d, { xp: v[`xp_${d}`], gold: v[`gold_${d}`] }])),
+  difficulties: Object.fromEntries(v.difficulties.map(d => [d.key, { xp: d.xp, gold: d.gold }])),
   areas: v.areas.map(a => ({ ...pick(a), key: a.key.trim() })),
   levels: { spark: v.spark, glow: v.glow, aura: v.aura },
   levelCost: { base: v.base, step: v.step },

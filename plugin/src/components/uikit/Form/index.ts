@@ -8,10 +8,12 @@ import { useVueApp } from "#/composables/vueApp.ts";
 //   { name, key, text: placeholder, number?, lines?, color? }   a text box (lines: several lines
 //                                                   of text; color: the colour picker, "#rrggbb")
 //   { name, key, check: description }               a checkbox
-//   { name, key, list: rows, required? }            groups of those rows, + adds one, × takes it
-//                                                   off; the value: an array of the groups' values.
-//                                                   Rows of text boxes and checkboxes only: a group
-//                                                   is one line under the rows' names
+//   { name, key, label: true }                      its value as text, not edited
+//   { name, key, list: rows, required?, fixed? }    groups of those rows, + adds one, × takes it
+//                                                   off (fixed: neither, the groups as given);
+//                                                   the value: an array of the groups' values.
+//                                                   Rows of text boxes, checkboxes and labels
+//                                                   only: a table, a group a line under the names
 // Any row can have `tab`: the window then shows its tabs (WinxTabs) and one tab's rows at a time.
 // `values` has the starting ones; the keys in `required` must be set before the button works (it's
 // greyed out; a list: one group at least, each with its own required keys). Form.ask(...) resolves
@@ -22,7 +24,8 @@ export type Row = Tab & (
   | { name: string; key: string; options: { label: string; value: unknown; img?: TFile }[] }
   | { name: string; key: string; text: string; number?: boolean; lines?: boolean; color?: boolean }
   | { name: string; key: string; check: string }
-  | { name: string; key: string; list: Row[]; required?: string[] });
+  | { name: string; key: string; label: true }
+  | { name: string; key: string; list: Row[]; required?: string[]; fixed?: boolean });
 
 export type Values = Record<string, any>;
 type Options = { values?: Values; required?: string[]; submit?: string };
@@ -135,6 +138,8 @@ export class Form extends Modal {
 
         return b;
       });
+    } else if ("label" in r) {
+      ctl.createSpan({ cls: "winx-form__label", text: vals[r.key] ?? "" });
     } else if ("check" in r) {
       const box = ctl.createEl("input", { type: "checkbox" });
       box.checked = !!vals[r.key];
@@ -160,22 +165,28 @@ export class Form extends Modal {
     }
   }
 
-  // the groups of a list row, each its rows and a ×, then a + for one more. Rows of text boxes and
-  // checkboxes only: one line a group under a line of the rows' names (a checkbox's description
-  // as its name's tooltip); a checkbox, a colour and the × take a fixed width, a text box the rest,
-  // so the names stand over their fields. Other rows: the groups stacked, each its own rows
+  // the groups of a list row, each its rows and a ×, then a + for one more (fixed: neither). Rows
+  // of text boxes, checkboxes and labels only: one grid, a line of the rows' names (a checkbox's
+  // description as its name's tooltip), then a line a group; a text box's column shares the width,
+  // the others fit what's in them, so the names stand over their fields. Other rows: the groups
+  // stacked, each its own rows. A list named as its tab has no heading of its own
   private list(r: Extract<Row, { list: Row[] }>, vals: Values, parent: HTMLElement) {
     const groups: Values[] = (vals[r.key] ??= []);
-    const item = parent.createDiv("setting-item");
-    const line = r.list.every(s => ("text" in s && !s.lines) || "check" in s);
+    const line = r.list.every(s => ("text" in s && !s.lines) || "check" in s || "label" in s);
     const narrow = (s: Row) => "check" in s || ("color" in s && !!s.color);
+    const wide = (s: Row) => "text" in s && !s.color;
     const cell = (on: HTMLElement, small: boolean) =>
       on.createDiv(small ? "winx-form__cell winx-form__cell--narrow" : "winx-form__cell");
 
-    item.createDiv({ cls: "setting-item-info" })
-      .createDiv({ cls: "setting-item-name", text: r.name });
+    if (r.name !== r.tab) {
+      parent.createDiv("setting-item").createDiv({ cls: "setting-item-info" })
+        .createDiv({ cls: "setting-item-name", text: r.name });
+    }
+
     const box = parent.createDiv(`winx-form__list${line ? " winx-form__list--lines" : ""}`);
-    const more = parent.createDiv("winx-form__more");
+    const cols = r.list.map(s => wide(s) ? "minmax(0, 1fr)" : "auto").concat(r.fixed ? [] : "auto");
+
+    if (line) box.setCssProps({ "--winx-form-cols": cols.join(" ") });
     const draw = () => {
       box.empty();
       if (line && groups.length) {
@@ -188,7 +199,7 @@ export class Form extends Modal {
           if ("check" in sub) name.setAttr("title", sub.check);
         }
 
-        cell(head, true);
+        if (!r.fixed) cell(head, true);
       }
 
       for (const g of groups) {
@@ -199,6 +210,7 @@ export class Form extends Modal {
           else this.row(sub, g, group);
         }
 
+        if (r.fixed) continue;
         const off = (line ? cell(group, true) : group)
           .createEl("button", { text: "×", attr: { title: "Remove" } });
 
@@ -206,11 +218,15 @@ export class Form extends Modal {
       }
     };
 
-    const add = more.createEl("button", { text: "+", attr: { title: "One more" } });
+    if (!r.fixed) {
+      const add = parent.createDiv("winx-form__more")
+        .createEl("button", { text: "+", attr: { title: "One more" } });
 
-    add.onclick = () => { groups.push({}); draw(); this.update(); };
+      add.onclick = () => { groups.push({}); draw(); this.update(); };
 
-    if (!groups.length) groups.push({});
+      if (!groups.length) groups.push({});
+    }
+
     draw();
   }
 }

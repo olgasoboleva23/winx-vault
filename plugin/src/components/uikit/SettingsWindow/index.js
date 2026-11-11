@@ -8,11 +8,12 @@ const D = "Difficulties", A = "Areas", X = "XP Today & Level";
 const number = (tab, name, key, text) => ({ tab, name, key, text, number: true });
 
 export const settingsWindow = (config, values) => Form.ask(app, "✦ Settings", [
-  ...config.difficulties.flatMap(d => [
-    number(D, `${d.label} · XP`, `xp_${d.key}`, String(d.xp)),
-    number(D, `${d.label} · gold`, `gold_${d.key}`, String(d.gold)),
-  ]),
-  { tab: A, name: "Areas", key: "areas", required: ["key", "icon", "title"], list: [
+  { tab: D, name: D, key: "difficulties", fixed: true, required: ["xp", "gold"], list: [
+    { name: "Difficulty", key: "label", label: true },
+    { name: "XP", key: "xp", text: "XP", number: true },
+    { name: "Gold", key: "gold", text: "gold", number: true },
+  ] },
+  { tab: A, name: A, key: "areas", required: ["key", "icon", "title"], list: [
     { name: "Key", key: "key", text: "body" },
     { name: "Icon", key: "icon", text: "🌺" },
     { name: "Name", key: "title", text: "Body" },
@@ -27,7 +28,6 @@ export const settingsWindow = (config, values) => Form.ask(app, "✦ Settings", 
   number(X, "Level · each next one costs more by", "step", "25"),
 ], {
   values,
-  required: ["areas", ...config.difficulties.flatMap(d => [`xp_${d.key}`, `gold_${d.key}`]),
-    "spark", "glow", "aura", "base", "step"],
+  required: ["difficulties", "areas", "spark", "glow", "aura", "base", "step"],
   submit: "Save",
 });

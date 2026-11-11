@@ -20,16 +20,20 @@ before(async () => {
     return e;
   };
   el.createDiv = function (o) { return this.createEl("div", o); };
+  el.createSpan = function (o) { return this.createEl("span", o); };
   el.empty = function () { this.replaceChildren(); };
   el.setText = function (t) { this.textContent = t; };
   el.setAttr = function (k, v) { this.setAttribute(k, v); };
   el.addClass = function (c) { this.classList.add(c); };
+  el.toggle = function (on) { this.hidden = !on; };
   el.toggleClass = function (c, on) { this.classList.toggle(c, on); };
+  el.setCssProps = function (props) { Object.assign(this.cssProps ??= {}, props); };
   ({ Form } = await import("#/components/uikit/Form/index.ts"));
 });
 
-const open = rows => {
-  const form = new Form({ vault: { getResourcePath: () => "app://icon.webp" } }, "✦ Test", rows);
+const open = (rows, values) => {
+  const app = { vault: { getResourcePath: () => "app://icon.webp" } };
+  const form = new Form(app, "✦ Test", rows, { values });
 
   Object.assign(form, {
     titleEl: document.createElement("div"), contentEl: document.createElement("div"),
@@ -68,6 +72,31 @@ test("Form: a list of text boxes and checkboxes is a line of names, then one lin
   win.querySelector(".winx-form__line:last-child button").click();   // × takes it off
   assert.equal(win.querySelectorAll(".winx-form__line").length, 2);
   assert.equal(win.querySelector("[style]"), null);
+  // one grid: a text box's column shares the width, a colour's, a checkbox's and the ×'s fit them
+  assert.equal(win.querySelector(".winx-form__list--lines").cssProps["--winx-form-cols"],
+    "minmax(0, 1fr) auto auto auto");
+});
+
+test("Form: a fixed list has no + or ×, a label row shows its value as text", () => {
+  const win = open([{ tab: "Difficulties", name: "Difficulties", key: "d", fixed: true, list: [
+    { name: "Difficulty", key: "label", label: true },
+    { name: "XP", key: "xp", text: "XP", number: true },
+  ] }]);
+  const lines = win.querySelectorAll(".winx-form__line:not(.winx-form__line--head)");
+
+  assert.equal(lines.length, 0);   // no values: no groups, none added
+  const win2 = open([{ name: "Difficulties", key: "d", fixed: true, list: [
+    { name: "Difficulty", key: "label", label: true },
+    { name: "XP", key: "xp", text: "XP", number: true },
+  ] }], { d: [{ label: "⭐ Easy", xp: 5 }] });
+  const [, line] = win2.querySelectorAll(".winx-form__line");
+
+  assert.equal(line.querySelector(".winx-form__label").textContent, "⭐ Easy");
+  assert.equal(line.querySelector("input").value, "5");
+  assert.equal(win2.querySelectorAll("button").length, 1);   // the window's own button only
+  assert.equal(win2.querySelector(".winx-form__list--lines").cssProps["--winx-form-cols"],
+    "auto minmax(0, 1fr)");
+  assert.equal(win.querySelector(".setting-item-name"), null);   // named as its tab: no heading
 });
 
 test("Form: a list with buttons or long text keeps its groups stacked, rows inside", () => {
