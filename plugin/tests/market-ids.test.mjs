@@ -48,6 +48,19 @@ test("Market migration backs up before replacing text and can resume after the c
   assert.deepEqual(files, saved);
 });
 
+test("A half-migrated market: ＋ on a catalog item adds no second open line, and the migration finishes", async () => {
+  const { files, app } = vault({ [note]: old });
+  const process = app.vault.process;
+  app.vault.process = async () => { throw new Error("disk full"); };
+  await migrateMarket();
+  app.vault.process = process;
+  await addToMarket("Tea", "#food", "m1");
+  assert.equal(files[note], old);
+  await migrateMarket();
+  assert.equal(files[note], migrateMarketText(old).log);
+  assert.equal(files[MARKET_OLD], old);
+});
+
 test("Market migration refuses a concurrent log change without losing the new line", async () => {
   const { files, app } = vault({ [note]: old });
   const process = app.vault.process;

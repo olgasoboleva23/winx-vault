@@ -49,7 +49,7 @@ export function migrateMarketText(text, existing = {}) {
 }
 
 // Explicit command only. Catalog first, log last under vault.process's content check. A failed
-// last write can be retried; the original backup must still match the source being migrated.
+// last write can be retried: the backup stays the log as it was at the first run.
 export async function migrateMarket() {
   const { vault } = app, file = vault.getFileByPath(NOTE);
 
@@ -60,11 +60,7 @@ export async function migrateMarket() {
 
     if (log === text && vault.getFileByPath(MARKET_RECORDS))
       return void new Notice("✦ market is already in ID format");
-    const backup = vault.getFileByPath(MARKET_OLD);
-
-    if (backup && await vault.read(backup) !== text)
-      throw new Error("Market changed since its backup; reconcile the (old) copy before retrying");
-    if (!backup) await vault.create(MARKET_OLD, text);
+    if (!vault.getFileByPath(MARKET_OLD)) await vault.create(MARKET_OLD, text);
     const folder = MARKET_RECORDS.slice(0, MARKET_RECORDS.lastIndexOf("/"));
 
     if (!vault.getFolderByPath(folder)) await vault.createFolder(folder);

@@ -125,13 +125,22 @@ test("Backdated calendar completion keeps Wednesday and advances the same JSON q
 
 test("Another open occurrence or stale completion cannot start an extra chain", async () => {
   let v = setup(`${before}\n${next}`);
-  await assert.rejects(() => tickTask(v.task), /another open copy/);
+  await tickTask(v.task);
+  assert.match(Notice.last, /another open copy/);
   assert.equal(v.files[MASTER], `${before}\n${next}`);
   assert.equal(rec(v).currVariant, "Core");
   v = setup(); v.files[MASTER] = done;
   await tickTask(v.task);
   assert.equal(v.files[MASTER], done);
   assert.equal(rec(v).currVariant, "Core");
+});
+
+test("A tasks.json that isn't valid JSON: a tick says so and writes nothing", async () => {
+  const v = setup();
+  v.files[TASK_RECORDS] = "broken";
+  await tickTask(v.task);
+  assert.match(Notice.last, /tasks\.json isn't valid JSON/);
+  assert.equal(v.files[MASTER], before);
 });
 
 test("Open tasks use the current name; training history always uses the common name", () => {

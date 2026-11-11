@@ -4,7 +4,8 @@
 import { Task } from "#/models/task.js";
 import { T, canReorder } from "#/models/calendarData.js";
 import {
-  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal, saveRecords, tickTask,
+  addTask, deleteTaskLine, editTaskLine, editTaskLineWithUndo, editTaskModal,
+  saveRecords, tickTask,
 } from "./tasks.js";
 
 

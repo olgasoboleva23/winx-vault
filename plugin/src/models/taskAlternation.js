@@ -2,6 +2,9 @@
 // a completion with a generated next copy advances the JSON queue once.
 import { Task } from "./task.js";
 
+// a record or a log the queue can't move on: shown to the user, nothing written
+export class VariantProblem extends Error {}
+
 export const variantNames = text => text.split("\n").map(s => s.trim()).filter(Boolean);
 
 export function variantsProblem(variants, next) {
@@ -26,13 +29,13 @@ export function nextVariantAfter(before, after, record, others = []) {
   const variant = record.currVariant ?? variants[0];
   const problem = variantsProblem(variants, variant);
 
-  if (problem) throw new Error(problem);
+  if (problem) throw new VariantProblem(problem);
   if (done.length !== 1 || open.length !== 1)
-    throw new Error(`Ambiguous variant copies for ${current.id}`);
+    throw new VariantProblem(`Ambiguous variant copies for ${current.id}`);
   if (others.some(l => {
     const t = new Task(l);
 
     return t.isOpen && t.id === current.id;
-  })) throw new Error("Task has another open copy; resolve it before completing");
+  })) throw new VariantProblem("Task has another open copy; resolve it before completing");
   return variants[(variants.indexOf(variant) + 1) % variants.length];
 }

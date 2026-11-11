@@ -14,7 +14,6 @@ import { logPurchase } from "#/controllers/widgets/shop.js";
 import { createNote } from "#/controllers/notes.js";
 import { editCourse } from "#/controllers/meds.js";
 import { tasksApi } from "#/helpers/plugins.js";
-import { MASTER } from "#/helpers/paths.js";
 import { Task } from "#/models/task.js";
 
 
@@ -42,9 +41,7 @@ export function registerCommands(plugin: Plugin) {
     const result = await api.editTaskLineModal(Task.created(found.name, todayYmd()).line);
 
     if (!result) return;
-    if (!await saveNewTask(found.name, pick, result, found.id)) {
-      new Notice(`✦ ${MASTER} not found — task not saved`);
-    }
+    await saveNewTask(found.name, pick, result, found.id);   // says so itself when it can't
   });
 
   // a watch / read / game / recipe / work task note (models/kinds.js), in its folder, opened in a

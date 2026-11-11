@@ -5,7 +5,7 @@ import { Notice } from "obsidian";
 import { edit, editLine, undoLines } from "#/helpers/files.js";
 import { tasksApi } from "#/helpers/plugins.js";
 import { Task } from "#/models/task.js";
-import { nextVariantAfter, variantsProblem } from "#/models/taskAlternation.js";
+import { VariantProblem, nextVariantAfter, variantsProblem } from "#/models/taskAlternation.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { app } from "#/helpers/app.js";
 import { parseNote } from "#/models/taskFile.js";
@@ -27,8 +27,10 @@ export const editTaskLine = (t, fn) => writeTask(() => changeTaskLine(t, fn));
 // A modal supplies the original line and record so a concurrent edit wins over the old form.
 async function changeTaskLine(t, fn, patch = {}, expected = null) {
   const id = Task.of(t).id;
-  const record = JSON.parse(await fromDisk(TASK_RECORDS) || "{}")[id];
+  const all = await recordsFromDisk();
 
+  if (!all) return null;
+  const record = all[id];
   const stale = expected ? JSON.stringify(record) !== JSON.stringify(expected.record)
     : new Task("", null, record).currVariant !== Task.of(t).currVariant;
 
@@ -40,18 +42,25 @@ async function changeTaskLine(t, fn, patch = {}, expected = null) {
   const updated = { ...record, ...patch };
   let before, after, around;
 
-  if (!await editLine(t.path, t.line,
-    line => expected ? line === expected.line : new Task(line).sameAs(Task.of(t)),
-    (line, lines) => {
-      before = line;
-      after = fn(line, lines);
-      around = { above: lines[t.line - 1], below: lines[t.line + 1] };
-      const next = nextVariantAfter(line, after, updated, lines.filter((_, i) => i !== t.line));
+  try {
+    if (!await editLine(t.path, t.line,
+      line => expected ? line === expected.line : new Task(line).sameAs(Task.of(t)),
+      (line, lines) => {
+        before = line;
+        after = fn(line, lines);
+        around = { above: lines[t.line - 1], below: lines[t.line + 1] };
+        const next = nextVariantAfter(line, after, updated, lines.filter((_, i) => i !== t.line));
 
-      if (next !== null) patch = { ...patch, currVariant: next };
-      Object.assign(updated, patch);
-      return after;
-    })) return null;
+        if (next !== null) patch = { ...patch, currVariant: next };
+        Object.assign(updated, patch);
+        return after;
+      })) return null;
+  } catch (error) {
+    if (!(error instanceof VariantProblem)) throw error;
+    new Notice(`✦ ${error.message}`);
+    return null;
+  }
+
   const added = after === null ? [] : after.split("\n");
   const revert = () => undoLines(t.path, t.line, added, before, around)();
 
@@ -72,9 +81,10 @@ async function changeTaskLine(t, fn, patch = {}, expected = null) {
     const queueChanged = "currVariant" in patch;
 
     if (queueChanged) {
-      const now = JSON.parse(await fromDisk(TASK_RECORDS) || "{}")[id];
+      const all = await recordsFromDisk();
 
-      if (JSON.stringify(now) !== JSON.stringify(updated)) {
+      if (!all) return false;
+      if (JSON.stringify(all[id]) !== JSON.stringify(updated)) {
         new Notice("✦ task changed since completion — undo not applied");
         return false;
       }
@@ -150,7 +160,10 @@ export const newId = (records, tasks = []) => {
 // meanwhile (another device): nothing saved.
 export const editTaskModal = async (t, ask = taskWindow) => {
   const id = Task.of(t).id, api = tasksApi();
-  const record = JSON.parse(await fromDisk(TASK_RECORDS) || "{}")[id];
+  const all = await recordsFromDisk();
+
+  if (!all) return;
+  const record = all[id];
   const task = new Task(Task.of(t).line, t, record ?? t.rec);
   let line = null;
 
@@ -206,15 +219,20 @@ const fromDisk = async path => {
   return file ? app.vault.read(file) : "";
 };
 
-async function saveNew(name, pick, result, oldId = null) {
-  let parsed;
-
+// tasks.json parsed ({} when missing); null and a notice when it isn't valid JSON
+async function recordsFromDisk() {
   try {
-    parsed = JSON.parse(await fromDisk(TASK_RECORDS) || "{}");
+    return JSON.parse(await fromDisk(TASK_RECORDS) || "{}");
   } catch {
-    return void new Notice("✦ tasks.json isn't valid JSON — task not saved");
+    new Notice("✦ tasks.json isn't valid JSON — task not saved");
+    return null;
   }
+}
 
+async function saveNew(name, pick, result, oldId = null) {
+  const parsed = await recordsFromDisk();
+
+  if (!parsed) return;
   const records = new Map(Object.entries(parsed));
   const tasks = parseNote(MASTER, await fromDisk(MASTER)).filter(i => i.status !== null);
   const final = Task.unnamed(result, "t0").name || name;
@@ -232,8 +250,15 @@ async function saveNew(name, pick, result, oldId = null) {
 
   if (problem) return void new Notice(problem);
   if (pick.pool) return saveRecords({ [id]: patch }, { [id]: records.get(id) });
-  const variant = nextVariantAfter(Task.created(id, "").line, back.line,
-    record, tasks.map(t => Task.of(t).line));
+  let variant;
+
+  try {
+    variant = nextVariantAfter(Task.created(id, "").line, back.line,
+      record, tasks.map(t => Task.of(t).line));
+  } catch (error) {
+    if (!(error instanceof VariantProblem)) throw error;
+    return void new Notice(`✦ ${error.message}`);
+  }
 
   if (variant !== null) patch.currVariant = variant;
   if (!await addTask(back.line)) return false;
@@ -280,10 +305,14 @@ export async function deleteTaskLine(t) {
   undoNotice(t, "🗑", () => saveRecords({ [t.id]: { pool: true } }));
 }
 
-// a new task: the line on top of Master.md (false when Master.md is missing: nothing written); one
-// place for the New task command and the calendar's pool drop
+// a new task: the line on top of Master.md (false and a notice when Master.md is missing: nothing
+// written); one place for the New task command and the calendar's pool drop
 export async function addTask(line) {
-  if (!app.vault.getFileByPath(MASTER)) return false;
+  if (!app.vault.getFileByPath(MASTER)) {
+    new Notice(`✦ ${MASTER} not found — task not saved`);
+    return false;
+  }
+
   await edit(MASTER, c => line + "\n" + c);
   return true;
 }

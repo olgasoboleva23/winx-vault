@@ -14,7 +14,7 @@
 │   │   │   │                       WinxCard, WinxChart, WinxTable, WinxInput, WinxCheckbox, WinxNoteLink,
 │   │   │   │                       WinxEmpty / WinxMissing / WinxFailed, tooltip.js (the v-tip directive),
 │   │   │   │                       WinxGroupHeader, WinxAddForm; Obsidian's windows: Form, Search,
-│   │   │   │                       TaskWindow (a task's difficulty, area, time, sticker), TaskSearch
+│   │   │   │                       TaskWindow (a task's difficulty, area, time, sticker, variants), TaskSearch
 │   │   │   └── 📁 pages
 │   │   │       ├── 📁 dashboard  — view.ts (the tab: its date, the ✦ pill), layout.md (its cards),
 │   │   │       │                   DashboardDate.vue (the date row), index.scss; widgets/<topic>/ (each
@@ -27,13 +27,15 @@
 │   │   ├── 📁 controllers        — per topic, what a widget shows (its load) and what it writes (weight,
 │   │   │                           cycle, savings, shop, market, finance, goals, xp, pomodoro, dailyNote),
 │   │   │                           tasks.js (a task's line with undo, new tasks and pool lines),
+│   │   │                           taskMigration.js and marketMigration.js (the one-off migrations),
 │   │   │                           calendar.js (what the calendar writes), notes.js, mobileConfig.js,
 │   │   │                           blocks.js (the ```winx block: names → { view, load, watches })
 │   │   ├── 📁 models             — the things and their rules, no Obsidian in them: Task, Note, Goal,
 │   │   │                           MarketItem, SavingsJar, the weight / body / cycle logs, CalendarData,
 │   │   │                           repeats (🔁 rules), ledger (finance), timer (pomodoro), vitals (HP / MP),
 │   │   │                           xp, market (supply stats), kinds (watch / read / game / recipe notes),
-│   │   │                           taskFile (a task note's lines as tasks and pool lines)
+│   │   │                           taskFile (a task note's lines as tasks and pool lines),
+│   │   │                           taskAlternation (a 🔁 task's variants in turn)
 │   │   ├── 📁 composables        — use.js (useRedraw, useDataviewChanges, useWhenIndexed, useNewDay,
 │   │   │                           useBusy, useLater…), vueApp.ts (useVueApp: a Vue app owned by an Obsidian
 │   │   │                           component), vueHost.ts (VueHost: a widget's), drag.js / swipe.js (the
@@ -53,7 +55,8 @@
 │   ├── 📁 Assets                 — sounds, task stickers (stickers/)
 │   └── 📁 Data                   — everything Winx reads and writes (paths: plugin/src/helpers/paths.js):
 │                                   Tasks/ (Master.md: the lines, tasks.json: Winx's fields by id), Goals.md, Finance/ (Ledger/, rules.json),
-│                                   Shop.md, Celestial Market.md, Supplies.md, Cycle.md, Weight.md, Body log.md, Savings/
+│                                   Shop.md, Celestial Market.md (the log; Market/items.json: the items by id;
+│                                   Celestial Market (old).md: the copy before the migration), Supplies.md, Cycle.md, Weight.md, Body log.md, Savings/
 ├── 📁 02 Areas/Personal/Daily Notes — daily notes (the folder set in Obsidian's Daily notes)
 ├── 📁 03 Resources/Collections   — Readlist, Gamelist, Watchlist, Recipes (Obsidian Bases)
 ```

@@ -19,7 +19,7 @@ Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `di
 ```
 
 **Winx: New task** (Cmd+P, or **＋ task** in the calendar):
-1. One window: difficulty and area (both needed), time of day, sticker; or tick **To pool** to keep it only as a record
+1. One window: difficulty and area (both needed), time of day, sticker, variants (a 🔁 task's names in turn, and the next one); or tick **To pool** to keep it only as a record
 2. Rule and dates in the Tasks dialog
 3. A new id (an existing name reuses its id), a record in `tasks.json`, a line at the top of `Master.md` (none for the pool)
 

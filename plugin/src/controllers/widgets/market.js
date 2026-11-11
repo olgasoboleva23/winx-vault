@@ -154,9 +154,12 @@ async function addItem(name, tag, id) {
   const file = app.vault.getFileByPath(MARKET_NOTE);
 
   if (!file) return appendLine(MARKET_NOTE, `- [ ] ${id}`);
+  // open already by its id, or by its name on a legacy line (a migration not finished)
+  const key = name.trim().toLowerCase();
+
   await app.vault.process(file, text => {
     const listed = parseNote(MARKET_NOTE, text).map(MarketItem.of)
-      .some(i => i.id === id && i.isOpen);
+      .some(i => i.isOpen && (i.id === id || i.key === key));
 
     return listed ? text : `${text.trimEnd()}\n- [ ] ${id}\n`;
   });
