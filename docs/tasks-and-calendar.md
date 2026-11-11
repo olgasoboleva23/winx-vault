@@ -12,7 +12,7 @@ Every task has an id (`t12`). `00 System/Data/Tasks/Master.md` holds the Tasks p
 - [ ] t12 [repeat:: every week on Tuesday, Thursday] [due:: 2026-11-03]
 ```
 
-Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `difficulty` (easy / medium / hard / epic), `area` (an area key: body, mind…), `daytime` (morning / evening), `goal` (a goal's key in `Goals.md`: workout), `sticker`, `after` (the task ID it follows, or an array of IDs), `order` (the place in its day), `pool`, `variants` (names in cycle order), `currVariant` (the upcoming variant). A rename or a new sticker changes only the record: the done lines keep the id, so the history stays. Difficulty and area live in the record too, so changing them recounts the gold and XP of all that task's past done copies (no history of changes is kept). A line whose id has no record shows the id as its name.
+Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `difficulty` (easy / medium / hard / epic / none), `area` (an area key: body, mind…), `daytime` (morning / evening), `goal` (a goal's key in `Goals.md`: workout), `sticker`, `after` (the task ID it follows, or an array of IDs), `order` (the place in its day), `pool`, `variants` (names in cycle order), `currVariant` (the upcoming variant). A rename or a new sticker changes only the record: the done lines keep the id, so the history stays. Difficulty and area live in the record too, so changing them recounts the gold and XP of all that task's past done copies (no history of changes is kept). A line whose id has no record shows the id as its name.
 
 ```
 "t12": { "name": "read a chapter", "difficulty": "medium", "area": "mind", "daytime": "evening", "sticker": "rings.webp" }

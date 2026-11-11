@@ -23,7 +23,10 @@ type Choice = { label: string; value: unknown; img?: TFile };
 
 export type Row = Tab & (
   | { name: string; key: string; options: Choice[] | ((values: Values) => Choice[]) }
-  | { name: string; key: string; text: string; number?: boolean; lines?: boolean; color?: boolean }
+  | {
+    name: string; key: string; text: string; number?: boolean; lines?: boolean; color?: boolean;
+    readonly?: (values: Values) => boolean;
+  }
   | { name: string; key: string; check: string }
   | { name: string; key: string; label: true }
   | { name: string; key: string; list: Row[]; required?: string[]; fixed?: boolean });
@@ -171,6 +174,7 @@ export class Form extends Modal {
         type: r.number ? "number" : r.color ? "color" : "text", attr: { placeholder: r.text },
         cls: r.color ? "" : "winx-form__input",   // fills a list's cell (a colour: its own size)
       });
+      input.readOnly = r.readonly?.(vals) ?? false;
       input.value = vals[r.key] ?? "";
       input.oninput = () => {
         vals[r.key] = !r.number ? input.value.trim()

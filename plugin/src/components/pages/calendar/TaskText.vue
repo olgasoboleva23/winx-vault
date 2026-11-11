@@ -15,7 +15,7 @@ const text = computed(() =>
 
 <template>
   <span
-    v-if="task.difficulty"
+    v-if="task.difficulty && task.difficulty !== 'none'"
     v-tip="'difficulty'"
     class="tag"
     :data-difficulty="task.difficulty"

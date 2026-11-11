@@ -117,6 +117,14 @@ test("Form: a list with buttons or long text keeps its groups stacked, rows insi
 });
 
 
+test("Form: a row can keep a fixed numeric value read-only for selected records", () => {
+  const rows = [{ name: "XP", key: "xp", text: "XP", number: true,
+    readonly: values => values.key === "none" }];
+  assert.equal(open(rows, { key: "none", xp: 0 }).querySelector("input").readOnly, true);
+  assert.equal(open(rows, { key: "easy", xp: 5 }).querySelector("input").readOnly, false);
+});
+
+
 test("Form: dependent choices follow edited variant names and keep the selected value", () => {
   const win = open([
     { name: "Variants", key: "variants", text: "one per line", lines: true },

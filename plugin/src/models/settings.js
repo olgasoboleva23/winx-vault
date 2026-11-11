@@ -20,7 +20,8 @@ export function settingsValues(config) {
 
 // the values as config.json
 export const toConfig = v => ({
-  difficulties: Object.fromEntries(v.difficulties.map(d => [d.key, { xp: d.xp, gold: d.gold }])),
+  difficulties: Object.fromEntries(v.difficulties.map(d =>
+    [d.key, { xp: d.key === "none" ? 0 : d.xp, gold: d.gold }])),
   areas: v.areas.map(a => ({ ...pick(a), key: a.key.trim() })),
   levels: { spark: v.spark, glow: v.glow, aura: v.aura },
   levelCost: { base: v.base, step: v.step },

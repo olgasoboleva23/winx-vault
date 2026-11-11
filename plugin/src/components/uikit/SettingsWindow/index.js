@@ -10,7 +10,7 @@ const number = (tab, name, key, text) => ({ tab, name, key, text, number: true }
 export const settingsWindow = (config, values) => Form.ask(app, "✦ Settings", [
   { tab: D, name: D, key: "difficulties", fixed: true, required: ["xp", "gold"], list: [
     { name: "Difficulty", key: "label", label: true },
-    { name: "XP", key: "xp", text: "XP", number: true },
+    { name: "XP", key: "xp", text: "XP", number: true, readonly: v => v.key === "none" },
     { name: "Gold", key: "gold", text: "gold", number: true },
   ] },
   { tab: A, name: A, key: "areas", required: ["key", "icon", "title"], list: [

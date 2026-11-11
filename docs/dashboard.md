@@ -40,6 +40,9 @@ Completing a task awards XP and gold by its difficulty (the `difficulty` of its 
 | ⭐⭐ `medium` | 10 | 5 |
 | ⭐⭐⭐ `hard` | 20 | 10 |
 | ⭐⭐⭐⭐ `epic` | 50 | 25 |
+| No XP `none` | 0 (fixed) | 0 (configurable) |
+
+Choose **No XP (0 XP)** in a task’s Difficulty field for activities that should not earn experience. These tasks never change HP, whether completed or overdue. Gold is configured separately in the **No XP** row of Settings; its default is zero. This applies to the selected task, not its whole life area.
 
 Level `n` costs `100 + (n-1) × 25` XP (base and step in ⚙ Settings).
 

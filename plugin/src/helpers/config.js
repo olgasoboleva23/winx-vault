@@ -8,6 +8,7 @@ const DIFFICULTIES = [
   { label: "⭐⭐ Medium", key: "medium", xp: 10, gold: 5 },
   { label: "⭐⭐⭐ Hard", key: "hard", xp: 20, gold: 10 },
   { label: "⭐⭐⭐⭐ Epic", key: "epic", xp: 50, gold: 25 },
+  { label: "No XP", key: "none", xp: 0, gold: 0 },
 ];
 
 // an area: its key (in the records), icon, title, the Life Areas radar's name, its colour (the
@@ -49,7 +50,8 @@ export function applyConfig(json = {}) {
   const lv = { ...LEVELS, ...json.levels }, cost = { ...LEVEL_COST, ...json.levelCost };
 
   config.difficulties = DIFFICULTIES.map(x =>
-    ({ ...x, xp: num(d[x.key]?.xp, x.xp), gold: num(d[x.key]?.gold, x.gold) }));
+    ({ ...x, xp: x.key === "none" ? 0 : num(d[x.key]?.xp, x.xp),
+      gold: num(d[x.key]?.gold, x.gold) }));
   config.areas = areas.map(a => ({
     key: String(a.key), icon: a.icon ?? "✦", title: a.title ?? String(a.key),
     name: a.name ?? a.title,

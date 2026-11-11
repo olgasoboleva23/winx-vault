@@ -4,7 +4,8 @@
 import config from "#/helpers/config.js";
 
 const HP_MAX = 50, MP_MAX = 4;
-const stars = t => config.difficulties.findIndex(d => d.key === t.difficulty) + 1;
+const stars = t => t.difficulty === "none" ? 0
+  : config.difficulties.findIndex(d => d.key === t.difficulty) + 1;
 const sum = (list, f) => list.reduce((a, t) => a + f(t), 0);
 
 export function vitals({ missed, doneToday }) {
