@@ -2,19 +2,14 @@ import { FuzzySuggestModal, Notice, Platform, Plugin } from "obsidian";
 import { KINDS } from "#/models/kinds.js";
 import { mirrorMobileConfig } from "#/controllers/mobileConfig.js";
 import { Form } from "#/components/uikit/Form/index.ts";
-import { todayYmd } from "#/helpers/dates.js";
-import { saveNewTask } from "#/controllers/tasks.js";
+import { newTask } from "#/controllers/tasks.js";
 import { migrateMarket } from "#/migrations/market.js";
 import { migrateTasks } from "#/migrations/tasks.js";
 import { openSettings } from "#/controllers/settings.js";
-import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
-import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { addMarketItem } from "#/controllers/widgets/market.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
 import { createNote } from "#/controllers/notes.js";
 import { editCourse } from "#/controllers/meds.js";
-import { tasksApi } from "#/helpers/plugins.js";
-import { Task } from "#/models/task.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
@@ -26,23 +21,7 @@ export function registerCommands(plugin: Plugin) {
   // a past task (its difficulty, area, time and sticker come along) or a new one: then difficulty,
   // area, time of day, sticker (or "to pool") in one window; then the Tasks modal for the text and
   // dates
-  add("new-task", "New task", async () => {
-    const found = await pickTask();
-
-    if (!found) return;
-    const ready = !found.isNew && found.picks.difficulty && found.picks.area;
-    const pick = ready ? found.picks : await taskWindow(found.picks ?? {}, true);
-
-    if (!pick) return;
-    const api = tasksApi();
-
-    if (!api) return void new Notice("✦ Tasks plugin is off — task not saved");
-    // created shows how long it waits on the board
-    const result = await api.editTaskLineModal(Task.created(found.name, todayYmd()).line);
-
-    if (!result) return;
-    await saveNewTask(found.name, pick, result, found.id);   // says so itself when it can't
-  });
+  add("new-task", "New task", async () => void await newTask());
 
   // a watch / read / game / recipe / work task note (models/kinds.js), in its folder, opened in a
   // new tab

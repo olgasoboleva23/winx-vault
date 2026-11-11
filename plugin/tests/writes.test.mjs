@@ -153,11 +153,11 @@ test("a pool item: the window's picks and name go to its record, no line", async
 
 test("a new task: a new name gets a new id, a past name its old one; the line goes on top", async () => {
   const files = vault({ [MASTER]: "- [ ] t4 [due:: 2026-11-03]\n" }, { t4: { name: "walk", goal: null } });
-  await saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02] [due:: 2026-11-06]");
+  assert.equal(await saveNewTask("stretch", PICK, "- [ ] stretch [created:: 2026-11-02] [due:: 2026-11-06]"), "t5");
   assert.equal(files[MASTER], "- [ ] t5 [created:: 2026-11-02] [due:: 2026-11-06]\n- [ ] t4 [due:: 2026-11-03]\n");
   assert.deepEqual(json(files).t5, { name: "stretch", difficulty: "easy", area: "body", daytime: "evening", goal: null, sticker: "a.webp", after: null });
   taskStore.putRecords(json(files));
-  await saveNewTask("Walk ", PICK, "- [ ] Walk  [created:: 2026-11-02]", "t4");
+  assert.equal(await saveNewTask("Walk ", PICK, "- [ ] Walk  [created:: 2026-11-02]", "t4"), "t4");
   assert.match(files[MASTER], /^- \[ \] t4 \[created:: 2026-11-02\]\n/);
   assert.equal(Object.keys(json(files)).length, 2);
 });
@@ -179,7 +179,7 @@ test("a new task typed with a name a record already has (no pick): reuses its id
 
 test("a new task to the pool: a record with pool: true, no line", async () => {
   const files = vault({ [MASTER]: "- [ ] t1\n" });
-  assert.equal(await saveNewTask("water herbs", { ...PICK, pool: true }, "- [ ] water herbs [created:: 2026-11-02]"), true);
+  assert.equal(await saveNewTask("water herbs", { ...PICK, pool: true }, "- [ ] water herbs [created:: 2026-11-02]"), "t2");
   assert.deepEqual(json(files).t2.pool, true);   // t1 is taken by the line
   assert.equal(files[MASTER], "- [ ] t1\n");
 });
