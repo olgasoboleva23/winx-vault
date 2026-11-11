@@ -236,3 +236,11 @@ test("projects.json that isn't JSON leaves the projects as they were; a deleted 
   assert.equal(taskStore.projects.size, 0);
   assert.equal(taskStore.inProject.size, 0);
 });
+
+test("a project without stages, or a stage without tasks: no throw, projects and inProject agree", () => {
+  vault({});
+  taskStore.putProjects({ p1: { name: "x" }, p2: { name: "y", stages: [{ name: "A" }, { name: "B", tasks: ["t1"] }] } });
+  assert.deepEqual([...taskStore.projects.keys()], ["p1", "p2"]);
+  assert.deepEqual(taskStore.inProject, new Set(["t1"]));
+  assert.deepEqual(stageTasks({ name: "A" }), []);
+});

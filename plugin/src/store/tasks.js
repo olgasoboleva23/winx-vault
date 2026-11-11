@@ -38,9 +38,12 @@ export const taskStore = {
   putRecords(json) { taskStore.records = new Map(Object.entries(json)); refresh(); },
   // the projects set from projects.json's object
   putProjects(json) {
-    taskStore.projects = new Map(Object.entries(json));
-    taskStore.inProject = new Set([...taskStore.projects.values()]
-      .flatMap(p => p.stages.flatMap(s => s.tasks)));
+    const projects = new Map(Object.entries(json));
+    const ids = [...projects.values()]
+      .flatMap(p => (p.stages ?? []).flatMap(s => s.tasks ?? []));
+
+    taskStore.projects = projects;
+    taskStore.inProject = new Set(ids);
     refresh();
   },
   drop(path) {
@@ -69,7 +72,7 @@ export function stageTasks(stage) {
     }
   }
 
-  return [...new Set(stage.tasks)].map(id => lines.get(id)).filter(Boolean);
+  return [...new Set(stage.tasks ?? [])].map(id => lines.get(id)).filter(Boolean);
 }
 
 const reads = new Map();   // path → its last read's number: an older read, or one of a note dropped
