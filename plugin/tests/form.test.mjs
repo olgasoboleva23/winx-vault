@@ -2,32 +2,14 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
-// the Form window draws its rows with classes only (its look: uikit/Form/index.scss). The DOM
-// helpers Obsidian adds to elements, the few the Form uses, written here
-let Form;
+// the Form window draws its rows with classes only (its look: uikit/Form/index.scss); the only
+// inline style is a lines list's columns. The DOM helpers Obsidian adds, the two the Form uses
+let Form, nextTick;
 before(async () => {
   GlobalRegistrator.register();
-  const el = HTMLElement.prototype;
-  el.createEl = function (tag, o = {}) {
-    const { cls, text, type, attr = {} } = typeof o === "string" ? { cls: o } : o;
-    const e = this.appendChild(document.createElement(tag));
-
-    if (cls) e.className = cls;
-    if (text) e.textContent = text;
-    if (type) e.type = type;
-    for (const [k, v] of Object.entries(attr)) e.setAttribute(k, v);
-
-    return e;
-  };
-  el.createDiv = function (o) { return this.createEl("div", o); };
-  el.createSpan = function (o) { return this.createEl("span", o); };
-  el.empty = function () { this.replaceChildren(); };
-  el.setText = function (t) { this.textContent = t; };
-  el.setAttr = function (k, v) { this.setAttribute(k, v); };
-  el.addClass = function (c) { this.classList.add(c); };
-  el.toggle = function (on) { this.hidden = !on; };
-  el.toggleClass = function (c, on) { this.classList.toggle(c, on); };
-  el.setCssProps = function (props) { Object.assign(this.cssProps ??= {}, props); };
+  HTMLElement.prototype.setText = function (t) { this.textContent = t; };
+  HTMLElement.prototype.addClass = function (c) { this.classList.add(c); };
+  ({ nextTick } = await import("vue"));
   ({ Form } = await import("#/components/uikit/Form/index.ts"));
 });
 
@@ -44,8 +26,12 @@ const open = (rows, values) => {
   return form.contentEl;
 };
 const classes = els => [...els].map(e => e.className);
+const cols = win => win.querySelector(".winx-form__list--lines").style
+  .getPropertyValue("--winx-form-cols");
+// no inline style but a lines list's columns
+const styled = win => [...win.querySelectorAll("[style]")].map(e => e.getAttribute("style"));
 
-test("Form: a list of text boxes and checkboxes is a line of names, then one line a group", () => {
+test("Form: a list of text boxes and checkboxes is a line of names, then one line a group", async () => {
   const win = open([
     { name: "Title", key: "title", text: "a title" },
     { name: "Areas", key: "areas", list: [
@@ -68,13 +54,14 @@ test("Form: a list of text boxes and checkboxes is a line of names, then one lin
   assert.equal(win.querySelectorAll(".winx-form__line").length, 2);
 
   win.querySelector(".winx-form__more button").click();   // + adds a group's line
+  await nextTick();
   assert.equal(win.querySelectorAll(".winx-form__line").length, 3);
   win.querySelector(".winx-form__line:last-child button").click();   // × takes it off
+  await nextTick();
   assert.equal(win.querySelectorAll(".winx-form__line").length, 2);
-  assert.equal(win.querySelector("[style]"), null);
   // one grid: a text box's column shares the width, a colour's, a checkbox's and the ×'s fit them
-  assert.equal(win.querySelector(".winx-form__list--lines").cssProps["--winx-form-cols"],
-    "minmax(0, 1fr) auto auto auto");
+  assert.equal(cols(win), "minmax(0, 1fr) auto auto auto");
+  assert.deepEqual(styled(win), ["--winx-form-cols: minmax(0, 1fr) auto auto auto;"]);
 });
 
 test("Form: a fixed list has no + or ×, a label row shows its value as text", () => {
@@ -94,8 +81,7 @@ test("Form: a fixed list has no + or ×, a label row shows its value as text", (
   assert.equal(line.querySelector(".winx-form__label").textContent, "⭐ Easy");
   assert.equal(line.querySelector("input").value, "5");
   assert.equal(win2.querySelectorAll("button").length, 1);   // the window's own button only
-  assert.equal(win2.querySelector(".winx-form__list--lines").cssProps["--winx-form-cols"],
-    "auto minmax(0, 1fr)");
+  assert.equal(cols(win2), "auto minmax(0, 1fr)");
   assert.equal(win.querySelector(".setting-item-name"), null);   // named as its tab: no heading
 });
 
@@ -113,7 +99,7 @@ test("Form: a list with buttons or long text keeps its groups stacked, rows insi
   assert.equal(group.querySelector("textarea").className, "winx-form__textarea");
   assert.equal(group.querySelector("textarea").getAttribute("rows"), "4");
   assert.equal(win.querySelector(".winx-form__line"), null);
-  assert.equal(win.querySelector("[style]"), null);
+  assert.deepEqual(styled(win), []);
 });
 
 
@@ -125,7 +111,7 @@ test("Form: a row can keep a fixed numeric value read-only for selected records"
 });
 
 
-test("Form: dependent choices follow edited variant names and keep the selected value", () => {
+test("Form: dependent choices follow edited variant names and keep the selected value", async () => {
   const win = open([
     { name: "Variants", key: "variants", text: "one per line", lines: true },
     { name: "Next variant", key: "next", options: values => values.variants.split("\n")
@@ -135,8 +121,10 @@ test("Form: dependent choices follow edited variant names and keep the selected 
   assert.equal(rows[1].querySelector(".mod-cta").textContent, "Arms");
   const field = win.querySelector("textarea");
   field.value = "Core\nArms\nLegs"; field.dispatchEvent(new Event("input"));
+  await nextTick();
   assert.deepEqual([...rows[1].querySelectorAll("button")].map(b => b.textContent), ["Core", "Arms", "Legs"]);
   assert.equal(rows[1].querySelector(".mod-cta").textContent, "Arms");
   rows[1].querySelector("button:last-child").click();
+  await nextTick();
   assert.equal(rows[1].querySelector(".mod-cta").textContent, "Legs");
 });
