@@ -35,3 +35,7 @@ test("a date in today's week (or month) means following today again", () => {
   assert.equal(dateFor("2026-11-03", "month", today), "2026-11-03");
   assert.equal(dateFor(null, "week", today), null);
 });
+
+test("the Projects tab is a known tab", () => {
+  assert.equal(readState({ tab: "projects" }).tab, "projects");
+});

@@ -1,5 +1,6 @@
 // The panel's cards grouped by area, shared by its tabs
 import { T } from "#/models/calendarData.js";
+import { taskStore, stageTasks } from "#/store/tasks.js";
 
 export const SHOWN = 8;   // No date: the first 8 until "show all"
 
@@ -23,4 +24,16 @@ export function byArea(items, card, config) {
 
   return runs.map((r, i) =>
     ({ key: `${i}|${r.a}`, title: areaTitle(config, r.a), cards: r.items.map(card) }));
+}
+
+// the projects not done, each with its stages' open tasks (a stage with none is left out), and
+// how many open tasks that is, in file order: [{ key, title, stages: [{ name, entries }], open }]
+export function openProjects() {
+  return [...taskStore.projects].filter(([, p]) => p.status !== "done").map(([key, p]) => {
+    const stages = (p.stages ?? [])
+      .map(s => ({ name: s.name, entries: stageTasks(s).filter(e => !e.done) }))
+      .filter(s => s.entries.length);
+
+    return { key, title: p.name, stages, open: stages.reduce((n, s) => n + s.entries.length, 0) };
+  }).filter(p => p.stages.length);
 }

@@ -1,4 +1,5 @@
-<!-- The bottom panel: No date | Ahead | Regulars | Pool, one card per area (Ahead: per month);
+<!-- The bottom panel: No date | Ahead | Regulars | Pool | Projects, one card per area (Ahead: per
+     month, Projects: per project);
      a drop here takes the date off. Only it shows the tab and the backlog's cut, so switching them
      redraws only it -->
 <script setup>
@@ -6,6 +7,7 @@ import { computed, inject, provide, reactive, watch } from "vue";
 import PanelTabs from "./PanelTabs.vue";
 import NoDateTab from "./NoDateTab.vue";
 import AheadTab from "./AheadTab.vue";
+import ProjectsTab from "./ProjectsTab.vue";
 import PoolTab from "./PoolTab.vue";
 import RegularsTab from "./RegularsTab.vue";
 import { SHOWN } from "#/helpers/panelGroups.js";
@@ -44,6 +46,7 @@ const toggleMore = () => { state.backlogOpen = !state.backlogOpen; };
       <NoDateTab v-if="state.tab === 'nodate'" />
       <AheadTab v-else-if="state.tab === 'ahead'" />
       <PoolTab v-else-if="state.tab === 'pool'" />
+      <ProjectsTab v-else-if="state.tab === 'projects'" />
       <RegularsTab v-else />
     </div>
     <button v-if="more" class="winx-cal__more" @click="toggleMore">{{ more }}</button>

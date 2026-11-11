@@ -101,7 +101,7 @@ export class CalendarView extends ItemView {
     const data = (area: string | null) => new CalendarData({
       tasks: area ? tasks.filter((t: any) => T(t).area === area) : tasks,
       poolLines: area ? poolLines.filter((l: any) => l.rec.area === area) : poolLines,
-      days, today, areaOrder: Object.keys(config.areaIcons),
+      days, today, areaOrder: Object.keys(config.areaIcons), inProject: taskStore.inProject,
     });
     const ctx: any = {
       state, today, days, base: baseDate(state, today), view: state.view,

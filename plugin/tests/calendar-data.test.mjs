@@ -265,3 +265,11 @@ test("a follower can stay after either member of an alternating pair", () => {
     assert.equal(rows[1].follows, rows[0]);
   }
 });
+
+test("an undated open one-off in a project is not in backlog; a dated one is still on its day", () => {
+  const plan = task(" ", "plan launch"), draft = task(" ", "draft memo [due:: 2026-10-30]");
+  const m = new CalendarData({ tasks: [plan, draft, task(" ", "buy tape")], poolLines: [], days: weekOf(TODAY),
+    today: TODAY, inProject: new Set([T(plan).id, T(draft).id]) });
+  assert.deepEqual(texts(m.backlog), ["buy tape"]);
+  assert.deepEqual(m.byDay["2026-10-30"].map(e => T(e.t).text), ["draft memo"]);
+});

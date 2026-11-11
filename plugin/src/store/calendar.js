@@ -8,6 +8,8 @@ export const DEFAULT = Object.freeze({
   backlogOpen: false,
 });
 
+const TABS = ["nodate", "ahead", "regulars", "pool", "projects"];
+
 // what's saved with the layout; the rest of the tab's state is not
 export const SAVED = Object.keys(DEFAULT);
 
@@ -27,7 +29,7 @@ export function readState(saved) {
     date: pick(s.date, v => typeof v === "string" && DATE.test(v), null),
     view: pick(s.view, v => v === "week" || v === "month", "week"),
     showDone: pick(s.showDone, bool, false),
-    tab: pick(s.tab, v => ["nodate", "ahead", "regulars", "pool"].includes(v), "nodate"),
+    tab: pick(s.tab, v => TABS.includes(v), "nodate"),
     unfolded: Array.isArray(s.unfolded)
       ? [...new Set(s.unfolded.filter(d => typeof d === "string" && DATE.test(d)))]
       : [],

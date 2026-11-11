@@ -266,3 +266,28 @@ test("on the phone, a card can't be swiped while the Tasks plugin is off", async
     assert.equal(ticked.length, 0);
   } finally { document.body.classList.remove("is-mobile"); }
 });
+
+test("Projects tab: a GroupCard per project that isn't Done, a stage title over its open tasks, done ones hidden", async () => {
+  const { taskStore } = await import("#/store/tasks.js");
+  const { MASTER } = await import("#/helpers/paths.js");
+  taskStore.put(MASTER, [
+    "- [ ] t1 [due:: 2026-11-10]", "- [x] t2 [completion:: 2026-11-01]", "- [ ] t3", "- [ ] t4",
+  ].join("\n"));
+  taskStore.putRecords({ t1: { name: "pick venue" }, t2: { name: "book flights" },
+    t3: { name: "pack bags" }, t4: { name: "old chore" } });
+  taskStore.putProjects({
+    trip: { name: "Trip", status: "active", stages: [{ name: "Plan", tasks: ["t1", "t2"] },
+      { name: "Go", tasks: ["t3"] }, { name: "Back", tasks: ["t2"] }] },
+    old: { name: "Old", status: "done", stages: [{ name: "All", tasks: ["t4"] }] },
+  });
+  const { el, st } = mount({ tab: "projects" });
+  const panel = el.querySelector(".winx-cal__backlog-grid");
+  assert.deepEqual([...panel.querySelectorAll(".winx-cal__group")].map(g => g.textContent), ["Trip"]);
+  assert.deepEqual([...panel.querySelectorAll(".winx-cal__stage")].map(g => g.textContent), ["Plan", "Go"]);
+  assert.match(panel.textContent, /pick venue/);
+  assert.match(panel.textContent, /pack bags/);
+  assert.doesNotMatch(panel.textContent, /book flights|old chore/);
+  assert.match(el.querySelector(".winx-tabs__tab--on").textContent, /^Projects · 2$/);
+  assert.equal(st.tab, "projects");
+  taskStore.put(MASTER, ""); taskStore.putRecords({}); taskStore.putProjects({});
+});
