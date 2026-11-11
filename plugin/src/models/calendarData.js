@@ -30,7 +30,8 @@ export const canReorder = (a, b) => !!T(a).id && !!T(b).id && T(a).id !== T(b).i
 // a task with #after/id/<id> right under the task with #id/<id> when both are in `list` (after its
 // earlier followers), with .follows set to it; the rest in their order
 const chain = list => {
-  const lead = e => T(e.t).after && list.find(x => x !== e && T(x.t).id === T(e.t).after);
+  const lead = e => T(e.t).after && list.find(x =>
+    x !== e && [T(e.t).after].flat().includes(T(x.t).id));
   const out = list.filter(e => !lead(e));
 
   for (const e of list.filter(lead)) {

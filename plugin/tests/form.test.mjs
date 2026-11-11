@@ -115,3 +115,20 @@ test("Form: a list with buttons or long text keeps its groups stacked, rows insi
   assert.equal(win.querySelector(".winx-form__line"), null);
   assert.equal(win.querySelector("[style]"), null);
 });
+
+
+test("Form: dependent choices follow edited variant names and keep the selected value", () => {
+  const win = open([
+    { name: "Variants", key: "variants", text: "one per line", lines: true },
+    { name: "Next variant", key: "next", options: values => values.variants.split("\n")
+      .filter(Boolean).map(value => ({ label: value, value })) },
+  ], { variants: "Core\nArms", next: "Arms" });
+  const rows = win.querySelectorAll(".setting-item");
+  assert.equal(rows[1].querySelector(".mod-cta").textContent, "Arms");
+  const field = win.querySelector("textarea");
+  field.value = "Core\nArms\nLegs"; field.dispatchEvent(new Event("input"));
+  assert.deepEqual([...rows[1].querySelectorAll("button")].map(b => b.textContent), ["Core", "Arms", "Legs"]);
+  assert.equal(rows[1].querySelector(".mod-cta").textContent, "Arms");
+  rows[1].querySelector("button:last-child").click();
+  assert.equal(rows[1].querySelector(".mod-cta").textContent, "Legs");
+});

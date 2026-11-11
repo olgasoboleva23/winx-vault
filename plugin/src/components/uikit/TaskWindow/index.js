@@ -1,6 +1,8 @@
 // The task window: what the Tasks plugin's dialog doesn't ask (difficulty, area, time of day,
 // sticker), in the shared Form window. Used to edit a task (controllers/tasks.js) and for a new one
 // (the New task command).
+import { Notice } from "obsidian";
+import { variantNames, variantsProblem } from "#/models/taskAlternation.js";
 import config from "#/helpers/config.js";
 import { app } from "#/helpers/app.js";
 import { STICKERS } from "#/helpers/paths.js";
@@ -10,12 +12,12 @@ import { Form } from "#/components/uikit/Form/index.ts";
 // System/Assets/stickers); `preset` (Task#picks, plus `name` for a pool item) has the current
 // ones. A new task must have a difficulty and an area (`required`) and can go to the pool instead
 // (a "to pool" checkbox: pick.pool). Resolves to the picks, null when closed.
-export const taskWindow = async (preset = {}, required = false) => {
+export const taskWindow = async (preset = {}, required = false, { variants = true } = {}) => {
   const { difficulties, areas } = config;
   const stickers = (app.vault.getFolderByPath(STICKERS)?.children ?? [])
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  return Form.ask(app, required ? "✦ New task" : "✦ Edit task", [
+  const rows = [
     // a pool item's rename (a task with a line is renamed in the Tasks dialog)
     ...("name" in preset ? [{ name: "Name", key: "name", text: "name" }] : []),
     {
@@ -33,14 +35,40 @@ export const taskWindow = async (preset = {}, required = false) => {
       { label: "—", value: null },
       ...stickers.map(f => ({ label: f.name, value: f.name, img: f })),
     ] },
+    ...(variants ? [
+      { name: "Variants · in order", key: "variantsText",
+        text: "One name per line; empty = no alternation", lines: true },
+      { name: "Next variant", key: "currVariant", options: v => [
+        { label: "First in the list", value: null },
+        ...variantNames(v.variantsText).map(value => ({ label: value, value })),
+      ] },
+    ] : []),
     // the pool: tasks to pick when it's time (the calendar's Pool tab); no dates
     ...(required
       ? [{
         name: "To pool", key: "pool", check: "pick it from the calendar's Pool tab when it's time",
       }]
       : []),
-  ], {
-    values: { difficulty: null, area: null, daytime: null, sticker: null, ...preset },
-    required: required ? ["difficulty", "area"] : [],
-  });
+  ];
+  let values = { difficulty: null, area: null, daytime: null, sticker: null, ...preset,
+    variantsText: (preset.variants ?? []).join("\n"), currVariant: preset.currVariant ?? null };
+
+  for (;;) {
+    const pick = await Form.ask(app, required ? "✦ New task" : "✦ Edit task", rows, {
+      values, required: required ? ["difficulty", "area"] : [],
+    });
+
+    if (!pick) return null;
+    const { variantsText, currVariant, ...rest } = pick;
+
+    delete rest.variants;
+
+    if (!variants) return rest;
+    const names = variantNames(variantsText), next = names.length ? currVariant ?? names[0] : null;
+    const problem = variantsProblem(names, next);
+
+    if (!problem) return { ...rest, variants: names, currVariant: next };
+    new Notice(problem);
+    values = pick;
+  }
 };

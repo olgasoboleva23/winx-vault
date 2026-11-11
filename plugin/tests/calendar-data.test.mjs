@@ -254,3 +254,14 @@ test("taskInfo: a one-off's time is shown, a 🔁 task's is left to its box head
   assert.equal(taskInfo(task(" ", "tea #time/evening [due:: 2026-10-28]"), ctx, app).daytime, "evening");
   assert.equal(taskInfo(task(" ", "run #time/evening [repeat:: every day] [due:: 2026-10-28]"), ctx, app).daytime, null);
 });
+
+test("a follower can stay after either member of an alternating pair", () => {
+  for (const id of ["t900", "t901"]) {
+    const lead = { status: " ", text: `${id} [repeat:: every day] [due:: ${TODAY}]`, rec: { name: "Workout" }, path: "Tasks/Master.md", line: 0 };
+    const follower = { status: " ", text: `t902 [repeat:: every day] [due:: ${TODAY}]`, rec: { name: "After workout", after: ["t900", "t901"] }, path: lead.path, line: 1 };
+    const m = data([follower, lead]);
+    const rows = m.dayParts(TODAY, { open: true, ghost: true, done: true }).routineRows;
+    assert.deepEqual(rows.map(e => T(e.t).id), [id, "t902"]);
+    assert.equal(rows[1].follows, rows[0]);
+  }
+});

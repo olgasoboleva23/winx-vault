@@ -12,7 +12,7 @@ Every task has an id (`t12`). `00 System/Data/Tasks/Master.md` holds the Tasks p
 - [ ] t12 [repeat:: every week on Tuesday, Thursday] [due:: 2026-11-03]
 ```
 
-Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `difficulty` (easy / medium / hard / epic), `area` (an area key: body, mind…), `daytime` (morning / evening), `goal` (a goal's key in `Goals.md`: workout), `sticker`, `after` (the task it follows), `order` (the place in its day), `pool`. A rename or a new sticker changes only the record: the done lines keep the id, so the history stays. Difficulty and area live in the record too, so changing them recounts the gold and XP of all that task's past done copies (no history of changes is kept). A line whose id has no record shows the id as its name.
+Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `difficulty` (easy / medium / hard / epic), `area` (an area key: body, mind…), `daytime` (morning / evening), `goal` (a goal's key in `Goals.md`: workout), `sticker`, `after` (the task ID it follows, or an array of IDs), `order` (the place in its day), `pool`, `variants` (names in cycle order), `currVariant` (the upcoming variant). A rename or a new sticker changes only the record: the done lines keep the id, so the history stays. Difficulty and area live in the record too, so changing them recounts the gold and XP of all that task's past done copies (no history of changes is kept). A line whose id has no record shows the id as its name.
 
 ```
 "t12": { "name": "read a chapter", "difficulty": "medium", "area": "mind", "daytime": "evening", "sticker": "rings.webp" }
@@ -26,6 +26,12 @@ Winx's part is in `00 System/Data/Tasks/tasks.json`, a record by id: `name`, `di
 The pool is the records with `pool: true`: tasks to pick when it's time. Dragging one onto a day makes a line with the same id (there is no `Pool.md`).
 
 **Winx: Migrate tasks** is a one-off command for a vault in the old format (`#area/…` tags and 📅 / 🔁 dates in the text, plus `Pool.md`): it gives every task an id (a task and its done copies the same one), writes `tasks.json`, rewrites `Master.md` in the Dataview format and keeps the old notes as `Master (old).md` and `Pool (old).md`. It refuses to run when `tasks.json` exists. Afterwards switch Tasks' format to Dataview.
+
+**Recurring tasks with variants:** one record, for example `t12` named `Training` with `variants: ["Core", "Arms"]` and `currVariant: "Core"`. All occurrences share the same ID, properties, goal and history. A following task uses `after: "t12"`, so it follows either variant. The Tasks line contains only its ID and native Tasks fields: `- [ ] t12 [repeat:: every week on Monday, Wednesday, Friday when done] [due:: 2026-11-13]`. Winx-specific state belongs in its JSON, not in Tasks lines.
+
+In the open task's Winx window, **Variants · in order** takes one name per line; **Next variant** selects `currVariant` (or the first name in the list). Completing through Winx lets Tasks generate the next occurrence and advances `currVariant` in a circle. Dates follow the recurrence rule. Skipping does not advance it; **Undo** restores both the completion and the JSON queue, provided neither changed meanwhile. A failed JSON save rolls back the unchanged log edit. There is no per-completion variant history: completed and skipped tasks show the common task name, regardless of the current variant. Clearing the list disables alternation.
+
+Regulars shows one **Training · Core ↔ Arms** card, the upcoming variant and date, and the combined history. Its pencil opens the common properties and variants, then Tasks' text/date dialog. Pause and resume retain the current variant. Completion works from Winx's dashboard, calendar and task edit window. Direct checkbox changes in raw Markdown are handled by Tasks alone and do not advance Winx's queue. Use the completion notice's **Undo** to roll back a step; reopening an old completion does not rewrite the later chain. A second open occurrence of the same task must be resolved before completion can advance the cycle.
 
 **Sync:** `tasks.json` and `Master.md` are two files. A record edit rewrites the whole `tasks.json`, so between syncs the last writer wins for the whole file: one device's record edits since the last sync can be lost. Sync the desktop first, then the phone, before editing there.
 

@@ -19,9 +19,10 @@ import { useVueApp } from "#/composables/vueApp.ts";
 // greyed out; a list: one group at least, each with its own required keys). Form.ask(...) resolves
 // to the values on the button (or Enter), null when closed. Its look: index.scss (block winx-form).
 type Tab = { tab?: string };
+type Choice = { label: string; value: unknown; img?: TFile };
 
 export type Row = Tab & (
-  | { name: string; key: string; options: { label: string; value: unknown; img?: TFile }[] }
+  | { name: string; key: string; options: Choice[] | ((values: Values) => Choice[]) }
   | { name: string; key: string; text: string; number?: boolean; lines?: boolean; color?: boolean }
   | { name: string; key: string; check: string }
   | { name: string; key: string; label: true }
@@ -37,6 +38,7 @@ export class Form extends Modal {
   private required: string[];
   private submit: string;
   private done = false;
+  private refreshChoices: (() => void)[] = [];
   private button!: HTMLButtonElement;
   private resolve: (v: Values | null) => void = () => {};
   private owner = new Component();   // the tabs' Vue app unmounts with the window
@@ -67,7 +69,10 @@ export class Form extends Modal {
 
     return this.required.every(k => ok(this.rows.find(r => r.key === k), this.values[k]));
   }
-  private update()    { this.button.disabled = !this.ready; }
+  private update() {
+    this.refreshChoices.forEach(refresh => refresh());
+    this.button.disabled = !this.ready;
+  }
   private send()      { if (this.ready) { this.done = true; this.close(); } }
 
   onOpen() {
@@ -103,7 +108,11 @@ export class Form extends Modal {
     });
     this.contentEl.querySelector<HTMLInputElement>("input:not([type=checkbox])")?.focus();
   }
-  onClose() { this.owner.unload(); this.resolve(this.done ? this.values : null); }
+  onClose() {
+    this.refreshChoices = [];
+    this.owner.unload();
+    this.resolve(this.done ? this.values : null);
+  }
 
   private row(r: Row, vals: Values, parent: HTMLElement) {
     if ("list" in r) return this.list(r, vals, parent);
@@ -120,24 +129,31 @@ export class Form extends Modal {
   // a row's own control (buttons, a checkbox, a text box) in `ctl`
   private control(r: Exclude<Row, { list: Row[] }>, vals: Values, ctl: HTMLElement) {
     if ("options" in r) {
-      const buttons = r.options.map(({ label, value, img }) => {
-        const b = ctl.createEl("button", { text: img ? "" : label, attr: { title: label } });
+      const draw = () => {
+        ctl.empty();
+        const options = typeof r.options === "function" ? r.options(vals) : r.options;
+        const buttons = options.map(({ label, value, img }) => {
+          const b = ctl.createEl("button", { text: img ? "" : label, attr: { title: label } });
 
-        if (img) {
-          const src = this.app.vault.getResourcePath(img);
+          if (img) {
+            const src = this.app.vault.getResourcePath(img);
 
-          b.createEl("img", { cls: "winx-form__img", attr: { src } });
-        }
+            b.createEl("img", { cls: "winx-form__img", attr: { src } });
+          }
 
-        b.toggleClass("mod-cta", value === vals[r.key]);
-        b.onclick = () => {
-          vals[r.key] = value;
-          buttons.forEach(x => x.toggleClass("mod-cta", x === b));
-          this.update();
-        };
+          b.toggleClass("mod-cta", value === vals[r.key]);
+          b.onclick = () => {
+            vals[r.key] = value;
+            buttons.forEach(x => x.toggleClass("mod-cta", x === b));
+            this.update();
+          };
 
-        return b;
-      });
+          return b;
+        });
+      };
+
+      draw();
+      if (typeof r.options === "function") this.refreshChoices.push(draw);
     } else if ("label" in r) {
       ctl.createSpan({ cls: "winx-form__label", text: vals[r.key] ?? "" });
     } else if ("check" in r) {

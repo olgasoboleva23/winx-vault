@@ -44,7 +44,7 @@ const { swipe, ...touch } = useSwipe(view, key, t => {
     @touchmove.passive="touch.move"
     @touchend="touch.end"
   >
-    <div class="winx-task-card__text"><TaskText :task="task" /></div>
+    <div class="winx-task-card__text"><slot name="text"><TaskText :task="task" /></slot></div>
     <div class="winx-task-card__meta"><slot name="meta">{{ meta }}</slot></div>
     <div class="winx-task-btns">
       <slot name="extra" />

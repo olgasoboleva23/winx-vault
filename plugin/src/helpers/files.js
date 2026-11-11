@@ -7,7 +7,7 @@
 //   changed since it was read (a line that's gone or isn't the same: nothing, a notice, false).
 // undoLines: () => put `before` back in place of `added` (a deleted line: []), once, while they're
 //   still there: near line `at`, between its old neighbours when they're given ({ above, below }:
-//   lines above may have come or gone since).
+//   lines above may have come or gone since). Returns whether it restored the line.
 // appendLine: a line at the end (unique: not when it's already there); a missing note is made with
 // `header` on top.
 import { Notice } from "obsidian";
@@ -47,20 +47,26 @@ export function undoLines(path, at, added, before, around = null) {
     && p + added.length <= lines.length
     && (!around || lines[p - 1] === around.above && lines[p + added.length] === around.below);
 
-  return () => done ? Promise.resolve() : edit(path, c => {
-    const lines = c.split("\n");
-    // the nearest place to `at` that fits
-    const p = around
-      ? [...lines.keys(), lines.length]
-        .sort((a, b) => Math.abs(a - at) - Math.abs(b - at))
-        .find(p => fits(lines, p))
-      : fits(lines, at) ? at : undefined;
+  return async () => {
+    if (done) return false;
+    let changed = false;
+    await edit(path, c => {
+      const lines = c.split("\n");
+      // the nearest place to `at` that fits
+      const p = around
+        ? [...lines.keys(), lines.length]
+          .sort((a, b) => Math.abs(a - at) - Math.abs(b - at))
+          .find(p => fits(lines, p))
+        : fits(lines, at) ? at : undefined;
 
-    if (done || p === undefined) return c;   // changed since
-    done = true;
-    lines.splice(p, added.length, before);
-    return lines.join("\n");
-  });
+      if (p === undefined) return c;
+      changed = true;
+      lines.splice(p, added.length, before);
+      return lines.join("\n");
+    });
+    done = changed;
+    return changed;
+  };
 }
 
 export async function appendLine(path, line, { header = "", unique = false } = {}) {

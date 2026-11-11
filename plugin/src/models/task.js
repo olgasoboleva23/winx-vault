@@ -51,7 +51,7 @@ export class Task {
   get id()         { return this.words.match(ID)?.[0] ?? null; }
   get area()       { return this.rec?.area ?? null; }   // "body"
   get difficulty() { return this.rec?.difficulty ?? null; }
-  // the id it follows
+  // the id it follows, or several ids (whichever is present on the day)
   get after()      { return this.rec?.after ?? null; }
   // "morning" | "evening"
   get daytime()    { return this.rec?.daytime ?? null; }
@@ -74,7 +74,14 @@ export class Task {
   // its sticker's file name, in a list
   get stickers()   { return this.rec?.sticker ? [this.rec.sticker] : []; }
   // its name: the record's, else the line's words (a line whose id has no record: the id)
-  get text()       { return this.rec?.name ?? this.words; }
+  get name()       { return this.rec?.name ?? this.words; }
+  get currVariant(){
+    return this.variants.length ? this.rec?.currVariant ?? this.variants[0] : null;
+  }
+  get variants()   { return this.rec?.variants ?? []; }
+  get text()       {
+    return this.isOpen && this.currVariant ? `${this.name} · ${this.currVariant}` : this.name;
+  }
   // the line's words alone: no checkbox, sticker, tags, rule or date fields
   get words() {
     return this.line.replace(ANY, "").replace(/^\s*- /, "").replace(FIELD, "")
@@ -115,6 +122,8 @@ export class Task {
     return {
       difficulty: this.difficulty, area: this.area,
       daytime: this.daytime, sticker: this.rec?.sticker ?? null,
+      ...this.variants.length ? { variants: [...this.variants],
+        currVariant: this.currVariant } : {},
     };
   }
   // the line with its id swapped for `name`: what the Tasks plugin's dialog shows and edits
@@ -156,12 +165,19 @@ export class Task {
   static backdateDone(toggled, date, today) {
     const shift = diffDays(date, today);
 
-    return toggled.split("\n").map(l =>
-      DONE.test(l) ? new Task(l).place(date, true)
-      : /when done/.test(l)
-        ? l.replace(FIELD, (m, k, d) =>
-          ["due", "scheduled", "start"].includes(k) ? `[${k}:: ${addDays(d, shift)}]` : m)
-      : l).join("\n");
+    return toggled.split("\n").map(l => {
+      const task = new Task(l);
+
+      if (task.isDone) return task.place(date, true);
+      if (!task.isOpen || !task.whenDone) return l;
+      // A weekly weekday rule must stay on those weekdays when completion is backdated.
+      // Shift start/scheduled/due together so their relative distances are retained.
+      const weekday = /^every week on /i.test(task.rule) && task.date;
+      const delta = weekday ? diffDays(task.firstDay(addDays(date, 1)), task.date) : shift;
+
+      return l.replace(FIELD, (m, k, d) =>
+        ["due", "scheduled", "start"].includes(k) ? `[${k}:: ${addDays(d, delta)}]` : m);
+    }).join("\n");
   }
   // as a skip of this time: the done line turns cancelled ("- [-] … [cancelled:: date]"),
   // so the rule

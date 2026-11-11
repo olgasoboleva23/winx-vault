@@ -4,6 +4,7 @@
 import { computed, inject } from "vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import GroupCard from "./GroupCard.vue";
+import TaskText from "#/components/pages/calendar/TaskText.vue";
 import TaskCard from "#/components/pages/calendar/TaskCard/index.vue";
 import { T } from "#/models/calendarData.js";
 import { dm } from "#/helpers/dates.js";
@@ -21,11 +22,14 @@ const groups = computed(() => {
 
   return byArea(model.regulars, t => {
     const next = T(t).date, task = view.info(t), flip = flipped.has(task.key);
+    const variants = T(t).variants, variant = T(t).currVariant;
 
     return {
-      task, flip, paused: flip ? !T(t).isPaused : !next,
-      rule: `${ruleText(T(t).rule)}  ·  `, history: `  ·  ${model.regularHistory(t)}`,
-      when: next ? `next ${dm(next)}` : "⏸ paused",
+      task, variants, name: T(t).name, flip, paused: flip ? !T(t).isPaused : !next,
+      rule: `${ruleText(T(t).rule)}  ·  `,
+      history: `  ·  ${model.regularHistory(t)}`,
+      when: variants.length ? `next: ${variant} · ${next ? dm(next) : "⏸ paused"}`
+        : next ? `next ${dm(next)}` : "⏸ paused",
       late: !!next && next < today,
       button: next ? { icon: "⏸", title: "pause: drop its dates" } : { icon: "▶", title: RESUME },
     };
@@ -50,6 +54,9 @@ const pause = c => {
       :task="c.task"
       :paused="c.paused"
     >
+      <template v-if="c.variants.length" #text>
+        <TaskText :task="{ ...c.task, text: c.name }" /> · {{ c.variants.join(" ↔ ") }}
+      </template>
       <!-- one line: the rule, when (late: in red), the history; no spaces between them -->
       <template #meta>{{ c.rule }}<span
         v-if="c.late"
