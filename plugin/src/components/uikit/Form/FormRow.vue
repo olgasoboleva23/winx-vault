@@ -7,7 +7,7 @@
 <script setup>
 /* eslint-disable vue/no-mutating-props -- `values` is the window's one reactive object (or a
    list group's in it): every row writes its own key there, Form/index.ts resolves to it */
-import { computed, inject } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
 
 const props = defineProps({
   row: { type: Object, required: true },
@@ -15,6 +15,11 @@ const props = defineProps({
   bare: { type: Boolean, default: false },
 });
 const resourcePath = inject("resourcePath");
+// a text box offers itself for the window's first focus (the window keeps the first one)
+const focusFirst = inject("focusFirst");
+const field = ref(null);
+
+onMounted(() => { if (field.value) focusFirst(field.value); });
 const { row } = props;   // a row never changes; its values do (a group taken off: the next one's)
 const list = "list" in row;
 
@@ -122,6 +127,7 @@ const model = computed({
   <!-- a text box fills a list's cell; a colour keeps its own size -->
   <input
     v-else
+    ref="field"
     v-model.trim="model"
     :type="row.number ? 'number' : row.color ? 'color' : 'text'"
     :class="{ 'winx-form__input': !row.color }"

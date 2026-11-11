@@ -128,3 +128,19 @@ test("Form: dependent choices follow edited variant names and keep the selected 
   await nextTick();
   assert.equal(rows[1].querySelector(".mod-cta").textContent, "Legs");
 });
+
+
+test("Form: the first text box has the focus when the window opens", () => {
+  const win = document.createElement("div");
+
+  document.body.append(win);
+  const form = new Form({ vault: { getResourcePath: () => "" } }, "t", [
+    { name: "On", key: "on", check: "x" },
+    { name: "Title", key: "title", text: "a title" },
+    { name: "Other", key: "other", text: "b" },
+  ]);
+
+  Object.assign(form, { titleEl: document.createElement("div"), contentEl: win, scope: { register() {} } });
+  form.onOpen();
+  assert.equal(document.activeElement, win.querySelectorAll("input[type=text]")[0]);
+});

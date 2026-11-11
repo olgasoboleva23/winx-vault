@@ -1,7 +1,7 @@
 <!-- The Form window's content (Form/index.ts opens it): the tabs (WinxTabs) and a pane a tab, one
      shown at a time, the rows without a tab, then the button (greyed out until `ready`) -->
 <script setup>
-import { ref } from "vue";
+import { provide, ref } from "vue";
 import WinxTabs from "#/components/uikit/WinxTabs/index.vue";
 import FormRow from "./FormRow.vue";
 
@@ -16,6 +16,14 @@ defineEmits(["submit"]);
 
 const tabs = [...new Set(props.rows.map(r => r.tab).filter(Boolean))];
 const picked = ref(tabs[0]);
+// the rows mount in the window's order: the first text box takes the focus, the rest don't
+let focused = false;
+
+provide("focusFirst", el => {
+  if (focused) return;
+  focused = true;
+  el.focus();
+});
 </script>
 
 <template>

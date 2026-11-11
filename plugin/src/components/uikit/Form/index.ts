@@ -93,7 +93,6 @@ export class Form extends Modal {
       e.preventDefault();
       send();
     });
-    this.contentEl.querySelector<HTMLInputElement>("input:not([type=checkbox])")?.focus();
   }
   onClose() {
     this.owner.unload();
