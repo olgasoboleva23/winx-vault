@@ -13,6 +13,9 @@ export const MASTER_OLD = `${TASKS}/Master (old).md`, POOL_OLD = `${TASKS}/Pool 
 // Winx's part of every task (name, difficulty, area…), an object by id
 export const TASK_RECORDS = `${TASKS}/tasks.json`;
 
+// the projects (stages of task ids), an object by id, in the order of the file
+export const PROJECTS = `${DATA}/Projects/projects.json`;
+
 export const GOALS = `${DATA}/Goals`;
 
 export const LEDGER = `${DATA}/Finance/Ledger`, RULES = `${DATA}/Finance/rules.json`;

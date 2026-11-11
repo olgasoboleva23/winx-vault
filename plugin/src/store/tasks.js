@@ -1,10 +1,12 @@
 // The tasks, read by the plugin itself and kept up to date: `tasks` (every task of Master.md, each
 // with its record as `rec`, null when its id has none), `records` (tasks.json: Winx's part of every
-// task, by id), `pool` (the records with pool: true, as { id, pool: true, rec, path }), `ready`
+// task, by id), `pool` (the records with pool: true, as { id, pool: true, rec, path }), `projects`
+// (projects.json by id, in file order), `inProject` (the ids on any project's stages), `ready`
 // (the first read is done), `version` (a Vue ref, bumped on every change: a computed that reads it
-// is worked out again). useTaskStore(plugin) starts it once the vault is loaded; Master.md,
-// tasks.json or config.json (the ⚙ Settings: XP, gold, areas, put into helpers/config.js) saved,
-// made, deleted or renamed is read again on Obsidian's own event, at once (Dataview's index comes a
+// is worked out again). stageTasks(stage) gives a stage's tasks with their state.
+// useTaskStore(plugin) starts it once the vault is loaded; Master.md, tasks.json, projects.json
+// or config.json (the ⚙ Settings: XP, gold, areas, put into helpers/config.js) saved, made,
+// deleted or renamed is read again on Obsidian's own event, at once (Dataview's index comes a
 // second later, and only once it's built), so everything drawn from the tasks draws again. The
 // folder's other files (backups) are not read.
 import { ref } from "vue";
@@ -12,7 +14,7 @@ import { app } from "#/helpers/app.js";
 import { parseNote } from "#/models/taskFile.js";
 import { Task } from "#/models/task.js";
 import { applyConfig } from "#/helpers/config.js";
-import { CONFIG, MASTER, TASK_RECORDS } from "#/helpers/paths.js";
+import { CONFIG, MASTER, PROJECTS, TASK_RECORDS } from "#/helpers/paths.js";
 
 let items = [];   // Master.md's items
 
@@ -28,20 +30,48 @@ const refresh = () => {
 };
 
 export const taskStore = {
-  tasks: [], pool: [], records: new Map(), ready: false, version: ref(0),
+  tasks: [], pool: [], records: new Map(), projects: new Map(), inProject: new Set(),
+  ready: false, version: ref(0),
   // the note's items set from its text (a test's, or a write the plugin just made)
   put(path, text) { items = parseNote(path, text); refresh(); },
   // the records set from tasks.json's object
   putRecords(json) { taskStore.records = new Map(Object.entries(json)); refresh(); },
+  // the projects set from projects.json's object
+  putProjects(json) {
+    taskStore.projects = new Map(Object.entries(json));
+    taskStore.inProject = new Set([...taskStore.projects.values()]
+      .flatMap(p => p.stages.flatMap(s => s.tasks)));
+    refresh();
+  },
   drop(path) {
     reads.delete(path);
     if (path === TASK_RECORDS) taskStore.putRecords({});
+    else if (path === PROJECTS) taskStore.putProjects({});
     else if (path === CONFIG) { applyConfig(); refresh(); }
     else { items = []; refresh(); }
   },
 };
 
-const ours = path => path === MASTER || path === TASK_RECORDS || path === CONFIG;
+const ours = path => path === MASTER || path === TASK_RECORDS || path === PROJECTS
+  || path === CONFIG;
+
+// a stage's tasks, each once: its open line, else its done line (a skipped-only or unknown id is
+// left out), as { id, t, done }, in the stage's order
+export function stageTasks(stage) {
+  const lines = new Map();
+
+  for (const t of taskStore.tasks) {
+    const task = Task.of(t), id = task.id;
+
+    if (!id || !(task.isOpen || task.isDone)) continue;
+    if (!lines.has(id) || (task.isOpen && lines.get(id).done)) {
+      lines.set(id, { id, t, done: task.isDone });
+    }
+  }
+
+  return [...new Set(stage.tasks)].map(id => lines.get(id)).filter(Boolean);
+}
+
 const reads = new Map();   // path → its last read's number: an older read, or one of a note dropped
                            // since, is not put
 let lastRead = 0;          // one count for every read, never reused (a note made again starts no
@@ -62,6 +92,7 @@ const take = (path, text) => {
   if (path === MASTER) return taskStore.put(path, text);
   try {
     if (path === TASK_RECORDS) return taskStore.putRecords(JSON.parse(text));
+    if (path === PROJECTS) return taskStore.putProjects(JSON.parse(text));
     applyConfig(JSON.parse(text));
     refresh();
   } catch (e) {
@@ -93,7 +124,7 @@ export function useTaskStore(plugin) {
   const start = async () => {
     if (started) return;
     started = true;
-    const files = [MASTER, TASK_RECORDS, CONFIG].map(p => app.vault.getFileByPath(p))
+    const files = [MASTER, TASK_RECORDS, PROJECTS, CONFIG].map(p => app.vault.getFileByPath(p))
       .filter(Boolean);
 
     items = [];
