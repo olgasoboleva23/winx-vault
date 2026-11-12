@@ -130,3 +130,13 @@ test("closing the tab unloads every page, hidden ones too", async () => {
   await view.onClose();
   assert.deepEqual(unloaded.sort(), ["calendar", "dashboard"]);
 });
+
+test("two Winx tabs keep their own state: one's dashboard date isn't the other's", async () => {
+  const a = open(), b = open();
+
+  await a.ready;
+  await b.ready;
+  await a.leaf.setViewState({ state: { dashboard: { date: "2026-11-10" } } });
+  assert.equal(a.view.state.dashboard.date, "2026-11-10");
+  assert.equal(b.view.state.dashboard.date, null);
+});

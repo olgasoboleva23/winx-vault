@@ -41,6 +41,10 @@ export class DashboardPage extends Component {
     this.el.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard", "winx-dash"]);
     this.listen();
     this.render();
+    // a date set from outside (the tab's Back / Forward); not the date row's own go()
+    this.register(watch(() => this.state.date, d => {
+      if ((d ?? todayYmd()) !== this.shownDate) this.go(d);
+    }));
   }
 
   // another day: the cards draw again in place (the pomodoro isn't touched), the date row anew

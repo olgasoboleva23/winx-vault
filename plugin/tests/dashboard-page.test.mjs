@@ -50,3 +50,16 @@ test("DashboardPage: the body carries the date; go(today) saves null and moves d
   assert.deepEqual(triggered, ["winx:date"]);
   page.unload();
 });
+
+test("DashboardPage: a date set from outside (Back / Forward) is drawn", async () => {
+  const state = vue.reactive({ date: "2026-11-10" });
+  const el = document.body.appendChild(document.createElement("div"));
+  const page = new DashboardPage(state, el);
+
+  page.load();
+  await new Promise(r => setTimeout(r));
+  state.date = "2026-11-05";
+  await vue.nextTick();
+  assert.equal(el.querySelector("[data-date]").dataset.date, "2026-11-05");
+  page.unload();
+});

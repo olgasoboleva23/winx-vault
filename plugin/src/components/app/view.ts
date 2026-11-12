@@ -13,15 +13,12 @@ export const WINX_VIEW = "winx";
 
 type Page = ReturnType<PageDef["make"]>;
 
-const fresh = readState(undefined);
-
 export class WinxView extends ItemView {
   navigation = true;   // Obsidian records a history step only for a navigation view
-  // the saved state, plus the calendar's unsaved area and picked day
-  state = reactive({
-    ...fresh,
-    calendar: { ...fresh.calendar, area: null as string | null, picked: null as string | null },
-  });
+  // the saved state, plus the calendar's unsaved area and picked day; a new one per tab
+  state = (s => reactive({
+    ...s, calendar: { ...s.calendar, area: null as string | null, picked: null as string | null },
+  }))(readState(undefined));
   private made = new Map<string, { page: Page, el: HTMLElement }>();
   private shown: string | null = null;
   private pagesEl: HTMLElement | null = null;
