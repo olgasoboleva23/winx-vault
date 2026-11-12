@@ -77,7 +77,8 @@ export class DashboardPage extends Component {
     });
   }
 
-  // the date row: DashboardDate.vue in the layout's slot (the calendar's date field, ‹ ›, today)
+  // the date row: DashboardDate.vue in the layout's slot (the calendar's date field, ‹ ›,
+  // today)
   private dateRow() {
     const slot = this.body?.querySelector(".winx-dash__date");
 

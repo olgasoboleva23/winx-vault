@@ -183,10 +183,25 @@ test("an old calendar leaf becomes a Winx tab on the calendar, with its state", 
   const leaf = { app: {}, setViewState: async s => got.push(s) };
   const old = new OldWinxView(leaf, "winx-calendar", "calendar");
 
+  leaf.view = old;
   assert.equal(old.getViewType(), "winx-calendar");
   await old.setState({ view: "month" }, {});
   await new Promise(r => setTimeout(r));   // after Obsidian's setViewState is done with it
-  assert.deepEqual(got, [{ type: "winx", state: { page: "calendar", calendar: { view: "month" } } }]);
+  assert.deepEqual(got, [
+    { type: "winx", state: { page: "calendar", calendar: { view: "month" } } },
+  ]);
+});
+
+test("an old leaf closed before its move does not come back as a Winx tab", async () => {
+  const got = [];
+  const leaf = { app: {}, setViewState: async s => got.push(s) };
+  const old = new OldWinxView(leaf, "winx-calendar", "calendar");
+
+  leaf.view = old;
+  await old.setState({}, {});
+  await old.onClose();
+  await new Promise(r => setTimeout(r));
+  assert.deepEqual(got, []);
 });
 
 // the workspace openWinx sees: its Winx leaves, the leaves it makes, what it reveals
@@ -194,9 +209,9 @@ function workspace(leaves) {
   const made = [], revealed = [];
   const leaf = () => {
     const l = {
-      pinned: false, state: null, went: [],
+      pinned: false, state: null, states: [], went: [],
       setPinned(p) { this.pinned = p; },
-      async setViewState(s) { this.state = s; },
+      async setViewState(s) { this.state = s; this.states.push(s); },
     };
     l.view = Object.assign(Object.create(WinxView.prototype), { go: (...a) => l.went.push(a) });
     return l;
@@ -226,6 +241,14 @@ test("openWinx: the newest Winx tab, else one new pinned tab", async () => {
   assert.equal(leaf.state.type, "winx");
   assert.deepEqual(leaf.went, []);
 
+  // a page on a fresh tab: built in one call, so there is no dashboard step to go Back to
+  w = workspace([]);
+  const fresh = await openWinx("calendar", { view: "month" });
+  assert.deepEqual(fresh.states, [{
+    type: "winx", active: true, state: { page: "calendar", calendar: { view: "month" } },
+  }]);
+  assert.deepEqual(fresh.went, []);
+
   w = workspace([recent]);
   const extra = await openWinx("calendar", {}, true);
   assert.deepEqual(w.made, [extra]);
@@ -250,7 +273,7 @@ test("the drawer lists Projects; its ↗ opens a new tab", async () => {
   await new Promise(r => setTimeout(r));
   assert.equal(w.made.length, 1);
   assert.equal(w.made[0].pinned, false);
-  assert.deepEqual(w.made[0].went, [["projects", {}]]);
+  assert.equal(w.made[0].state.state.page, "projects");
 
   await rows[0].trigger("click");
   assert.deepEqual(went.map(a => a[0]), ["projects"]);

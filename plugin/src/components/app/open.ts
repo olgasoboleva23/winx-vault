@@ -11,9 +11,14 @@ export async function openWinx(page?: string, params = {}, newTab = false) {
     ? undefined : workspace.getLeavesOfType(WINX_VIEW).sort(newest)[0];
 
   if (!leaf) {
+    // a fresh tab opens on its page in one call: no dashboard step to go Back to
     leaf = workspace.getLeaf("tab");
-    await leaf.setViewState({ type: WINX_VIEW, active: true });
+    const state = page ? { page, [page]: params } : undefined;
+
+    await leaf.setViewState({ type: WINX_VIEW, active: true, state });
     if (!newTab) leaf.setPinned(true);
+    await workspace.revealLeaf(leaf);
+    return leaf;
   }
 
   await workspace.revealLeaf(leaf);   // loads a tab still deferred since the start
@@ -29,6 +34,7 @@ export const inWinx = () => app.workspace.getActiveViewOfType(WinxView) !== null
 export class OldWinxView extends ItemView {
   private type: string;
   private page: string;
+  private timer = 0;
 
   constructor(leaf: WorkspaceLeaf, type: string, page: string) {
     super(leaf);
@@ -37,13 +43,15 @@ export class OldWinxView extends ItemView {
   }
   getViewType() { return this.type; }
   getDisplayText() { return "Winx"; }
+  async onClose() { window.clearTimeout(this.timer); }
 
   // Obsidian calls it on every open (`{}` without a saved state). Moved a moment later: the leaf
   // ignores a setViewState while it is still busy with this one
   async setState(s: unknown) {
     const { page } = this;
 
-    window.setTimeout(() => {
+    this.timer = window.setTimeout(() => {
+      if (this.leaf.view !== this) return;   // closed or already something else
       void this.leaf.setViewState({ type: WINX_VIEW, state: { page, [page]: s ?? {} } });
     });
   }
