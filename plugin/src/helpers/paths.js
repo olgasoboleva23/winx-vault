@@ -44,6 +44,13 @@ export const FOOD = `${DATA}/Food/Food.md`, FOODS = `${DATA}/Food/Foods.md`;
 
 export const FOOD_LOG = `${DATA}/Food/Log.md`;
 
+// the medication courses (an object by id), their page, the Base the course notes had
+export const COURSES = `${DATA}/Medication/courses.json`;
+
+export const MEDICATION = `${DATA}/Medication/Medication.md`;
+
+export const MEDICATION_BASE = `${DATA}/Medication/_index.base`;
+
 export const CYCLE = `${DATA}/Cycle.md`;
 
 export const POMODORO = `${DATA}/pomodoro.json`;

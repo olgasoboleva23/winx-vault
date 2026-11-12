@@ -43,7 +43,10 @@ export function vault(files = {}, { folders = [], props = {}, dataview = null } 
       getFileCache: f => ({ frontmatter: props[f.path] ?? {} }),
       getFirstLinkpathDest: p => byPath(p) ?? byPath(`${p}.md`),
     },
-    fileManager: { trashFile: async f => { delete files[f.path]; } },
+    fileManager: {
+      trashFile: async f => { delete files[f.path]; },
+      renameFile: async (f, p) => { files[p] = files[f.path]; delete files[f.path]; },
+    },
     loadLocalStorage: k => local[k] ?? null,
     saveLocalStorage: (k, v) => { local[k] = v; },
     plugins: { plugins: dataview ? { dataview: { api: dataview } } : {} },
