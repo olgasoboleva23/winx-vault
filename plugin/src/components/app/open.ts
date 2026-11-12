@@ -1,5 +1,6 @@
-import { ItemView, type WorkspaceLeaf } from "obsidian";
+import { ItemView, Keymap, type WorkspaceLeaf } from "obsidian";
 import { app } from "#/helpers/app.js";
+import { pageOf } from "./pages.ts";
 import { WINX_VIEW, WinxView } from "./view.ts";
 
 // Opening Winx: ✨, the command and the reminders go to the Winx tab used last, or open one
@@ -32,8 +33,22 @@ export const activeWinx = () => app.workspace.getActiveViewOfType(WinxView);
 // is a Winx tab the one in front?
 export const inWinx = () => activeWinx() !== null;
 
-// The old Winx tabs (winx-dashboard, winx-calendar) come back from a saved layout as a Winx tab on
-// their page, with their state. For one release, then they go with their registerView.
+// A link to a note: a Winx page's note (Finance, Shop, Supplies, Food) switches the page of the
+// Winx tab in front, in place (Cmd/Ctrl: in a new Winx tab); any other note opens as a note
+// does, in a new tab from a Winx tab, so that one stays where it is. `href` may be a short link
+// ("Finance").
+export function openNote(href: string, sourcePath: string, e?: MouseEvent | null,
+  tab: WinxView | null = activeWinx()) {
+  const path = app.metadataCache.getFirstLinkpathDest(href, sourcePath)?.path;
+  const page = path ? pageOf(path) : null;
+
+  if (tab && page) return void tab.go(page, {}, e);
+  return void app.workspace.openLinkText(href, sourcePath, Keymap.isModEvent(e) || tab !== null);
+}
+
+// The old Winx tabs (winx-dashboard, winx-calendar, winx-projects) come back from a saved layout
+// as a Winx tab on their page, with their state. For one release, then they go with their
+// registerView.
 export class OldWinxView extends ItemView {
   private type: string;
   private page: string;
@@ -55,7 +70,10 @@ export class OldWinxView extends ItemView {
 
     this.timer = window.setTimeout(() => {
       if (this.leaf.view !== this) return;   // closed or already something else
-      void this.leaf.setViewState({ type: WINX_VIEW, state: { page, [page]: s ?? {} } });
+      // `popstate` (not in the typings, but read by Obsidian's setViewState): no Back step for
+      // the old view this one replaces
+      void this.leaf.setViewState({ type: WINX_VIEW, state: { page, [page]: s ?? {} },
+        popstate: true } as any);
     });
   }
 }

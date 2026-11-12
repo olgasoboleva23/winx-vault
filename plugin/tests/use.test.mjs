@@ -99,44 +99,56 @@ test("useTabDate: the dashboard's date change reaches a block inside a dated tab
   assert.equal(n, 1);
 });
 
-test("useNoteLinks: a [[link]] opens its note (Cmd/Ctrl: a new tab); other clicks pass", () => {
-  const c = component(), el = {}; let stopped = 0;
-  useNoteLinks(c, el, e => e.mod, () => null);
-  const link = href => ({ closest: () => href && { dataset: { href } } });
-  el.listeners.click({ target: link("Finance"), preventDefault: () => stopped++, mod: true });
-  el.listeners.click({ target: link(null), preventDefault: () => stopped++ });
-  assert.deepEqual(c.app.workspace.opened, [["Finance", true]]);
-  assert.equal(stopped, 1);
-});
+// the notes the vault knows: a short link finds its full path, as Obsidian's link resolution does
+const vaultNotes = { Finance: "02 Areas/Finance.md", Ideas: "Notes/Ideas.md" };
+const resolve = (href) => { const p = vaultNotes[href.replace(/^.*\//, "")]; return p && { path: p }; };
 
-// a link clicked in a Winx tab (winx() gives the tab's view, here one that notes its go())
-const clickIn = (href, mod = false) => {
+// a link clicked; `winx` is the tab in front (null: not a Winx tab), here one that notes its go()
+const clickIn = (href, { mod = false, winx = null } = {}) => {
   const c = component(), el = {}, went = [];
 
-  useNoteLinks(c, el, e => e.mod, () => ({ go: page => went.push(page) }));
+  c.app.metadataCache.getFirstLinkpathDest = resolve;
+  setApp(c.app);
+  useNoteLinks(c, el, () => winx && { go: (...a) => went.push(a) });
+  let stopped = 0;
   el.listeners.click({ target: { closest: () => ({ dataset: { href } }) },
-    preventDefault() {}, mod });
-  return { opened: c.app.workspace.opened, went };
+    preventDefault: () => stopped++, mod });
+  return { opened: c.app.workspace.opened, went, stopped };
 };
 
-test("useNoteLinks in a Winx tab: an ordinary note opens in a new tab", () => {
-  const { opened, went } = clickIn("Notes/Ideas");
+test("useNoteLinks: a [[link]] opens its note (Cmd/Ctrl: a new tab); other clicks pass", () => {
+  const c = component(), el = {}; let stopped = 0;
+  useNoteLinks(c, el, () => null);
+  const link = href => ({ closest: () => href && { dataset: { href } } });
+  el.listeners.click({ target: link(null), preventDefault: () => stopped++ });
+  assert.equal(stopped, 0);
+  const plain = clickIn("Ideas"), mod = clickIn("Ideas", { mod: true });
+  assert.deepEqual(plain.opened, [["Ideas", false]]);
+  assert.deepEqual(mod.opened, [["Ideas", true]]);
+  assert.equal(plain.stopped, 1);
+});
 
-  assert.deepEqual(opened, [["Notes/Ideas", true]]);
+test("useNoteLinks in a Winx tab: an ordinary note opens in a new tab", () => {
+  const { opened, went } = clickIn("Ideas", { winx: true });
+
+  assert.deepEqual(opened, [["Ideas", true]]);
   assert.deepEqual(went, []);
 });
 
-test("useNoteLinks in a Winx tab: a link to a Winx page's note switches the page", async () => {
-  const { pages } = await import("#/components/app/pages.ts");
+test("useNoteLinks in a Winx tab: a short link to a Winx page's note switches the page", () => {
+  const short = clickIn("Finance", { winx: true });
+  const full = clickIn("02 Areas/Finance", { winx: true });
+  const mod = clickIn("Finance", { winx: true, mod: true });
 
-  pages.projects.note = "02 Areas/Projects.md";
-  const plain = clickIn("02 Areas/Projects");
-  const mod = clickIn("02 Areas/Projects", true);
+  for (const r of [short, full]) {
+    assert.deepEqual(r.went.map(a => [a[0], a[1]]), [["finance", {}]]);
+    assert.deepEqual(r.opened, []);
+  }
+  assert.equal(mod.went[0][2].mod, true);   // go() opens a new Winx tab for it
+});
 
-  delete pages.projects.note;
-  assert.deepEqual(plain.went, ["projects"]);
-  assert.deepEqual(plain.opened, []);
-  assert.deepEqual(mod.opened, [["02 Areas/Projects", true]]);
+test("useNoteLinks outside a Winx tab: a Winx page's note opens as a note", () => {
+  assert.deepEqual(clickIn("Finance").opened, [["Finance", false]]);
 });
 
 test("redrawNotes: every open note's preview is rendered anew (after a Winx reload)", async () => {

@@ -31,8 +31,10 @@ $label-w: 110px;   // an opened label's room: the longest name, Dashboard, in Ci
     white-space: nowrap;
     transition: max-width $medium ease, opacity $medium ease;
   }
+  // opened by the pointer, or by the keyboard (:focus-visible: a mouse click's focus doesn't count);
+  // --shut (clicked) keeps it folded
   &--open &__label,
-  &:focus-within &__label { max-width: $label-w; padding-right: $space-l; opacity: 1; }
+  &:not(&--shut):has(:focus-visible) &__label { max-width: $label-w; padding-right: $space-l; opacity: 1; }
 
   // phone: the bar in the page's flow (the shell puts it last), three equal places, an icon
   // above its label

@@ -71,6 +71,14 @@ test("the note changed: drawn again, the old child unloaded", async () => {
   note.unload();
 });
 
+test("a render that lands after the page unloaded is dropped", async () => {
+  const { note, settle } = page("a.md", { "a.md": "one" });
+
+  note.unload();
+  await settle();
+  assert.deepEqual(MarkdownRenderer.calls, []);
+});
+
 test("a missing note says so", async () => {
   const { el, settle } = page("gone.md", {});
 

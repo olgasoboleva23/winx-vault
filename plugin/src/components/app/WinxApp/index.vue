@@ -76,7 +76,7 @@ function pick(key, event) {
         </WinxButton>
         <WinxButton
           kind="text"
-          class="winx-drawer__open-tab"
+          class="winx-app__open-tab"
           :title="`${p.text} in a new tab`"
           @click="openTab(p.key)"
         >

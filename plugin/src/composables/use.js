@@ -2,11 +2,10 @@
 // component, a tab (ItemView) or a widget's VueHost (composables/vueHost.ts). They listen through
 // the component's registerDomEvent / registerEvent / registerInterval, so Obsidian drops it all
 // when the component unloads.
-import { Keymap, debounce } from "obsidian";
+import { debounce } from "obsidian";
 import { todayYmd } from "#/helpers/dates.js";
 import { dataview } from "#/helpers/plugins.js";
-import { activeWinx } from "#/components/app/open.ts";
-import { pageOf } from "#/components/app/pages.ts";
+import { activeWinx, openNote } from "#/components/app/open.ts";
 
 // redraw(): drawn now when shown, else once it shows (a leaf or the layout changes, the Winx tab
 // switches its page) — catchUp() asks again
@@ -99,16 +98,13 @@ export const useTabDate = (c, el, fn) =>
 // [[links]] in `el` open their note, as in a note (Cmd/Ctrl: a new tab). In a Winx tab (winx()
 // gives its view) a plain click on a Winx page's note switches the page, any other note opens in
 // a new tab: the Winx tab stays where it is
-export function useNoteLinks(c, el, isMod = Keymap.isModEvent, winx = activeWinx) {
+export function useNoteLinks(c, el, winx = activeWinx) {
   c.registerDomEvent(el, "click", e => {
     const link = e.target.closest?.("a.internal-link[data-href]");
 
     if (!link) return;
     e.preventDefault();
-    const href = link.dataset.href, tab = winx(), page = pageOf(href);
-
-    if (tab && page && !isMod(e)) return void tab.go(page);
-    void c.app.workspace.openLinkText(href, "", isMod(e) || !!tab);
+    openNote(link.dataset.href, "", e, winx());
   });
 }
 

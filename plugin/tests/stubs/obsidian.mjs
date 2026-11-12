@@ -32,7 +32,7 @@ export const getFrontMatterInfo = text => {
 export const debounce = fn => Object.assign(fn, { cancel() {} });
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };
-export const Keymap = { isModEvent: () => false };
+export const Keymap = { isModEvent: e => !!e?.mod };
 // fuzzy: the letters of the query in order
 export const prepareFuzzySearch = q => text => {
   let i = 0;

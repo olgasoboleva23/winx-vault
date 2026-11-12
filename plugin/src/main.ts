@@ -27,7 +27,7 @@ export default class WinxPlugin extends Plugin {
     // the old tabs, from a layout saved before: a Winx tab on their page
     for (const page of ["dashboard", "calendar", "projects"])
       this.registerView(`winx-${page}`, leaf => new OldWinxView(leaf, `winx-${page}`, page));
-    this.addCommand({ id: "open", name: "Open Winx", callback: () => openWinx() });
+    this.addCommand({ id: "open", name: "Open", callback: () => openWinx() });
     this.addRibbonIcon("sparkles", "Winx", () => openWinx());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",

@@ -32,6 +32,22 @@ test("WinxButton: kinds, on, title, extra classes", () => {
   draws(mount(ui.WinxButton, { props: { kind: "toggle" }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle">✓ done</button>');
 });
 
+test("WinxNoteLink: a short link to a Winx page's note switches the page in place", async () => {
+  const { setApp } = await import("#/helpers/app.js");
+  const went = [], opened = [];
+  const tab = { go: (...a) => went.push(a) };
+  const { WinxView } = await import("#/components/app/view.ts");
+  const front = Object.assign(Object.create(WinxView.prototype), tab);
+
+  setApp({
+    metadataCache: { getFirstLinkpathDest: () => ({ path: "02 Areas/Finance.md" }) },
+    workspace: { getActiveViewOfType: () => front, openLinkText: (...a) => opened.push(a) },
+  });
+  await mount(ui.WinxNoteLink, { props: { path: "Finance" } }).find("button").trigger("click");
+  assert.deepEqual(went.map(a => [a[0], a[1]]), [["finance", {}]]);
+  assert.deepEqual(opened, []);
+});
+
 test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAddForm, WinxCard", () => {
   draws(mount(ui.WinxNoteLink, { props: { path: "x/Cycle.md" }, slots: { default: "dates" } }), '<button class="winx-btn winx-btn--pill">dates</button>');
   draws(mount(ui.WinxEmpty, { props: { text: "All bought" } }), '<div class="winx-empty winx-text-center">✦ All bought</div>');

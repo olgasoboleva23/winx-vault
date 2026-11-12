@@ -46,6 +46,8 @@ export class NotePage extends Component {
     void this.render();
   }
 
+  onunload() { this.pass++; }   // a render still reading the note is dropped
+
   async render() {
     const { body, path } = this, pass = ++this.pass;
     const file = app.vault.getFileByPath(path);

@@ -189,7 +189,8 @@ test("an old calendar leaf becomes a Winx tab on the calendar, with its state", 
   await old.setState({ view: "month" }, {});
   await new Promise(r => setTimeout(r));   // after Obsidian's setViewState is done with it
   assert.deepEqual(got, [
-    { type: "winx", state: { page: "calendar", calendar: { view: "month" } } },
+    // popstate: the old view this replaces is no Back step
+    { type: "winx", state: { page: "calendar", calendar: { view: "month" } }, popstate: true },
   ]);
 });
 
@@ -272,7 +273,7 @@ test("the drawer: Projects, Finance, Shop, Supplies, Food, then ⚙ Settings; �
   assert.deepEqual(rows.map(r => r.text().replace(/^\S+ /, "")),
     ["Projects", "Finance", "Shop", "Supplies", "Food", "Settings"]);
   assert.match(rows[5].text(), /⚙/);
-  await shell.find(".winx-drawer__open-tab").trigger("click");
+  await shell.find(".winx-app__open-tab").trigger("click");
   await new Promise(r => setTimeout(r));
   assert.equal(w.made.length, 1);
   assert.equal(w.made[0].pinned, false);

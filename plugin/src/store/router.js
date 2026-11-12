@@ -1,7 +1,8 @@
-import { readState as readCalendar, SAVED as CALENDAR_SAVED } from "#/store/calendar.js";
-import { readState as readProjects } from "#/store/projects.js";
 // The single Winx tab's state: the page shown and each page's own state. Obsidian saves it with
 // the layout; `saved` is what goes in, `readState` makes a whole state of whatever comes back.
+
+import { readState as readCalendar, SAVED as CALENDAR_SAVED } from "#/store/calendar.js";
+import { readState as readProjects } from "#/store/projects.js";
 
 export const PAGES = ["dashboard", "calendar", "projects", "finance", "shop", "supplies", "food"];
 
