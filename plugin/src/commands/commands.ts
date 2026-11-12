@@ -10,6 +10,7 @@ import { addMarketItem } from "#/controllers/widgets/market.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
 import { createNote } from "#/controllers/notes.js";
 import { editCourse } from "#/controllers/meds.js";
+import { askNewProject } from "#/controllers/projects.js";
 
 
 // The commands in Cmd+P ("Winx: …"); each one window, then saved.
@@ -37,6 +38,9 @@ export function registerCommands(plugin: Plugin) {
       await app.workspace.getLeaf("tab").openFile(file);
     });
   }
+
+  // a project: name, description, status, an optional cover; then the Projects tab opens on it
+  add("new-project", "New project", async () => void await askNewProject(app));
 
   // the open medication course, its window again (the ✎ on its card does the same)
   add("edit-meds", "Edit medication course", async () => {

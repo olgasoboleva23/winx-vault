@@ -1,9 +1,10 @@
-<!-- The projects' list (block winx-projects): the title, a tab per status with its count, then a
-     card per project in file order: its cover, name, status, description, progress (none without
-     tasks) and next task (the first open one of the first stage not complete), its box ticks it;
-     a click elsewhere on the card opens the project -->
+<!-- The projects' list (block winx-projects): the title, ✦ New project, a tab per status with
+     its count, then a card per project in file order: its cover, name, status, description,
+     progress (none without tasks) and next task (the first open one of the first stage not
+     complete), its box ticks it; a click elsewhere on the card opens the project -->
 <script setup>
 import { computed, inject } from "vue";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxCard from "#/components/uikit/WinxCard/index.vue";
 import WinxCheckbox from "#/components/uikit/WinxCheckbox/index.vue";
 import WinxProgress from "#/components/uikit/WinxProgress/index.vue";
@@ -11,6 +12,7 @@ import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxTabs from "#/components/uikit/WinxTabs/index.vue";
 import { app } from "#/helpers/app.js";
 import { tasksApi } from "#/helpers/plugins.js";
+import { askNewProject } from "#/controllers/projects.js";
 import { tickTask } from "#/controllers/tasks.js";
 import { T } from "#/models/calendarData.js";
 import { stageTasks, taskStore } from "#/store/tasks.js";
@@ -50,6 +52,7 @@ const canTick = computed(() => { void view.version.value; return !!tasksApi(); }
   <div class="winx-projects">
     <div class="winx-projects__header winx-row winx-between winx-wrap winx-gap-m">
       <h1 class="winx-projects__title">Projects</h1>
+      <WinxButton @click="askNewProject(app)">✦ New project</WinxButton>
       <WinxTabs v-model="state.filter" :tabs="tabs" />
     </div>
     <WinxEmpty v-if="!all.length" text="No projects yet" />

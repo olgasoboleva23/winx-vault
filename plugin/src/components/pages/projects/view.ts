@@ -3,14 +3,14 @@ import { reactive, ref, watch } from "vue";
 import { useRedraw } from "#/composables/use.js";
 import { useVueApp } from "#/composables/vueApp.ts";
 import { taskStore } from "#/store/tasks.js";
-import { SAVED, readState } from "#/store/projects.js";
+import { PROJECTS_VIEW, SAVED, readState } from "#/store/projects.js";
 import ProjectsTab from "./index.vue";
 
 // The Projects tab: the list of projects (00 System/Data/Projects/projects.json) or one project's
 // page, drawn by Vue (index.vue and its parts). Its state (the open project, the list's filter) is
 // reactive and saved with the layout, as the calendar's is. The parts read the store's projects
 // and tasks; `version` is bumped when they change (a hidden tab waits until it shows).
-export const PROJECTS_VIEW = "winx-projects";
+export { PROJECTS_VIEW };
 
 export class ProjectsView extends ItemView {
   state = reactive(readState(undefined));
