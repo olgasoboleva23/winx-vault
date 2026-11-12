@@ -6,7 +6,7 @@ import { setApp } from "#/helpers/app.js";
 
 // The Winx tab: its pages made once and kept (hidden), its steps in Obsidian's history, Cmd-click
 // a new tab. The pages here are stand-ins (pages.ts' make replaced), counted as they're made.
-let WinxView, pages, made, unloaded, vue, openWinx, OldWinxView;
+let WinxView, pages, realMake, made, unloaded, vue, openWinx, OldWinxView;
 
 before(async () => {
   GlobalRegistrator.register();
@@ -28,6 +28,7 @@ before(async () => {
   ({ pages } = await import("#/components/app/pages.ts"));
   ({ openWinx, OldWinxView } = await import("#/components/app/open.ts"));
   vue = await import("vue");
+  realMake = Object.fromEntries(Object.entries(pages).map(([k, p]) => [k, p.make]));
   for (const key of Object.keys(pages)) {
     pages[key].make = () => {
       made.push(key);
@@ -255,7 +256,7 @@ test("openWinx: the newest Winx tab, else one new pinned tab", async () => {
   assert.equal(extra.pinned, false);
 });
 
-test("the drawer lists Projects; its ↗ opens a new tab", async () => {
+test("the drawer: Projects, Finance, Shop, Supplies, Food, then ⚙ Settings; ↗ opens a tab", async () => {
   const { mount } = await import("@vue/test-utils");
   const WinxApp = (await import("#/components/app/WinxApp/index.vue")).default;
   const w = workspace([]);
@@ -266,9 +267,11 @@ test("the drawer lists Projects; its ↗ opens a new tab", async () => {
 
   assert.equal(shell.find(".winx-drawer").exists(), false);
   await shell.findAll(".winx-btn--rail").at(-1).trigger("click");
-  const rows = shell.findAll(".winx-drawer .winx-btn--text");
+  const rows = shell.findAll(".winx-app__row .winx-grow");
 
-  assert.match(rows[0].text(), /Projects/);
+  assert.deepEqual(rows.map(r => r.text().replace(/^\S+ /, "")),
+    ["Projects", "Finance", "Shop", "Supplies", "Food", "Settings"]);
+  assert.match(rows[5].text(), /⚙/);
   await shell.find(".winx-drawer__open-tab").trigger("click");
   await new Promise(r => setTimeout(r));
   assert.equal(w.made.length, 1);
@@ -278,4 +281,11 @@ test("the drawer lists Projects; its ↗ opens a new tab", async () => {
   await rows[0].trigger("click");
   assert.deepEqual(went.map(a => a[0]), ["projects"]);
   assert.equal(shell.find(".winx-drawer").exists(), false);
+});
+
+test("Finance is its note drawn in the tab", () => {
+  const page = realMake.finance({}, document.createElement("div"));
+
+  assert.equal(page.constructor.name, "NotePage");
+  assert.equal(page.path, "02 Areas/Finance.md");
 });

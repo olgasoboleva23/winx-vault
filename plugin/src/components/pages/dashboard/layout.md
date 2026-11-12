@@ -67,6 +67,3 @@
 > > > ```winx
 > > > savings
 > > > ```
-> >
-> > > [!card] ✦ Menu
-> > > [[02 Areas/Finance|💰 Finance]] · [[00 System/Data/Shop|🛍 Shop]] · [[00 System/Data/Supplies|📦 Supplies]] · [[00 System/Data/Medication/_index.base|💊 Medication]] · [[00 System/Data/Food/Food|🍽 Food]] · [⚙ Settings](obsidian://winx-settings)

@@ -5,6 +5,8 @@ import type { Component } from "obsidian";
 import { CalendarPage } from "#/components/pages/calendar/view.ts";
 import { DashboardPage } from "#/components/pages/dashboard/view.ts";
 import { ProjectsPage } from "#/components/pages/projects/view.ts";
+import { FINANCE_PAGE, FOOD, SHOP, SUPPLIES } from "#/helpers/paths.js";
+import { NotePage } from "./NotePage.ts";
 import type { WinxView } from "./view.ts";
 
 export interface PageDef {
@@ -15,6 +17,12 @@ export interface PageDef {
   note?: string;   // the note this page draws: a link to it switches to the page
   make(tab: WinxView, el: HTMLElement): Component & { catchUp?(): void };
 }
+
+// a page that is a note of the vault, drawn in the tab
+const note = (title: string, icon: string, path: string): PageDef => ({
+  title, icon, main: false, keep: false, note: path,
+  make: (tab, el) => new NotePage(path, el),
+});
 
 export const pages: Record<string, PageDef> = {
   dashboard: {
@@ -37,6 +45,10 @@ export const pages: Record<string, PageDef> = {
         (key, e) => void tab.go("projects", { open: key }, e));
     },
   },
+  finance: note("Finance", "💰", FINANCE_PAGE),
+  shop: note("Shop", "🛍", `${SHOP}.md`),
+  supplies: note("Supplies", "📦", `${SUPPLIES}.md`),
+  food: note("Food", "🍽", FOOD),
 };
 
 // the page that draws the note at `path` (a link's target, with or without .md), if any
