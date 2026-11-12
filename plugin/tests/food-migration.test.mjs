@@ -57,7 +57,7 @@ test("migrateFood: food.json and log.json written, the notes renamed (old); twic
 
   await migrateFood();
   assert.deepEqual(files, before);
-  assert.equal(Notice.last, "✦ food is already migrated");
+  assert.equal(Notice.last, "✦ food is already migrated: food.json, log.json have data");
 });
 
 test("migrateFood: no Foods.md, nothing to migrate; an \"(old)\" note already there stops "
@@ -75,4 +75,33 @@ test("migrateFood: no Foods.md, nothing to migrate; an \"(old)\" note already th
   await migrateFood();
   assert.match(Notice.last, /^✦ migration stopped: Foods \(old\)\.md already exists/);
   assert.deepEqual(taken, before);
+});
+
+test("foodFromNotes: a line read but lost (a day's second note, a food id twice, a note "
+  + "cleared) or properties not read yet stop it", () => {
+  const twice = LOG + "- 2026-11-02 note: прошло\n";
+
+  assert.throws(() => foodFromNotes(FOODS, FM, twice), /1 day notes kept of 2 note lines/);
+  assert.throws(() => foodFromNotes(FOODS + "- f1 чай\n", FM, LOG), /2 foods kept of 3 food lines/);
+  assert.throws(() => foodFromNotes(FOODS, FM, LOG + "- 2026-11-02 note: \n"),
+    /0 day notes kept of 1 note lines/);
+  assert.throws(() => foodFromNotes(FOODS, { task: "t5" }, LOG),
+    /Foods\.md's marks not read yet/);
+  // a note line with nothing in it, on a day without one, loses nothing
+  assert.equal(foodFromNotes(FOODS, FM, LOG + "- 2026-11-04 note: \n").skipped, 1);
+});
+
+test("migrateFood: a day's second note stops it before any write, named; log.json alone "
+  + "with data is named", async () => {
+  const notes = { [FOODS_NOTE]: FOODS, [FOOD_LOG_NOTE]: LOG + "- 2026-11-02 note: прошло\n" };
+  const { files } = vault(notes, { props: { [FOODS_NOTE]: FM } });
+  const before = structuredClone(files);
+
+  await migrateFood();
+  assert.match(Notice.last, /^✦ migration stopped: Log\.md: 1 day notes kept of 2 note lines/);
+  assert.deepEqual(files, before);
+
+  vault({ [FOODS_NOTE]: FOODS, [FOOD_LOG]: JSON.stringify({ "2026-11-02": {} }) });
+  await migrateFood();
+  assert.equal(Notice.last, "✦ food is already migrated: log.json has data");
 });
