@@ -8,8 +8,8 @@ import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
 import { edit } from "#/helpers/files.js";
 import { todayYmd } from "#/helpers/dates.js";
-import { carry, courseData, rebuild, tick } from "#/models/course.js";
-import { KINDS, codeOf, nameOf } from "#/models/kinds.js";
+import { carry, codeOf, nameOf, rebuild, tableData, tick } from "#/models/course.js";
+import { KINDS } from "#/models/kinds.js";
 import { Note } from "#/models/note.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 
@@ -25,7 +25,7 @@ const names = fm =>
   Object.fromEntries((fm?.meds ?? []).map(g => [g.code ?? codeOf(g.name), nameOf(g.name)]));
 
 export async function loadMeds({ source, sourcePath }) {
-  return courseData(source, names(props(sourcePath)), todayYmd());
+  return tableData(source, names(props(sourcePath)), todayYmd());
 }
 
 export const tickMeds = (path, date, col, mark) => edit(path, t => tick(t, date, col, mark));

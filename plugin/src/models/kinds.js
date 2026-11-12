@@ -3,6 +3,7 @@
 //   sections, file? } for Note (a note's name is its file's: no title property, no # heading;
 //   `file` names it when the window has no title: a course's medicines)
 import { addDays } from "#/helpers/dates.js";
+import { courseForm, intake, medicine, withCodes } from "#/models/course.js";
 
 const pairs = list => list.map(([label, value]) => ({ label, value }));
 const titleOnly = () => ({
@@ -40,52 +41,6 @@ const item = ({ type, steps, types, statuses, ...rest }) => ({
   }),
 });
 
-// the medicines of a course, a group each in the window: the name, the dose ("30 капель"; none:
-// the words from the first number of the name), when (morning | both | day | evening | any: once a
-// day), the meal (before | after | sleep | any), days
-const WHEN = { morning: ["☀️"], both: ["☀️", "🌙"], day: ["🌤"], evening: ["🌙"], any: [] };
-const WHEN_TEXT = { "☀️": "☀️ утро", "🌤": "🌤 днём", "🌙": "🌙 на ночь", "": "в любое время" };
-const MEAL_TEXT = { before: "перед едой", after: "после еды", sleep: "перед сном" };
-const MEALS = [...Object.values(MEAL_TEXT), ""];
-
-// a name as typed may carry the dose ("Мастодинон 30 капель"): the words before its first number
-const parts = typed => {
-  const words = typed.trim().split(/\s+/), at = words.findIndex(w => /^\d/.test(w));
-
-  return at < 0 ? [words.join(" "), ""] : [words.slice(0, at).join(" "), words.slice(at).join(" ")];
-};
-
-export const nameOf = typed => parts(typed)[0];
-
-export const codeOf = typed => nameOf(typed).slice(0, 2).toUpperCase();
-
-// a code per medicine, its column's name, the key its marks follow through an edit: kept once it
-// has one (a rename or a new order keeps it), else free letters of its name (Мастодинон МА,
-// Магний МГ), else a number
-const withCodes = groups => {
-  const taken = new Set(groups.map(g => g.code).filter(Boolean));
-
-  return groups.map(g => {
-    if (g.code) return g;
-    const n = nameOf(g.name).toUpperCase().replace(/[^\p{L}\p{N}]/gu, "");
-    const tries = [...n.slice(1)].map(c => n[0] + c)
-      .concat(Array.from({ length: 9 }, (_, i) => n.slice(0, 2) + (i + 2)));
-    const code = tries.find(c => !taken.has(c)) ?? n.slice(0, 2);
-
-    taken.add(code);
-    return { ...g, code };
-  });
-};
-
-const medicine = g => {
-  const [name, dose] = parts(g.name);
-
-  return {
-    name, dose: g.dose?.trim() || dose, times: WHEN[g.times] ?? [],
-    meal: MEAL_TEXT[g.meal] ?? "", days: Number(g.days) || 90, code: g.code,
-  };
-};
-
 // the course as a note: the medicines as data in its properties; the day by its anchors (a time
 // of day, a meal: what to take then, the doses) and the notes typed, on cards (the page has the
 // dashboard's photo behind it; the legend is the block's own), and a day
@@ -95,14 +50,6 @@ const course = (v, today) => {
   const groups = withCodes(v.meds), meds = groups.map(medicine), start = v.start?.trim() || today;
   const days = Math.max(...meds.map(m => m.days));
   const columns = meds.flatMap(m => (m.times.length ? m.times : [""]).map(t => ({ m, t })));
-  const anchors = Object.keys(WHEN_TEXT).flatMap(t => MEALS.map(meal => {
-    const take = columns.filter(c => c.t === t && c.m.meal === meal)
-      .map(c => [c.m.name, c.m.dose].filter(Boolean).join(" "));
-
-    const label = [WHEN_TEXT[t], meal].filter(Boolean).join(", ");
-
-    return take.length ? `- ${label}: ${take.join(", ")}` : "";
-  })).filter(Boolean);
   const row = cells => `| ${cells.join(" | ")} |`;
   const notes = v.notes?.trim() ? v.notes.trim().split("\n") : [];
   const table = [
@@ -125,7 +72,7 @@ const course = (v, today) => {
     file: meds.map(m => m.name).join(", "),
     body: [
       "> [!card] Приём",
-      ...anchors.map(a => `> ${a}`),
+      ...intake(groups).map(a => `> - ${a}`),
       "",
       ...(notes.length ? ["> [!card] Заметки", ...notes.map(l => `> ${l}`), ""] : []),
       "```winx", "meds", "card: Курс", ...table, "```",
@@ -183,38 +130,7 @@ export const KINDS = {
   meds: {
     id: "new-meds", name: "New medication course", folder: "00 System/Data/Medication",
     setting: "meds",
-    form: () => ({
-      rows: [
-        {
-          name: "Medicines", key: "meds", required: ["name"],
-          list: [
-            { name: "Name", key: "name", text: "Мастодинон" },
-            { name: "Dose", key: "dose", text: "30 капель" },
-            {
-              name: "When", key: "times",
-              options: pairs([
-                ["утром", "morning"], ["утром и вечером", "both"], ["днём", "day"],
-                ["вечером", "evening"], ["неважно", "any"],
-              ]),
-            },
-            {
-              name: "Meal", key: "meal",
-              options: pairs([
-                ["перед едой", "before"], ["после еды", "after"], ["перед сном", "sleep"],
-                ["неважно", "any"],
-              ]),
-            },
-            { name: "Days", key: "days", text: "90", number: true },
-          ],
-        },
-        { name: "Start", key: "start", text: "YYYY-MM-DD (empty: today)" },
-        {
-          name: "Notes", key: "notes", text: "доп. информация: от врача, как принимать…",
-          lines: true,
-        },
-      ],
-      values: {}, required: ["meds"],
-    }),
+    form: courseForm,
     note: course,
   },
   // a free journal (the weight card's journals): a level 0–3 a day and its reasons; lag: the days

@@ -2,7 +2,7 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { vault } from "./stubs/vault.mjs";
-import { courseData } from "#/models/course.js";
+import { tableData } from "#/models/course.js";
 
 let mount, reactive, MedsCourse, loadMeds;
 before(async () => {
@@ -48,7 +48,7 @@ test("loadMeds: the course from the block's text, the names from the note's meds
 
 test("MedsCourse: the counts, today's chips, the grid; a click on a tick or a chip goes round and writes the cell", async () => {
   const { files } = vault({ [P]: NOTE });
-  const state = reactive({ data: courseData(TABLE, { "АЕ": "аевит", "МА": "магний" }, "2026-11-08") });
+  const state = reactive({ data: tableData(TABLE, { "АЕ": "аевит", "МА": "магний" }, "2026-11-08") });
   const w = mount(MedsCourse, { props: { state }, global: { provide: { sourcePath: P } } });
 
   assert.equal(w.find(".winx-meds__sum").text().replace(/\s+/g, " "), "день 2 из 3 · принято 4 из 6");
@@ -81,7 +81,7 @@ test("MedsCourse: the counts, today's chips, the grid; a click on a tick or a ch
 test("MedsCourse: a write that fails puts the mark and the note back, and says so", async () => {
   const { app } = vault({ [P]: NOTE });
   const { Notice } = await import("obsidian");
-  const state = reactive({ data: courseData(TABLE, { "АЕ": "аевит", "МА": "магний" }, "2026-11-08") });
+  const state = reactive({ data: tableData(TABLE, { "АЕ": "аевит", "МА": "магний" }, "2026-11-08") });
   const w = mount(MedsCourse, { props: { state }, global: { provide: { sourcePath: P } } });
 
   app.vault.process = async () => { throw new Error("disk"); };
