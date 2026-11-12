@@ -1,4 +1,4 @@
-<!-- the top row: the date field, sounds on/off, ＋ task, ✦ to the dashboard (the phone) -->
+<!-- the top row: the date field, sounds on/off, ＋ task -->
 <script setup>
 import { computed, inject, ref } from "vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
@@ -15,7 +15,6 @@ const onDate = e => goTo(view.state, e.target.value || null, view.ctx);
 const mute = () => { toggleMute(); muted.value = isMuted(); };
 
 const newTask = () => app.commands.executeCommandById("winx:new-task");
-const dashboard = () => app.commands.executeCommandById("winx:open-dashboard");
 </script>
 
 <template>
@@ -28,11 +27,5 @@ const dashboard = () => app.commands.executeCommandById("winx:open-dashboard");
       @click="mute"
     >{{ muted ? "🔇" : "🔊" }}</button>
     <WinxButton kind="chip" title="new task (Winx: New task)" @click="newTask">＋ task</WinxButton>
-    <WinxButton
-      kind="chip"
-      title="dashboard"
-      class="winx-cal__to-dash winx-is-phone-only"
-      @click="dashboard"
-    >✦</WinxButton>
   </div>
 </template>

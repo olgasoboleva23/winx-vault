@@ -1,6 +1,6 @@
 import { Platform, Plugin } from "obsidian";
-import { CalendarView, VIEW_TYPE } from "./components/pages/calendar/view.ts";
-import { DashboardView, DASHBOARD_VIEW } from "./components/pages/dashboard/view.ts";
+import { WINX_VIEW, WinxView } from "./components/app/view.ts";
+import { OldWinxView, openWinx } from "./components/app/open.ts";
 import { ProjectsView, PROJECTS_VIEW } from "./components/pages/projects/view.ts";
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./controllers/blocks.js";
@@ -10,7 +10,7 @@ import { setApp } from "./helpers/app.js";
 import { installSounds } from "./helpers/sounds.js";
 import { useTaskStore } from "./store/tasks.js";
 
-// The Winx plugin: the ```winx blocks (widgets), the calendar tab, the task window and the
+// The Winx plugin: the ```winx blocks (widgets), the Winx tab, the task window and the
 // commands, and the styles (styles.css, built from src/styles/main.scss and the components'
 // index.scss).
 
@@ -22,22 +22,18 @@ export default class WinxPlugin extends Plugin {
     registerCommands(this);
     // a ```winx block in a note: a widget by name (controllers/blocks.js)
     this.registerMarkdownCodeBlockProcessor("winx", drawBlock);
-    // the calendar: its own tab; the command opens it, or goes to the one already open.
-    // The ✨ ribbon icon opens Winx: the dashboard and the calendar as two pinned tabs (or goes back
-    // to them)
-    this.registerView(VIEW_TYPE, leaf => new CalendarView(leaf));
-    this.registerView(DASHBOARD_VIEW, leaf => new DashboardView(leaf));
+    // the Winx tab (its pages: components/app/pages.ts); ✨ and the command go to the one used
+    // last, or open it, pinned, on the dashboard
+    this.registerView(WINX_VIEW, leaf => new WinxView(leaf));
+    // the old tabs, from a layout saved before: a Winx tab on their page
+    for (const page of ["dashboard", "calendar"])
+      this.registerView(`winx-${page}`, leaf => new OldWinxView(leaf, `winx-${page}`, page));
     this.registerView(PROJECTS_VIEW, leaf => new ProjectsView(leaf));
+    this.addCommand({ id: "open", name: "Open Winx", callback: () => openWinx() });
     this.addCommand({
-      id: "open-calendar", name: "Open calendar", callback: () => this.open(VIEW_TYPE),
+      id: "open-projects", name: "Open projects", callback: () => this.openProjects(),
     });
-    this.addCommand({
-      id: "open-dashboard", name: "Open dashboard", callback: () => this.open(DASHBOARD_VIEW),
-    });
-    this.addCommand({
-      id: "open-projects", name: "Open projects", callback: () => this.open(PROJECTS_VIEW),
-    });
-    this.addRibbonIcon("sparkles", "Winx", () => this.openWinx());
+    this.addRibbonIcon("sparkles", "Winx", () => openWinx());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",
       name: "Reload",
@@ -64,34 +60,20 @@ export default class WinxPlugin extends Plugin {
       }, 500));
     }
 
-    // desktop: today's reminders; a click opens the calendar
-    useNotify(this, () => this.open(VIEW_TYPE));
+    // desktop: today's reminders; a click opens the calendar in the Winx tab
+    useNotify(this, () => openWinx("calendar"));
   }
-  // a Winx tab, pinned: the one already open, or a new one
-  async open(type: string, reveal = true) {
+  // the projects tab, pinned: the one already open, or a new one (until it is a Winx page)
+  async openProjects() {
     const { workspace } = this.app;
-    let leaf = workspace.getLeavesOfType(type)[0];
+    let leaf = workspace.getLeavesOfType(PROJECTS_VIEW)[0];
 
     if (!leaf) {
       leaf = workspace.getLeaf("tab");
-      await leaf.setViewState({ type, active: reveal });
+      await leaf.setViewState({ type: PROJECTS_VIEW, active: true });
       leaf.setPinned(true);
     }
 
-    if (reveal) void workspace.revealLeaf(leaf);
-    return leaf;
-  }
-  // ✨: back to the Winx tab used last, or both tabs opened (the dashboard shown)
-  async openWinx() {
-    const { workspace } = this.app;
-    const open = [DASHBOARD_VIEW, VIEW_TYPE].flatMap(t => workspace.getLeavesOfType(t));
-
-    if (open.length)
-      return workspace.revealLeaf(
-        open.sort((a: any, b: any) => (b.activeTime ?? 0) - (a.activeTime ?? 0))[0],
-      );
-    const dash = await this.open(DASHBOARD_VIEW, false);
-    await this.open(VIEW_TYPE, false);
-    void workspace.revealLeaf(dash);
+    void workspace.revealLeaf(leaf);
   }
 }

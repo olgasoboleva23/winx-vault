@@ -2,10 +2,11 @@ import { test, before, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { Component, Keymap } from "obsidian";
+import { setApp } from "#/helpers/app.js";
 
 // The Winx tab: its pages made once and kept (hidden), its steps in Obsidian's history, Cmd-click
 // a new tab. The pages here are stand-ins (pages.ts' make replaced), counted as they're made.
-let WinxView, pages, made, unloaded;
+let WinxView, pages, made, unloaded, vue, openWinx, OldWinxView;
 
 before(async () => {
   GlobalRegistrator.register();
@@ -25,6 +26,8 @@ before(async () => {
   });
   ({ WinxView } = await import("#/components/app/view.ts"));
   ({ pages } = await import("#/components/app/pages.ts"));
+  ({ openWinx, OldWinxView } = await import("#/components/app/open.ts"));
+  vue = await import("vue");
   for (const key of Object.keys(pages)) {
     pages[key].make = () => {
       made.push(key);
@@ -40,9 +43,9 @@ beforeEach(() => { made = []; unloaded = []; });
 // a leaf as Obsidian's: setViewState opens nothing new, it gives the view the state (and keeps
 // the result: a history step or not); getLeaf("tab") is another such leaf, its calls noted
 function open() {
-  const opened = [], pinned = [];
+  const opened = [], pinned = [], saves = [];
   const workspace = {
-    on: () => ({}), trigger() {}, requestSaveLayout() {},
+    on: () => ({}), trigger() {}, requestSaveLayout: () => saves.push(1),
     getLeaf: type => ({
       setViewState: async s => opened.push([type, s]), setPinned: p => pinned.push(p),
     }),
@@ -60,7 +63,7 @@ function open() {
   const view = new WinxView(leaf);
 
   view.load();
-  return { view, leaf, opened, pinned, ready: view.onOpen() };
+  return { view, leaf, opened, pinned, saves, ready: view.onOpen() };
 }
 
 const keeps = "switching keeps the dashboard and calendar loaded and hidden; "
@@ -139,4 +142,80 @@ test("two Winx tabs keep their own state: one's dashboard date isn't the other's
   await a.leaf.setViewState({ state: { dashboard: { date: "2026-11-10" } } });
   assert.equal(a.view.state.dashboard.date, "2026-11-10");
   assert.equal(b.view.state.dashboard.date, null);
+});
+
+test("the calendar's state is saved with the layout: unfolded days are, area isn't", async () => {
+  const { view, leaf, saves, ready } = open();
+
+  await ready;
+  await leaf.setViewState({ state: { page: "calendar", calendar: {
+    view: "month", tab: "pool", showDone: true, unfolded: ["2026-11-04", "bad"],
+    date: "2026-12-09",
+  } } });
+  assert.deepEqual(view.getState().calendar, { date: "2026-12-09", view: "month",
+    showDone: true, tab: "pool", unfolded: ["2026-11-04"], unfoldedDay: null,
+    backlogOpen: false });
+  await vue.nextTick();
+  const before = saves.length;
+  view.state.calendar.area = "body";
+  view.state.calendar.picked = "2026-11-06";
+  await vue.nextTick();
+  assert.equal(saves.length, before);
+  view.state.calendar.unfolded = [...view.state.calendar.unfolded, "2026-11-05"];
+  await vue.nextTick();
+  assert.equal(saves.length, before + 1);
+});
+
+test("an old calendar leaf becomes a Winx tab on the calendar, with its state", async () => {
+  const got = [];
+  const leaf = { app: {}, setViewState: async s => got.push(s) };
+  const old = new OldWinxView(leaf, "winx-calendar", "calendar");
+
+  assert.equal(old.getViewType(), "winx-calendar");
+  await old.setState({ view: "month" }, {});
+  await new Promise(r => setTimeout(r));   // after Obsidian's setViewState is done with it
+  assert.deepEqual(got, [{ type: "winx", state: { page: "calendar", calendar: { view: "month" } } }]);
+});
+
+// the workspace openWinx sees: its Winx leaves, the leaves it makes, what it reveals
+function workspace(leaves) {
+  const made = [], revealed = [];
+  const leaf = () => {
+    const l = {
+      pinned: false, state: null, went: [],
+      setPinned(p) { this.pinned = p; },
+      async setViewState(s) { this.state = s; },
+    };
+    l.view = Object.assign(Object.create(WinxView.prototype), { go: (...a) => l.went.push(a) });
+    return l;
+  };
+  for (const l of leaves) Object.assign(l, leaf(), l);
+  setApp({ workspace: {
+    getLeavesOfType: t => (t === "winx" ? leaves : []),
+    getLeaf: () => { const l = leaf(); made.push(l); return l; },
+    revealLeaf: async l => { revealed.push(l); },
+  } });
+  return { made, revealed };
+}
+
+test("openWinx: the newest Winx tab, else one new pinned tab", async () => {
+  const old = { activeTime: 1 }, recent = { activeTime: 5 };
+  let w = workspace([old, recent]);
+
+  assert.equal(await openWinx("calendar"), recent);
+  assert.deepEqual(w.made, []);
+  assert.deepEqual(w.revealed, [recent]);
+  assert.deepEqual(recent.went, [["calendar", {}]]);
+
+  w = workspace([]);
+  const leaf = await openWinx();
+  assert.deepEqual(w.made, [leaf]);
+  assert.equal(leaf.pinned, true);
+  assert.equal(leaf.state.type, "winx");
+  assert.deepEqual(leaf.went, []);
+
+  w = workspace([recent]);
+  const extra = await openWinx("calendar", {}, true);
+  assert.deepEqual(w.made, [extra]);
+  assert.equal(extra.pinned, false);
 });

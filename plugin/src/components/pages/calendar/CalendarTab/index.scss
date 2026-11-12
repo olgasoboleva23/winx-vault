@@ -144,8 +144,6 @@
     &:has(> input.task-list-item-checkbox) { padding-left: 26px; }
     > input.task-list-item-checkbox { position: absolute; left: $space-xs; top: 5px; margin: 0; }
   }
-  /* ✦ dashboard on the right of the top row */
-  &__top &__to-dash { margin-left: auto; }
   /* stickers from ![[...]] in the task text */
   &__sticker { height: 24px; width: auto; vertical-align: middle; }
   &__month &__sticker { height: 14px; }

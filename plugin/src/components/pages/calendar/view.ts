@@ -1,5 +1,5 @@
-import { Component, ItemView, Notice, WorkspaceLeaf } from "obsidian";
-import { computed, markRaw, reactive, ref, watch } from "vue";
+import { Component, Notice } from "obsidian";
+import { computed, markRaw, ref, watch } from "vue";
 import { useLater, useNewDay, useRedraw } from "#/composables/use.js";
 import { app } from "#/helpers/app.js";
 import { useVueApp } from "#/composables/vueApp.ts";
@@ -8,12 +8,12 @@ import { taskStore } from "#/store/tasks.js";
 import config from "#/helpers/config.js";
 import { todayYmd } from "#/helpers/dates.js";
 import { CalendarData, T, findTask, taskInfo } from "#/models/calendarData.js";
-import { SAVED, baseDate, readState, shownDays } from "#/store/calendar.js";
+import { baseDate, readState, shownDays } from "#/store/calendar.js";
 import { makeActions } from "#/controllers/calendar.js";
 import { dragState } from "#/composables/drag.js";
 import CalendarTab from "./CalendarTab/index.vue";
 
-// The calendar tab: the week (7 day columns) or the month around a date, the tasks of 00
+// The calendar page: the week (7 day columns) or the month around a date, the tasks of 00
 // System/Data/Tasks on their days, "Missed?" above, and the No date | Ahead | Regulars | Pool panel
 // below, drawn by Vue (CalendarTab.vue and its parts). Its state (date, view, tab, folds) is
 // reactive and saved with the layout, so a pinned calendar comes back as it was. The data (ctx: the
@@ -23,7 +23,6 @@ import CalendarTab from "./CalendarTab/index.vue";
 // from the state, so a change there redraws only them. A row handles its own drags (drag.js) and
 // swipes (swipe.js) and names its task by its key (file, line, status, words: never another one —
 // see calendarData.js).
-export const VIEW_TYPE = "winx-calendar";
 
 // the saved keys (state.js) and the ones that aren't: area (one area's tasks only), picked (the
 // phone's day); reactive, owned by whoever holds the page (the tab)
@@ -102,40 +101,5 @@ export class CalendarPage extends Component {
     };
     ctx.actions = makeActions(ctx);
     return ctx;
-  }
-}
-
-export class CalendarView extends ItemView {
-  state: CalendarState = reactive({
-    ...readState(undefined), area: null as string | null, picked: null as string | null,
-  });
-  private page: CalendarPage | null = null;
-
-  constructor(leaf: WorkspaceLeaf) {
-    super(leaf);
-    const saved = () => JSON.stringify(SAVED.map(k => (this.state as any)[k]));
-    this.register(watch(saved, () => this.app.workspace.requestSaveLayout()));
-  }
-  getViewType() { return VIEW_TYPE; }
-  getDisplayText() { return "Calendar"; }
-  getIcon() { return "calendar-days"; }
-
-  getState() { return Object.fromEntries(SAVED.map(k => [k, (this.state as any)[k]])); }
-  async setState(saved: unknown, result: any) {
-    Object.assign(this.state, readState(saved));
-    await super.setState(saved, result);
-  }
-
-  async onOpen() {
-    // a note in reading view (fonts, margins), with the dashboard pages' background and fonts on
-    // top
-    this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
-    this.page = this.addChild(new CalendarPage(this.state, this.contentEl.createDiv()));
-  }
-  onResize() { this.page?.catchUp(); }
-  async onClose() {
-    if (this.page) this.removeChild(this.page);
-    this.page = null;
-    this.contentEl.empty();
   }
 }

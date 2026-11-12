@@ -1,4 +1,4 @@
-import { Component, ItemView, MarkdownRenderer, Platform, WorkspaceLeaf } from "obsidian";
+import { Component, MarkdownRenderer, Platform } from "obsidian";
 import { h, reactive, watch } from "vue";
 import { useVueApp } from "#/composables/vueApp.ts";
 import layout from "./layout.md";
@@ -8,12 +8,11 @@ import { useBusy, useNewDay, useNoteLinks } from "#/composables/use.js";
 import { DATA, POMODORO } from "#/helpers/paths.js";
 import DashboardDate from "./DashboardDate.vue";
 
-// The dashboard tab: layout.md (the grid of cards, its ```winx blocks) drawn
+// The dashboard page: layout.md (the grid of cards, its ```winx blocks) drawn
 // by Obsidian's markdown renderer, as a note in reading view would be, for the tab's date. The date
 // is the tab's own (no date: today, and it moves on at midnight); Obsidian saves it with the
 // layout. After a write to the tasks or the data, the tab dims with the calendar's ✦ pill until a
 // widget has drawn again (5 s at most).
-export const DASHBOARD_VIEW = "winx-dashboard";
 const WATCHED = [`${DATA}/`];
 const QUIET = POMODORO;   // the timer saves itself all the time
 
@@ -78,8 +77,7 @@ export class DashboardPage extends Component {
     });
   }
 
-  // the date row: DashboardDate.vue in the layout's slot (the calendar's date field, ‹ ›, today, 📅
-  // on the phone)
+  // the date row: DashboardDate.vue in the layout's slot (the calendar's date field, ‹ ›, today)
   private dateRow() {
     const slot = this.body?.querySelector(".winx-dash__date");
 
@@ -88,12 +86,11 @@ export class DashboardPage extends Component {
     Object.assign(this.shown, { date: this.shownDate, today: todayYmd() });
     const { shown } = this, phone = Platform.isMobile;
     const go = (date: string | null) => this.go(date || null);
-    const calendar = () => (this.app as any).commands.executeCommandById("winx:open-calendar");
     // a render function, so the row follows shown.date (props given to an app are read once)
     // owned by the render: gone with it when the dashboard draws again or closes
     useVueApp(this.drawn!, slot as HTMLElement, {
       render: () => h(DashboardDate, {
-        date: shown.date, today: shown.today, phone, onGo: go, onCalendar: calendar,
+        date: shown.date, today: shown.today, phone, onGo: go,
       }),
     });
   }
@@ -109,34 +106,5 @@ export class DashboardPage extends Component {
       () => window.setTimeout(() => el.removeClass("winx-dash--busy"), 200));
     // following today: a new day moves the dashboard on
     useNewDay(this, () => { if (!this.state.date) this.go(null); });
-  }
-}
-
-export class DashboardView extends ItemView {
-  state: DashboardState = reactive({ date: null });
-  private page: DashboardPage | null = null;
-
-  constructor(leaf: WorkspaceLeaf) {
-    super(leaf);
-    this.register(watch(() => this.state.date, () => this.app.workspace.requestSaveLayout()));
-  }
-  getViewType() { return DASHBOARD_VIEW; }
-  getDisplayText() { return "Dashboard"; }
-  getIcon() { return "sparkles"; }
-
-  getState() { return { date: this.state.date }; }
-  async setState(saved: any, result: any) {
-    this.state.date = typeof saved?.date === "string" ? saved.date : null;
-    await super.setState(saved, result);
-    if (this.page) this.page.render();
-  }
-
-  async onOpen() {
-    this.page = this.addChild(new DashboardPage(this.state, this.contentEl));
-  }
-  async onClose() {
-    if (this.page) this.removeChild(this.page);
-    this.page = null;
-    this.contentEl.empty();
   }
 }

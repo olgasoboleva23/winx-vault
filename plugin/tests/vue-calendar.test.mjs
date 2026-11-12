@@ -5,10 +5,10 @@ import { createRequire } from "node:module";
 import { setApp } from "#/helpers/app.js";
 import { idTask } from "./stubs/idTask.mjs";
 
-// The calendar tab on Vue: its state through Obsidian's layout, a tick's 2 s, the folds, the panel's tab
+// The calendar page on Vue: a tick's 2 s, the folds, the panel's tab
 const require = createRequire(import.meta.url);
 const TODAY = "2026-11-04";   // a Wednesday
-let vue, Tab, data, actions, state, CalendarView, useLater, dragState, Component, saves = 0;
+let vue, Tab, data, actions, state, useLater, dragState, Component;
 before(async () => {
   GlobalRegistrator.register();
   window.moment = require("moment");
@@ -17,7 +17,7 @@ before(async () => {
   setApp({
     metadataCache: { getFirstLinkpathDest: n => ({ path: n }), on: () => ({}) },
     vault: { getResourcePath: f => f.path, on: () => ({}), adapter: { readBinary: async () => null } },
-    workspace: { on: () => ({}), requestSaveLayout: () => saves++ },
+    workspace: { on: () => ({}), requestSaveLayout() {} },
     loadLocalStorage: () => null, saveLocalStorage() {}, commands: { executeCommandById() {} },
   });
   vue = await import("vue");
@@ -25,7 +25,6 @@ before(async () => {
   data = await import("#/models/calendarData.js");
   actions = await import("#/controllers/calendar.js");
   state = await import("#/store/calendar.js");
-  ({ CalendarView } = await import("#/components/pages/calendar/view.ts"));
   ({ useLater } = await import("#/composables/use.js"));
   ({ dragState } = await import("#/composables/drag.js"));
   ({ Component } = await import("obsidian"));
@@ -67,21 +66,6 @@ function mount(over = {}, tasksApi = {}) {
 }
 const box = (el, text) => [...el.querySelectorAll(".winx-cal__task--open")].find(r => r.textContent.includes(text))
   .querySelector("input");
-
-test("its state goes into Obsidian's layout and comes back; area and the phone's day aren't saved", async () => {
-  const v = new CalendarView({ app: { workspace: { requestSaveLayout: () => saves++ } } });
-  await v.setState({ view: "month", tab: "pool", showDone: true, unfolded: ["2026-11-04", "bad"], date: "2026-12-09" }, {});
-  assert.deepEqual(v.getState(), { date: "2026-12-09", view: "month", showDone: true, tab: "pool",
-    unfolded: ["2026-11-04"], unfoldedDay: null, backlogOpen: false });
-  await vue.nextTick();
-  const before = saves;
-  v.state.area = "body"; v.state.picked = "2026-11-06";
-  await vue.nextTick();
-  assert.equal(saves, before);   // not saved
-  v.state.unfolded = [...v.state.unfolded, "2026-11-05"];
-  await vue.nextTick();
-  assert.equal(saves, before + 1);
-});
 
 test("CalendarPage: hidden, a task change waits; shown again, catchUp draws it once", async () => {
   const { CalendarPage } = await import("#/components/pages/calendar/view.ts");
