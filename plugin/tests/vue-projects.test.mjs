@@ -109,6 +109,15 @@ test("No projects: WinxEmpty 'No projects yet'", () => {
   assert.equal(el.querySelector(".winx-empty").textContent, "✦ No projects yet");
 });
 
+test("A filter that matches nothing shows WinxEmpty 'No <status> projects'", () => {
+  const { el } = mount({ filter: "paused" });
+  assert.equal(el.querySelector(".winx-empty"), null);
+  taskStore.putProjects({ p3: { name: "Poem", status: "idea", stages: [] } });
+  const none = mount({ filter: "paused" }).el;
+  assert.equal(none.querySelector(".winx-empty").textContent, "✦ No paused projects");
+  assert.deepEqual(names(none), []);
+});
+
 // the project's page
 const saved = () => JSON.parse(files[PROJECTS]).p1;
 const until = async ok => { for (let i = 0; i < 50 && !ok(); i++) await new Promise(r => setTimeout(r, 2)); };
