@@ -47,3 +47,4 @@ export class Menu {
   }
   showAtMouseEvent() { Menu.last = this; }
 }
+export const MarkdownRenderer = { render: async (app, md, el) => { el.textContent = md; } };
