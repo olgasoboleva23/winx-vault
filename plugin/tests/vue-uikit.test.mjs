@@ -4,10 +4,11 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
 // each component draws the markup the styles expect (the components' index.scss): the same as the old uikit/*.js did,
 // written out here; Vue's <!--v-if--> placeholders left out (no box, no style)
-let mount, ui;
+let mount, nextTick, ui;
 before(async () => {
   GlobalRegistrator.register();
   ({ mount } = await import("@vue/test-utils"));
+  ({ nextTick } = await import("vue"));
   // a component is <Name>.vue, or <Name>/index.vue when it has its own styles
   const load = async n => (await import(`../src/components/uikit/${n}`)).default;
   ui = Object.fromEntries(await Promise.all(["WinxButton", "WinxNoteLink", "WinxEmpty", "WinxMissing", "WinxFailed",
@@ -173,10 +174,40 @@ test("WinxDrawer: closed draws nothing; open, Esc and the backdrop close it", as
   const closed = mount(WinxDrawer, { props: { open: false }, slots: { default: "rows" } });
   assert.equal(closed.find(".winx-drawer").exists(), false);
 
-  const drawer = mount(WinxDrawer, { props: { open: true, side: "bottom" }, slots: { default: "rows" } });
+  const drawer = mount(WinxDrawer,
+    { props: { open: true, side: "bottom" }, slots: { default: "rows" } });
   assert.equal(drawer.find(".winx-drawer.winx-drawer--bottom .winx-drawer__panel").text(), "rows");
   await drawer.find(".winx-drawer__backdrop").trigger("click");
-  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+  await drawer.find(".winx-drawer__panel").trigger("keydown", { key: "Escape" });
+  await drawer.find(".winx-drawer__panel").trigger("keydown", { key: "Enter" });
   assert.equal(drawer.emitted("close").length, 2);
   drawer.unmount();
+});
+
+test("WinxDrawer: a labelled dialog; open, it takes the focus, closed, gives it back", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const other = document.body.appendChild(document.createElement("button"));
+  other.focus();
+  const drawer = mount(WinxDrawer, { props: { label: "Other" }, attachTo: document.body });
+
+  await drawer.setProps({ open: true });
+  await nextTick();
+  const panel = drawer.find(".winx-drawer__panel");
+  assert.deepEqual(["role", "aria-modal", "tabindex", "aria-label"].map(a => panel.attributes(a)),
+    ["dialog", "true", "-1", "Other"]);
+  assert.equal(document.activeElement, panel.element);
+  await drawer.setProps({ open: false });
+  await nextTick();
+  assert.equal(document.activeElement, other);
+  drawer.unmount();
+  other.remove();
+});
+
+test("WinxNav: the current item is the page; the one whose drawer is open, expanded", async () => {
+  const nav = mount(await loadNav(),
+    { props: { items: navItems, current: "calendar", expanded: "other" } });
+  const items = nav.findAll(".winx-btn--rail");
+
+  assert.deepEqual(items.map(b => b.attributes("aria-current")), [undefined, "page", undefined]);
+  assert.deepEqual(items.map(b => b.attributes("aria-expanded")), [undefined, undefined, "true"]);
 });

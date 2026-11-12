@@ -37,7 +37,8 @@ $text-6xl: 30px;     // the pomodoro's time
 $font-deco: Cinzel, serif;   // titles, dates, the big numbers
 $border: 1px solid var(--winx-border);
 
-// what sits over what (low to high): under -1 < base 0 < over 1 < raised 2 < scroll 3 < dropbar 5 < busy 6 < sticker 20 < nav 30 < drawer 31
+// what sits over what (low to high): under -1 < base 0 < over 1 < raised 2 < scroll 3
+// < dropbar 5 < busy 6 < sticker 20 < nav 30 < drawer 31
 $z-under: -1;     // the leaf's photo, below its content
 $z-base: 0;       // a new stacking context; the card's wings behind its content
 $z-over: 1;       // content over its own decoration (a card's, a day's, Missed's)
@@ -96,14 +97,15 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
 @function white($opacity) { @return rgba(255, 255, 255, $opacity); }
 @function black($opacity) { @return rgba(0, 0, 0, $opacity); }
 
-// sparkles fly out of the middle on hover (WinxButton's add and rail); the hover's own look is the
-// block passed in. The parent is position: relative
+// sparkles fly out of the middle on hover (WinxButton's add and rail; the picture is
+// --winx-sparkles-svg in _assets.scss), none for reduced motion; the hover's own look is the block
+// passed in. The parent is position: relative
 @mixin sparkles {
   &::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='26' viewBox='0 0 40 26'%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-16 -8' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.4Q0 0 2.4 0Q0 0 0 2.4Q0 0 -2.4 0Q0 0 0 -2.4Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;15 -9' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.2Q0 0 2.2 0Q0 0 0 2.2Q0 0 -2.2 0Q0 0 0 -2.2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-17 7' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2Q0 0 2 0Q0 0 0 2Q0 0 -2 0Q0 0 0 -2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;16 7' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.2Q0 0 2.2 0Q0 0 0 2.2Q0 0 -2.2 0Q0 0 0 -2.2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-5 -11' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Cpath d='M0 -1.8Q0 0 1.8 0Q0 0 0 1.8Q0 0 -1.8 0Q0 0 0 -1.8Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;6 11' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2Q0 0 2 0Q0 0 0 2Q0 0 -2 0Q0 0 0 -2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center / 30px 19.5px no-repeat;
+    background: var(--winx-sparkles-svg) center / 30px 19.5px no-repeat;
     opacity: 0;
     pointer-events: none;
   }
@@ -111,5 +113,9 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
   &:hover {
     @content;
     &::after { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after { display: none; }
   }
 }
