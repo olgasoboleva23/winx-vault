@@ -6,14 +6,14 @@ const WING =
   "26 44 C22 44 18 42 14 40 C10 40 6 40 4 38 Z'/>";
 
 export const PLACEHOLDER = "data:image/svg+xml," + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 150" preserveAspectRatio="none">' +
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 150" preserveAspectRatio="xMidYMid slice">' +
   '<defs><linearGradient id="g" x2="1" y2="1"><stop offset="0" stop-color="#fce4f1"/>' +
   '<stop offset="1" stop-color="#b88ad8"/></linearGradient>' +
   '<linearGradient id="w" x2="1" y2="1"><stop offset="0" stop-color="#f8c8e0"/>' +
   '<stop offset="1" stop-color="#a8c8f0"/></linearGradient></defs>' +
-  '<rect width="400" height="150" fill="url(#g)"/>' +
-  // the wings keep their shape however wide the card is
-  '<svg x="0" y="30" width="400" height="90" viewBox="0 0 112 64">' +
+  '<rect width="1200" height="150" fill="url(#g)"/>' +
+  // wide and cropped to the card (slice), so the wings keep their shape at any width
+  '<svg x="0" y="30" width="1200" height="90" viewBox="0 0 112 64">' +
   '<g fill="url(#w)" stroke="#c89dd6" stroke-width="0.8">' +
   `<g transform="translate(56 0) scale(-1 1)">${WING}</g>` +
   `<g transform="translate(56 0)">${WING}</g></g></svg></svg>`,
