@@ -14,4 +14,9 @@
     border-color: transparent;
     background: linear-gradient(135deg, var(--winx-pink), var(--winx-pink-deep));
   }
+  /* on the photo: the field nearly opaque, so its text and placeholder read */
+  &#{&}--photo input#{&}__input {
+    background: white(90%);
+    &::placeholder { color: alpha(--winx-purple-deep, 55%); }
+  }
 }

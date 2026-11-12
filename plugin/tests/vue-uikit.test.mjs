@@ -121,3 +121,10 @@ test("WinxTabs: on the photo (a page without a card) the light look", async () =
   assert.equal(plain.classes().includes("winx-tabs--photo"), false);
   assert.equal(photo.classes().includes("winx-tabs--photo"), true);
 });
+
+test("WinxAddForm: on the photo (no card under it) the --photo look", () => {
+  const photo = mount(ui.WinxAddForm, { props: { photo: true } });
+
+  assert.equal(photo.classes().includes("winx-add-form--photo"), true);
+  assert.equal(mount(ui.WinxAddForm).classes().includes("winx-add-form--photo"), false);
+});
