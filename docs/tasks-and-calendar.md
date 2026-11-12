@@ -60,7 +60,7 @@ A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (w
 - **Days** show one-off tasks, and a day's 🔁 tasks folded into one pill "🔁 2/5"; a click unfolds them, grouped by time of day (morning / evening, which any task can have). The order inside a day is dragged and kept in the records' `order`.
 - **Drag** a task onto a day: open and due that day, or ✓ done that day. While dragging, a bar of 7 days sticks to the top of the screen.
 - **Missed?** lists open tasks whose day has passed: ✓ done that day, or ☀️ move to today.
-- **Bottom tabs:** **No date** (open tasks without a date), **Ahead** (dated tasks after this week and the birthdays, a card per month), **Regulars** (🔁 tasks), **Pool** (tasks to pick when it's time, the records with `pool: true`: drag one onto a day to make a line).
+- **Bottom tabs:** **No date** (open one-off tasks without a date, not a project's), **Ahead** (dated tasks after this week and the birthdays, a card per month), **Regulars** (🔁 tasks), **Projects** ("Projects · N": the open tasks of projects, grouped by project and stage; a Done project with open tasks still shows), **Pool** (tasks to pick when it's time, the records with `pool: true`: drag one onto a day to make a line).
 
   ![Ahead](images/calendar-ahead.webp)
 - **On a task:** ⭐ change difficulty, ✏️ edit (the task window, then the Tasks dialog), ⏭ skip a 🔁 task this time, 🗑 delete (click twice). On the phone, swipe right = done, swipe left = skip / take the date off.
@@ -75,4 +75,4 @@ The file is `00 System/Data/Projects/projects.json`, an object by key (`p1`, `p2
 
 - **The list:** a card per project (cover, status, description, progress, the next open task, which its box ticks), with tabs by status and their counts. A click on a card opens the project.
 - **A project's page:** the status (a menu), description, progress, Result and Notes (each edited in a window), and the stages with their tasks; **+ stage** adds one, **+ task** on a stage runs the New task flow and puts the new task there. A task's 📅 puts it on a calendar day (today, tomorrow or a date).
-- **The calendar:** a project's task with a date shows on its day like any other. One without a date does not show in the calendar's **No date** tab: it waits on its project's page.
+- **The calendar:** a project's task with a date shows on its day like any other. One without a date is not in **No date**: it shows only in the calendar's **Projects** tab (by project, then stage) and on its project's page.
