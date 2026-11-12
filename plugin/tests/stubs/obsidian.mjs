@@ -14,6 +14,10 @@ export class Component {
   registerInterval(id) { this._cleanups.push(() => clearInterval(id)); return id; }
 }
 export class MarkdownRenderChild extends Component { constructor(el) { super(); this.containerEl = el; } }
+// rendering markdown: the dashboard layout's date slot only (its ```winx blocks aren't drawn here)
+export const MarkdownRenderer = {
+  render: async (app, md, el) => { el.innerHTML = md.includes("winx-dash__date") ? '<div class="winx-dash__date"></div>' : ""; },
+};
 export const debounce = fn => Object.assign(fn, { cancel() {} });
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };
