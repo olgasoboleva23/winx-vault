@@ -22,11 +22,13 @@ export async function createProject({ name, description = "", status = "active",
 }
 
 // merge fields (name, status, description, result, notes, cover) into a project
-export const saveProject = (key, patch) =>
-  editJson(PROJECTS, all => ({ ...all, [key]: { ...all[key], ...patch } }));
+export const saveProject = (key, patch) => editJson(PROJECTS, all =>
+  all[key] ? { ...all, [key]: { ...all[key], ...patch } } : null);
 
 export const addStage = (key, name) => editJson(PROJECTS, all => {
   const project = all[key];
+
+  if (!project) return null;
 
   return { ...all, [key]: { ...project, stages: [...project.stages ?? [], { name, tasks: [] }] } };
 });

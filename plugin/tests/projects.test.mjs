@@ -40,6 +40,15 @@ test("addStage appends", async () => {
   assert.deepEqual(json(files).p1.stages, [{ name: "A", tasks: [] }, { name: "B", tasks: [] }]);
 });
 
+test("saveProject and addStage on a missing key write nothing", async () => {
+  const { files } = vault();
+  await createProject({ name: "Garden" });
+  const before = files[PROJECTS];
+  await saveProject("p9", { notes: "x" });
+  assert.equal(await addStage("p9", "A"), undefined);
+  assert.equal(files[PROJECTS], before);
+});
+
 test("addToStage: lists the id once; null or a changed stage writes nothing", async () => {
   const { files } = vault();
   await createProject({ name: "Garden" });

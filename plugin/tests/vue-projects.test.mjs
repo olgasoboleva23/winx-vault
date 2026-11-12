@@ -56,7 +56,7 @@ test("the list: a card per project in file order with its status pill, descripti
   assert.deepEqual(names(el), ["Garden", "Shed", "Poem", "Kite"]);
   const garden = cards(el)[0];
   assert.equal(garden.querySelector(".winx-projects__status").className, "winx-projects__status winx-projects__status--active");
-  assert.equal(garden.querySelector(".winx-projects__status").textContent, "active");
+  assert.equal(garden.querySelector(".winx-projects__status").textContent, "Active");
   assert.equal(garden.querySelector(".winx-projects__description").textContent, "beds by the wall");
   const bar = garden.querySelector("progress.winx-projects__progress");
   assert.equal([bar.value, bar.max].join("/"), "3/8");
@@ -206,9 +206,20 @@ test("Result and Notes show their text; Edit opens a Form with one lines row and
     button(notes, "Edit").click();
     await until(() => saved().notes === "water at dusk");
     assert.deepEqual(asked.slice(1), [
-      "✦ Notes", [{ name: "Notes", key: "notes", text: "", lines: true }], { values: { notes: "water at dawn" } },
+      "✦ Notes", [{ name: "Notes", key: "notes", text: "", lines: true }], { values: { notes: "water at dawn" }, submit: "Save" },
     ]);
     assert.equal(saved().notes, "water at dusk");
     assert.equal(saved().result, "a full basket");
+  } finally { Form.ask = ask; }
+});
+
+test("Edit when the project is removed while the Form is open writes nothing and does not throw", async () => {
+  const ask = Form.ask;
+  Form.ask = async () => { taskStore.putProjects({}); files[PROJECTS] = "{}"; return { notes: "late" }; };
+  try {
+    const { el } = mount({ open: "p1" });
+    button(el.querySelector(".winx-project__notes"), "Edit").click();
+    await new Promise(r => setTimeout(r, 30));
+    assert.equal(files[PROJECTS], "{}");
   } finally { Form.ask = ask; }
 });

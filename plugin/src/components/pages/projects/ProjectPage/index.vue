@@ -45,13 +45,14 @@ function statusMenu(e) {
   menu.showAtMouseEvent(e);
 }
 
-async function edit({ key, name }) {
-  const values = { [key]: page.value.p[key] ?? "" };
+async function edit({ key: field, name }) {
+  const project = state.open;  // kept before the Form: the page may be gone when it answers
+  const values = { [field]: page.value.p[field] ?? "" };
   const got = await Form.ask(
-    app, `✦ ${name}`, [{ name, key, text: "", lines: true }], { values },
+    app, `✦ ${name}`, [{ name, key: field, text: "", lines: true }], { values, submit: "Save" },
   );
 
-  if (got) await saveProject(page.value.key, { [key]: got[key] });
+  if (got) await saveProject(project, { [field]: got[field] });
 }
 
 async function newStage(name) {

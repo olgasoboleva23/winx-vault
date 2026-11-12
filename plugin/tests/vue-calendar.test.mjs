@@ -291,3 +291,28 @@ test("Projects tab: a GroupCard per project that isn't Done, a stage title over 
   assert.equal(st.tab, "projects");
   taskStore.put(MASTER, ""); taskStore.putRecords({}); taskStore.putProjects({});
 });
+
+test("Projects tab: no projects at first, then one with an open task shows its stage", async () => {
+  const { taskStore } = await import("#/store/tasks.js");
+  const { MASTER } = await import("#/helpers/paths.js");
+  taskStore.putProjects({});
+  const { el } = mount({ tab: "projects" });
+  assert.equal(el.querySelector(".winx-cal__stage"), null);
+  taskStore.put(MASTER, "- [ ] t1");
+  taskStore.putRecords({ t1: { name: "pick venue" } });
+  taskStore.putProjects({ trip: { name: "Trip", status: "active", stages: [{ name: "Plan", tasks: ["t1"] }] } });
+  await vue.nextTick();
+  assert.equal(el.querySelector(".winx-cal__stage").textContent, "Plan");
+  taskStore.put(MASTER, ""); taskStore.putRecords({}); taskStore.putProjects({});
+});
+
+test("Projects tab: two stages with one name both show", async () => {
+  const { taskStore } = await import("#/store/tasks.js");
+  const { MASTER } = await import("#/helpers/paths.js");
+  taskStore.put(MASTER, "- [ ] t1\n- [ ] t2");
+  taskStore.putRecords({ t1: { name: "one" }, t2: { name: "two" } });
+  taskStore.putProjects({ x: { name: "X", status: "active", stages: [{ name: "S", tasks: ["t1"] }, { name: "S", tasks: ["t2"] }] } });
+  const { el } = mount({ tab: "projects" });
+  assert.deepEqual([...el.querySelectorAll(".winx-cal__stage")].map(g => g.textContent), ["S", "S"]);
+  taskStore.put(MASTER, ""); taskStore.putRecords({}); taskStore.putProjects({});
+});

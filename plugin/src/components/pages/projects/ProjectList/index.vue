@@ -18,6 +18,7 @@ import { coverUrl } from "../cover.js";
 
 const view = inject("projects");
 const state = view.state;
+const label = s => `${s[0].toUpperCase()}${s.slice(1)}`;
 
 // every project as its card shows it (read again when the tasks or projects change)
 const all = computed(() => {
@@ -37,7 +38,7 @@ const shown = computed(() =>
   all.value.filter(p => state.filter === "all" || p.status === state.filter));
 const tabs = computed(() => FILTERS.map(f => ({
   key: f,
-  text: `${f[0].toUpperCase()}${f.slice(1)} · ${
+  text: `${label(f)} · ${
     f === "all" ? all.value.length : all.value.filter(p => p.status === f).length}`,
 })));
 const canTick = computed(() => { void view.version.value; return !!tasksApi(); });
@@ -61,7 +62,7 @@ const canTick = computed(() => { void view.version.value; return !!tasksApi(); }
       >
         <template #button>
           <span :class="['winx-projects__status', `winx-projects__status--${p.status}`]">{{
-            p.status }}</span>
+            label(p.status) }}</span>
         </template>
         <div v-if="p.description" class="winx-projects__description">{{ p.description }}</div>
         <div v-if="p.total" class="winx-row winx-gap-m">
