@@ -1,58 +1,80 @@
-// A medication course's block (components/pages/meds, a note made by "Winx: New
-// medication course"): the course from the block's own lines (its table), the medicines' names
-// from the note's legend (a two-cell row: | КОД | name |, on a card or not), today's doses; a mark
-// or a note's text written into the note's table; the course edited (the ✎ by the card's title,
-// the command): the window again with the course's values, the note rebuilt with its marks kept
-// (by each medicine's code, kept in the properties).
+// The medication courses (courses.json, a record by id: models/course.js) and their page
+// (components/pages/meds): the courses for the tabs and each one's table, notes and doses; a mark
+// or a day's note written; a course made or edited in its window ("Winx: New / Edit medication
+// course", the ✎ on its card); which course, when several (a picker).
 import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
-import { edit } from "#/helpers/files.js";
+import { readJson } from "#/helpers/files.js";
+import { collection } from "#/helpers/collection.js";
 import { todayYmd } from "#/helpers/dates.js";
-import { carry, codeOf, nameOf, rebuild, tableData, tick } from "#/models/course.js";
-import { KINDS } from "#/models/kinds.js";
-import { Note } from "#/models/note.js";
+import { COURSES, MEDICATION } from "#/helpers/paths.js";
+import {
+  courseData, courseForm, courseList, courseOf, edited, formValues, intake, withDayNote, withMark,
+} from "#/models/course.js";
 import { Form } from "#/components/uikit/Form/index.ts";
+import { Search } from "#/components/uikit/Search/index.ts";
 
-const props = path => {
-  const file = app.vault.getFileByPath(path);
+export const courses = collection(COURSES);
 
-  return file && app.metadataCache.getFileCache(file)?.frontmatter;
-};
+const by = (json, fn) => Object.fromEntries(Object.entries(json).map(([id, r]) => [id, fn(r)]));
 
-// the medicines' names by code, from the note's `meds` property (a note before codes were kept:
-// the first two letters)
-const names = fm =>
-  Object.fromEntries((fm?.meds ?? []).map(g => [g.code ?? codeOf(g.name), nameOf(g.name)]));
+export async function loadMeds() {
+  const json = await readJson(COURSES, {}), today = todayYmd();
 
-export async function loadMeds({ source, sourcePath }) {
-  return tableData(source, names(props(sourcePath)), todayYmd());
+  return {
+    list: courseList(json, today), data: by(json, r => courseData(r, today)),
+    notes: by(json, r => r.notes), intake: by(json, r => intake(r.meds)),
+  };
 }
 
-export const tickMeds = (path, date, col, mark) => edit(path, t => tick(t, date, col, mark));
+export const tickMeds = (id, date, key, mark) =>
+  courses.update(id, r => withMark(r, date, key, mark));
 
-export async function editCourse(path, ask = (...a) => Form.ask(app, ...a)) {
-  const file = app.vault.getFileByPath(path), fm = props(path);
+export const setDayNote = (id, date, text) => courses.update(id, r => withDayNote(r, date, text));
 
-  if (fm?.type !== "meds" || !Array.isArray(fm.meds)) {
-    return void new Notice("✦ Not a medication course (no medicines in its properties)");
+const formAsk = (...a) => Form.ask(app, ...a);
+
+// the window, then the course saved; the Medication page opened in a new tab. The new id, null
+// when closed.
+export async function newCourse(ask = formAsk) {
+  const { rows, values, required } = courseForm();
+  const v = await ask("✦ New medication course", rows, { values, required, submit: "Create" });
+
+  if (!v) return null;
+  const id = await courses.add(courseOf(v, todayYmd()), "c");
+  const page = app.vault.getFileByPath(MEDICATION);
+
+  if (page) await app.workspace.getLeaf("tab").openFile(page);
+  return id;
+}
+
+// the window with the course's values; saved over the record as it is then (a mark written while
+// the window was open stays)
+export async function editCourse(id, ask = formAsk) {
+  const rec = (await readJson(COURSES, {}))[id];
+
+  if (!rec) return void new Notice("✦ That course is gone");
+  const { rows, required } = courseForm();
+  const v = await ask("✦ Edit medication course", rows,
+    { values: formValues(rec), required, submit: "Save" });
+
+  if (v) await courses.update(id, r => edited(r, v));
+}
+
+const searchPick = list => Search.pick(
+  app, "Which course…",
+  q => list.filter(c => c.label.toLowerCase().includes(q.trim().toLowerCase())),
+  (c, el) => void el.createDiv({ text: c.label }),
+).then(c => c?.id ?? null);
+
+// the course to edit from Cmd+P: the only one, or one picked (running first)
+export async function pickCourse(pick = searchPick) {
+  const list = courseList(await readJson(COURSES, {}), todayYmd());
+
+  if (!list.length) {
+    new Notice("✦ No medication course yet");
+    return null;
   }
 
-  const old = await app.vault.read(file);   // its properties: the course the window shows
-  const { rows, required } = KINDS.meds.form();
-  const values = { meds: fm.meds.map(g => ({ ...g })), start: fm.start, notes: fm.notes ?? "" };
-  const v = await ask("✦ Edit medication course", rows, { values, required, submit: "Save" });
-
-  if (!v) return;
-  const fresh = new Note(KINDS.meds.note(v, todayYmd())).text;
-  let changed = false;
-
-  // from the note as it is now (a mark or a card written while the window was open stays); a
-  // course changed meanwhile (its properties: another device, another window) isn't written over
-  await edit(path, now => {
-    changed = head(now) !== head(old);
-    return changed ? now : rebuild(now, carry(now, fresh));
-  });
-  if (changed) new Notice("✦ The course changed meanwhile: open its window again");
+  return list.length === 1 ? list[0].id : pick(list);
 }
-
-const head = text => text.slice(0, text.indexOf("\n---\n", 3));

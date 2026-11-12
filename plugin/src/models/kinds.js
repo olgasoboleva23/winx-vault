@@ -1,9 +1,6 @@
 // The notes Winx makes (a command each, "Winx: New …"): the window's rows and the note's data.
 //   form() → { rows, values, required } for Form.ask; note(values, today) → { props, body?,
-//   sections, file? } for Note (a note's name is its file's: no title property, no # heading;
-//   `file` names it when the window has no title: a course's medicines)
-import { addDays } from "#/helpers/dates.js";
-import { courseForm, intake, medicine, withCodes } from "#/models/course.js";
+//   sections } for Note (a note's name is its file's: no title property, no # heading)
 
 const pairs = list => list.map(([label, value]) => ({ label, value }));
 const titleOnly = () => ({
@@ -40,45 +37,6 @@ const item = ({ type, steps, types, statuses, ...rest }) => ({
     sections: { Notes: "", Progress: steps.map(s => `- [ ] ${s}`).join("\n") },
   }),
 });
-
-// the course as a note: the medicines as data in its properties; the day by its anchors (a time
-// of day, a meal: what to take then, the doses) and the notes typed, on cards (the page has the
-// dashboard's photo behind it; the legend is the block's own), and a day
-// per row up to the longest course (a medicine's cells blank after its own days) inside a
-// ```winx meds block, which draws it and ticks it (components/pages/meds)
-const course = (v, today) => {
-  const groups = withCodes(v.meds), meds = groups.map(medicine), start = v.start?.trim() || today;
-  const days = Math.max(...meds.map(m => m.days));
-  const columns = meds.flatMap(m => (m.times.length ? m.times : [""]).map(t => ({ m, t })));
-  const row = cells => `| ${cells.join(" | ")} |`;
-  const notes = v.notes?.trim() ? v.notes.trim().split("\n") : [];
-  const table = [
-    row(["Дата", ...columns.map(c => c.m.code + c.t), "Заметки"]),
-    row(["---", ...columns.map(() => ":-:"), "---"]),
-    ...Array.from({ length: days }, (_, i) =>
-      row([addDays(start, i), ...columns.map(c => i < c.m.days ? "☐" : ""), ""])),
-  ];
-
-  return {
-    props: {
-      type: "meds", start, days, cssclasses: ["dashboard"],   // the card look
-      // the medicines as typed, to edit the course later (controllers/meds.js)
-      meds: groups.map(g => ({
-        name: g.name, code: g.code, dose: g.dose ?? "", times: g.times ?? "any",
-        meal: g.meal ?? "any", days: Number(g.days) || 90,
-      })),
-      ...(v.notes?.trim() ? { notes: v.notes.trim() } : {}),
-    },
-    file: meds.map(m => m.name).join(", "),
-    body: [
-      "> [!card] Приём",
-      ...intake(groups).map(a => `> - ${a}`),
-      "",
-      ...(notes.length ? ["> [!card] Заметки", ...notes.map(l => `> ${l}`), ""] : []),
-      "```winx", "meds", "card: Курс", ...table, "```",
-    ].join("\n"),
-  };
-};
 
 export const KINDS = {
   watch: item({
@@ -124,14 +82,6 @@ export const KINDS = {
       props: { type: "recipe", tags: [], source: null, time: null, difficulty: null, rating: null },
       sections: { Ingredients: "", Steps: "", Notes: "", Variations: "" },
     }),
-  },
-  // a course of medicines, a group per medicine (+ adds one): a day per row to tick (the folder:
-  // "meds" in the plugin's data.json)
-  meds: {
-    id: "new-meds", name: "New medication course", folder: "00 System/Data/Medication",
-    setting: "meds",
-    form: courseForm,
-    note: course,
   },
   // a free journal (the weight card's journals): a level 0–3 a day and its reasons; lag: the days
   // after a meal its level is looked at on the food page (a rash: the next day)

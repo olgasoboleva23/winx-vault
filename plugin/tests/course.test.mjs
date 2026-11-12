@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  carry, columns, courseData, courseList, courseOf, dayLabel, edited, forFood, intake, next,
+  carry, columns, courseData, courseForm, courseList, courseOf, dayLabel, edited, forFood, intake, next,
   parseCourse, rebuild, tableData, tick, withDayNote, withMark,
 } from "#/models/course.js";
 
@@ -203,6 +203,20 @@ test("courseOf / edited: the window's values as a record, the marks kept through
 
   assert.deepEqual([rec.start, rec.notes, rec.meds[0].dose], ["2026-11-07", "x", "3 капли"]);
   assert.deepEqual([rec.marks, rec.dayNotes], [REC.marks, REC.dayNotes]);
+});
+
+test("courseOf / edited: a code per medicine, unique, kept through a rename; the window's rows", () => {
+  const rec = courseOf({ meds: [{ name: "Мастодинон" }, { name: "Магний" }, { name: "Масло" }] }, "2026-11-08");
+
+  assert.deepEqual(rec.meds.map(m => m.code), ["МА", "МГ", "МС"]);
+  const again = edited(rec, { meds: [{ name: "Магний цитрат", code: "МГ" }, { name: "Мастодинон", code: "МА" }, { name: "Мелатонин" }] });
+
+  assert.deepEqual(again.meds.map(m => m.code), ["МГ", "МА", "МЕ"]);
+  const { rows, required } = courseForm();
+
+  assert.deepEqual(rows.map(r => r.key), ["meds", "start", "notes"]);
+  assert.deepEqual(rows[0].list.map(r => r.key), ["name", "dose", "times", "meal", "days"]);
+  assert.deepEqual([rows[0].required, required, rows[2].lines], [["name"], ["meds"], true]);
 });
 
 test("forFood: the codes taken by day; courseList: running first, then the newest", () => {
