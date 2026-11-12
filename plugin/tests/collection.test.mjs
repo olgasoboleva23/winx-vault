@@ -19,6 +19,7 @@ const vault = (files = {}) => {
 
 test("nextId: the biggest prefix<N> plus one; other keys skipped", () => {
   assert.equal(nextId("m", ["m2", "m10", null, "x7"]), "m11");
+  assert.equal(nextId("m", []), "m1");
   assert.equal(nextId("t", []), "t1");
   assert.equal(nextId("t", ["t3", "tea"]), "t4");
 });

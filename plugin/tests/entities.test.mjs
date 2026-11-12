@@ -6,7 +6,7 @@ import { Goal, reminders } from "#/models/goal.js";
 import { CycleLog } from "#/models/cycleLog.js";
 import { WeightLog } from "#/models/weightLog.js";
 import { BodyLog } from "#/models/bodyLog.js";
-import { MarketItem, catLabel, historyOf, nextMarketId, openKeys } from "#/models/market.js";
+import { MarketItem, catLabel, historyOf, openKeys } from "#/models/market.js";
 import { paydays, SavingsJar } from "#/models/savingsJar.js";
 
 // 2026-10-19 is a Monday
@@ -118,9 +118,7 @@ test("MarketItem: bought, the way the Tasks plugin marks a line", () => {
   assert.equal(new MarketItem("просто текст").bought("2026-10-23"), "просто текст");
 });
 
-test("Market: the next id, the history and what is on the list, from the lines", () => {
-  assert.equal(nextMarketId(["m2", "m10", null, "x7"]), "m11");
-  assert.equal(nextMarketId([]), "m1");
+test("Market: the history and what is on the list, from the lines", () => {
   const items = [
     new MarketItem("- [x] m1 [completion:: 2026-10-02]", null, { name: "tea", tag: "#food" }),
     new MarketItem("- [ ] m2", null, { name: "soap", tag: "#care" }),
