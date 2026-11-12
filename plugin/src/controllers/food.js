@@ -4,18 +4,18 @@
 // a day's note, the marks edited.
 import { prepareFuzzySearch } from "obsidian";
 import { app } from "#/helpers/app.js";
-import { edit } from "#/helpers/files.js";
+import { edit, readJson } from "#/helpers/files.js";
 import { todayYmd } from "#/helpers/dates.js";
 import { DEFAULT_MARKS, FoodLog, Foods } from "#/models/food.js";
 import { readJournals } from "#/controllers/journals.js";
-import { codeOf, nameOf, parseCourse } from "#/models/course.js";
+import { forFood } from "#/models/course.js";
 import { T } from "#/models/calendarData.js";
 import { Notice } from "obsidian";
 import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { taskStore } from "#/store/tasks.js";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { Form } from "#/components/uikit/Form/index.ts";
-import { FOOD_LOG, FOODS } from "#/helpers/paths.js";
+import { COURSES, FOOD_LOG, FOODS } from "#/helpers/paths.js";
 
 const read = async path => {
   const file = app.vault.getFileByPath(path);
@@ -46,26 +46,10 @@ const ready = async () => {
   await made(FOOD_LOG, "");
 };
 
-// the medication courses: their notes (type: meds), when they run, their medicines, and by day the
-// codes with a ✅ in the course's table
-async function courses() {
-  const notes = app.vault.getMarkdownFiles()
-    .map(f => ({ f, fm: app.metadataCache.getCache(f.path)?.frontmatter }))
-    .filter(c => c.fm?.type === "meds" && c.fm.start);
-
-  return Promise.all(notes.map(async ({ f, fm }) => {
-    const { columns, rows } = parseCourse(await read(f.path));
-
-    return {
-      path: f.path, name: f.basename, start: String(fm.start), days: Number(fm.days) || 0,
-      meds: (fm.meds ?? []).map(m => ({
-        code: m.code ?? codeOf(m.name), name: nameOf(m.name), days: Number(m.days) || 0,
-      })),
-      taken: new Map(rows.map(r => [r.date,
-        new Set(columns.filter((c, i) => r.marks[i] === "✅").map(c => c.code))])),
-    };
-  }));
-}
+// the medication courses (courses.json): when they run, their medicines, and by day the codes
+// with a ✅
+const courses = async () =>
+  Object.entries(await readJson(COURSES, {})).map(([id, rec]) => forFood(id, rec));
 
 export async function loadFood() {
   const [foods, log, journals, taking] =

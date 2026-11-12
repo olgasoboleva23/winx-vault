@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Foods, FoodLog, foodWeek, DEFAULT_MARKS } from "#/models/food.js";
+import { forFood } from "#/models/course.js";
 
 const FOODS = `---
 marks:
@@ -42,9 +43,11 @@ test("FoodLog: what was eaten by day, the day's note; one eaten taken off, a not
 test("foodWeek: a row per day: what was eaten with its marks, the marks counted, each journal's level after its lag, the courses on, the note", () => {
   const marks = [...DEFAULT_MARKS];
   const journals = [{ path: "J/Skin.md", name: "Skin", lag: 1, entries: new Map([["2026-11-03", { level: 2, reasons: ["🍰"] }]]) }];
-  const courses = [{ path: "M/A.md", name: "A", start: "2026-11-02", days: 10, meds: [
-    { code: "МА", name: "мастодинон", days: 10 }, { code: "БА", name: "баксет", days: 1 },
-  ], taken: new Map([["2026-11-02", new Set(["МА"])]]) }];
+  // a course as courses.json keeps it; АЕ has no days: 90, as the course's grid shows it
+  const courses = [forFood("c1", { start: "2026-11-02", meds: [
+    { name: "мастодинон", code: "МА", times: "both", days: 10 },
+    { name: "баксет", code: "БА", times: "any", days: 1 }, { name: "аевит", code: "АЕ" },
+  ], marks: { "2026-11-02": { "МА☀️": "✅", "БА": "❌" } } })];
   const days = ["2026-11-02", "2026-11-03"];
   const [mon, tue] = foodWeek({ foods: new Foods(FOODS).list, marks, log: new FoodLog(LOG), journals, courses, days });
 
@@ -52,8 +55,8 @@ test("foodWeek: a row per day: what was eaten with its marks, the marks counted,
   assert.deepEqual(mon.counts, { m1: 1, m2: 0, m3: 1 });
   assert.deepEqual(mon.journals, [{ name: "Skin", level: 2, reasons: ["🍰"], on: "2026-11-03" }]);   // the next day's
   // the course's medicines on that day: a short code each, the full name for its tip
-  assert.deepEqual(mon.courses, [{ path: "M/A.md", name: "A", meds: [{ code: "МА", name: "мастодинон", taken: true }, { code: "БА", name: "баксет", taken: false }] }]);
-  assert.deepEqual(tue.courses[0].meds.map(m => m.code), ["МА"]);   // баксет's one day is over
+  assert.deepEqual(mon.courses, [{ id: "c1", name: "мастодинон, баксет, аевит", meds: [{ code: "МА", name: "мастодинон", taken: true }, { code: "БА", name: "баксет", taken: false }, { code: "АЕ", name: "аевит", taken: false }] }]);
+  assert.deepEqual(tue.courses[0].meds.map(m => m.code), ["МА", "АЕ"]);   // баксет's one day is over
   assert.equal(mon.note, "сыпь на подбородке");
   assert.deepEqual(tue.journals, [{ name: "Skin", level: null, reasons: [], on: "2026-11-04" }]);
 });

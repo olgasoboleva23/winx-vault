@@ -13,8 +13,8 @@ import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
 import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
-  CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET_NOTE, MARKET_RECORDS, PURCHASES, RULES,
-  SAVINGS, SHOP, TASKS, WEIGHT,
+  COURSES, CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET_NOTE, MARKET_RECORDS, PURCHASES,
+  RULES, SAVINGS, SHOP, TASKS, WEIGHT,
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
@@ -38,8 +38,7 @@ import WeightCard from "#/components/pages/dashboard/widgets/weight/index.vue";
 import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vue";
 import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/index.vue";
 // the pages on notes of their own: components/pages/<page>/
-import MedsCourse from "#/components/pages/meds/index.vue";
-import MedsEdit from "#/components/pages/meds/EditButton.vue";
+import MedsPage from "#/components/pages/meds/index.vue";
 import FoodPage from "#/components/pages/food/index.vue";
 
 // the widgets: name → { view: the .vue, load(ctx): its data, cardButton: a .vue next to the
@@ -75,10 +74,13 @@ export const blocks = {
     cardButton: CelestialMarketAdd,
     watches: [MARKET_NOTE, MARKET_RECORDS],
   },
-  // a medication course's own note: its table is the block's text
-  meds: { view: MedsCourse, load: loadMeds, cardButton: MedsEdit, watches: [] },
+  // the Medication page (00 System/Data/Medication/Medication.md): the courses
+  meds: { view: MedsPage, load: loadMeds, watches: [COURSES] },
   // the food journal's own note (00 System/Data/Food/Food.md)
-  food: { view: FoodPage, load: loadFood, watches: [FOODS, FOOD_LOG, `${JOURNALS}/`, TASK_FILES] },
+  food: {
+    view: FoodPage, load: loadFood,
+    watches: [FOODS, FOOD_LOG, COURSES, `${JOURNALS}/`, TASK_FILES],
+  },
 };
 
 // a widget on its block: its VueHost, with the card when the block has a "card:" line

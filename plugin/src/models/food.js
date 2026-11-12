@@ -61,7 +61,7 @@ export class FoodLog {
   }
 }
 
-// journals: [{ path, name, lag, entries: Map date → { level, reasons } }]; courses: [{ path, name,
+// journals: [{ path, name, lag, entries: Map date → { level, reasons } }]; courses: [{ id, name,
 // start, days, meds: [{ code, name, days }], taken: Map date → the codes with a ✅ that day }]
 // task: { id, name, days: Set of the dates it was done } or null: each row then says `trained`
 export function foodWeek({ foods, marks, log, journals, courses, days, task = null }) {
@@ -83,7 +83,7 @@ export function foodWeek({ foods, marks, log, journals, courses, days, task = nu
       }),
       // a course on that day, its medicines still on then (each its own days)
       courses: courses.filter(c => c.start <= date && date < addDays(c.start, c.days)).map(c => ({
-        path: c.path, name: c.name,
+        id: c.id, name: c.name,
         meds: (c.meds ?? []).filter(m => date < addDays(c.start, m.days))
           .map(m => ({ code: m.code, name: m.name, taken: !!c.taken?.get(date)?.has(m.code) })),
       })),

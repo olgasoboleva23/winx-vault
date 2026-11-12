@@ -12,6 +12,7 @@ import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 import { vTip } from "#/components/uikit/tooltip.js";
 import { addDays, weekOf } from "#/helpers/dates.js";
 import { dayLabel } from "#/models/course.js";
+import { MEDICATION } from "#/helpers/paths.js";
 import { FoodLog, foodWeek } from "#/models/food.js";
 import {
   addEaten, editFood, editMarks, pickTrainingTask, removeEaten, setFoodNote,
@@ -108,8 +109,8 @@ const act = async (write) => {
             {{ row.trained ? "✓" : "" }}
           </span>
           <template v-else-if="col.key === 'courses'">
-            <span v-for="c in row.courses" :key="c.path" class="winx-row winx-gap-xs">
-              <WinxNoteLink :path="c.path" class="winx-food__course">💊</WinxNoteLink>
+            <span v-for="c in row.courses" :key="c.id" class="winx-row winx-gap-xs">
+              <WinxNoteLink :path="MEDICATION" class="winx-food__course">💊</WinxNoteLink>
               <span
                 v-for="m in c.meds"
                 :key="m.code"

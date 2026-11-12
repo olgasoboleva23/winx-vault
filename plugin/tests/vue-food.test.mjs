@@ -2,7 +2,8 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { vault } from "./stubs/vault.mjs";
-import { FOOD_LOG, FOODS, JOURNALS } from "#/helpers/paths.js";
+import { COURSES, FOOD_LOG, FOODS, JOURNALS, MEDICATION } from "#/helpers/paths.js";
+import { forFood } from "#/models/course.js";
 
 let mount, FoodPage, loadFood, DEFAULT_MARKS;
 before(async () => {
@@ -15,11 +16,16 @@ before(async () => {
 });
 const tick = () => new Promise(r => setTimeout(r));
 const LOG = "- 2026-11-02 f1\n- 2026-11-02 f2\n- 2026-11-02 note: сыпь\n";
+// a course as courses.json keeps it (made-up)
+const REC = {
+  start: "2026-11-02", meds: [{ name: "мастодинон", code: "МА", times: "both", days: 2 }],
+  notes: "", marks: { "2026-11-03": { "МА🌙": "✅" } }, dayNotes: {},
+};
 const data = () => ({
   today: "2026-11-04", marks: DEFAULT_MARKS, log: LOG,
   foods: [{ id: "f1", name: "каша с 4 ч", marks: ["m1"] }, { id: "f2", name: "кофе с бзм", marks: ["m3"] }],
   journals: [{ path: `${JOURNALS}/Высыпания.md`, name: "Высыпания", lag: 1, entries: new Map([["2026-11-03", { level: 2, reasons: ["🍰"] }]]) }],
-  courses: [{ path: "M/Курс.md", name: "Курс", start: "2026-11-02", days: 2, meds: [{ code: "МА", name: "мастодинон", days: 2 }], taken: new Map([["2026-11-03", new Set(["МА"])]]) }],
+  courses: [forFood("c1", REC)],
 });
 
 test("the food page: the week, a row a day: what was eaten with its marks, the marks counted, the journal the next day, the course, the note", () => {
@@ -35,6 +41,11 @@ test("the food page: the week, a row a day: what was eaten with its marks, the m
   assert.equal(mon.find(".winx-food__level").text(), "2");   // Высыпания on the 3rd
   assert.ok(w.findAll(".winx-table__head").map(h => h.text()).includes("Высыпания +1д"));   // the next day's, said in its head
   assert.equal(mon.find(".winx-food__course").text(), "💊");
+  let opened = null;
+
+  vault().app.workspace.openLinkText = p => { opened = p; };
+  mon.find(".winx-food__course").trigger("click");
+  assert.equal(opened, MEDICATION);
   assert.equal(mon.find(".winx-food__med").text(), "МА");
   assert.equal(mon.find(".winx-food__med").attributes("aria-label"), "мастодинон: не принято");
   assert.ok(mon.find(".winx-food__med").classes().includes("winx-food__med--not"));   // no ✅ that day
@@ -63,15 +74,15 @@ test("the food page: ‹ › step a week; × takes an eaten one off; a note type
 test("loadFood: the foods and marks, the log, the journals, the medication courses", async () => {
   vault({
     [FOODS]: "---\nmarks: []\n---\n- f1 чай\n", [FOOD_LOG]: LOG, [`${JOURNALS}/Высыпания.md`]: "- 2026-11-03 1\n",
-    "M/Курс.md": "```winx\nmeds\n| Дата | МА☀️ | МА🌙 | Заметки |\n| --- | :-: | :-: | --- |\n| 2026-11-02 | ☐ | ✅ |  |\n| 2026-11-03 | ☐ | ❌ |  |\n```\n",
-  }, { props: { [FOODS]: { marks: [{ tag: "m1", icon: "🍫", name: "какао" }] }, [`${JOURNALS}/Высыпания.md`]: { lag: 1 }, "M/Курс.md": { type: "meds", start: "2026-11-02", days: 5, meds: [{ name: "мастодинон 30 капель", code: "МА", days: 5 }] } } });
+    [COURSES]: JSON.stringify({ c1: { ...REC, marks: { "2026-11-02": { "МА🌙": "✅" }, "2026-11-03": { "МА🌙": "❌" } } } }),
+  }, { props: { [FOODS]: { marks: [{ tag: "m1", icon: "🍫", name: "какао" }] }, [`${JOURNALS}/Высыпания.md`]: { lag: 1 } } });
   const d = await loadFood();
 
   assert.deepEqual(d.foods, [{ id: "f1", name: "чай", marks: [] }]);
   assert.deepEqual(d.marks.map(m => m.icon), ["🍫"]);
   assert.equal(d.log, LOG);
   assert.deepEqual([d.journals[0].name, d.journals[0].lag], ["Высыпания", 1]);
-  assert.deepEqual(d.courses.map(({ taken, ...c }) => c), [{ path: "M/Курс.md", name: "Курс", start: "2026-11-02", days: 5, meds: [{ code: "МА", name: "мастодинон", days: 5 }] }]);
+  assert.deepEqual(d.courses.map(({ taken, ...c }) => c), [{ id: "c1", name: "мастодинон", start: "2026-11-02", days: 2, meds: [{ code: "МА", name: "мастодинон", days: 2 }] }]);
   assert.deepEqual([...d.courses[0].taken], [["2026-11-02", new Set(["МА"])], ["2026-11-03", new Set()]]);   // a ✅ that day (❌ isn't one)
 });
 

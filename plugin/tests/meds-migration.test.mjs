@@ -2,7 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { vault } from "./stubs/vault.mjs";
 import { Notice } from "obsidian";
-import { checkCourse, courseFromNote, migrateMeds, migrateMedsNotes } from "#/migrations/meds.js";
+import {
+  checkCourse, courseFromNote, migrateMeds, migrateMedsNotes, parseCourse,
+} from "#/migrations/meds.js";
 import { COURSES, MEDICATION, MEDICATION_BASE } from "#/helpers/paths.js";
 import { withMark } from "#/models/course.js";
 
@@ -40,6 +42,23 @@ const REC = {
   dayNotes: { "2026-11-08": "сегодня" },
 };
 const MEDICATION_TEXT = "---\ncssclasses:\n  - dashboard\n---\n\n```winx\nmeds\n```\n";
+
+const TABLE = `| Дата | БА | МА☀️ | МА🌙 | АЕ | Заметки |
+| --- | :-: | :-: | :-: | :-: | --- |
+| 2026-11-07 | ✅ | ✅ | ✅ | ✅ |  |
+| 2026-11-08 | ✅ | ✅ | ☐ | ❌ | сегодня |
+| 2026-11-09 |  | ☐ | ☐ | ☐ |  |`;
+
+test("parseCourse: the columns (a code and its time of day) and a row per day (its marks, its note)", () => {
+  const { columns, rows } = parseCourse(TABLE);
+
+  assert.deepEqual(columns, [
+    { code: "БА", time: "" }, { code: "МА", time: "☀️" }, { code: "МА", time: "🌙" }, { code: "АЕ", time: "" },
+  ]);
+  assert.deepEqual(rows[1], { date: "2026-11-08", marks: ["✅", "✅", "☐", "❌"], note: "сегодня" });
+  assert.deepEqual(rows[2].marks, ["", "☐", "☐", "☐"]);
+});
+
 
 test("courseFromNote: the properties and the table's marks and day notes as a record", () => {
   assert.deepEqual(courseFromNote(NOTE, FM), REC);

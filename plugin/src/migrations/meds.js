@@ -1,16 +1,34 @@
 // The one-off move of the medication courses from their notes (type: meds, a ```winx meds table)
 // to Medication/courses.json: a record per note, checked cell by cell against the table it came
 // from before anything is written; the notes kept as "<name> (old).md", Medication.md made (the
-// page), the old Base trashed. courseFromNote / checkCourse / migrateMedsNotes pure (tested),
-// migrateMeds() the command. Once the notes' block reads courses.json, the old table format
-// lives here only.
+// page), the old Base trashed. parseCourse / courseFromNote / checkCourse / migrateMedsNotes pure
+// (tested), migrateMeds() the command. The old table format lives here only.
 import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
 import { collection } from "#/helpers/collection.js";
 import { todayYmd } from "#/helpers/dates.js";
 import { nextId } from "#/helpers/ids.js";
 import { COURSES, MEDICATION, MEDICATION_BASE } from "#/helpers/paths.js";
-import { codeOf, courseData, parseCourse } from "#/models/course.js";
+import { TIMES, codeOf, courseData } from "#/models/course.js";
+
+// the old table (a course note's ```winx meds block): its columns (a code and its time of day)
+// and a row per day (its marks, its note)
+const cells = line => line.split("|").slice(1, -1).map(c => c.trim());
+
+export function parseCourse(text) {
+  const lines = text.split("\n").filter(l => l.trim().startsWith("|"));
+  const head = lines.length ? cells(lines[0]).slice(1, -1) : [];
+  const columns = head.map(h => {
+    const time = Object.keys(TIMES).find(t => t && h.endsWith(t)) ?? "";
+
+    return { code: time ? h.slice(0, -time.length) : h, time };
+  });
+  const rows = lines.map(cells).filter(c => /^\d{4}-\d\d-\d\d$/.test(c[0])).map(c => ({
+    date: c[0], marks: c.slice(1, columns.length + 1), note: c[columns.length + 1] ?? "",
+  }));
+
+  return { columns, rows };
+}
 
 const MEDICATION_TEXT = "---\ncssclasses:\n  - dashboard\n---\n\n```winx\nmeds\n```\n";
 
