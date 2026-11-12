@@ -39,3 +39,10 @@ test("a date in today's week (or month) means following today again", () => {
 test("the Projects tab is a known tab", () => {
   assert.equal(readState({ tab: "projects" }).tab, "projects");
 });
+
+test("the Projects tab's state: a key and a known filter, else the defaults", async () => {
+  const projects = await import("#/store/projects.js");
+  assert.deepEqual(projects.readState(undefined), projects.DEFAULT);
+  assert.deepEqual(projects.readState({ open: 5, filter: "x" }), projects.DEFAULT);
+  assert.deepEqual(projects.readState({ open: "p2", filter: "paused" }), { open: "p2", filter: "paused" });
+});

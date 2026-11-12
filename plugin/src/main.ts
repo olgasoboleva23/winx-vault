@@ -1,6 +1,7 @@
 import { Platform, Plugin } from "obsidian";
 import { CalendarView, VIEW_TYPE } from "./components/pages/calendar/view.ts";
 import { DashboardView, DASHBOARD_VIEW } from "./components/pages/dashboard/view.ts";
+import { ProjectsView, PROJECTS_VIEW } from "./components/pages/projects/view.ts";
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./controllers/blocks.js";
 import { useNotify } from "./composables/notify.js";
@@ -26,11 +27,15 @@ export default class WinxPlugin extends Plugin {
     // to them)
     this.registerView(VIEW_TYPE, leaf => new CalendarView(leaf));
     this.registerView(DASHBOARD_VIEW, leaf => new DashboardView(leaf));
+    this.registerView(PROJECTS_VIEW, leaf => new ProjectsView(leaf));
     this.addCommand({
       id: "open-calendar", name: "Open calendar", callback: () => this.open(VIEW_TYPE),
     });
     this.addCommand({
       id: "open-dashboard", name: "Open dashboard", callback: () => this.open(DASHBOARD_VIEW),
+    });
+    this.addCommand({
+      id: "open-projects", name: "Open projects", callback: () => this.open(PROJECTS_VIEW),
     });
     this.addRibbonIcon("sparkles", "Winx", () => this.openWinx());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
