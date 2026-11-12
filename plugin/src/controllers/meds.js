@@ -52,7 +52,7 @@ export async function newCourse(ask = formAsk) {
 // the window was open stays)
 export async function editCourse(id, ask = formAsk) {
   const rec = (await readJson(COURSES, {}))[id];
-  const gone = () => void new Notice("✦ That course is gone");
+  const gone = () => void new Notice("✦ that course is gone");
 
   if (!rec) return gone();
   const { rows, required } = courseForm();
@@ -74,7 +74,7 @@ export async function pickCourse(pick = searchPick) {
   const list = courseList(await readJson(COURSES, {}), todayYmd());
 
   if (!list.length) {
-    new Notice("✦ No medication course yet");
+    new Notice("✦ no medication course yet");
     return null;
   }
 

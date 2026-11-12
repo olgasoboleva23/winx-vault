@@ -66,7 +66,7 @@ test("editCourse: a course gone: nothing asked or written, a notice", async () =
   await editCourse("c9", async () => { calls++; return null; });
   assert.equal(calls, 0);
   assert.equal(files[COURSES], before);
-  assert.equal(Notice.last, "✦ That course is gone");
+  assert.equal(Notice.last, "✦ that course is gone");
 });
 
 test("editCourse: the course deleted while its window was open: nothing written, a notice", async () => {
@@ -78,7 +78,7 @@ test("editCourse: the course deleted while its window was open: nothing written,
     return o.values;
   });
   assert.deepEqual(Object.keys(read(files)), ["c2"]);
-  assert.equal(Notice.last, "✦ That course is gone");
+  assert.equal(Notice.last, "✦ that course is gone");
 });
 
 test("newCourse: courses.json made with c1, the next one c2", async () => {
@@ -94,7 +94,7 @@ test("newCourse: courses.json made with c1, the next one c2", async () => {
 test("pickCourse: none: a notice; one: its id; more: the picker's", async () => {
   vault();
   assert.equal(await pickCourse(), null);
-  assert.equal(Notice.last, "✦ No medication course yet");
+  assert.equal(Notice.last, "✦ no medication course yet");
   let calls = 0;
   const pick = async list => { calls++; return list[1].id; };
 

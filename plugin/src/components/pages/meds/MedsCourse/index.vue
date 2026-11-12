@@ -47,7 +47,7 @@ async function write(save, undo) {
   try {
     if (await save()) return;
     undo();
-    new Notice("✦ That course is gone");
+    new Notice("✦ that course is gone");
   } catch (e) {
     console.error(e);
     undo();

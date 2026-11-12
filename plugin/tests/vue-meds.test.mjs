@@ -131,7 +131,7 @@ test("MedsCourse: a course deleted meanwhile: the mark goes back, said", async (
   files[COURSES] = JSON.stringify({ c2: C2 });
   await w.find(".winx-meds__row--future .winx-meds__tick").trigger("click"); await tick(); await tick();
   assert.equal(w.find(".winx-meds__row--future .winx-meds__tick").attributes("data-mark"), "☐");
-  assert.equal(Notice.last, "✦ That course is gone");
+  assert.equal(Notice.last, "✦ that course is gone");
 });
 
 test("MedsCourse: ✎ in the Курс card edits the course shown", async () => {
