@@ -17,14 +17,14 @@ import { coverUrl } from "../cover.js";
 import ProjectStatus from "../ProjectStatus/index.vue";
 import ProjectStage from "./ProjectStage.vue";
 
-const view = inject("projects");
-const state = view.state;
+const projects = inject("projects");
+const state = projects.state;
 const label = s => `${s[0].toUpperCase()}${s.slice(1)}`;
 const SIDE = [{ key: "result", name: "Result" }, { key: "notes", name: "Notes" }];
 
 // the project and its stages' tasks (read again when the tasks or projects change)
 const page = computed(() => {
-  void view.version.value;
+  void projects.version.value;
   const p = taskStore.projects.get(state.open);
   const stages = (p.stages ?? []).map(s => ({ name: s.name, entries: stageTasks(s) }));
   const entries = stages.flatMap(s => s.entries);
@@ -66,7 +66,7 @@ async function newStage(name) {
 
 <template>
   <div class="winx-project">
-    <WinxButton kind="chip" class="winx-project__back" @click="state.open = null">
+    <WinxButton kind="chip" class="winx-project__back" @click="projects.open(null, $event)">
       ← Projects
     </WinxButton>
     <WinxCard

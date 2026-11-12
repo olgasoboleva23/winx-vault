@@ -20,13 +20,13 @@ import { FILTERS } from "#/store/projects.js";
 import { coverUrl } from "../cover.js";
 import ProjectStatus from "../ProjectStatus/index.vue";
 
-const view = inject("projects");
-const state = view.state;
+const projects = inject("projects");
+const state = projects.state;
 const label = s => `${s[0].toUpperCase()}${s.slice(1)}`;
 
 // every project as its card shows it (read again when the tasks or projects change)
 const all = computed(() => {
-  void view.version.value;
+  void projects.version.value;
   return [...taskStore.projects].map(([key, p]) => {
     const entries = (p.stages ?? []).flatMap(stageTasks);
     const next = entries.find(e => !e.done);
@@ -45,7 +45,7 @@ const tabs = computed(() => FILTERS.map(f => ({
   text: `${label(f)} · ${
     f === "all" ? all.value.length : all.value.filter(p => p.status === f).length}`,
 })));
-const canTick = computed(() => { void view.version.value; return !!tasksApi(); });
+const canTick = computed(() => { void projects.version.value; return !!tasksApi(); });
 </script>
 
 <template>
@@ -70,7 +70,7 @@ const canTick = computed(() => { void view.version.value; return !!tasksApi(); }
         class="winx-projects__card"
         :title="p.name"
         :cover="p.cover"
-        @click="state.open = p.key"
+        @click="projects.open(p.key, $event)"
       >
         <template #button>
           <ProjectStatus :status="p.status" />

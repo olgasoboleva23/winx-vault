@@ -43,7 +43,10 @@ beforeEach(() => {
 });
 
 function mount(over = {}) {
-  const view = { state: vue.reactive({ open: null, filter: "all", ...over }), version: vue.ref(0) };
+  const view = {
+    state: vue.reactive({ open: null, filter: "all", ...over }), version: vue.ref(0),
+    open: k => { view.state.open = k; },
+  };
   const el = document.body.appendChild(document.createElement("div"));
   vue.createApp(Projects).provide("projects", view).mount(el);
   return { el, view };
@@ -92,6 +95,20 @@ test("Clicking a card sets state.open", () => {
   const { el, view } = mount();
   cards(el)[1].click();
   assert.equal(view.state.open, "p2");
+});
+
+test("a project card opens through projects.open (the router's step later)", async () => {
+  const { el, view } = mount();
+  const opened = [], open = view.open;
+  view.open = (k, e) => { opened.push(k); assert.ok(e instanceof MouseEvent); open(k); };
+  cards(el)[0].click();
+  await vue.nextTick();
+  assert.deepEqual(opened, ["p1"]);
+  assert.ok(el.querySelector(".winx-project"));
+  el.querySelector(".winx-project__back").click();
+  await vue.nextTick();
+  assert.deepEqual(opened, ["p1", null]);
+  assert.deepEqual(names(el), ["Garden", "Shed", "Poem", "Kite"]);
 });
 
 test("An open key in the store shows its page; one that isn't shows the list", () => {

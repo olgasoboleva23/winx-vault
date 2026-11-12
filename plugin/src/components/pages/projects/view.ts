@@ -1,6 +1,7 @@
-import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
+import { Component, ItemView, Notice, WorkspaceLeaf } from "obsidian";
 import { reactive, ref, watch } from "vue";
 import { useRedraw } from "#/composables/use.js";
+import { app } from "#/helpers/app.js";
 import { useVueApp } from "#/composables/vueApp.ts";
 import { taskStore } from "#/store/tasks.js";
 import { PROJECTS_VIEW, SAVED, readState } from "#/store/projects.js";
@@ -12,11 +13,46 @@ import ProjectsTab from "./index.vue";
 // and tasks; `version` is bumped when they change (a hidden tab waits until it shows).
 export { PROJECTS_VIEW };
 
+type ProjectsState = ReturnType<typeof readState>;
+type Open = (key: string | null, e?: MouseEvent) => void;
+
+// The projects themselves: their Vue app on `el`, their redraws. The tab around them (or any
+// owner) gives the state and adds the page as a child, so it all goes when the owner does.
+// `open` shows a project (null: the list); by default it sets the state's open key.
+export class ProjectsPage extends Component {
+  app = app;   // for the composables (useRedraw: the workspace's events)
+  version = ref(0);
+  state: ProjectsState;
+  open: Open;
+  private el: HTMLElement;
+  private redraws: ReturnType<typeof useRedraw> | null = null;
+
+  constructor(state: ProjectsState, el: HTMLElement, open?: Open) {
+    super();
+    this.state = state;
+    this.el = el;
+    this.open = open ?? (key => { this.state.open = key; });
+  }
+
+  onload() {
+    useVueApp(this, this.el, ProjectsTab, {
+      provide: { projects: this },
+      onError: e => {
+        console.error(e);
+        new Notice(`Projects: couldn't draw: ${e.message}`);
+      },
+    });
+    this.redraws = useRedraw(this, () => this.el.isShown(), () => { this.version.value++; });
+    this.register(watch(taskStore.version, this.redraws.redraw));
+  }
+
+  // a hidden page that missed changes, drawn when it shows
+  catchUp() { this.redraws?.catchUp(); }
+}
+
 export class ProjectsView extends ItemView {
   state = reactive(readState(undefined));
-  version = ref(0);
-  private unmount = () => {};   // the tab's Vue app (useVueApp), gone on close
-  private catchUp = () => {};   // a hidden tab that missed changes, drawn when it shows
+  private page: ProjectsPage | null = null;
 
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
@@ -38,19 +74,12 @@ export class ProjectsView extends ItemView {
     this.contentEl.addClasses(
       ["markdown-preview-view", "markdown-rendered", "dashboard", "winx-projects-tab"],
     );
-    ({ unmount: this.unmount } = useVueApp(this, this.contentEl.createDiv(), ProjectsTab, {
-      provide: { projects: this },
-      onError: e => {
-        console.error(e);
-        new Notice(`Projects: couldn't draw: ${e.message}`);
-      },
-    }));
-    const { redraw, catchUp } = useRedraw(
-      this, () => this.contentEl.isShown(), () => { this.version.value++; },
-    );
-    this.catchUp = catchUp;
-    this.register(watch(taskStore.version, redraw));
+    this.page = this.addChild(new ProjectsPage(this.state, this.contentEl.createDiv()));
   }
-  onResize() { this.catchUp(); }
-  async onClose() { this.unmount(); this.contentEl.empty(); }
+  onResize() { this.page?.catchUp(); }
+  async onClose() {
+    if (this.page) this.removeChild(this.page);
+    this.page = null;
+    this.contentEl.empty();
+  }
 }
