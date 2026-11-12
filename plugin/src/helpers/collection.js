@@ -2,7 +2,7 @@
 // writes go through editJson, so nothing is lost between read and write.
 // edit: the whole object through fn (null: nothing written); true when it was written.
 // update: one record through fn (null: nothing written); false when the id isn't there.
-// add: a record under a new id made inside the write from the file's keys (and `more`).
+// add: a record under a new id made inside the write from the file's keys.
 import { editJson } from "./files.js";
 import { nextId } from "./ids.js";
 
@@ -25,16 +25,16 @@ export function collection(path) {
     load(json) { this.records = new Map(Object.entries(json)); },
     edit,
     update: (id, fn) => edit(all => {
-      if (!(id in all)) return null;
+      if (!all[id]) return null;
       const rec = fn(all[id]);
 
       return rec === null ? null : { ...all, [id]: rec };
     }),
-    async add(rec, prefix, more = []) {
+    async add(rec, prefix) {
       let id = "";
 
       await edit(all => {
-        id = nextId(prefix, [...Object.keys(all), ...more]);
+        id = nextId(prefix, Object.keys(all));
         return { ...all, [id]: rec };
       });
       return id;

@@ -31,7 +31,6 @@ test("add: ids from the file, two in a row; a missing file is made", async () =>
   assert.equal(await c.add({ n: 1 }, "p"), "p1");
   assert.equal(await c.add({ n: 2 }, "p"), "p2");
   assert.equal(files[P], JSON.stringify({ p1: { n: 1 }, p2: { n: 2 } }, null, 2));
-  assert.equal(await c.add({}, "t", ["t5"]), "t6");
 });
 
 test("update: merges via fn; a missing id or null writes nothing and is false", async () => {

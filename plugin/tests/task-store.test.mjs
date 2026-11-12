@@ -263,3 +263,12 @@ test("a projects.json that throws while read leaves the projects and the store a
   taskStore.put(P, "- [ ] t1");
   assert.equal(taskStore.tasks.length, 1);
 });
+
+test("a tasks.json with a null record leaves the records and the store as they were", () => {
+  vault({});
+  taskStore.putRecords({ t1: { name: "a" } });
+  assert.throws(() => taskStore.putRecords({ t1: null }));
+  assert.equal(taskStore.records.get("t1").name, "a");
+  taskStore.put(P, "- [ ] t1");
+  assert.equal(taskStore.tasks.length, 1);
+});

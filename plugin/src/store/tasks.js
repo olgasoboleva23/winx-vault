@@ -42,6 +42,8 @@ const refresh = () => {
 const loadJson = (c, json) => {
   const ids = c === projects ? idsOf(json) : null;
 
+  if (!ids) Object.values(json).forEach(r => r.pool);  // a null record throws here, not later
+
   c.load(json);
   if (ids) taskStore.inProject = ids;
   refresh();
