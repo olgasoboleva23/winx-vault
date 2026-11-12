@@ -1,0 +1,53 @@
+/* A project's page (ProjectPage), block winx-project: ← Projects, the header card over a grid of
+   the stages (two thirds) and Result / Notes (a third); one column on the phone. The status pill
+   and the progress bar are the list's (winx-projects__status, __progress) */
+@use "mixins" as *;
+
+.winx-project {
+  &__back { margin-bottom: $space-xl; }
+  &__header { margin-bottom: $space-xl; }
+  &__description { margin-bottom: $space-m; color: var(--winx-text-dark); }
+  &__count { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); }
+  &__body {
+    display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: $space-xl;
+    align-items: start;
+  }
+
+  /* a stage: its number in a lavender circle, the name in Cinzel, done/total, ✓, the fold */
+  &__stage-num {
+    @include center;
+    width: $btn-l; height: $btn-l; flex-shrink: 0; border-radius: $round;
+    background: alpha(--winx-purple, 30%); font-family: $font-deco; font-size: $text-xl;
+    color: var(--winx-purple-deep);
+  }
+  &__stage-name {
+    font-family: $font-deco; font-size: $text-2xl; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--winx-purple-deep);
+  }
+  &__stage-count { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); }
+  &__stage-done {
+    @include center;
+    width: $btn-s; height: $btn-s; border: $border; border-radius: $round; background: white(85%);
+    color: var(--winx-purple-deep);
+  }
+  &__stage-head { margin-bottom: $space-s; }
+  &__stage--folded &__stage-head { margin-bottom: 0; }
+
+  /* a task row: a bar in its area's colour, a dashed line under it */
+  &__task {
+    position: relative; padding: $space-xs $space-m;
+    border-left: 3px solid var(--area, alpha(--winx-purple, 50%));
+    border-bottom: 1px dashed alpha(--winx-purple, 35%);
+  }
+  // the date field 📅 → Pick a date… opens: there for showPicker(), never seen
+  &__date { position: absolute; right: 0; bottom: 0; width: 0; height: 0; opacity: 0; }
+  &__add { margin-top: $space-s; font-size: $text-m; opacity: 0.7; }
+
+  /* Result and Notes: the text as typed, line breaks kept; Edit at the bottom right */
+  &__text { margin-bottom: $space-m; white-space: pre-wrap; }
+  &__edit { margin-left: auto; }
+
+  body.is-mobile & {
+    &__body { grid-template-columns: minmax(0, 1fr); }
+  }
+}
