@@ -83,6 +83,21 @@ test("its state goes into Obsidian's layout and comes back; area and the phone's
   assert.equal(saves, before + 1);
 });
 
+test("CalendarPage: hidden, a task change waits; shown again, catchUp draws it once", async () => {
+  const { CalendarPage } = await import("#/components/pages/calendar/view.ts");
+  const { taskStore } = await import("#/store/tasks.js");
+  const el = document.body.appendChild(document.createElement("div"));
+  let shown = false; el.isShown = () => shown;
+  const st = vue.reactive({ ...state.readState(undefined), area: null, picked: null });
+  const page = new CalendarPage(st, el); page.load();
+  const v0 = page.ctx;
+  taskStore.version.value++; await vue.nextTick();
+  assert.equal(page.ctx, v0);           // hidden: not rebuilt
+  shown = true; page.catchUp(); await vue.nextTick();
+  assert.notEqual(page.ctx, v0);        // shown: rebuilt once
+  page.unload();
+});
+
 test("a tick is written 2 s later; unticked in time, nothing", async () => {
   mock.timers.enable({ apis: ["setTimeout"] });   // happy-dom's window is globalThis: its timers too
   try {

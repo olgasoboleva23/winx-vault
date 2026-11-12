@@ -1,4 +1,4 @@
-import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
+import { Component, ItemView, Notice, WorkspaceLeaf } from "obsidian";
 import { computed, markRaw, reactive, ref, watch } from "vue";
 import { useLater, useNewDay, useRedraw } from "#/composables/use.js";
 import { app } from "#/helpers/app.js";
@@ -25,62 +25,52 @@ import CalendarTab from "./CalendarTab/index.vue";
 // see calendarData.js).
 export const VIEW_TYPE = "winx-calendar";
 
-export class CalendarView extends ItemView {
-  // the saved keys (state.js) and the ones that aren't: area (one area's tasks only), picked (the
-  // phone's day)
-  state = reactive({
-    ...readState(undefined), area: null as string | null, picked: null as string | null,
-  });
+// the saved keys (state.js) and the ones that aren't: area (one area's tasks only), picked (the
+// phone's day); reactive, owned by whoever holds the page (the tab)
+type CalendarState = ReturnType<typeof readState> & { area: string | null, picked: string | null };
+
+// The calendar itself: its data, its Vue app on `el`, its redraws. The tab around it (or any
+// owner) gives it the state and adds it as a child, so it all goes when the owner does.
+export class CalendarPage extends Component {
+  app = app;   // for the composables (useRedraw: the workspace's events)
   private version = ref(0);   // bumped when the tasks change: the data is worked out again
   private data = computed(() => { void this.version.value; return markRaw(this.build()); });
-  private unmount = () => {};   // the calendar's Vue app (useVueApp), gone on close
-  // the ticks waiting their 2 s (TaskRow): they outlive a redraw, not the tab
+  // the ticks waiting their 2 s (TaskRow): they outlive a redraw, not the page
   waits = useLater(this);
   drag = dragState();   // what is dragged, from which day (drag.js): the rows and zones read it
-  private catchUp = () => {};   // a hidden tab that missed changes, drawn when it shows (useRedraw)
+  catchUp = () => {};   // a hidden page that missed changes, drawn when it shows (useRedraw)
 
-  constructor(leaf: WorkspaceLeaf) {
-    super(leaf);
-    const saved = () => JSON.stringify(SAVED.map(k => (this.state as any)[k]));
-    this.register(watch(saved, () => this.app.workspace.requestSaveLayout()));
-  }
-  getViewType() { return VIEW_TYPE; }
-  getDisplayText() { return "Calendar"; }
-  getIcon() { return "calendar-days"; }
+  state: CalendarState;
+  private el: HTMLElement;   // the page's own element: drawn into, and shown or not
 
-  getState() { return Object.fromEntries(SAVED.map(k => [k, (this.state as any)[k]])); }
-  async setState(saved: unknown, result: any) {
-    Object.assign(this.state, readState(saved));
-    await super.setState(saved, result);
+  constructor(state: CalendarState, el: HTMLElement) {
+    super();
+    this.state = state;
+    this.el = el;
   }
 
   // what the parts draw from ({ say } while there's nothing to draw)
   get ctx(): any { return this.data.value; }
   get actions(): any { return this.ctx?.actions ?? null; }
 
-  async onOpen() {
-    // a note in reading view (fonts, margins), with the dashboard pages' background and fonts on
-    // top
-    this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
-    ({ unmount: this.unmount } = useVueApp(this, this.contentEl.createDiv(), CalendarTab, {
+  onload() {
+    useVueApp(this, this.el, CalendarTab, {
       provide: { calendar: this },
       onError: e => {
         console.error(e);
         new Notice(`Calendar: couldn't draw: ${e.message}`);
       },
-    }));
+    });
     const reload = () => { this.version.value++; };
 
-    // the tasks changed (a task file read again as soon as it's saved): new data (a hidden tab
+    // the tasks changed (a task file read again as soon as it's saved): new data (a hidden page
     // waits until it shows)
-    const { redraw, catchUp } = useRedraw(this, () => this.contentEl.isShown(), reload);
+    const { redraw, catchUp } = useRedraw(this, () => this.el.isShown(), reload);
     this.catchUp = catchUp;
     this.register(watch(taskStore.version, redraw));
     // a new day: following today, the days move on; and "today" in every action is the new one
     useNewDay(this, redraw);
   }
-  onResize() { this.catchUp(); }
-  async onClose() { this.unmount(); this.contentEl.empty(); }
 
   info(t: any) { return taskInfo(t, this.ctx, app); }
   // the task a row's key stands for, in this data; a task that's gone or changed meanwhile:
@@ -112,5 +102,40 @@ export class CalendarView extends ItemView {
     };
     ctx.actions = makeActions(ctx);
     return ctx;
+  }
+}
+
+export class CalendarView extends ItemView {
+  state: CalendarState = reactive({
+    ...readState(undefined), area: null as string | null, picked: null as string | null,
+  });
+  private page: CalendarPage | null = null;
+
+  constructor(leaf: WorkspaceLeaf) {
+    super(leaf);
+    const saved = () => JSON.stringify(SAVED.map(k => (this.state as any)[k]));
+    this.register(watch(saved, () => this.app.workspace.requestSaveLayout()));
+  }
+  getViewType() { return VIEW_TYPE; }
+  getDisplayText() { return "Calendar"; }
+  getIcon() { return "calendar-days"; }
+
+  getState() { return Object.fromEntries(SAVED.map(k => [k, (this.state as any)[k]])); }
+  async setState(saved: unknown, result: any) {
+    Object.assign(this.state, readState(saved));
+    await super.setState(saved, result);
+  }
+
+  async onOpen() {
+    // a note in reading view (fonts, margins), with the dashboard pages' background and fonts on
+    // top
+    this.contentEl.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
+    this.page = this.addChild(new CalendarPage(this.state, this.contentEl.createDiv()));
+  }
+  onResize() { this.page?.catchUp(); }
+  async onClose() {
+    if (this.page) this.removeChild(this.page);
+    this.page = null;
+    this.contentEl.empty();
   }
 }
