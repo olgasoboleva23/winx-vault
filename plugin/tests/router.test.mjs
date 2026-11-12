@@ -7,6 +7,7 @@ test("readState: junk and old shapes become a whole state", () => {
   assert.equal(readState(null).calendar.view, "week");
   assert.equal(readState({ dashboard: { date: 5 } }).dashboard.date, null);
   assert.equal(readState({ page: "calendar" }).page, "calendar");
+  assert.equal(readState({ page: "projects", projects: { open: "p1" } }).page, "projects");
   assert.equal(readState({ projects: { open: "p1" } }).projects.open, "p1");
 });
 

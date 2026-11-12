@@ -106,6 +106,18 @@ test("a page step is a history step; a calendar week is not", async () => {
   assert.deepEqual(leaf.results.map(r => r.history), [undefined, true, false]);
 });
 
+test("opening a project is a history step; ← list too", async () => {
+  const { view, leaf, ready } = open();
+
+  await ready;
+  await leaf.setViewState({ state: {} });
+  await view.go("projects");
+  await view.go("projects", { open: "p1" });
+  await view.go("projects", { open: null });
+  assert.deepEqual(leaf.results.map(r => r.history), [undefined, true, true, true]);
+  assert.equal(view.state.projects.open, null);
+});
+
 test("Cmd-click opens a new, unpinned Winx tab with a copy", async () => {
   const { view, leaf, opened, pinned, ready } = open();
 
@@ -218,4 +230,29 @@ test("openWinx: the newest Winx tab, else one new pinned tab", async () => {
   const extra = await openWinx("calendar", {}, true);
   assert.deepEqual(w.made, [extra]);
   assert.equal(extra.pinned, false);
+});
+
+test("the drawer lists Projects; its ↗ opens a new tab", async () => {
+  const { mount } = await import("@vue/test-utils");
+  const WinxApp = (await import("#/components/app/WinxApp/index.vue")).default;
+  const w = workspace([]);
+  const went = [];
+  const shell = mount(WinxApp, { global: { provide: { winx: {
+    state: { page: "dashboard" }, go: async (...a) => { went.push(a); },
+  } } } });
+
+  assert.equal(shell.find(".winx-drawer").exists(), false);
+  await shell.findAll(".winx-btn--rail").at(-1).trigger("click");
+  const rows = shell.findAll(".winx-drawer .winx-btn--text");
+
+  assert.match(rows[0].text(), /Projects/);
+  await shell.find(".winx-drawer__open-tab").trigger("click");
+  await new Promise(r => setTimeout(r));
+  assert.equal(w.made.length, 1);
+  assert.equal(w.made[0].pinned, false);
+  assert.deepEqual(w.made[0].went, [["projects", {}]]);
+
+  await rows[0].trigger("click");
+  assert.deepEqual(went.map(a => a[0]), ["projects"]);
+  assert.equal(shell.find(".winx-drawer").exists(), false);
 });

@@ -4,6 +4,7 @@
 import type { Component } from "obsidian";
 import { CalendarPage } from "#/components/pages/calendar/view.ts";
 import { DashboardPage } from "#/components/pages/dashboard/view.ts";
+import { ProjectsPage } from "#/components/pages/projects/view.ts";
 import type { WinxView } from "./view.ts";
 
 export interface PageDef {
@@ -25,6 +26,16 @@ export const pages: Record<string, PageDef> = {
     make: (tab, el) => {
       el.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
       return new CalendarPage(tab.state.calendar, el.createDiv());
+    },
+  },
+  projects: {
+    title: "Projects", icon: "📁", main: false, keep: false,
+    make: (tab, el) => {
+      el.addClasses(
+        ["markdown-preview-view", "markdown-rendered", "dashboard", "winx-projects-tab"],
+      );
+      return new ProjectsPage(tab.state.projects, el.createDiv(),
+        (key, e) => void tab.go("projects", { open: key }, e));
     },
   },
 };

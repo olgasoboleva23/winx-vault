@@ -1,18 +1,16 @@
-import { Component, ItemView, Notice, WorkspaceLeaf } from "obsidian";
-import { reactive, ref, watch } from "vue";
+import { Component, Notice } from "obsidian";
+import { ref, watch } from "vue";
 import { useRedraw } from "#/composables/use.js";
 import { app } from "#/helpers/app.js";
 import { useVueApp } from "#/composables/vueApp.ts";
 import { taskStore } from "#/store/tasks.js";
-import { PROJECTS_VIEW, SAVED, readState } from "#/store/projects.js";
+import { readState } from "#/store/projects.js";
 import ProjectsTab from "./index.vue";
 
-// The Projects tab: the list of projects (00 System/Data/Projects/projects.json) or one project's
-// page, drawn by Vue (index.vue and its parts). Its state (the open project, the list's filter) is
-// reactive and saved with the layout, as the calendar's is. The parts read the store's projects
-// and tasks; `version` is bumped when they change (a hidden tab waits until it shows).
-export { PROJECTS_VIEW };
-
+// The Projects page of the Winx tab: the list of projects (00 System/Data/Projects/projects.json)
+// or one project's page, drawn by Vue (index.vue and its parts). Its state (the open project, the
+// list's filter) is the tab's, saved with the layout. The parts read the store's projects and
+// tasks; `version` is bumped when they change (a hidden page waits until it shows).
 type ProjectsState = ReturnType<typeof readState>;
 type Open = (key: string | null, e?: MouseEvent) => void;
 
@@ -48,38 +46,4 @@ export class ProjectsPage extends Component {
 
   // a hidden page that missed changes, drawn when it shows
   catchUp() { this.redraws?.catchUp(); }
-}
-
-export class ProjectsView extends ItemView {
-  state = reactive(readState(undefined));
-  private page: ProjectsPage | null = null;
-
-  constructor(leaf: WorkspaceLeaf) {
-    super(leaf);
-    const saved = () => JSON.stringify(SAVED.map(k => (this.state as any)[k]));
-    this.register(watch(saved, () => this.app.workspace.requestSaveLayout()));
-  }
-  getViewType() { return PROJECTS_VIEW; }
-  getDisplayText() { return "Projects"; }
-  getIcon() { return "folder-kanban"; }
-
-  getState() { return Object.fromEntries(SAVED.map(k => [k, (this.state as any)[k]])); }
-  async setState(saved: unknown, result: any) {
-    Object.assign(this.state, readState(saved));
-    await super.setState(saved, result);
-  }
-
-  async onOpen() {
-    // a note in reading view, with the dashboard's photo and fonts, as the calendar
-    this.contentEl.addClasses(
-      ["markdown-preview-view", "markdown-rendered", "dashboard", "winx-projects-tab"],
-    );
-    this.page = this.addChild(new ProjectsPage(this.state, this.contentEl.createDiv()));
-  }
-  onResize() { this.page?.catchUp(); }
-  async onClose() {
-    if (this.page) this.removeChild(this.page);
-    this.page = null;
-    this.contentEl.empty();
-  }
 }

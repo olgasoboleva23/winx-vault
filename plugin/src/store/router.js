@@ -3,7 +3,7 @@ import { readState as readProjects } from "#/store/projects.js";
 // The single Winx tab's state: the page shown and each page's own state. Obsidian saves it with
 // the layout; `saved` is what goes in, `readState` makes a whole state of whatever comes back.
 
-export const PAGES = ["dashboard", "calendar"];
+export const PAGES = ["dashboard", "calendar", "projects"];
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 

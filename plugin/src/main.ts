@@ -1,7 +1,6 @@
 import { Platform, Plugin } from "obsidian";
 import { WINX_VIEW, WinxView } from "./components/app/view.ts";
 import { OldWinxView, openWinx } from "./components/app/open.ts";
-import { ProjectsView, PROJECTS_VIEW } from "./components/pages/projects/view.ts";
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./controllers/blocks.js";
 import { useNotify } from "./composables/notify.js";
@@ -26,13 +25,9 @@ export default class WinxPlugin extends Plugin {
     // last, or open it, pinned, on the dashboard
     this.registerView(WINX_VIEW, leaf => new WinxView(leaf));
     // the old tabs, from a layout saved before: a Winx tab on their page
-    for (const page of ["dashboard", "calendar"])
+    for (const page of ["dashboard", "calendar", "projects"])
       this.registerView(`winx-${page}`, leaf => new OldWinxView(leaf, `winx-${page}`, page));
-    this.registerView(PROJECTS_VIEW, leaf => new ProjectsView(leaf));
     this.addCommand({ id: "open", name: "Open Winx", callback: () => openWinx() });
-    this.addCommand({
-      id: "open-projects", name: "Open projects", callback: () => this.openProjects(),
-    });
     this.addRibbonIcon("sparkles", "Winx", () => openWinx());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
       id: "reload",
@@ -62,18 +57,5 @@ export default class WinxPlugin extends Plugin {
 
     // desktop: today's reminders; a click opens the calendar in the Winx tab
     useNotify(this, () => openWinx("calendar"));
-  }
-  // the projects tab, pinned: the one already open, or a new one (until it is a Winx page)
-  async openProjects() {
-    const { workspace } = this.app;
-    let leaf = workspace.getLeavesOfType(PROJECTS_VIEW)[0];
-
-    if (!leaf) {
-      leaf = workspace.getLeaf("tab");
-      await leaf.setViewState({ type: PROJECTS_VIEW, active: true });
-      leaf.setPinned(true);
-    }
-
-    void workspace.revealLeaf(leaf);
   }
 }

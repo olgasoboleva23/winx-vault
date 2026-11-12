@@ -32,6 +32,8 @@ $panel-w: 240px;   // the left drawer's width: an icon, a name and its ↗
     grid-template-columns: repeat(4, 1fr);
     gap: $space-xl;
     width: auto;
+    // above Obsidian's floating navbar (0 when it doesn't float)
+    padding-bottom: calc(var(--view-bottom-spacing, 0px) + #{$space-xl});
     border-radius: $radius-xl $radius-xl 0 0;
     animation-name: winx-drawer-bottom;
   }

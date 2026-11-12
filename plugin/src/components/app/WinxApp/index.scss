@@ -27,4 +27,7 @@
   // rule's own !important (_callout-grid.scss)
   .is-phone &.dashboard { padding-bottom: 0 !important; }
   .is-phone & &__page { padding-bottom: $space-2xl !important; }
+
+  // the phone's sheet: a round icon over its name
+  &__label { font-size: $text-s; text-align: center; }
 }
