@@ -52,13 +52,15 @@ export async function newCourse(ask = formAsk) {
 // the window was open stays)
 export async function editCourse(id, ask = formAsk) {
   const rec = (await readJson(COURSES, {}))[id];
+  const gone = () => void new Notice("✦ That course is gone");
 
-  if (!rec) return void new Notice("✦ That course is gone");
+  if (!rec) return gone();
   const { rows, required } = courseForm();
   const v = await ask("✦ Edit medication course", rows,
     { values: formValues(rec), required, submit: "Save" });
 
-  if (v) await courses.update(id, r => edited(r, v));
+  // deleted while the window was open: said, not lost silently
+  if (v && !await courses.update(id, r => edited(r, v))) gone();
 }
 
 const searchPick = list => Search.pick(

@@ -206,10 +206,13 @@ test("courseOf / edited: the window's values as a record, the marks kept through
 });
 
 test("courseOf / edited: a code per medicine, unique, kept through a rename; the window's rows", () => {
-  const rec = courseOf({ meds: [{ name: "Мастодинон" }, { name: "Магний" }, { name: "Масло" }] }, "2026-11-08");
+  const three = [{ name: "Мастодинон" }, { name: "Магний" }, { name: "Масло" }];
+  const rec = courseOf({ meds: three }, "2026-11-08");
 
   assert.deepEqual(rec.meds.map(m => m.code), ["МА", "МГ", "МС"]);
-  const again = edited(rec, { meds: [{ name: "Магний цитрат", code: "МГ" }, { name: "Мастодинон", code: "МА" }, { name: "Мелатонин" }] });
+  const again = edited(rec, { meds: [
+    { name: "Магний цитрат", code: "МГ" }, { name: "Мастодинон", code: "МА" }, { name: "Мелатонин" },
+  ] });
 
   assert.deepEqual(again.meds.map(m => m.code), ["МГ", "МА", "МЕ"]);
   const { rows, required } = courseForm();
@@ -217,6 +220,10 @@ test("courseOf / edited: a code per medicine, unique, kept through a rename; the
   assert.deepEqual(rows.map(r => r.key), ["meds", "start", "notes"]);
   assert.deepEqual(rows[0].list.map(r => r.key), ["name", "dose", "times", "meal", "days"]);
   assert.deepEqual([rows[0].required, required, rows[2].lines], [["name"], ["meds"], true]);
+  assert.deepEqual(rows[0].list[2].options.map(o => o.label),
+    ["утром", "утром и вечером", "днём", "вечером", "неважно"]);
+  assert.deepEqual(rows[0].list[3].options.map(o => o.label),
+    ["перед едой", "после еды", "перед сном", "неважно"]);
 });
 
 test("forFood: the codes taken by day; courseList: running first, then the newest", () => {

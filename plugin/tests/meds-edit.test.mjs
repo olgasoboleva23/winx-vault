@@ -69,6 +69,18 @@ test("editCourse: a course gone: nothing asked or written, a notice", async () =
   assert.equal(Notice.last, "✦ That course is gone");
 });
 
+test("editCourse: the course deleted while its window was open: nothing written, a notice", async () => {
+  const { files } = stored({ c1: REC, c2: REC });
+  Notice.last = "";
+
+  await editCourse("c1", async (t, rows, o) => {
+    files[COURSES] = JSON.stringify({ c2: REC });
+    return o.values;
+  });
+  assert.deepEqual(Object.keys(read(files)), ["c2"]);
+  assert.equal(Notice.last, "✦ That course is gone");
+});
+
 test("newCourse: courses.json made with c1, the next one c2", async () => {
   const { files } = vault();
   const ask = async () => ({ meds: [{ name: "Аевит" }], start: "", notes: "" });
