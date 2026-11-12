@@ -70,6 +70,7 @@ test("migrateMedsNotes: new records c1…; a course already there is skipped", (
   const again = migrateMedsNotes([{ path: P, text: NOTE, fm: FM }], first.records, "2026-11-08");
 
   assert.deepEqual(again.added, []);
+  assert.deepEqual(again.skipped, [P]);
   assert.deepEqual(again.records, first.records);
 });
 
@@ -106,5 +107,24 @@ test("migrateMeds: a cell the record can't draw stops it before any write", asyn
 
   await migrateMeds();
   assert.match(Notice.last, /^✦ migration stopped: .*2026-11-09 АЕ/);
+  assert.deepEqual(files, before);
+});
+
+test("migrateMeds: a course already in courses.json is named as skipped; its note still renamed", async () => {
+  const { files } = vault({ [P]: NOTE, [COURSES]: JSON.stringify({ c1: REC }) }, { props: { [P]: FM } });
+
+  await migrateMeds();
+  assert.deepEqual(JSON.parse(files[COURSES]), { c1: REC });
+  assert.equal(files[`${DIR}/Аевит, Магний (old).md`], NOTE);
+  assert.match(Notice.last, /^✦ 0 course\(s\) migrated: .*; skipped, already in courses\.json: Аевит, Магний\.md$/);
+});
+
+test("migrateMeds: an \"(old)\" note already there stops it before any write, named", async () => {
+  const OLD = `${DIR}/Аевит, Магний (old).md`;
+  const { files } = vault({ [P]: NOTE, [OLD]: "earlier" }, { props: { [P]: FM } });
+  const before = structuredClone(files);
+
+  await migrateMeds();
+  assert.match(Notice.last, /^✦ migration stopped: .*Аевит, Магний \(old\)\.md already exists/);
   assert.deepEqual(files, before);
 });

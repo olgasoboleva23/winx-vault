@@ -69,16 +69,19 @@ export function checkCourse(text, rec, today) {
 const codes = rec => rec.meds.map(m => m.code).join(",");
 
 // the records with the notes' courses added (a course already there, same start and codes in
-// order, skipped), each checked first: the first one off throws
+// order, skipped: its path in `skipped`), each checked first: the first one off throws
 export function migrateMedsNotes(notes, existing, today) {
-  const records = { ...existing }, added = [], marks = { done: 0, skipped: 0 };
+  const records = { ...existing }, added = [], skipped = [], marks = { done: 0, skipped: 0 };
   let dayNotes = 0;
 
   for (const { path, text, fm } of notes) {
     const rec = courseFromNote(text, fm);
 
-    if (Object.values(records).some(r => r.start === rec.start && codes(r) === codes(rec)))
+    if (Object.values(records).some(r => r.start === rec.start && codes(r) === codes(rec))) {
+      skipped.push(path);
       continue;
+    }
+
     try {
       checkCourse(text, rec, today);
     } catch (e) {
@@ -92,19 +95,25 @@ export function migrateMedsNotes(notes, existing, today) {
     dayNotes += Object.keys(rec.dayNotes).length;
   }
 
-  return { records, added, marks, dayNotes };
+  return { records, added, skipped, marks, dayNotes };
 }
 
 // Explicit command only: every course note (not an "(old)" one) checked inside the one write of
-// courses.json, so a note off or a courses.json that isn't JSON writes nothing; then the notes
-// renamed, the page made, the Base trashed. Twice: nothing left to migrate.
+// courses.json, so a note off, a courses.json that isn't JSON or an "(old)" name taken writes
+// nothing; then the notes renamed, the page made, the Base trashed. Twice: nothing to migrate.
 export async function migrateMeds() {
   const { vault, metadataCache, fileManager } = app;
   const files = vault.getMarkdownFiles().filter(f => !f.basename.endsWith(" (old)")
     && metadataCache.getFileCache(f)?.frontmatter?.type === "meds");
 
   if (!files.length) return void new Notice("✦ no medication course to migrate");
+  const name = path => path.split("/").pop();
+  const oldPath = f => f.path.replace(/\.md$/, " (old).md");
+
   try {
+    const taken = files.map(oldPath).find(p => vault.getAbstractFileByPath(p));
+
+    if (taken) throw new Error(`${name(taken)} already exists`);
     const notes = await Promise.all(files.map(async f => ({
       path: f.path, text: await vault.read(f), fm: metadataCache.getFileCache(f).frontmatter,
     })));
@@ -112,23 +121,19 @@ export async function migrateMeds() {
 
     await collection(COURSES)
       .edit(all => (result = migrateMedsNotes(notes, all, todayYmd())).records);
-    const old = [];
-
-    for (const f of files) {
-      const path = f.path.replace(/\.md$/, " (old).md");
-
-      await fileManager.renameFile(f, path);
-      old.push(path.split("/").pop());
-    }
+    for (const f of files) await fileManager.renameFile(f, oldPath(f));
 
     if (!vault.getFileByPath(MEDICATION)) await vault.create(MEDICATION, MEDICATION_TEXT);
     const base = vault.getFileByPath(MEDICATION_BASE);
 
     if (base) await fileManager.trashFile(base);
-    const { added, marks, dayNotes } = result;
+    const { added, skipped, marks, dayNotes } = result;
+    const already = skipped.length
+      ? `; skipped, already in courses.json: ${skipped.map(name).join(", ")}` : "";
 
     new Notice(`✦ ${added.length} course(s) migrated: ${marks.done} ✅, ${marks.skipped} ❌, `
-      + `${dayNotes} day notes; old notes: ${old.join(", ")}`);
+      + `${dayNotes} day notes; old notes: ${files.map(f => name(oldPath(f))).join(", ")}`
+      + already);
   } catch (e) {
     new Notice(`✦ migration stopped: ${e.message}`);
   }
