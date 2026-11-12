@@ -10,8 +10,9 @@
 //   lines above may have come or gone since). Returns whether it restored the line.
 // appendLine: a line at the end (unique: not when it's already there); a missing note is made with
 // `header` on top.
-// editJson: a JSON file through fn(parsed) → the new object (null: nothing written); a missing or
-// empty file is {}, a missing one made (its folder too). A file that isn't JSON throws, untouched.
+// editJson: a JSON file through fn(parsed) → the new object (null: nothing written); true when it
+// wrote. A missing or empty file is {}, a missing one made (its folder too). A file that isn't JSON
+// throws, untouched.
 // serial: a queue that runs its jobs one at a time (a failed one doesn't stop the next).
 import { Notice } from "obsidian";
 import { app } from "./app.js";
@@ -91,11 +92,19 @@ export async function appendLine(path, line, { header = "", unique = false } = {
 export async function editJson(path, fn) {
   const file = app.vault.getFileByPath(path);
   const json = x => x === null ? null : JSON.stringify(x, null, 2);
+  let text = null;
 
-  if (file) return app.vault.process(file, text => json(fn(JSON.parse(text || "{}"))) ?? text);
-  const text = json(fn({}));
+  if (file) {
+    await app.vault.process(file, old => {
+      text = json(fn(JSON.parse(old || "{}")));
+      return text ?? old;
+    });
+  } else {
+    text = json(fn({}));
+    if (text !== null) await create(path, text);
+  }
 
-  if (text !== null) await create(path, text);
+  return text !== null;
 }
 
 /** @returns {<T>(fn: () => Promise<T>) => Promise<T>} */

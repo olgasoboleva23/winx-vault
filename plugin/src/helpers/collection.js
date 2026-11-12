@@ -7,17 +7,7 @@ import { editJson } from "./files.js";
 import { nextId } from "./ids.js";
 
 export function collection(path) {
-  const edit = async fn => {
-    let written = false;
-
-    await editJson(path, all => {
-      const next = fn(all);
-
-      written = next !== null;
-      return next;
-    });
-    return written;
-  };
+  const edit = fn => editJson(path, fn);
 
   return {
     path,

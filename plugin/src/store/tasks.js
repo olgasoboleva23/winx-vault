@@ -21,8 +21,8 @@ import { CONFIG, MASTER, PROJECTS, TASK_RECORDS } from "#/helpers/paths.js";
 let items = [];   // Master.md's items
 
 export const records = collection(TASK_RECORDS), projects = collection(PROJECTS);
-const JSONS = [records, projects];
-const jsonOf = path => JSONS.find(j => j.path === path);
+const jsonOf = path => [records, projects].find(c => c.path === path);
+const PATHS = [MASTER, TASK_RECORDS, PROJECTS, CONFIG];
 // the ids on the stages of projects.json's object (throws on a bad project, before anything is set)
 const idsOf = json => new Set(Object.values(json)
   .flatMap(p => (p.stages ?? []).flatMap(s => s.tasks ?? [])));
@@ -40,9 +40,9 @@ const refresh = () => {
 
 // a collection loaded from its file's object; the ids first, so a throw leaves everything as it was
 const loadJson = (c, json) => {
-  const ids = c === projects ? idsOf(json) : null;
+  if (Object.values(json).includes(null)) throw new TypeError("a null record");
 
-  if (!ids) Object.values(json).forEach(r => r.pool);  // a null record throws here, not later
+  const ids = c === projects && idsOf(json);
 
   c.load(json);
   if (ids) taskStore.inProject = ids;
@@ -69,8 +69,7 @@ export const taskStore = {
   },
 };
 
-const ours = path => path === MASTER || path === TASK_RECORDS || path === PROJECTS
-  || path === CONFIG;
+const ours = path => PATHS.includes(path);
 
 // a stage's tasks, each once: its open line, else its done line (a skipped-only or unknown id is
 // left out), as { id, t, done }, in the stage's order
@@ -141,7 +140,7 @@ export function useTaskStore(plugin) {
   const start = async () => {
     if (started) return;
     started = true;
-    const files = [MASTER, TASK_RECORDS, PROJECTS, CONFIG].map(p => app.vault.getFileByPath(p))
+    const files = PATHS.map(p => app.vault.getFileByPath(p))
       .filter(Boolean);
 
     items = [];
