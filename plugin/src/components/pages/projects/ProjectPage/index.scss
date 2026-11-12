@@ -1,13 +1,11 @@
 /* A project's page (ProjectPage), block winx-project: ← Projects, the header card over a grid of
-   the stages (two thirds) and Result / Notes (a third); one column on the phone. The status pill
-   and the progress bar are the list's (winx-projects__status, __progress) */
+   the stages (two thirds) and Result / Notes (a third); one column on the phone */
 @use "mixins" as *;
 
 .winx-project {
   &__back { margin-bottom: $space-xl; }
   &__header { margin-bottom: $space-xl; }
   &__description { margin-bottom: $space-m; color: var(--winx-text-dark); }
-  &__count { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); }
   &__body {
     display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: $space-xl;
     align-items: start;

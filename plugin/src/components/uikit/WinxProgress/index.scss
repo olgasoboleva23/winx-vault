@@ -1,0 +1,16 @@
+/* A progress bar (WinxProgress), block winx-progress: a pill bar, the done part from gold to pink,
+   as a medication course's, and the count after it */
+@use "mixins" as *;
+
+$fill: linear-gradient(90deg, var(--winx-gold), var(--winx-pink-deep));   // progress done
+
+.winx-progress {
+  &__bar {
+    flex: 1; height: $space-l; border: none; border-radius: $pill; overflow: hidden;
+    appearance: none; background: alpha(--winx-purple, 35%);
+    &::-webkit-progress-bar { background: transparent; }
+    &::-webkit-progress-value { background: $fill; }
+    &::-moz-progress-bar { background: $fill; }
+  }
+  &__count { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); }
+}

@@ -2,8 +2,6 @@
    of project cards (WinxCard), two columns on the desktop, one on the phone */
 @use "mixins" as *;
 
-$fill: linear-gradient(90deg, var(--winx-gold), var(--winx-pink-deep));   // progress done
-
 .winx-projects {
   &__header { margin-bottom: $space-xl; }
   &__title {
@@ -13,30 +11,8 @@ $fill: linear-gradient(90deg, var(--winx-gold), var(--winx-pink-deep));   // pro
   &__header .winx-tabs { font-size: $text-xl; }
   &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: $space-3xl; }
   &__card { cursor: pointer; }
-
-  /* a status pill next to the name: a dot in the status's colour, the word */
-  &__status {
-    @include row;
-    gap: $space-xs; margin-left: $space-m; padding: $space-2xs $space-m; border-radius: $pill;
-    background: alpha(--winx-purple, 30%); font-size: $text-s; letter-spacing: 0.06em;
-    color: var(--winx-purple-deep);
-    &::before { content: "●"; color: var(--status); }
-    &--idea { --status: var(--winx-purple); }
-    &--active { --status: var(--color-green);   /* Obsidian's green: no Winx token */ }
-    &--paused { --status: var(--winx-gold-deep); }
-    &--done { --status: var(--winx-blue-deep); }
-  }
   &__description { margin-bottom: $space-m; color: var(--winx-text-dark); }
 
-  /* progress: a pill bar, the done part from gold to pink, as a medication course's */
-  &__progress {
-    flex: 1; height: $space-l; border: none; border-radius: $pill; overflow: hidden;
-    appearance: none; background: alpha(--winx-purple, 35%);
-    &::-webkit-progress-bar { background: transparent; }
-    &::-webkit-progress-value { background: $fill; }
-    &::-moz-progress-bar { background: $fill; }
-  }
-  &__count { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); }
   &__next { margin-top: $space-m; cursor: default; }
 
   body.is-mobile & {

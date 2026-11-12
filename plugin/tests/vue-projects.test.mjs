@@ -55,12 +55,12 @@ test("the list: a card per project in file order with its status pill, descripti
   const { el } = mount();
   assert.deepEqual(names(el), ["Garden", "Shed", "Poem", "Kite"]);
   const garden = cards(el)[0];
-  assert.equal(garden.querySelector(".winx-projects__status").className, "winx-projects__status winx-projects__status--active");
-  assert.equal(garden.querySelector(".winx-projects__status").textContent, "Active");
+  assert.equal(garden.querySelector(".winx-project-status").className, "winx-project-status winx-project-status--active");
+  assert.equal(garden.querySelector(".winx-project-status").textContent, "Active");
   assert.equal(garden.querySelector(".winx-projects__description").textContent, "beds by the wall");
-  const bar = garden.querySelector("progress.winx-projects__progress");
+  const bar = garden.querySelector("progress.winx-progress__bar");
   assert.equal([bar.value, bar.max].join("/"), "3/8");
-  assert.equal(garden.querySelector(".winx-projects__count").textContent, "3/8");
+  assert.equal(garden.querySelector(".winx-progress__count").textContent, "3/8");
   assert.ok(garden.querySelector(".winx-projects__next .winx-check"));
   assert.equal(garden.querySelector(".winx-projects__next-text").textContent, "step 4");
   assert.equal(el.querySelector(".winx-tabs").textContent, "All · 4Idea · 1Active · 1Paused · 1Done · 1");
@@ -77,7 +77,7 @@ test("Filter Paused shows only paused projects; All shows every status, Idea and
 
 test("A project with no tasks has no progress bar", () => {
   const shed = cards(mount().el)[1];
-  assert.equal(shed.querySelector(".winx-projects__progress"), null);
+  assert.equal(shed.querySelector(".winx-progress"), null);
   assert.equal(shed.querySelector(".winx-projects__next"), null);
 });
 
@@ -129,9 +129,9 @@ test("the header: the name, status, description, 3/8; ← Projects clears state.
   const { el, view } = mount({ open: "p1" });
   const header = el.querySelector(".winx-project__header");
   assert.equal(header.querySelector(".callout-title-inner").textContent, "Garden");
-  assert.equal(header.querySelector(".winx-projects__status").textContent, "Active");
+  assert.equal(header.querySelector(".winx-project-status").textContent, "Active");
   assert.equal(header.querySelector(".winx-project__description").textContent, "beds by the wall");
-  assert.equal(header.querySelector(".winx-project__count").textContent, "3/8");
+  assert.equal(header.querySelector(".winx-progress__count").textContent, "3/8");
   button(el, "← Projects").click();
   assert.equal(view.state.open, null);
 });

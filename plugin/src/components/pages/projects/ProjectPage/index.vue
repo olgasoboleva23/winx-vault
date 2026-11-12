@@ -5,6 +5,7 @@
 import { computed, inject, ref } from "vue";
 import { Menu } from "obsidian";
 import WinxAddForm from "#/components/uikit/WinxAddForm/index.vue";
+import WinxProgress from "#/components/uikit/WinxProgress/index.vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxCard from "#/components/uikit/WinxCard/index.vue";
 import { Form } from "#/components/uikit/Form/index.ts";
@@ -13,6 +14,7 @@ import { addStage, saveProject } from "#/controllers/projects.js";
 import { stageTasks, taskStore } from "#/store/tasks.js";
 import { FILTERS } from "#/store/projects.js";
 import { coverUrl } from "../cover.js";
+import ProjectStatus from "../ProjectStatus/index.vue";
 import ProjectStage from "./ProjectStage.vue";
 
 const view = inject("projects");
@@ -75,16 +77,12 @@ async function newStage(name) {
           title="Status"
           @click="statusMenu"
         >
-          <span :class="['winx-projects__status', `winx-projects__status--${page.p.status}`]">{{
-            label(page.p.status) }}</span>
+          <ProjectStatus :status="page.p.status" />
         </WinxButton>
       </template>
       <div v-if="page.p.description" class="winx-project__description">{{
         page.p.description }}</div>
-      <div v-if="page.total" class="winx-row winx-gap-m">
-        <progress class="winx-projects__progress" :value="page.done" :max="page.total" />
-        <span class="winx-project__count">{{ page.done }}/{{ page.total }}</span>
-      </div>
+      <WinxProgress v-if="page.total" :value="page.done" :max="page.total" />
     </WinxCard>
     <div class="winx-project__body">
       <div class="winx-col winx-gap-l">

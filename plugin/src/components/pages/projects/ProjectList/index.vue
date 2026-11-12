@@ -6,6 +6,7 @@
 import { computed, inject } from "vue";
 import WinxCard from "#/components/uikit/WinxCard/index.vue";
 import WinxCheckbox from "#/components/uikit/WinxCheckbox/index.vue";
+import WinxProgress from "#/components/uikit/WinxProgress/index.vue";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxTabs from "#/components/uikit/WinxTabs/index.vue";
 import { app } from "#/helpers/app.js";
@@ -15,6 +16,7 @@ import { T } from "#/models/calendarData.js";
 import { stageTasks, taskStore } from "#/store/tasks.js";
 import { FILTERS } from "#/store/projects.js";
 import { coverUrl } from "../cover.js";
+import ProjectStatus from "../ProjectStatus/index.vue";
 
 const view = inject("projects");
 const state = view.state;
@@ -51,7 +53,10 @@ const canTick = computed(() => { void view.version.value; return !!tasksApi(); }
       <WinxTabs v-model="state.filter" :tabs="tabs" />
     </div>
     <WinxEmpty v-if="!all.length" text="No projects yet" />
-    <WinxEmpty v-else-if="!shown.length" :text="`No ${label(state.filter).toLowerCase()} projects`" />
+    <WinxEmpty
+      v-else-if="!shown.length"
+      :text="`No ${label(state.filter).toLowerCase()} projects`"
+    />
     <div class="winx-projects__grid">
       <WinxCard
         v-for="p in shown"
@@ -62,14 +67,10 @@ const canTick = computed(() => { void view.version.value; return !!tasksApi(); }
         @click="state.open = p.key"
       >
         <template #button>
-          <span :class="['winx-projects__status', `winx-projects__status--${p.status}`]">{{
-            label(p.status) }}</span>
+          <ProjectStatus :status="p.status" />
         </template>
         <div v-if="p.description" class="winx-projects__description">{{ p.description }}</div>
-        <div v-if="p.total" class="winx-row winx-gap-m">
-          <progress class="winx-projects__progress" :value="p.done" :max="p.total" />
-          <span class="winx-projects__count">{{ p.done }}/{{ p.total }}</span>
-        </div>
+        <WinxProgress v-if="p.total" :value="p.done" :max="p.total" />
         <div v-if="p.next" class="winx-projects__next winx-row winx-gap-s" @click.stop>
           <WinxCheckbox :static="!canTick" @tick="tickTask(p.next.t)" />
           <span class="winx-projects__next-text">{{ p.next.text }}</span>
