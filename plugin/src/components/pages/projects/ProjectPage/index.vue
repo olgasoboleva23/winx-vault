@@ -69,7 +69,12 @@ async function newStage(name) {
     <WinxButton kind="chip" class="winx-project__back" @click="state.open = null">
       ← Projects
     </WinxButton>
-    <WinxCard class="winx-project__header" :title="page.p.name" :cover="page.cover">
+    <WinxCard
+      :wings="false"
+      class="winx-project__header"
+      :title="page.p.name"
+      :cover="page.cover"
+    >
       <template #button>
         <WinxButton
           kind="text"
@@ -104,6 +109,7 @@ async function newStage(name) {
         <WinxCard
           v-for="f in SIDE"
           :key="f.key"
+          :wings="false"
           :class="`winx-project__${f.key}`"
           :title="f.name"
         >

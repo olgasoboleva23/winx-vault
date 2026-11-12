@@ -52,6 +52,12 @@
       right: $space-xs;
       transform: scale(-1, -1);
     }
+    /* no wings (WinxCard :wings="false", the projects' cards): the title without their room */
+    &.winx-widget--wingless {
+      &::before,
+      &::after { display: none; }
+      > .callout-title { padding-inline: 0 !important; }
+    }
 
     /* Title */
     > .callout-title {

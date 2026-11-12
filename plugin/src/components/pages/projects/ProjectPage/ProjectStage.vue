@@ -20,7 +20,10 @@ const folded = ref(complete.value);
 </script>
 
 <template>
-  <WinxCard :class="['winx-project__stage', { 'winx-project__stage--folded': folded }]">
+  <WinxCard
+    :wings="false"
+    :class="['winx-project__stage', { 'winx-project__stage--folded': folded }]"
+  >
     <div class="winx-project__stage-head winx-row winx-gap-m">
       <span class="winx-project__stage-num">{{ String(index + 1).padStart(2, "0") }}</span>
       <span class="winx-project__stage-name winx-grow">{{ stage.name }}</span>

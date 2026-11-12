@@ -8,12 +8,14 @@ defineProps({
   bodyClass: { type: String, default: null },
   // a picture above the title (a resource URL), cropped to a fixed height
   cover: { type: String, default: null },
+  // false: no fairy wings in the corners (the projects' cards)
+  wings: { type: Boolean, default: true },
 });
 </script>
 
 <template>
   <div
-    class="callout winx-widget"
+    :class="['callout winx-widget', { 'winx-widget--wingless': !wings }]"
     data-callout="card"
     :data-callout-metadata="meta.join(' ')"
     data-callout-fold=""

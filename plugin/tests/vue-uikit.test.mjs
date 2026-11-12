@@ -106,6 +106,13 @@ test("WinxCard: a cover picture above the title; none without one", () => {
   assert.equal(mount(ui.WinxCard, { props: { title: "Trip" } }).find("img").exists(), false);
 });
 
+test("WinxCard: wings by default, :wings=false draws it without (the --wingless modifier)", () => {
+  const wingless = mount(ui.WinxCard, { props: { title: "Trip", wings: false } });
+
+  assert.equal(wingless.classes().includes("winx-widget--wingless"), true);
+  assert.equal(mount(ui.WinxCard, { props: { title: "Trip" } }).classes().includes("winx-widget--wingless"), false);
+});
+
 test("WinxTabs: on the photo (a page without a card) the light look", async () => {
   const WinxTabs = (await import("../src/components/uikit/WinxTabs/index.vue")).default;
   const tabs = [{ key: "all", text: "All" }];

@@ -66,6 +66,7 @@ const canTick = computed(() => { void view.version.value; return !!tasksApi(); }
       <WinxCard
         v-for="p in shown"
         :key="p.key"
+        :wings="false"
         class="winx-projects__card"
         :title="p.name"
         :cover="p.cover"
