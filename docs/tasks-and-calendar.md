@@ -37,13 +37,13 @@ Regulars shows one **Training · Core ↔ Arms** card, the upcoming variant and 
 
 | Command (Cmd+P) | Creates |
 |---|---|
-| **Winx: New project** | a project in `00 System/Data/Projects/projects.json`: name, description, status (Active by default), an optional cover picked from `03 Resources/Media`; then the Projects tab opens on it |
+| **Winx: New project** | a project in `00 System/Data/Projects/projects.json`: name, description, status (Active by default), an optional cover picked from `03 Resources/Media`; then the Winx tab opens on it in Projects |
 | **Winx: New task** | a task: a record in `Tasks/tasks.json` and a line in `Tasks/Master.md` |
-| **Winx: Settings** | ⚙ the difficulties' XP and gold, the areas, XP Today's thresholds and the level cost, saved in `00 System/Data/config.json` (also in the dashboard's ✦ Menu) |
+| **Winx: Settings** | ⚙ the difficulties' XP and gold, the areas, XP Today's thresholds and the level cost, saved in `00 System/Data/config.json` (also in the Winx tab's drawer) |
 | **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
 | **Winx: New recipe** | a note in `03 Resources/Collections/Recipes` |
 | **Winx: New work task** | a note in `01 Projects/Work/tasks` (another folder: `"workTasks"` in the plugin's `data.json`), named `<next number>_<title in lower case with underscores>` |
-| **Winx: New medication course** | for a course of vitamins or medicines: a note in `00 System/Data/Medication` (`"meds"` in `data.json`): a group per medicine (+ adds one): name, dose, when (morning / morning and evening / day / evening / any), the meal (before / after / before sleep / any), its days; a start; the day by its anchors (a time of day and a meal: what to take then) and the codes' legend on cards, and a day per row up to the longest course inside a ```winx meds block that draws the course (today's doses as chips, the grid, a note per day) and ticks a cell round ☐ → ✅ → ❌ (its legend: taken, skipped on purpose, not marked) on a click, writing the table. A notes field (several lines) goes on a Заметки card. **Winx: Edit medication course** (or the ✎ by the course card's title) opens the same window with the course's values (kept in its `meds` property) and rebuilds the note: the marks and the days' notes carry over by date and column, cards written by hand stay. The courses' list: `_index.base` in the folder, linked from the dashboard's ✦ Menu card |
+| **Winx: New medication course** | for a course of vitamins or medicines: a note in `00 System/Data/Medication` (`"meds"` in `data.json`): a group per medicine (+ adds one): name, dose, when (morning / morning and evening / day / evening / any), the meal (before / after / before sleep / any), its days; a start; the day by its anchors (a time of day and a meal: what to take then) and the codes' legend on cards, and a day per row up to the longest course inside a ```winx meds block that draws the course (today's doses as chips, the grid, a note per day) and ticks a cell round ☐ → ✅ → ❌ (its legend: taken, skipped on purpose, not marked) on a click, writing the table. A notes field (several lines) goes on a Заметки card. **Winx: Edit medication course** (or the ✎ by the course card's title) opens the same window with the course's values (kept in its `meds` property) and rebuilds the note: the marks and the days' notes carry over by date and column, cards written by hand stay. The courses' list: `_index.base` in the folder, linked from the notes that list it |
 | **Winx: New journal** | a free journal in `00 System/Data/Journals`: its title, its reasons (a comma list) and the days after a meal its level is looked at on the food page (a rash: 1) |
 | **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
 | **Winx: New market item** | a catalog item (if new) and an open ID line in `00 System/Data/Celestial Market.md` |
@@ -53,7 +53,7 @@ Regulars shows one **Training · Core ↔ Arms** card, the upcoming variant and 
 
 ## 📅 Calendar
 
-A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (with the dashboard). The tasks of `00 System/Data/Tasks` on a week or a month. Pin the tab, drag it to a sidebar or a window; it keeps its week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
+A page of the Winx tab (🗓 in its pill; see [Dashboard](dashboard.md#the-winx-tab)). The tasks of `00 System/Data/Tasks` on a week or a month. The tab keeps the week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
 
 ![Calendar](images/calendar.webp)
 
@@ -69,7 +69,7 @@ A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (w
 
 ## Projects
 
-A tab of its own: **Winx: Open projects** (Cmd+P). A project is a bigger undertaking cut into stages, each a list of tasks. **Winx: New project** (or **✦ New project** in the tab's header) creates one.
+A page of the Winx tab (**⋯ Other** in the pill, then Projects). A project is a bigger undertaking cut into stages, each a list of tasks. **Winx: New project** (or **✦ New project** in the tab's header) creates one.
 
 The file is `00 System/Data/Projects/projects.json`, an object by key (`p1`, `p2`…) in display order: `name`, `status` (idea / active / paused / done), `description`, `result`, `notes`, `cover` (a picture path in the vault, or null) and `stages`, each `{ "name": "Dig the beds", "tasks": ["t41", "t42"] }`, the task ids from `tasks.json`. A project's tasks are ordinary tasks: they live in `Master.md` like the rest and take Tasks' dates and repeats.
 

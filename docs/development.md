@@ -7,19 +7,25 @@
 ```
 ├── 📁 plugin — the Winx plugin
 │   ├── 📁 src
-│   │   ├── main.ts               — loads everything: the ```winx block, the dashboard and calendar tabs, ✨,
+│   │   ├── main.ts               — loads everything: the ```winx block, the Winx tab, ✨,
 │   │   │                           the commands
 │   │   ├── 📁 components         — every .vue (a styled one: a folder with index.vue and its index.scss)
 │   │   │   ├── 📁 uikit          — the shared parts: WinxButton (round, nav, pill, chip, toggle, text),
 │   │   │   │                       WinxCard, WinxChart, WinxTable, WinxInput, WinxCheckbox, WinxNoteLink,
 │   │   │   │                       WinxEmpty / WinxMissing / WinxFailed, tooltip.js (the v-tip directive),
-│   │   │   │                       WinxGroupHeader, WinxAddForm; Obsidian's windows: Form, Search,
+│   │   │   │                       WinxGroupHeader, WinxAddForm, WinxNav (the pill and the phone's bar), WinxDrawer (the left drawer, the phone's sheet); Obsidian's windows: Form, Search,
 │   │   │   │                       TaskWindow (a task's difficulty, area, time, sticker, variants), TaskSearch
+│   │   │   ├── 📁 app           — the one Winx tab: view.ts (WinxView, the ItemView: its page, history,
+│   │   │   │                       saved state), pages.ts (the pages: title, icon, main or under Other, how
+│   │   │   │                       each is made), open.ts (openWinx(page): open or reveal the tab; turns old
+│   │   │   │                       dashboard / calendar / projects tabs into Winx tabs), NotePage.ts (a
+│   │   │   │                       note drawn as a page: Finance, Shop, Supplies, Food), WinxApp (the
+│   │   │   │                       Vue root: nav, drawer and the page)
 │   │   │   └── 📁 pages
-│   │   │       ├── 📁 dashboard  — view.ts (the tab: its date, the ✦ pill), layout.md (its cards),
+│   │   │       ├── 📁 dashboard  — view.ts (the page: its date, the ✦ pill), layout.md (its cards),
 │   │   │       │                   DashboardDate.vue (the date row), index.scss; widgets/<topic>/ (each
 │   │   │       │                   widget's markup and styles)
-│   │   │       ├── 📁 calendar   — view.ts (the tab: its state, the model, the listeners), CalendarTab,
+│   │   │       ├── 📁 calendar   — view.ts (the page: its state, the model, the listeners), CalendarTab,
 │   │   │       │                   CalendarHeader, CalendarMissed, CalendarGrid, CalendarPanel, the days
 │   │   │       │                   and the tasks (TaskRow, TaskCard…)
 │   │   │       └── 📁 finance, shop, supplies, meds — the pages on notes of their own: a note's
@@ -43,12 +49,12 @@
 │   │   │                           calendar's), notify.js (desktop reminders)
 │   │   ├── 📁 store              — tasks.js (the tasks of 00 System/Data/Tasks, read by the plugin itself and
 │   │   │                           kept up to date on Obsidian's own file events: no Dataview, no wait for its
-│   │   │                           index), calendar.js (the calendar tab's state: its saved and data keys)
+│   │   │                           index), calendar.js (the calendar's state: its saved and data keys), router.js (the Winx tab's pages and Back / Forward history)
 │   │   ├── 📁 helpers            — paths (where the data lives), app, dates, files (edit / editLine /
 │   │   │                           appendLine), config, format (money, amount), sounds, chart, plugins
 │   │   │                           (Dataview, Tasks, blockDv), find, parse (a block's lines), panelGroups
 │   │   ├── 📁 styles             — main.scss (every block in cascade order) and the shared look: tokens,
-│   │   │                           mixins ($space-*, $text-*, $radius-*, $btn-*, row / center), fonts,
+│   │   │                           mixins ($space-*, $text-*, $radius-*, $btn-*, row / center, sparkles: stars flying out on hover, drawn from `--winx-sparkles-svg` in `_assets.scss`), fonts,
 │   │   │                           layout, the cards' grid, nav, busy, syncing, helpers (.winx-is-*)
 │   │   └── 📁 commands           — commands.ts (the Cmd+P commands, the Alt+T menu)
 │   └── 📁 tests                  — npm test; tests/obsidian/ checks styles inside Obsidian
@@ -134,8 +140,8 @@ defineProps({ state: { type: Object, required: true } });
 
 ## The calendar
 
-The calendar tab is an ItemView (`plugin/src/components/pages/calendar/view.ts`) that mounts
-`CalendarTab`: its state (date, view, tab, folds; `store/calendar.js`) is Vue's `reactive`, saved
+The calendar is a page of the Winx tab (`plugin/src/components/pages/calendar/view.ts`, a Component that mounts
+`CalendarTab`) with its state (date, view, tab, folds; `store/calendar.js`) is Vue's `reactive`, saved
 with the layout; the model (`models/calendarData.js`) is recomputed
 when the date, the view or a filter changes, or when a task file does (`store/tasks.js` reads it again as soon as
 it's saved; the calendar needs no Dataview); the parts (`CalendarHeader`,
