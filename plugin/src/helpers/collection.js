@@ -1,18 +1,10 @@
 // A JSON file of records by id ({ id: record }): `records` is the loaded copy (file order), the
 // writes go through editJson, so nothing is lost between read and write.
-// nextId: prefix + (the biggest N among the ids that look like prefix<N>, else 0) + 1; other
-//   keys are skipped.
 // edit: the whole object through fn (null: nothing written); true when it was written.
 // update: one record through fn (null: nothing written); false when the id isn't there.
 // add: a record under a new id made inside the write from the file's keys (and `more`).
 import { editJson } from "./files.js";
-
-export function nextId(prefix, ids) {
-  const re = new RegExp(`^${prefix}(\\d+)$`);
-  const nums = [...ids].map(id => re.exec(id ?? "")?.[1]).filter(Boolean).map(Number);
-
-  return `${prefix}${Math.max(0, ...nums) + 1}`;
-}
+import { nextId } from "./ids.js";
 
 export function collection(path) {
   const edit = async fn => {

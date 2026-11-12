@@ -9,7 +9,7 @@ import {
   supplyStats,
 } from "#/models/market.js";
 import { Notice } from "obsidian";
-import { nextId } from "#/helpers/collection.js";
+import { nextId } from "#/helpers/ids.js";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { appendLine, editJson, editLine, readJson, serial } from "#/helpers/files.js";

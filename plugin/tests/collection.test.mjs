@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { collection, nextId } from "#/helpers/collection.js";
+import { collection } from "#/helpers/collection.js";
 import { setApp } from "#/helpers/app.js";
 
 const P = "Data/x.json";
@@ -16,13 +16,6 @@ const vault = (files = {}) => {
   } });
   return files;
 };
-
-test("nextId: the biggest prefix<N> plus one; other keys skipped", () => {
-  assert.equal(nextId("m", ["m2", "m10", null, "x7"]), "m11");
-  assert.equal(nextId("m", []), "m1");
-  assert.equal(nextId("t", []), "t1");
-  assert.equal(nextId("t", ["t3", "tea"]), "t4");
-});
 
 test("load: records in file order", () => {
   const c = collection(P);

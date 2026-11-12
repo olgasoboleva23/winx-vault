@@ -5,7 +5,7 @@
 // page: what was eaten with its marks' icons, the marks counted, each free journal's level after
 // its lag (a rash shows the next day), the medication courses on that day, the note.
 import { addDays } from "#/helpers/dates.js";
-import { nextId } from "#/helpers/collection.js";
+import { nextId } from "#/helpers/ids.js";
 
 export const DEFAULT_MARKS = [
   { tag: "m1", icon: "🍫", name: "какао" },

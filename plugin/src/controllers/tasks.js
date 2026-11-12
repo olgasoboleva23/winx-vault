@@ -11,7 +11,7 @@ import { parseNote } from "#/models/taskFile.js";
 import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { todayYmd } from "#/helpers/dates.js";
-import { nextId } from "#/helpers/collection.js";
+import { nextId } from "#/helpers/ids.js";
 import { records as recordsStore } from "#/store/tasks.js";
 
 // One write at a time, including its queue change and undo; dialogs do not hold the queue.
