@@ -1,4 +1,4 @@
-<!-- Projects: a card per project that isn't done, a stage's name over its open tasks -->
+<!-- Projects: a card per project with open tasks (a Done one too), a stage's name over them -->
 <script setup>
 import { computed, inject } from "vue";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";

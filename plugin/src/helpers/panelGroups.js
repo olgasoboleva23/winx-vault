@@ -26,10 +26,11 @@ export function byArea(items, card, config) {
     ({ key: `${i}|${r.a}`, title: areaTitle(config, r.a), cards: r.items.map(card) }));
 }
 
-// the projects not done, each with its stages' open tasks (a stage with none is left out), and
-// how many open tasks that is, in file order: [{ key, title, stages: [{ name, entries }], open }]
+// the projects with open tasks (a Done one too: its undated tasks show nowhere else), each with
+// its stages' open tasks (a stage with none is left out), and how many that is, in file order:
+// [{ key, title, stages: [{ name, entries }], open }]
 export function openProjects() {
-  return [...taskStore.projects].filter(([, p]) => p.status !== "done").map(([key, p]) => {
+  return [...taskStore.projects].map(([key, p]) => {
     const stages = (p.stages ?? [])
       .map(s => ({ name: s.name, entries: stageTasks(s).filter(e => !e.done) }))
       .filter(s => s.entries.length);
