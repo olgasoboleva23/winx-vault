@@ -13,7 +13,7 @@ import { vTip } from "#/components/uikit/tooltip.js";
 import { addDays, weekOf } from "#/helpers/dates.js";
 import { dayLabel } from "#/models/course.js";
 import { MEDICATION } from "#/helpers/paths.js";
-import { FoodLog, foodWeek } from "#/models/food.js";
+import { foodWeek } from "#/models/food.js";
 import {
   addEaten, editFood, editMarks, pickTrainingTask, removeEaten, setFoodNote,
 } from "#/controllers/food.js";
@@ -26,7 +26,7 @@ const short = date => dayLabel(date).split(",")[0];
 const step = n => { monday.value = n ? addDays(monday.value, 7 * n) : weekOf(d.value.today)[0]; };
 
 const rows = computed(() => foodWeek({
-  ...d.value, log: new FoodLog(d.value.log), days: days.value, task: d.value.task,
+  ...d.value, days: days.value, task: d.value.task,
 }).map(r => ({ ...r, label: dayLabel(r.date), when: r.date === d.value.today ? "today" : "" })));
 const columns = computed(() => [
   { key: "label", label: "День", class: "winx-food__day" },

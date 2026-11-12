@@ -13,8 +13,8 @@ import { loadCycle } from "#/controllers/widgets/cycle.js";
 import { loadFinance, loadFinanceLine } from "#/controllers/widgets/finance.js";
 import { loadWeight } from "#/controllers/widgets/weight.js";
 import {
-  COURSES, CYCLE, FOOD_LOG, FOODS, GOALS, JOURNALS, LEDGER, MARKET_NOTE, MARKET_RECORDS, PURCHASES,
-  RULES, SAVINGS, SHOP, TASKS, WEIGHT,
+  COURSES, CYCLE, FOOD_DATA, FOOD_LOG, GOALS, JOURNALS, LEDGER, MARKET_NOTE, MARKET_RECORDS,
+  PURCHASES, RULES, SAVINGS, SHOP, TASKS, WEIGHT,
 } from "#/helpers/paths.js";
 import { loadDailyNote } from "#/controllers/widgets/dailyNote.js";
 import { loadPomodoro } from "#/controllers/widgets/pomodoro.js";
@@ -79,7 +79,7 @@ export const blocks = {
   // the food journal's own note (00 System/Data/Food/Food.md)
   food: {
     view: FoodPage, load: loadFood,
-    watches: [FOODS, FOOD_LOG, COURSES, `${JOURNALS}/`, TASK_FILES],
+    watches: [FOOD_DATA, FOOD_LOG, COURSES, `${JOURNALS}/`, TASK_FILES],
   },
 };
 
