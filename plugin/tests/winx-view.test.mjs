@@ -270,7 +270,7 @@ test("the drawer: Projects, Finance, Shop, Supplies, Food, then ⚙ Settings; �
   await shell.findAll(".winx-btn--rail").at(-1).trigger("click");
   const rows = shell.findAll(".winx-app__row .winx-grow");
 
-  assert.deepEqual(rows.map(r => r.text().replace(/^\S+ /, "")),
+  assert.deepEqual(rows.map(r => r.findAll("span").at(-1).text()),
     ["Projects", "Finance", "Shop", "Supplies", "Food", "Settings"]);
   assert.match(rows[5].text(), /⚙/);
   await shell.find(".winx-app__open-tab").trigger("click");

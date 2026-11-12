@@ -8,7 +8,6 @@ import { inject, ref } from "vue";
 import { Platform } from "obsidian";
 import WinxNav from "#/components/uikit/WinxNav/index.vue";
 import WinxDrawer from "#/components/uikit/WinxDrawer/index.vue";
-import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import { openWinx } from "#/components/app/open.ts";
 import { pages } from "#/components/app/pages.ts";
 import { openSettings } from "#/controllers/settings.js";
@@ -63,33 +62,50 @@ function pick(key, event) {
     label="Other pages"
     @close="other = false"
   >
+    <div v-if="!phone" class="winx-app__head winx-row">
+      <span class="winx-app__crest winx-center" aria-hidden="true">✦</span>
+      <span class="winx-app__title">Winx</span>
+    </div>
     <template v-for="p in rest" :key="p.key">
-      <div v-if="phone" class="winx-app__cell winx-col winx-center winx-gap-xs">
-        <WinxButton kind="round" :title="p.text" @click="pick(p.key, $event)">
-          {{ p.icon }}
-        </WinxButton>
+      <button
+        v-if="phone"
+        type="button"
+        class="winx-app__tile"
+        :class="{ 'winx-app__tile--on': p.key === winx.state.page }"
+        @click="pick(p.key, $event)"
+      >
+        <span class="winx-app__tile-icon winx-center">{{ p.icon }}</span>
         <span class="winx-app__label">{{ p.text }}</span>
-      </div>
-      <div v-else class="winx-app__row winx-row winx-between">
-        <WinxButton kind="text" class="winx-grow" @click="pick(p.key, $event)">
-          {{ p.icon }} {{ p.text }}
-        </WinxButton>
-        <WinxButton
-          kind="text"
-          class="winx-app__open-tab"
+      </button>
+      <div
+        v-else
+        class="winx-app__row winx-row"
+        :class="{ 'winx-app__row--on': p.key === winx.state.page }"
+      >
+        <button type="button" class="winx-app__go winx-row winx-grow" @click="pick(p.key, $event)">
+          <span class="winx-app__icon winx-center">{{ p.icon }}</span>
+          <span>{{ p.text }}</span>
+        </button>
+        <button
+          type="button"
+          class="winx-app__open-tab winx-center"
           :title="`${p.text} in a new tab`"
+          :aria-label="`${p.text} in a new tab`"
           @click="openTab(p.key)"
         >
           ↗
-        </WinxButton>
+        </button>
       </div>
     </template>
-    <div v-if="phone" class="winx-app__cell winx-col winx-center winx-gap-xs">
-      <WinxButton kind="round" title="Settings" @click="settings">⚙</WinxButton>
+    <button v-if="phone" type="button" class="winx-app__tile" @click="settings">
+      <span class="winx-app__tile-icon winx-center">⚙</span>
       <span class="winx-app__label">Settings</span>
-    </div>
-    <div v-else class="winx-app__row winx-row winx-between">
-      <WinxButton kind="text" class="winx-grow" @click="settings">⚙ Settings</WinxButton>
+    </button>
+    <div v-else class="winx-app__row winx-app__row--last winx-row">
+      <button type="button" class="winx-app__go winx-row winx-grow" @click="settings">
+        <span class="winx-app__icon winx-center">⚙</span>
+        <span>Settings</span>
+      </button>
     </div>
   </WinxDrawer>
 </template>

@@ -4,6 +4,8 @@
    column, the bar last, right above Obsidian's floating navbar */
 @use "mixins" as *;
 
+$tile: 50px;   // the phone sheet's round tile (off the button sizes)
+
 .winx-app {
   // the tab's content: Obsidian's .workspace-leaf-content .view-content is (0,2,0)
   &.view-content { position: relative; padding: 0; overflow: hidden; }
@@ -28,6 +30,100 @@
   .is-phone &.dashboard { padding-bottom: 0 !important; }
   .is-phone & &__page { padding-bottom: $space-2xl !important; }
 
-  // the phone's sheet: a round icon over its name
-  &__label { font-size: $text-s; text-align: center; }
+  // the drawer's head: a gold crest and the name, a divider under
+  &__head {
+    gap: $space-l;
+    padding: 0 $space-s $space-l;
+    margin-bottom: $space-s;
+    border-bottom: $border;
+  }
+  &__crest {
+    width: $btn-l;
+    height: $btn-l;
+    border: 1.5px solid var(--winx-gold-deep);
+    border-radius: $round;
+    background: linear-gradient(135deg, var(--winx-gold-bright), var(--winx-gold));
+    box-shadow: 0 2px 10px alpha(--winx-gold-deep, 45%);
+    color: var(--winx-purple-deep);
+    font-family: $font-deco;
+    font-size: $text-2xl;
+  }
+  &__title { font-family: $font-deco; font-size: $text-2xl; color: var(--winx-purple-deep); }
+
+  // a row: the page's button (icon circle, name) and its ↗; hover or focus: light pink and the ↗;
+  // on: the pink gradient with a gold border; Settings last, at the bottom
+  &__row {
+    gap: $space-l;
+    padding: $space-s $space-m;
+    border: 1px solid transparent;
+    border-radius: $radius-m;
+    &:hover, &:focus-within { background: var(--winx-pink-light); }
+    &--on, &--on:hover {
+      border-color: var(--winx-gold);
+      background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
+    }
+    &--last { margin-top: auto; }
+  }
+  // Obsidian styles button at (0,1,1) and more: the doubled block
+  & button#{&}__go, & button#{&}__open-tab, & button#{&}__tile {
+    height: auto;
+    border: none;
+    background: none;
+    box-shadow: none;
+    color: var(--winx-text-dark);
+    font-family: var(--font-text);
+    font-size: $text-2xl;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+  }
+  & button#{&}__go { gap: $space-l; padding: 0; }
+  &__icon, &__tile-icon {
+    flex: none;
+    width: $btn-l;
+    height: $btn-l;
+    border: 1px solid alpha(--winx-pink-deep, 30%);
+    border-radius: $round;
+    background: #fff;
+    font-size: $text-2xl;
+  }
+  & button#{&}__open-tab {
+    flex: none;
+    width: auto;
+    padding: $space-2xs $space-s;
+    border: 1px solid alpha(--winx-pink-deep, 35%);
+    border-radius: $radius-s;
+    background: #fff;
+    color: alpha(--winx-purple-deep, 70%);
+    font-size: $text-l;
+    opacity: 0;
+  }
+  &__row:hover &__open-tab, &__row:focus-within &__open-tab { opacity: 1; }
+
+  // the phone's sheet: a round pink tile over its name
+  & button#{&}__tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-xs;
+    min-width: 0;
+    padding: 0;
+    text-align: center;
+  }
+  &__tile-icon {
+    width: $tile;
+    height: $tile;
+    border: 1.5px solid var(--winx-gold);
+    background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
+    box-shadow: 0 0 6px alpha(--winx-pink-deep, 30%);
+    font-size: $text-4xl;
+  }
+  &__tile--on &__tile-icon { border-color: var(--winx-gold-deep); box-shadow: 0 0 12px alpha(--winx-gold, 90%); }
+  &__label {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: $text-s;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

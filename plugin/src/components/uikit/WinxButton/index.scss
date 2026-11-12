@@ -2,6 +2,9 @@
    button + two classes (0,2,1), so Obsidian's button styles don't win */
 @use "mixins" as *;
 
+$rail-item: 32px;     // the nav's item: the mockup's rounded square (off the button sizes)
+$rail-radius: 8px;    // its corners, between $radius-s and $radius-m
+
 button.winx-btn {
   // round: an icon in a white circle (a task's ⭐ ⏭ ✏️ 🗑, the panel's +📅 ⏸ ▶, Missed's ✓ ☀️); bigger on the phone
   &.winx-btn--round {
@@ -105,26 +108,38 @@ button.winx-btn {
     &.winx-btn--jump:hover { transform: scale(1.08); }
   }
 
-  // rail: an item of the Winx tab's nav (WinxNav): its icon, and its Cinzel label when the pill is
-  // open, white on the pink pill; on: a light circle with a gold glow; on hover sparkles fly out
+  // rail: an item of the Winx tab's nav (WinxNav): a rounded square with its icon, and its Quicksand
+  // label when the pill is open; hover: light pink, on: pink with a gold border; on hover sparkles
+  // fly out (nav only; the pill is near-white, so they show over the hover's pink)
   &.winx-btn--rail {
     @include row;
     position: relative;
-    min-width: $btn-m;
-    height: $btn-m;
+    min-width: $rail-item;
+    height: $rail-item;
     padding: 0;
-    border: none;
-    border-radius: $pill;
+    border: 1px solid transparent;
+    border-radius: $rail-radius;
     background: none;
     box-shadow: none;
-    color: #fff;
-    font-family: $font-deco;
+    color: var(--winx-text-dark);
+    font-family: var(--font-text);
     font-size: $text-l;
+    font-weight: 500;
+    letter-spacing: 0;
     line-height: 1;
+    text-transform: none;
     cursor: pointer;
 
-    @include sparkles;
-    &.winx-btn--on { background: white(30%); box-shadow: 0 0 8px alpha(--winx-gold, 70%); }
+    @include sparkles {
+      background: var(--winx-pink-light);
+      box-shadow: none;
+    }
+    &:focus-visible { background: var(--winx-pink-light); box-shadow: none; }
+    &.winx-btn--on,
+    &.winx-btn--on:hover {
+      border-color: var(--winx-gold);
+      background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
+    }
   }
 }
 
