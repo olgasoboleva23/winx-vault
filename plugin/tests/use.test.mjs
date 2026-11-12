@@ -31,6 +31,15 @@ test("useRedraw: hidden, a redraw waits; shown, the next leaf or layout change d
   assert.equal(draws, 1);
 });
 
+test("useRedraw: a winx:page switch catches up too", () => {
+  const c = component(); let shown = false, draws = 0;
+  const { redraw } = useRedraw(c, () => shown, () => draws++);
+  redraw();
+  shown = true;
+  c.events["winx:page"][0]();
+  assert.equal(draws, 1);
+});
+
 test("useNewDay: the handler runs once when the date changes", () => {
   let day = "2026-11-01", tick = null;
   globalThis.window = { moment: () => ({ format: () => day }), setInterval: fn => { tick = fn; return 1; } };

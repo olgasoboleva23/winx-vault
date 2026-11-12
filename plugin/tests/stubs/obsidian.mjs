@@ -8,6 +8,7 @@ export class Component {
     this.onunload?.();
   }
   addChild(c) { this._children.push(c); if (this._loaded) c.load(); return c; }
+  removeChild(c) { this._children = this._children.filter(x => x !== c); c.unload(); return c; }
   register(fn) { this._cleanups.push(fn); }
   registerEvent(ref) { this._cleanups.push(() => ref?.off?.()); }
   registerDomEvent(el, type, fn) { el.addEventListener?.(type, fn); this._cleanups.push(() => el.removeEventListener?.(type, fn)); }

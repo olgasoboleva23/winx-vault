@@ -6,8 +6,8 @@ import { Keymap, debounce } from "obsidian";
 import { todayYmd } from "#/helpers/dates.js";
 import { dataview } from "#/helpers/plugins.js";
 
-// redraw(): drawn now when shown, else once it shows (a leaf or the layout changes) — catchUp()
-// asks again
+// redraw(): drawn now when shown, else once it shows (a leaf or the layout changes, the Winx tab
+// switches its page) — catchUp() asks again
 export function useRedraw(c, isShown, draw) {
   let stale = false;
   const redraw = () => { if (isShown()) { stale = false; draw(); } else stale = true; };
@@ -16,6 +16,7 @@ export function useRedraw(c, isShown, draw) {
 
   c.registerEvent(c.app.workspace.on("active-leaf-change", catchUp));
   c.registerEvent(c.app.workspace.on("layout-change", catchUp));   // a sidebar or split shown
+  c.registerEvent(c.app.workspace.on("winx:page", catchUp));   // a kept page shown again
   return { redraw, catchUp };
 }
 

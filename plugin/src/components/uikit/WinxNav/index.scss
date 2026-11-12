@@ -1,6 +1,7 @@
 /* The Winx tab's nav (WinxNav), block winx-rail: desktop, a short pink pill at the tab's left edge,
    over the page (it takes no width); opened, it widens and shows the labels. Phone (--phone): the
-   bottom bar, an icon above a small label. The items' own look is WinxButton's kind rail */
+   bottom bar (in flow, last in the shell), an icon above a small label. The items' own look is
+   WinxButton's kind rail */
 @use "mixins" as *;
 
 $label-w: 110px;   // an opened label's room: the longest name, Dashboard, in Cinzel
@@ -33,9 +34,10 @@ $label-w: 110px;   // an opened label's room: the longest name, Dashboard, in Ci
   &--open &__label,
   &:focus-within &__label { max-width: $label-w; padding-right: $space-l; opacity: 1; }
 
-  // phone: the bar along the bottom, three equal places, an icon above its label
+  // phone: the bar in the page's flow (the shell puts it last), three equal places, an icon
+  // above its label
   &--phone {
-    inset: auto 0 0;
+    position: static;
     translate: none;
     flex-direction: row;
     justify-content: space-around;
