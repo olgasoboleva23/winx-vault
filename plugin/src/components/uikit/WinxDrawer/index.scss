@@ -1,0 +1,45 @@
+/* A drawer (WinxDrawer), block winx-drawer: over the whole tab, a dim backdrop and the panel; left
+   slides in from the left edge (the page stays put), --bottom is the phone's sheet of round icons,
+   four to a row */
+@use "mixins" as *;
+
+$panel-w: 240px;   // the left drawer's width: an icon, a name and its ↗
+
+.winx-drawer {
+  position: absolute;
+  inset: 0;
+  z-index: $z-drawer;
+
+  &__backdrop { position: absolute; inset: 0; background: black(25%); }
+
+  &__panel {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    width: $panel-w;
+    padding: $space-4xl $space-xl;
+    overflow-y: auto;
+    background: var(--winx-lavender);
+    box-shadow: 0 0 16px alpha(--winx-pink-deep, 50%);
+    animation: winx-drawer-left $medium ease-out;
+  }
+
+  &--bottom &__panel {
+    inset: auto 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-xl;
+    width: auto;
+    border-radius: $radius-xl $radius-xl 0 0;
+    animation-name: winx-drawer-bottom;
+  }
+}
+
+@keyframes winx-drawer-left { from { translate: -100% 0; } }
+@keyframes winx-drawer-bottom { from { translate: 0 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .winx-drawer__panel { animation: none; }
+}

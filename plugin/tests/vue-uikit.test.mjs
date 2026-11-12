@@ -128,3 +128,55 @@ test("WinxAddForm: on the photo (no card under it) the --photo look", () => {
   assert.equal(photo.classes().includes("winx-add-form--photo"), true);
   assert.equal(mount(ui.WinxAddForm).classes().includes("winx-add-form--photo"), false);
 });
+
+const navItems = [
+  { key: "dashboard", icon: "✦", text: "Dashboard" },
+  { key: "calendar", icon: "🗓", text: "Calendar" },
+  { key: "other", icon: "⋯", text: "Other" },
+];
+const loadNav = async () => (await import("../src/components/uikit/WinxNav/index.vue")).default;
+
+test("WinxNav: three items, the current one on, a click says which", async () => {
+  const nav = mount(await loadNav(), { props: { items: navItems, current: "calendar" } });
+  const items = nav.findAll(".winx-rail .winx-btn--rail");
+
+  assert.equal(items.length, 3);
+  assert.deepEqual(items.map(b => b.classes().includes("winx-btn--on")), [false, true, false]);
+  await items[1].trigger("click");
+  const [[key, event]] = nav.emitted("go");
+  assert.equal(key, "calendar");
+  assert.equal(event instanceof MouseEvent, true);
+});
+
+test("WinxNav: hover opens it; a click shuts it until the pointer leaves", async () => {
+  const nav = mount(await loadNav(), { props: { items: navItems, current: "calendar" } });
+  const is = m => nav.classes().includes(`winx-rail--${m}`);
+
+  await nav.trigger("pointerenter");
+  assert.equal(is("open"), true);
+  await nav.find(".winx-btn--rail").trigger("click");
+  assert.deepEqual([is("shut"), is("open")], [true, false]);
+  await nav.trigger("pointerleave");
+  await nav.trigger("pointerenter");
+  assert.deepEqual([is("shut"), is("open")], [false, true]);
+});
+
+test("WinxNav: on the phone the bottom bar, no hover states", async () => {
+  const nav = mount(await loadNav(), { props: { items: navItems, phone: true } });
+
+  await nav.trigger("pointerenter");
+  assert.deepEqual(nav.classes(), ["winx-rail", "winx-rail--phone"]);
+});
+
+test("WinxDrawer: closed draws nothing; open, Esc and the backdrop close it", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const closed = mount(WinxDrawer, { props: { open: false }, slots: { default: "rows" } });
+  assert.equal(closed.find(".winx-drawer").exists(), false);
+
+  const drawer = mount(WinxDrawer, { props: { open: true, side: "bottom" }, slots: { default: "rows" } });
+  assert.equal(drawer.find(".winx-drawer.winx-drawer--bottom .winx-drawer__panel").text(), "rows");
+  await drawer.find(".winx-drawer__backdrop").trigger("click");
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+  assert.equal(drawer.emitted("close").length, 2);
+  drawer.unmount();
+});

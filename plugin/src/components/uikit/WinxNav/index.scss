@@ -1,0 +1,50 @@
+/* The Winx tab's nav (WinxNav), block winx-rail: desktop, a short pink pill at the tab's left edge,
+   over the page (it takes no width); opened, it widens and shows the labels. Phone (--phone): the
+   bottom bar, an icon above a small label. The items' own look is WinxButton's kind rail */
+@use "mixins" as *;
+
+$label-w: 110px;   // an opened label's room: the longest name, Dashboard, in Cinzel
+
+.winx-rail {
+  position: absolute;
+  top: 50%;
+  left: $space-m;
+  z-index: $z-nav;
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  padding: $space-xs;
+  border-radius: $pill;
+  background: alpha(--winx-pink-deep, 85%);
+  box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
+
+  &__icon { flex-shrink: 0; width: $btn-m; text-align: center; font-size: $text-2xl; }
+
+  // folded away until the pill opens
+  &__label {
+    box-sizing: border-box;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    transition: max-width $medium ease, opacity $medium ease;
+  }
+  &--open &__label { max-width: $label-w; padding-right: $space-l; opacity: 1; }
+
+  // phone: the bar along the bottom, three equal places, an icon above its label
+  &--phone {
+    inset: auto 0 0;
+    translate: none;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: $space-xs 0;
+    border-radius: 0;
+  }
+  &--phone button#{&}__item { flex-direction: column; gap: $space-2xs; height: $tap; }
+  &--phone &__label { max-width: none; font-size: $text-xs; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .winx-rail__label { transition: none; }
+}
