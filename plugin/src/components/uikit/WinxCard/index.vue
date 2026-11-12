@@ -6,6 +6,8 @@ defineProps({
   meta: { type: Array, default: () => [] },
   // the widget's own class on the body (the shop's winx-shop)
   bodyClass: { type: String, default: null },
+  // a picture above the title (a resource URL), cropped to a fixed height
+  cover: { type: String, default: null },
 });
 </script>
 
@@ -16,6 +18,12 @@ defineProps({
     :data-callout-metadata="meta.join(' ')"
     data-callout-fold=""
   >
+    <img
+      v-if="cover"
+      class="winx-widget__cover"
+      :src="cover"
+      alt=""
+    >
     <div class="callout-title winx-widget__title" dir="auto">
       <div class="callout-icon" />
       <div class="callout-title-inner">{{ title }}</div>

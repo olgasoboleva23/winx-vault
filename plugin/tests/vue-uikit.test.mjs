@@ -96,3 +96,12 @@ test("Search.pickGrouped: a header over each group's first row, the name and its
   const row = "winx-search__row winx-row winx-between winx-gap-l";
   assert.deepEqual(drawn, ["#1", row, "a", "A", row, "b", "B", "#2", row, "c", "C", row, "+ new: d", ""]);
 });
+
+test("WinxCard: a cover picture above the title; none without one", () => {
+  const card = mount(ui.WinxCard, { props: { title: "Trip", cover: "app://x/trip.webp" } });
+  const img = card.find("img.winx-widget__cover");
+  assert.equal(img.attributes("src"), "app://x/trip.webp");
+  assert.equal(img.attributes("alt"), "");
+  assert.equal(card.find(".winx-widget").element.firstElementChild, img.element);
+  assert.equal(mount(ui.WinxCard, { props: { title: "Trip" } }).find("img").exists(), false);
+});

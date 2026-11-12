@@ -117,7 +117,17 @@
 }
 
 /* a card widget until its first draw */
+$cover-h: 150px; /* a cover's height: a picture's frame, not a spacing value */
+
 .winx-widget {
+  &__cover {
+    display: block;
+    width: 100%;
+    height: $cover-h;
+    object-fit: cover;
+    border-radius: $radius-l;
+    margin-bottom: $space-m;
+  }
   &__skeleton {
     height: 72px;
     border-radius: $radius-l;
