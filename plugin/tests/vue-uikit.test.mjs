@@ -105,3 +105,12 @@ test("WinxCard: a cover picture above the title; none without one", () => {
   assert.equal(card.find(".winx-widget").element.firstElementChild, img.element);
   assert.equal(mount(ui.WinxCard, { props: { title: "Trip" } }).find("img").exists(), false);
 });
+
+test("WinxTabs: on the photo (a page without a card) the light look", async () => {
+  const WinxTabs = (await import("../src/components/uikit/WinxTabs/index.vue")).default;
+  const tabs = [{ key: "all", text: "All" }];
+  const plain = mount(WinxTabs, { props: { tabs } }), photo = mount(WinxTabs, { props: { tabs, photo: true } });
+
+  assert.equal(plain.classes().includes("winx-tabs--photo"), false);
+  assert.equal(photo.classes().includes("winx-tabs--photo"), true);
+});

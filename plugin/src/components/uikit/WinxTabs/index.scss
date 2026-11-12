@@ -8,6 +8,9 @@
   margin-bottom: $space-xs;
   & button#{&}__tab { margin: 0; padding: 0; border: none; background: none; box-shadow: none; text-align: left; font-family: $font-deco; font-size: inherit; opacity: 0.5; color: var(--winx-purple-deep); cursor: pointer; }
   & button#{&}__tab--on { opacity: 1; border-bottom: 2px solid var(--winx-gold-deep); border-radius: 0; }
+  // straight on the photo: light words with a shadow, the picked one fully lit
+  &--photo button#{&}__tab { color: white(95%); opacity: 0.75; text-shadow: 0 1px 3px black(50%); }
+  &--photo button#{&}__tab--on { opacity: 1; }
   // in an Obsidian window (a Form's tabs): the theme's text colour, so it reads on a dark one too
   .modal & button#{&}__tab { color: var(--text-normal); }
 }
