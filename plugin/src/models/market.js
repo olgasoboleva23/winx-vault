@@ -38,10 +38,6 @@ export const historyOf = items => items.filter(i => i.isDone && i.doneOn)
 
 export const openKeys = items => new Set(items.filter(i => i.isOpen).map(i => i.key));
 
-// the id after the highest m<N> among `ids`
-export const nextMarketId = ids =>
-  `m${Math.max(0, ...ids.filter(k => /^m\d+$/.test(k ?? "")).map(k => +k.slice(1))) + 1}`;
-
 // history oldest first, with each buy's item key: its id, else its lowercased name
 const byItem = history => [...history].sort((a, b) => a.date.localeCompare(b.date))
   .map(h => [h.id ?? h.name.trim().toLowerCase(), h]);

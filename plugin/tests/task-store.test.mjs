@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseNote } from "#/models/taskFile.js";
 import { setApp } from "#/helpers/app.js";
-import { taskStore, useTaskStore, stageTasks } from "#/store/tasks.js";
+import { taskStore, useTaskStore, stageTasks, records } from "#/store/tasks.js";
 
 const P = "00 System/Data/Tasks/Master.md", J = "00 System/Data/Tasks/tasks.json";
 
@@ -243,4 +243,32 @@ test("a project without stages, or a stage without tasks: no throw, projects and
   assert.deepEqual([...taskStore.projects.keys()], ["p1", "p2"]);
   assert.deepEqual(taskStore.inProject, new Set(["t1"]));
   assert.deepEqual(stageTasks({ name: "A" }), []);
+});
+
+test("the store's records are the collection's current Map", () => {
+  vault({});
+  taskStore.putRecords({ t1: { name: "a" } });
+  assert.equal(taskStore.records, records.records);
+  records.load({ t2: {} });
+  assert.ok(taskStore.records.has("t2"));
+});
+
+test("a projects.json that throws while read leaves the projects and the store as they were", () => {
+  vault({});
+  taskStore.putProjects({ p1: { stages: [{ tasks: ["t1"] }] } });
+  assert.throws(() => taskStore.putProjects({ p1: null }));
+  assert.ok(taskStore.projects.has("p1"));
+  assert.ok(taskStore.projects.get("p1"));
+  assert.ok(taskStore.inProject.has("t1"));
+  taskStore.put(P, "- [ ] t1");
+  assert.equal(taskStore.tasks.length, 1);
+});
+
+test("a tasks.json with a null record leaves the records and the store as they were", () => {
+  vault({});
+  taskStore.putRecords({ t1: { name: "a" } });
+  assert.throws(() => taskStore.putRecords({ t1: null }));
+  assert.equal(taskStore.records.get("t1").name, "a");
+  taskStore.put(P, "- [ ] t1");
+  assert.equal(taskStore.tasks.length, 1);
 });

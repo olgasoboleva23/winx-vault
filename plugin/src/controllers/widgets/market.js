@@ -5,10 +5,11 @@
 // (✓), an item running low back on the list. The markup: widgets/market/.
 import { dm, todayYmd } from "#/helpers/dates.js";
 import {
-  MarketItem, catLabel, catOf, historyOf, marketCats, marketChoices, nextMarketId, openKeys,
+  MarketItem, catLabel, catOf, historyOf, marketCats, marketChoices, openKeys,
   supplyStats,
 } from "#/models/market.js";
 import { Notice } from "obsidian";
+import { nextId } from "#/helpers/ids.js";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { appendLine, editJson, editLine, readJson, serial } from "#/helpers/files.js";
@@ -108,7 +109,7 @@ async function addItem(name, tag, id) {
     id ??= Object.keys(records)
       .find(k => records[k].name.trim().toLowerCase() === name.trim().toLowerCase());
     if (!id) {
-      id = nextMarketId([...Object.keys(records), ...state.items.map(i => i.id)]);
+      id = nextId("m", [...Object.keys(records), ...state.items.map(i => i.id)]);
       records[id] = { name, tag };
     }
 

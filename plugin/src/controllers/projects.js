@@ -1,28 +1,17 @@
-// The writes of projects.json (a project by key p1, p2…): one editJson per write, so two writes
-// never lose each other. A stage found changed meanwhile (another device) writes nothing.
+// The writes of projects.json (a project by key p1, p2…): one write each (the projects collection),
+// so two writes never lose each other. A stage found changed meanwhile (another device) writes
+// nothing.
 import { Notice } from "obsidian";
-import { editJson } from "#/helpers/files.js";
-import { MEDIA, PROJECTS } from "#/helpers/paths.js";
+import { MEDIA } from "#/helpers/paths.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { Search } from "#/components/uikit/Search/index.ts";
 import { PROJECTS_VIEW } from "#/store/projects.js";
+import { projects } from "#/store/tasks.js";
 import { Task } from "#/models/task.js";
 import { editTaskLine, newTask } from "#/controllers/tasks.js";
 
-// the next free key: the biggest one plus one
-const nextKey = all => `p${Math.max(0, ...Object.keys(all).map(k => +k.slice(1))) + 1}`;
-
-export async function createProject({ name, description = "", status = "active", cover = null }) {
-  let key;
-
-  await editJson(PROJECTS, all => {
-    key = nextKey(all);
-    return {
-      ...all, [key]: { name, status, description, result: "", notes: "", cover, stages: [] },
-    };
-  });
-  return key;
-}
+export const createProject = ({ name, description = "", status = "active", cover = null }) =>
+  projects.add({ name, status, description, result: "", notes: "", cover, stages: [] }, "p");
 
 // a picture of 03 Resources/Media by a search window: its path, null when closed
 const pickCover = app => {
@@ -67,16 +56,10 @@ export async function askNewProject(
 }
 
 // merge fields (name, status, description, result, notes, cover) into a project
-export const saveProject = (key, patch) => editJson(PROJECTS, all =>
-  all[key] ? { ...all, [key]: { ...all[key], ...patch } } : null);
+export const saveProject = (key, patch) => projects.update(key, p => ({ ...p, ...patch }));
 
-export const addStage = (key, name) => editJson(PROJECTS, all => {
-  const project = all[key];
-
-  if (!project) return null;
-
-  return { ...all, [key]: { ...project, stages: [...project.stages ?? [], { name, tasks: [] }] } };
-});
+export const addStage = (key, name) => projects.update(key, p =>
+  ({ ...p, stages: [...p.stages ?? [], { name, tasks: [] }] }));
 
 // a new task (`ask`: the New task flow) on a stage: found by index and name, so a stage that moved
 // meanwhile is not written to. null when cancelled or changed.
@@ -84,20 +67,21 @@ export async function addToStage(key, index, stageName, ask = newTask) {
   const id = await ask();
 
   if (!id) return null;
-  let saved = false;
-
-  await editJson(PROJECTS, all => {
-    const stage = all[key]?.stages?.[index];
+  const saved = await projects.update(key, p => {
+    const stage = p.stages?.[index];
 
     if (stage?.name !== stageName) {
       new Notice("✦ project changed, try again");
       return null;
     }
 
-    saved = true;
-    if (!stage.tasks.includes(id)) stage.tasks.push(id);
-    return all;
+    return {
+      ...p,
+      stages: p.stages.map((st, i) => i !== index || st.tasks.includes(id) ? st
+        : { ...st, tasks: [...st.tasks, id] }),
+    };
   });
+
   return saved ? id : null;
 }
 

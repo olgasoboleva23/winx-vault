@@ -5,6 +5,7 @@
 // page: what was eaten with its marks' icons, the marks counted, each free journal's level after
 // its lag (a rash shows the next day), the medication courses on that day, the note.
 import { addDays } from "#/helpers/dates.js";
+import { nextId } from "#/helpers/ids.js";
 
 export const DEFAULT_MARKS = [
   { tag: "m1", icon: "🍫", name: "какао" },
@@ -23,7 +24,7 @@ export class Foods {
     return lines(this.text).map(l => l.match(FOOD)).filter(Boolean)
       .map(m => ({ id: m[1], name: m[2], marks: m[3].split(" #").filter(Boolean) }));
   }
-  get nextId() { return `f${Math.max(0, ...this.list.map(f => Number(f.id.slice(1)))) + 1}`; }
+  get nextId() { return nextId("f", this.list.map(f => f.id)); }
   // the text with the food's line: replaced (its id's), or a new one at the end
   set({ id, name, marks }) {
     const line = `- ${id} ${name.trim()}${marks.map(m => ` #${m}`).join("")}`;

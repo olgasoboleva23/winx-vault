@@ -94,12 +94,12 @@ test("undoLines leaves lines that changed since", async () => {
 
 test("editJson: a missing file is made from {} (its folder too), null writes nothing, a broken one throws untouched", async () => {
   const { files, dirs } = vault();
-  await editJson("x/a.json", o => ({ ...o, n: 1 }));
+  assert.equal(await editJson("x/a.json", o => ({ ...o, n: 1 })), true);
   assert.ok(dirs.has("x"));
-  await editJson("x/a.json", o => ({ ...o, m: 2 }));
+  assert.equal(await editJson("x/a.json", o => ({ ...o, m: 2 })), true);
   assert.equal(files["x/a.json"], JSON.stringify({ n: 1, m: 2 }, null, 2));
-  await editJson("x/a.json", () => null);
-  await editJson("x/b.json", () => null);
+  assert.equal(await editJson("x/a.json", () => null), false);
+  assert.equal(await editJson("x/b.json", () => null), false);
   assert.deepEqual(Object.keys(files), ["x/a.json"]);
   files["x/a.json"] = "broken";
   await assert.rejects(() => editJson("x/a.json", o => o), SyntaxError);

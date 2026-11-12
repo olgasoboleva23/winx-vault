@@ -71,6 +71,7 @@ test("saveRecords merges a patch into a record, a missing file is made", async (
 test("a new id is the biggest one plus one", () => {
   assert.equal(newId(new Map()), "t1");
   assert.equal(newId(new Map([["t2", {}], ["t10", {}]])), "t11");
+  assert.equal(newId(new Map([["t2", {}], ["x", {}], ["tea", {}]])), "t3");
 });
 
 // the Tasks plugin's edit dialog, answering with `edited` (null: cancelled)

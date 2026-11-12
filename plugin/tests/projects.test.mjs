@@ -45,7 +45,7 @@ test("saveProject and addStage on a missing key write nothing", async () => {
   await createProject({ name: "Garden" });
   const before = files[PROJECTS];
   await saveProject("p9", { notes: "x" });
-  assert.equal(await addStage("p9", "A"), undefined);
+  assert.equal(await addStage("p9", "A"), false);
   assert.equal(files[PROJECTS], before);
 });
 
@@ -89,4 +89,12 @@ test("askNewProject: the Form's values → createProject, then the tab opens on 
 
   assert.equal(await askNewProject(app, async () => null), null);
   assert.deepEqual(Object.keys(json(files)), ["p1"]);
+});
+
+test("a null project in projects.json: saveProject and addStage write nothing, addToStage null", async () => {
+  const { files } = vault({ [PROJECTS]: '{"p1":null}' });
+  assert.equal(await saveProject("p1", { notes: "x" }), false);
+  assert.equal(await addStage("p1", "A"), false);
+  assert.equal(await addToStage("p1", 0, "A", async () => "t7"), null);
+  assert.equal(files[PROJECTS], '{"p1":null}');
 });

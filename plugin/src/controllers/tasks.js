@@ -2,7 +2,7 @@
 // notice; the task window (components/uikit/TaskWindow) and the Tasks plugin's edit dialog; a
 // task's record in tasks.json; a new task on top of Master.md (to the pool: a record alone).
 import { Notice } from "obsidian";
-import { edit, editJson, editLine, serial, undoLines } from "#/helpers/files.js";
+import { edit, editLine, serial, undoLines } from "#/helpers/files.js";
 import { tasksApi } from "#/helpers/plugins.js";
 import { Task, VariantProblem, nextVariantAfter, variantsProblem } from "#/models/task.js";
 import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
@@ -11,6 +11,8 @@ import { parseNote } from "#/models/taskFile.js";
 import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
 import { pickTask } from "#/components/uikit/TaskSearch/index.js";
 import { todayYmd } from "#/helpers/dates.js";
+import { nextId } from "#/helpers/ids.js";
+import { records as recordsStore } from "#/store/tasks.js";
 
 // One write at a time, including its queue change and undo; dialogs do not hold the queue.
 const writeTask = serial();
@@ -111,30 +113,21 @@ const recOf = p => ({
 // Merge a patch into tasks.json ({ id: fields } merges into the record), one write; an optional
 // snapshot rejects stale modal edits. The file is made when missing.
 // Between devices, Remotely Save still uses last writer wins.
-export async function saveRecords(patch, expected = null) {
-  let saved = false;
+export const saveRecords = (patch, expected = null) => recordsStore.edit(all => {
+  if (expected && Object.entries(expected).some(([id, rec]) =>
+    JSON.stringify(all[id]) !== JSON.stringify(rec))) {
+    new Notice("✦ task record changed, try again");
+    return null;
+  }
 
-  await editJson(TASK_RECORDS, all => {
-    if (expected && Object.entries(expected).some(([id, rec]) =>
-      JSON.stringify(all[id]) !== JSON.stringify(rec))) {
-      new Notice("✦ task record changed, try again");
-      return null;
-    }
+  for (const [id, p] of Object.entries(patch)) all[id] = { ...all[id], ...p };
+  return all;
+});
 
-    saved = true;
-    for (const [id, p] of Object.entries(patch)) all[id] = { ...all[id], ...p };
-    return all;
-  });
-  return saved;
-}
-
-// the next free id: the biggest one of the records and of the lines (a line whose record was lost
-// to a sync conflict keeps its id) plus one
-export const newId = (records, tasks = []) => {
-  const ids = [...records.keys(), ...tasks.map(t => Task.of(t).id).filter(Boolean)];
-
-  return `t${Math.max(0, ...ids.map(id => +id.slice(1))) + 1}`;
-};
+// the next free id: the biggest t<N> of the records and of the lines (a line whose record was lost
+// to a sync conflict keeps its id) plus one; other keys are skipped
+export const newId = (records, tasks = []) =>
+  nextId("t", [...records.keys(), ...tasks.map(t => Task.of(t).id).filter(Boolean)]);
 
 // Edit a task: the task window (difficulty, area, daytime, sticker: to its record), then the Tasks
 // plugin's own edit dialog on its line with the name in place of the id (name: to the record,
