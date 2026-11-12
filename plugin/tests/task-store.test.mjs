@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseNote } from "#/models/taskFile.js";
 import { setApp } from "#/helpers/app.js";
-import { taskStore, useTaskStore } from "#/store/tasks.js";
+import { taskStore, useTaskStore, stageTasks } from "#/store/tasks.js";
 
 const P = "00 System/Data/Tasks/Master.md", J = "00 System/Data/Tasks/tasks.json";
 
@@ -190,4 +190,57 @@ test("put(path, text): the note's items set straight (tests, and a write the plu
   vault({});
   taskStore.put(P, "- [ ] z");
   assert.deepEqual(taskStore.tasks.map(t => t.text), ["z"]);
+});
+
+const PJ = "00 System/Data/Projects/projects.json";
+const stage = tasks => ({ p: { name: "Tea garden", stages: [{ name: "A", tasks }] } });
+
+test("the store reads projects.json: projects in file order, inProject holds every stage's ids", async () => {
+  vault({
+    [PJ]: JSON.stringify({
+      p1: { name: "Tea garden", stages: [{ name: "A", tasks: ["t1", "t2"] }] },
+      p2: { name: "Shelf", stages: [{ name: "B", tasks: ["t2", "t3"] }] },
+    }),
+  });
+  useTaskStore(plugin()); await settle();
+  assert.deepEqual([...taskStore.projects.keys()], ["p1", "p2"]);
+  assert.deepEqual(taskStore.inProject, new Set(["t1", "t2", "t3"]));
+});
+
+test("stageTasks: an open line is open, a done line with no open line is done, a skipped-only or missing id is left out", () => {
+  vault({});
+  taskStore.put(P, "- [ ] t1\n- [x] t2\n- [-] t3");
+  const got = stageTasks({ name: "A", tasks: ["t1", "t2", "t3", "t9"] });
+  assert.deepEqual(got.map(s => [s.id, s.done]), [["t1", false], ["t2", true]]);
+});
+
+test("stageTasks: a done 🔁 copy and its open next copy: open", () => {
+  vault({});
+  taskStore.put(P, "- [x] t4 [repeat:: every day when done] ✅ 2026-11-10\n- [ ] t4 [repeat:: every day when done] [due:: 2026-11-12]");
+  const got = stageTasks({ name: "A", tasks: ["t4", "t4"] });
+  assert.equal(got.length, 1);
+  assert.equal(got[0].done, false);
+  assert.equal(got[0].t.status, " ");
+});
+
+test("projects.json that isn't JSON leaves the projects as they were; a deleted one empties them", async () => {
+  const { files, fire } = vault({ [PJ]: JSON.stringify(stage(["t1"])) });
+  useTaskStore(plugin()); await settle();
+  const error = console.error;
+  console.error = () => {};
+  files[PJ] = "{ half"; fire("modify", PJ); await settle();
+  console.error = error;
+  assert.deepEqual([...taskStore.projects.keys()], ["p"]);
+  assert.deepEqual(taskStore.inProject, new Set(["t1"]));
+  delete files[PJ]; fire("delete", PJ); await settle();
+  assert.equal(taskStore.projects.size, 0);
+  assert.equal(taskStore.inProject.size, 0);
+});
+
+test("a project without stages, or a stage without tasks: no throw, projects and inProject agree", () => {
+  vault({});
+  taskStore.putProjects({ p1: { name: "x" }, p2: { name: "y", stages: [{ name: "A" }, { name: "B", tasks: ["t1"] }] } });
+  assert.deepEqual([...taskStore.projects.keys()], ["p1", "p2"]);
+  assert.deepEqual(taskStore.inProject, new Set(["t1"]));
+  assert.deepEqual(stageTasks({ name: "A" }), []);
 });

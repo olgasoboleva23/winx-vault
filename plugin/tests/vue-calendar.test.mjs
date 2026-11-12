@@ -266,3 +266,55 @@ test("on the phone, a card can't be swiped while the Tasks plugin is off", async
     assert.equal(ticked.length, 0);
   } finally { document.body.classList.remove("is-mobile"); }
 });
+
+test("Projects tab: a GroupCard per project with open tasks (a Done one too), a stage title over them, finished tasks hidden", async () => {
+  const { taskStore } = await import("#/store/tasks.js");
+  const { MASTER } = await import("#/helpers/paths.js");
+  taskStore.put(MASTER, [
+    "- [ ] t1 [due:: 2026-11-10]", "- [x] t2 [completion:: 2026-11-01]", "- [ ] t3", "- [ ] t4",
+  ].join("\n"));
+  taskStore.putRecords({ t1: { name: "pick venue" }, t2: { name: "book flights" },
+    t3: { name: "pack bags" }, t4: { name: "old chore" } });
+  taskStore.putProjects({
+    trip: { name: "Trip", status: "active", stages: [{ name: "Plan", tasks: ["t1", "t2"] },
+      { name: "Go", tasks: ["t3"] }, { name: "Back", tasks: ["t2"] }] },
+    old: { name: "Old", status: "done", stages: [{ name: "All", tasks: ["t4"] }] },
+    fin: { name: "Fin", status: "done", stages: [{ name: "All", tasks: ["t2"] }] },
+  });
+  const { el, st } = mount({ tab: "projects" });
+  const panel = el.querySelector(".winx-cal__backlog-grid");
+  assert.deepEqual([...panel.querySelectorAll(".winx-cal__group")].map(g => g.textContent), ["Trip", "Old"]);
+  assert.deepEqual([...panel.querySelectorAll(".winx-cal__stage")].map(g => g.textContent), ["Plan", "Go", "All"]);
+  assert.match(panel.textContent, /pick venue/);
+  assert.match(panel.textContent, /pack bags/);
+  assert.match(panel.textContent, /old chore/);
+  assert.doesNotMatch(panel.textContent, /book flights/);
+  assert.match(el.querySelector(".winx-tabs__tab--on").textContent, /^Projects · 3$/);
+  assert.equal(st.tab, "projects");
+  taskStore.put(MASTER, ""); taskStore.putRecords({}); taskStore.putProjects({});
+});
+
+test("Projects tab: no projects at first, then one with an open task shows its stage", async () => {
+  const { taskStore } = await import("#/store/tasks.js");
+  const { MASTER } = await import("#/helpers/paths.js");
+  taskStore.putProjects({});
+  const { el } = mount({ tab: "projects" });
+  assert.equal(el.querySelector(".winx-cal__stage"), null);
+  taskStore.put(MASTER, "- [ ] t1");
+  taskStore.putRecords({ t1: { name: "pick venue" } });
+  taskStore.putProjects({ trip: { name: "Trip", status: "active", stages: [{ name: "Plan", tasks: ["t1"] }] } });
+  await vue.nextTick();
+  assert.equal(el.querySelector(".winx-cal__stage").textContent, "Plan");
+  taskStore.put(MASTER, ""); taskStore.putRecords({}); taskStore.putProjects({});
+});
+
+test("Projects tab: two stages with one name both show", async () => {
+  const { taskStore } = await import("#/store/tasks.js");
+  const { MASTER } = await import("#/helpers/paths.js");
+  taskStore.put(MASTER, "- [ ] t1\n- [ ] t2");
+  taskStore.putRecords({ t1: { name: "one" }, t2: { name: "two" } });
+  taskStore.putProjects({ x: { name: "X", status: "active", stages: [{ name: "S", tasks: ["t1"] }, { name: "S", tasks: ["t2"] }] } });
+  const { el } = mount({ tab: "projects" });
+  assert.deepEqual([...el.querySelectorAll(".winx-cal__stage")].map(g => g.textContent), ["S", "S"]);
+  taskStore.put(MASTER, ""); taskStore.putRecords({}); taskStore.putProjects({});
+});

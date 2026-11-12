@@ -53,8 +53,8 @@ const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 //            later; the overdue ones are in missed), done ones on their completion date, a 🔁
 //            task's next repeats faded (future days only)
 //   missed   "Missed?": open tasks whose day has passed, the latest first
-//   backlog  No date: open one-offs with no date, by area, then the longest waiting (created)
-//            first
+//   backlog  No date: open one-offs with no date (not a project's: those are in Projects), by
+//            area, then the longest waiting (created) first
 //   pool     the pool's records, each { id, pool: true, rec, path } with its Task: by area, then
 //            the longest since last done (never done first)
 //   regulars open 🔁 tasks (an undated one is paused) but dated birthdays (a yearly rule, in Ahead):
@@ -67,10 +67,11 @@ const doneText = h => `done ${h.count}× · last ${dm(h.last)}`;
 export class CalendarData {
   /**
    * @param {{
-   *   tasks: any[], poolLines: any[], days: string[], today: string, areaOrder?: string[]
+   *   tasks: any[], poolLines: any[], days: string[], today: string, areaOrder?: string[],
+   *   inProject?: Set<string>
    * }} args
    */
-  constructor({ tasks, poolLines, days, today, areaOrder = [] }) {
+  constructor({ tasks, poolLines, days, today, areaOrder = [], inProject = new Set() }) {
     this.today = today;
     this.areaOrder = areaOrder;
     this.byDay = Object.fromEntries(days.map(d => [d, []]));
@@ -89,7 +90,7 @@ export class CalendarData {
       if (!task.isOpen) continue;   // skipped, in progress etc.
       const d = task.date;
 
-      if (!d) { if (!task.isRecurring) backlog.push(t); continue; }
+      if (!d) { if (!task.isRecurring && !inProject.has(task.id)) backlog.push(t); continue; }
 
       if (d >= today) this.byDay[d]?.push({ t, kind: "open" });
       if ((!task.isRecurring || task.isBirthday) && d > sunday) ahead.push(t);

@@ -47,5 +47,9 @@
 @use "../components/uikit/WinxChart";
 @use "../components/pages/meds";
 @use "../components/pages/food";
+@use "../components/uikit/WinxProgress";
+@use "../components/pages/projects/ProjectStatus";
+@use "../components/pages/projects/ProjectList";
+@use "../components/pages/projects/ProjectPage";
 @use "../components/pages/dashboard/widgets/finance";
 @use "helpers";   // global .winx-is-* helpers, after the blocks

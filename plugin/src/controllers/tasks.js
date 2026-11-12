@@ -9,6 +9,8 @@ import { taskWindow } from "#/components/uikit/TaskWindow/index.js";
 import { app } from "#/helpers/app.js";
 import { parseNote } from "#/models/taskFile.js";
 import { MASTER, TASK_RECORDS } from "#/helpers/paths.js";
+import { pickTask } from "#/components/uikit/TaskSearch/index.js";
+import { todayYmd } from "#/helpers/dates.js";
 
 // One write at a time, including its queue change and undo; dialogs do not hold the queue.
 const writeTask = serial();
@@ -189,6 +191,30 @@ export const editTaskModal = async (t, ask = taskWindow) => {
 // two saves at once never get one id.
 export const saveNewTask = (...args) => writeTask(() => saveNew(...args));
 
+// The New task command: a past task or a typed name, the window's picks, the Tasks dialog; the
+// saved id, or null when cancelled or not saved (saveNew says why itself).
+export async function newTask() {
+  const found = await pickTask();
+
+  if (!found) return null;
+  const ready = !found.isNew && found.picks.difficulty && found.picks.area;
+  const pick = ready ? found.picks : await taskWindow(found.picks ?? {}, true);
+
+  if (!pick) return null;
+  const api = tasksApi();
+
+  if (!api) {
+    new Notice("✦ Tasks plugin is off — task not saved");
+    return null;
+  }
+
+  // created shows how long it waits on the board
+  const result = await api.editTaskLineModal(Task.created(found.name, todayYmd()).line);
+
+  if (!result) return null;
+  return await saveNewTask(found.name, pick, result, found.id) || null;
+}
+
 // a note's text from disk ("" when it's missing)
 const fromDisk = async path => {
   const file = app.vault.getFileByPath(path);
@@ -226,7 +252,7 @@ async function saveNew(name, pick, result, oldId = null) {
   const problem = variantsProblem(record.variants ?? [], record.currVariant);
 
   if (problem) return void new Notice(problem);
-  if (pick.pool) return saveRecords({ [id]: patch }, { [id]: records.get(id) });
+  if (pick.pool) return await saveRecords({ [id]: patch }, { [id]: records.get(id) }) && id;
   let variant;
 
   try {
@@ -244,7 +270,7 @@ async function saveNew(name, pick, result, oldId = null) {
     text.startsWith(prefix) ? text.slice(prefix.length) : text);
 
   try {
-    if (await saveRecords({ [id]: patch }, { [id]: records.get(id) })) return true;
+    if (await saveRecords({ [id]: patch }, { [id]: records.get(id) })) return id;
     await rollback();
     return false;
   } catch (error) {

@@ -166,6 +166,13 @@
     color: color-mix(in srgb, var(--winx-pink-deep) 65%, var(--winx-purple-deep));
     font-weight: 600;
   }
+  /* Projects: a stage's name over its tasks inside a project card */
+  &__stage {
+    margin: $space-m 0 $space-2xs;
+    font-size: 0.9em;
+    font-weight: 600;
+    opacity: 0.8;
+  }
   /* Ahead: a date over its tasks inside a month card */
   &__date {
     margin: $space-m 0 $space-2xs;

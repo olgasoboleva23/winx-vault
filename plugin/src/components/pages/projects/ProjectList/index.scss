@@ -1,0 +1,21 @@
+/* The projects' list (ProjectList), block winx-projects: the title and the status tabs over a grid
+   of project cards (WinxCard), two columns on the desktop, one on the phone */
+@use "mixins" as *;
+
+.winx-projects {
+  &__header { margin-bottom: $space-xl; }
+  &__title {
+    margin: 0; font-family: $font-deco; font-size: $text-6xl; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--winx-lavender);
+  }
+  &__header .winx-tabs { font-size: $text-xl; }
+  &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: $space-3xl; }
+  &__card { cursor: pointer; }
+  &__description { margin-bottom: $space-m; color: var(--winx-text-dark); }
+
+  &__next { margin-top: $space-m; cursor: default; }
+
+  body.is-mobile & {
+    &__grid { grid-template-columns: minmax(0, 1fr); }
+  }
+}

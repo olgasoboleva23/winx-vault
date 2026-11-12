@@ -37,6 +37,7 @@ Regulars shows one **Training · Core ↔ Arms** card, the upcoming variant and 
 
 | Command (Cmd+P) | Creates |
 |---|---|
+| **Winx: New project** | a project in `00 System/Data/Projects/projects.json`: name, description, status (Active by default), an optional cover picked from `03 Resources/Media`; then the Projects tab opens on it |
 | **Winx: New task** | a task: a record in `Tasks/tasks.json` and a line in `Tasks/Master.md` |
 | **Winx: Settings** | ⚙ the difficulties' XP and gold, the areas, XP Today's thresholds and the level cost, saved in `00 System/Data/config.json` (also in the dashboard's ✦ Menu) |
 | **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
@@ -59,9 +60,19 @@ A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (w
 - **Days** show one-off tasks, and a day's 🔁 tasks folded into one pill "🔁 2/5"; a click unfolds them, grouped by time of day (morning / evening, which any task can have). The order inside a day is dragged and kept in the records' `order`.
 - **Drag** a task onto a day: open and due that day, or ✓ done that day. While dragging, a bar of 7 days sticks to the top of the screen.
 - **Missed?** lists open tasks whose day has passed: ✓ done that day, or ☀️ move to today.
-- **Bottom tabs:** **No date** (open tasks without a date), **Ahead** (dated tasks after this week and the birthdays, a card per month), **Regulars** (🔁 tasks), **Pool** (tasks to pick when it's time, the records with `pool: true`: drag one onto a day to make a line).
+- **Bottom tabs:** **No date** (open one-off tasks without a date, not a project's), **Ahead** (dated tasks after this week and the birthdays, a card per month), **Regulars** (🔁 tasks), **Projects** ("Projects · N": the open tasks of projects, grouped by project and stage; a Done project with open tasks still shows), **Pool** (tasks to pick when it's time, the records with `pool: true`: drag one onto a day to make a line).
 
   ![Ahead](images/calendar-ahead.webp)
 - **On a task:** ⭐ change difficulty, ✏️ edit (the task window, then the Tasks dialog), ⏭ skip a 🔁 task this time, 🗑 delete (click twice). On the phone, swipe right = done, swipe left = skip / take the date off.
 - **Stickers:** a task's `sticker` (files in `00 System/Assets/stickers/`); hover to see one big.
 - **Quests** (the dashboard card, or a ```` ```winx ```` block named `quests` in any note): today's tasks by life area. The food page has a 🏋 training column: pick one task once under ⚙, ✓ on the days it was done.
+
+## Projects
+
+A tab of its own: **Winx: Open projects** (Cmd+P). A project is a bigger undertaking cut into stages, each a list of tasks. **Winx: New project** (or **✦ New project** in the tab's header) creates one.
+
+The file is `00 System/Data/Projects/projects.json`, an object by key (`p1`, `p2`…) in display order: `name`, `status` (idea / active / paused / done), `description`, `result`, `notes`, `cover` (a picture path in the vault, or null) and `stages`, each `{ "name": "Dig the beds", "tasks": ["t41", "t42"] }`, the task ids from `tasks.json`. A project's tasks are ordinary tasks: they live in `Master.md` like the rest and take Tasks' dates and repeats.
+
+- **The list:** a card per project (cover, status, description, progress, the next open task, which its box ticks), with tabs by status and their counts. A click on a card opens the project.
+- **A project's page:** the status (a menu), description, progress, Result and Notes (each edited in a window), and the stages with their tasks; **+ stage** adds one, **+ task** on a stage runs the New task flow and puts the new task there. A task's 📅 puts it on a calendar day (today, tomorrow or a date).
+- **The calendar:** a project's task with a date shows on its day like any other. One without a date is not in **No date**: it shows only in the calendar's **Projects** tab (by project, then stage) and on its project's page.

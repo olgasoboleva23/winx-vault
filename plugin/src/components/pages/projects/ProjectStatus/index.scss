@@ -1,0 +1,15 @@
+/* A project's status pill (ProjectStatus), block winx-project-status: a dot in the status's
+   colour, the word */
+@use "mixins" as *;
+
+.winx-project-status {
+  @include row;
+  gap: $space-xs; margin-left: $space-m; padding: $space-2xs $space-m; border-radius: $pill;
+  background: alpha(--winx-purple, 30%); font-size: $text-s; letter-spacing: 0.06em;
+  color: var(--winx-purple-deep);
+  &::before { content: "●"; color: var(--status); }
+  &--idea { --status: var(--winx-purple); }
+  &--active { --status: var(--color-green);   /* Obsidian's green: no Winx token */ }
+  &--paused { --status: var(--winx-gold-deep); }
+  &--done { --status: var(--winx-blue-deep); }
+}

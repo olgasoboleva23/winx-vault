@@ -34,3 +34,16 @@ export class ItemView extends Component {
   async setState() {}
 }
 export class WorkspaceLeaf {}
+// a context menu: its items ({ title, checked, click }) kept; the last one shown is Menu.last
+export class Menu {
+  items = [];
+  addItem(fn) {
+    const item = {};
+    Object.assign(item, {
+      setTitle: t => { item.title = t; return item; }, setIcon: () => item,
+      setChecked: c => { item.checked = c; return item; }, onClick: f => { item.click = f; return item; },
+    });
+    fn(item); this.items.push(item); return this;
+  }
+  showAtMouseEvent() { Menu.last = this; }
+}
