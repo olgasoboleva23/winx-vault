@@ -1,7 +1,8 @@
 // The tasks, read by the plugin itself and kept up to date: `tasks` (every task of Master.md, each
 // with its record as `rec`, null when its id has none), `records` (tasks.json: Winx's part of every
 // task, by id), `pool` (the records with pool: true, as { id, pool: true, rec, path }), `projects`
-// (projects.json by id, in file order), `inProject` (the ids on any project's stages), `ready`
+// (projects.json by id, in file order; `records` and `projects` are the two collections'
+// loaded copies, helpers/collection.js), `inProject` (the ids on any project's stages), `ready`
 // (the first read is done), `version` (a Vue ref, bumped on every change: a computed that reads it
 // is worked out again). stageTasks(stage) gives a stage's tasks with their state.
 // useTaskStore(plugin) starts it once the vault is loaded; Master.md, tasks.json, projects.json
@@ -13,43 +14,43 @@ import { ref } from "vue";
 import { app } from "#/helpers/app.js";
 import { parseNote } from "#/models/taskFile.js";
 import { Task } from "#/models/task.js";
+import { collection } from "#/helpers/collection.js";
 import { applyConfig } from "#/helpers/config.js";
 import { CONFIG, MASTER, PROJECTS, TASK_RECORDS } from "#/helpers/paths.js";
 
 let items = [];   // Master.md's items
 
+export const records = collection(TASK_RECORDS), projects = collection(PROJECTS);
+const JSONS = [records, projects];
+
 const refresh = () => {
-  const recs = taskStore.records;
+  const recs = records.records;
   const rec = i => recs.get(new Task(`- ${i.text}`).id) ?? null;
 
   taskStore.tasks = items.filter(i => i.status !== null)
     .map(i => ({ ...i, rec: rec(i) }));
   taskStore.pool = [...recs].filter(([, r]) => r.pool)
     .map(([id, r]) => ({ id, pool: true, rec: r, path: TASK_RECORDS }));
+  taskStore.inProject = new Set([...projects.records.values()]
+    .flatMap(p => (p.stages ?? []).flatMap(s => s.tasks ?? [])));
   taskStore.version.value++;
 };
 
 export const taskStore = {
-  tasks: [], pool: [], records: new Map(), projects: new Map(), inProject: new Set(),
-  ready: false, version: ref(0),
+  tasks: [], pool: [], inProject: new Set(), ready: false, version: ref(0),
+  get records() { return records.records; },
+  get projects() { return projects.records; },
   // the note's items set from its text (a test's, or a write the plugin just made)
   put(path, text) { items = parseNote(path, text); refresh(); },
   // the records set from tasks.json's object
-  putRecords(json) { taskStore.records = new Map(Object.entries(json)); refresh(); },
+  putRecords(json) { records.load(json); refresh(); },
   // the projects set from projects.json's object
-  putProjects(json) {
-    const projects = new Map(Object.entries(json));
-    const ids = [...projects.values()]
-      .flatMap(p => (p.stages ?? []).flatMap(s => s.tasks ?? []));
-
-    taskStore.projects = projects;
-    taskStore.inProject = new Set(ids);
-    refresh();
-  },
+  putProjects(json) { projects.load(json); refresh(); },
   drop(path) {
     reads.delete(path);
-    if (path === TASK_RECORDS) taskStore.putRecords({});
-    else if (path === PROJECTS) taskStore.putProjects({});
+    const c = JSONS.find(j => j.path === path);
+
+    if (c) { c.load({}); refresh(); }
     else if (path === CONFIG) { applyConfig(); refresh(); }
     else { items = []; refresh(); }
   },
@@ -94,9 +95,10 @@ const fresh = async file => {
 const take = (path, text) => {
   if (path === MASTER) return taskStore.put(path, text);
   try {
-    if (path === TASK_RECORDS) return taskStore.putRecords(JSON.parse(text));
-    if (path === PROJECTS) return taskStore.putProjects(JSON.parse(text));
-    applyConfig(JSON.parse(text));
+    const c = JSONS.find(j => j.path === path);
+
+    if (c) c.load(JSON.parse(text));
+    else applyConfig(JSON.parse(text));
     refresh();
   } catch (e) {
     console.error(`winx: ${path} isn't JSON, it's left as it was`, e);

@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseNote } from "#/models/taskFile.js";
 import { setApp } from "#/helpers/app.js";
-import { taskStore, useTaskStore, stageTasks } from "#/store/tasks.js";
+import { taskStore, useTaskStore, stageTasks, records } from "#/store/tasks.js";
 
 const P = "00 System/Data/Tasks/Master.md", J = "00 System/Data/Tasks/tasks.json";
 
@@ -243,4 +243,12 @@ test("a project without stages, or a stage without tasks: no throw, projects and
   assert.deepEqual([...taskStore.projects.keys()], ["p1", "p2"]);
   assert.deepEqual(taskStore.inProject, new Set(["t1"]));
   assert.deepEqual(stageTasks({ name: "A" }), []);
+});
+
+test("the store's records are the collection's current Map", () => {
+  vault({});
+  taskStore.putRecords({ t1: { name: "a" } });
+  assert.equal(taskStore.records, records.records);
+  records.load({ t2: {} });
+  assert.ok(taskStore.records.has("t2"));
 });
