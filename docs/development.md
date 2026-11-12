@@ -23,7 +23,7 @@
 │   │   │       │                   CalendarHeader, CalendarMissed, CalendarGrid, CalendarPanel, the days
 │   │   │       │                   and the tasks (TaskRow, TaskCard…)
 │   │   │       └── 📁 finance, shop, supplies, meds — the pages on notes of their own: a note's
-│   │   │                           ```winx block (meds: a course of vitamins or medicines)
+│   │   │                           ```winx block (meds: a page drawn from `courses.json`: tabs per course, Приём, Заметки, the grid)
 │   │   ├── 📁 controllers        — per topic, what a widget shows (its load) and what it writes (weight,
 │   │   │                           cycle, savings, shop, market, finance, goals, xp, pomodoro, dailyNote),
 │   │   │                           tasks.js (a task's line with undo, new tasks and pool lines),
@@ -35,8 +35,9 @@
 │   │   │                           rules), ledger (finance), timer (pomodoro), vitals (HP / MP), xp, market
 │   │   │                           (MarketItem, the categories, supply stats), kinds (watch / read / game /
 │   │   │                           recipe notes), taskFile (a task note's lines as tasks and pool lines)
-│   │   ├── 📁 migrations         — tasks.js and market.js: the one-off migrations (Winx: Migrate tasks /
-│   │   │                           market)
+│   │   ├── 📁 migrations         — tasks.js, market.js, meds.js, food.js: the one-off migrations (Winx: Migrate tasks /
+│   │   │                           market / medication / food; install the new build on both devices first, then
+│   │   │                           migrate medication, then food, on the desktop)
 │   │   ├── 📁 composables        — use.js (useRedraw, useDataviewChanges, useWhenIndexed, useNewDay,
 │   │   │                           useBusy, useLater…), vueApp.ts (useVueApp: a Vue app owned by an Obsidian
 │   │   │                           component), vueHost.ts (VueHost: a widget's), drag.js / swipe.js (the
