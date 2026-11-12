@@ -22,6 +22,10 @@ let items = [];   // Master.md's items
 
 export const records = collection(TASK_RECORDS), projects = collection(PROJECTS);
 const JSONS = [records, projects];
+const jsonOf = path => JSONS.find(j => j.path === path);
+// the ids on the stages of projects.json's object (throws on a bad project, before anything is set)
+const idsOf = json => new Set(Object.values(json)
+  .flatMap(p => (p.stages ?? []).flatMap(s => s.tasks ?? [])));
 
 const refresh = () => {
   const recs = records.records;
@@ -31,9 +35,16 @@ const refresh = () => {
     .map(i => ({ ...i, rec: rec(i) }));
   taskStore.pool = [...recs].filter(([, r]) => r.pool)
     .map(([id, r]) => ({ id, pool: true, rec: r, path: TASK_RECORDS }));
-  taskStore.inProject = new Set([...projects.records.values()]
-    .flatMap(p => (p.stages ?? []).flatMap(s => s.tasks ?? [])));
   taskStore.version.value++;
+};
+
+// a collection loaded from its file's object; the ids first, so a throw leaves everything as it was
+const loadJson = (c, json) => {
+  const ids = c === projects ? idsOf(json) : null;
+
+  c.load(json);
+  if (ids) taskStore.inProject = ids;
+  refresh();
 };
 
 export const taskStore = {
@@ -43,14 +54,14 @@ export const taskStore = {
   // the note's items set from its text (a test's, or a write the plugin just made)
   put(path, text) { items = parseNote(path, text); refresh(); },
   // the records set from tasks.json's object
-  putRecords(json) { records.load(json); refresh(); },
+  putRecords(json) { loadJson(records, json); },
   // the projects set from projects.json's object
-  putProjects(json) { projects.load(json); refresh(); },
+  putProjects(json) { loadJson(projects, json); },
   drop(path) {
     reads.delete(path);
-    const c = JSONS.find(j => j.path === path);
+    const c = jsonOf(path);
 
-    if (c) { c.load({}); refresh(); }
+    if (c) loadJson(c, {});
     else if (path === CONFIG) { applyConfig(); refresh(); }
     else { items = []; refresh(); }
   },
@@ -95,11 +106,10 @@ const fresh = async file => {
 const take = (path, text) => {
   if (path === MASTER) return taskStore.put(path, text);
   try {
-    const c = JSONS.find(j => j.path === path);
+    const c = jsonOf(path);
 
-    if (c) c.load(JSON.parse(text));
-    else applyConfig(JSON.parse(text));
-    refresh();
+    if (c) loadJson(c, JSON.parse(text));
+    else { applyConfig(JSON.parse(text)); refresh(); }
   } catch (e) {
     console.error(`winx: ${path} isn't JSON, it's left as it was`, e);
   }

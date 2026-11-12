@@ -252,3 +252,14 @@ test("the store's records are the collection's current Map", () => {
   records.load({ t2: {} });
   assert.ok(taskStore.records.has("t2"));
 });
+
+test("a projects.json that throws while read leaves the projects and the store as they were", () => {
+  vault({});
+  taskStore.putProjects({ p1: { stages: [{ tasks: ["t1"] }] } });
+  assert.throws(() => taskStore.putProjects({ p1: null }));
+  assert.ok(taskStore.projects.has("p1"));
+  assert.ok(taskStore.projects.get("p1"));
+  assert.ok(taskStore.inProject.has("t1"));
+  taskStore.put(P, "- [ ] t1");
+  assert.equal(taskStore.tasks.length, 1);
+});
