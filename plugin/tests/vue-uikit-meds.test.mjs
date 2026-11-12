@@ -26,3 +26,28 @@ test("WinxMarkdown: renders the text, again when it changes", async () => {
   await flushPromises();
   assert.equal(md.find(".winx-markdown").text(), "b");
 });
+
+test("WinxMarkdown: a slow older draw never overwrites a newer one; owners are released", async () => {
+  const { MarkdownRenderer } = await import("obsidian");
+  const real = MarkdownRenderer.render, owners = [], gates = {};
+  MarkdownRenderer.render = (app, md, el, path, owner) => {
+    owners.push({ owner, path, loaded: () => owner._loaded });
+
+    return new Promise(done => { gates[md] = () => { el.textContent = md; done(); }; });
+  };
+  try {
+    const md = mount(WinxMarkdown, { props: { text: "old", sourcePath: "Note.md" } });
+    await md.setProps({ text: "new" });
+    gates.new();
+    await flushPromises();
+    gates.old();
+    await flushPromises();
+
+    assert.equal(md.find(".winx-markdown").text(), "new");
+    assert.equal(owners[0].path, "Note.md");
+    assert.equal(owners[0].loaded(), false);
+    assert.equal(owners[1].loaded(), true);
+    md.unmount();
+    assert.equal(owners[1].loaded(), false);
+  } finally { MarkdownRenderer.render = real; }
+});
