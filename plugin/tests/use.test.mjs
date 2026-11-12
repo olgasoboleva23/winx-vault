@@ -101,12 +101,42 @@ test("useTabDate: the dashboard's date change reaches a block inside a dated tab
 
 test("useNoteLinks: a [[link]] opens its note (Cmd/Ctrl: a new tab); other clicks pass", () => {
   const c = component(), el = {}; let stopped = 0;
-  useNoteLinks(c, el, e => e.mod);
+  useNoteLinks(c, el, e => e.mod, () => null);
   const link = href => ({ closest: () => href && { dataset: { href } } });
   el.listeners.click({ target: link("Finance"), preventDefault: () => stopped++, mod: true });
   el.listeners.click({ target: link(null), preventDefault: () => stopped++ });
   assert.deepEqual(c.app.workspace.opened, [["Finance", true]]);
   assert.equal(stopped, 1);
+});
+
+// a link clicked in a Winx tab (winx() gives the tab's view, here one that notes its go())
+const clickIn = (href, mod = false) => {
+  const c = component(), el = {}, went = [];
+
+  useNoteLinks(c, el, e => e.mod, () => ({ go: page => went.push(page) }));
+  el.listeners.click({ target: { closest: () => ({ dataset: { href } }) },
+    preventDefault() {}, mod });
+  return { opened: c.app.workspace.opened, went };
+};
+
+test("useNoteLinks in a Winx tab: an ordinary note opens in a new tab", () => {
+  const { opened, went } = clickIn("Notes/Ideas");
+
+  assert.deepEqual(opened, [["Notes/Ideas", true]]);
+  assert.deepEqual(went, []);
+});
+
+test("useNoteLinks in a Winx tab: a link to a Winx page's note switches the page", async () => {
+  const { pages } = await import("#/components/app/pages.ts");
+
+  pages.projects.note = "02 Areas/Projects.md";
+  const plain = clickIn("02 Areas/Projects");
+  const mod = clickIn("02 Areas/Projects", true);
+
+  delete pages.projects.note;
+  assert.deepEqual(plain.went, ["projects"]);
+  assert.deepEqual(plain.opened, []);
+  assert.deepEqual(mod.opened, [["02 Areas/Projects", true]]);
 });
 
 test("redrawNotes: every open note's preview is rendered anew (after a Winx reload)", async () => {

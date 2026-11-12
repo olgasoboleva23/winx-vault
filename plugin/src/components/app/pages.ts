@@ -12,6 +12,7 @@ export interface PageDef {
   icon: string;
   main: boolean;
   keep: boolean;
+  note?: string;   // the note this page draws: a link to it switches to the page
   make(tab: WinxView, el: HTMLElement): Component & { catchUp?(): void };
 }
 
@@ -31,11 +32,16 @@ export const pages: Record<string, PageDef> = {
   projects: {
     title: "Projects", icon: "📁", main: false, keep: false,
     make: (tab, el) => {
-      el.addClasses(
-        ["markdown-preview-view", "markdown-rendered", "dashboard", "winx-projects-tab"],
-      );
+      el.addClasses(["markdown-preview-view", "markdown-rendered", "dashboard"]);
       return new ProjectsPage(tab.state.projects, el.createDiv(),
         (key, e) => void tab.go("projects", { open: key }, e));
     },
   },
 };
+
+// the page that draws the note at `path` (a link's target, with or without .md), if any
+export function pageOf(path: string): string | null {
+  const bare = (p: string) => p.replace(/\.md$/, "");
+
+  return Object.keys(pages).find(k => pages[k].note && bare(pages[k].note) === bare(path)) ?? null;
+}

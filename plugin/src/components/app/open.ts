@@ -26,8 +26,11 @@ export async function openWinx(page?: string, params = {}, newTab = false) {
   return leaf;
 }
 
+// the Winx tab in front, if it is one
+export const activeWinx = () => app.workspace.getActiveViewOfType(WinxView);
+
 // is a Winx tab the one in front?
-export const inWinx = () => app.workspace.getActiveViewOfType(WinxView) !== null;
+export const inWinx = () => activeWinx() !== null;
 
 // The old Winx tabs (winx-dashboard, winx-calendar) come back from a saved layout as a Winx tab on
 // their page, with their state. For one release, then they go with their registerView.
