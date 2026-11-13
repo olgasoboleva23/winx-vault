@@ -101,7 +101,79 @@ test("migrateFood: a day's second note stops it before any write, named; log.jso
   assert.match(Notice.last, /^✦ migration stopped: Log\.md: 1 day notes kept of 2 note lines/);
   assert.deepEqual(files, before);
 
-  vault({ [FOODS_NOTE]: FOODS, [FOOD_LOG]: JSON.stringify({ "2026-11-02": {} }) });
+  vault({ [FOODS_NOTE]: FOODS, [FOOD_LOG]: JSON.stringify({ "2026-11-02": {} }) },
+    { props: { [FOODS_NOTE]: FM } });
   await migrateFood();
-  assert.equal(Notice.last, "✦ food is already migrated: log.json has data");
+  assert.match(Notice.last, /log\.json has different data/);
+});
+
+test("migrateFood: a failed log write resumes without losing or duplicating eaten history", async () => {
+  const { app, files } = vault({ [FOODS_NOTE]: FOODS, [FOOD_LOG_NOTE]: LOG },
+    { props: { [FOODS_NOTE]: FM } });
+  const create = app.vault.create;
+
+  app.vault.create = async (path, text) => {
+    if (path === FOOD_LOG) throw new Error("disk failure");
+    return create(path, text);
+  };
+  await migrateFood();
+  assert.match(Notice.last, /disk failure/);
+  assert.deepEqual(JSON.parse(files[FOOD_DATA]), FOOD);
+  assert.equal(files[FOOD_LOG_NOTE], LOG);
+  app.vault.create = create;
+  await migrateFood();
+  assert.deepEqual(JSON.parse(files[FOOD_DATA]), FOOD);
+  assert.deepEqual(JSON.parse(files[FOOD_LOG]), DAYS);
+  assert.equal(files[FOODS_NOTE.replace(".md", " (old).md")], FOODS);
+  assert.equal(files[FOOD_LOG_NOTE.replace(".md", " (old).md")], LOG);
+});
+
+test("migrateFood: a failed last rename resumes using the earlier renamed source", async () => {
+  const oldFoods = FOODS_NOTE.replace(".md", " (old).md");
+  const { app, files } = vault({ [FOODS_NOTE]: FOODS, [FOOD_LOG_NOTE]: LOG },
+    { props: { [FOODS_NOTE]: FM, [oldFoods]: FM } });
+  const rename = app.fileManager.renameFile;
+
+  app.fileManager.renameFile = async (file, path) => {
+    if (file.path === FOOD_LOG_NOTE) throw new Error("rename failed");
+    return rename(file, path);
+  };
+  await migrateFood();
+  assert.match(Notice.last, /rename failed/);
+  assert.equal(files[oldFoods], FOODS);
+  app.fileManager.renameFile = rename;
+  await migrateFood();
+  assert.deepEqual(JSON.parse(files[FOOD_DATA]), FOOD);
+  assert.deepEqual(JSON.parse(files[FOOD_LOG]), DAYS);
+  assert.equal(files[FOOD_LOG_NOTE.replace(".md", " (old).md")], LOG);
+});
+
+test("migrateFood: retry refuses a catalog edited since the interrupted import", async () => {
+  const newer = { ...FOOD, task: "t99" };
+  const { files } = vault({
+    [FOODS_NOTE]: FOODS, [FOOD_LOG_NOTE]: LOG, [FOOD_DATA]: JSON.stringify(newer),
+  }, { props: { [FOODS_NOTE]: FM } });
+  const before = structuredClone(files);
+
+  await migrateFood();
+  assert.match(Notice.last, /food\.json has different data/);
+  assert.deepEqual(files, before);
+});
+
+test("migrateFood: a simultaneous log edit is preserved and the sources stay available", async () => {
+  const { app, files } = vault({
+    [FOODS_NOTE]: FOODS, [FOOD_LOG_NOTE]: LOG, [FOOD_LOG]: "{}",
+  }, { props: { [FOODS_NOTE]: FM } });
+  const process = app.vault.process;
+  const newer = { "2026-11-13": { eaten: ["f1"], note: "new" } };
+
+  app.vault.process = async (file, fn) => {
+    if (file.path === FOOD_LOG) files[FOOD_LOG] = JSON.stringify(newer);
+    return process(file, fn);
+  };
+  await migrateFood();
+  assert.match(Notice.last, /log\.json has different data/);
+  assert.deepEqual(JSON.parse(files[FOOD_LOG]), newer);
+  assert.equal(files[FOODS_NOTE], FOODS);
+  assert.equal(files[FOOD_LOG_NOTE], LOG);
 });

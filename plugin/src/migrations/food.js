@@ -66,39 +66,64 @@ export function foodFromNotes(foodsText, fm, logText) {
 
 const has = json => Object.keys(json).length > 0;
 
-// the file written only while it's still empty
-const fresh = (path, data) => editJson(path, old => {
-  if (has(old)) throw new Error(`${path.split("/").pop()} has data`);
-  return data;
+// A retry accepts only the exact import already written; user edits are never overwritten.
+const checkImport = (path, old, data) => {
+  if (has(old) && JSON.stringify(old) !== JSON.stringify(data))
+    throw new Error(`${path.split("/").pop()} has different data; review it before retrying`);
+};
+
+const writeImport = (path, data) => editJson(path, old => {
+  checkImport(path, old, data);
+  return has(old) ? null : data;
 });
 
-// Explicit command only. Twice: "already migrated", nothing written.
+// Explicit command only. An interrupted pair of writes or renames can resume from the original
+// notes (including the first renamed one). A completed migration writes nothing on a retry.
 export async function migrateFood() {
   const { vault, metadataCache, fileManager } = app;
   const oldPath = path => path.replace(/\.md$/, " (old).md");
 
   try {
-    const full = [];
-
-    for (const path of [FOOD_DATA, FOOD_LOG])
-      if (has(await readJson(path, {}))) full.push(path.split("/").pop());
-    if (full.length)
-      return void new Notice(`✦ food is already migrated: ${full.join(", ")} `
-        + `${full.length > 1 ? "have" : "has"} data`);
     const foods = vault.getFileByPath(FOODS_NOTE), logNote = vault.getFileByPath(FOOD_LOG_NOTE);
+    const paths = [FOOD_DATA, FOOD_LOG];
+    const current = await Promise.all(paths.map(path => readJson(path, {})));
 
-    if (!foods) return void new Notice("✦ nothing to migrate");
+    if (!foods && !logNote) {
+      const full = paths.filter((_, i) => has(current[i])).map(p => p.split("/").pop());
+
+      return void new Notice(full.length
+        ? `✦ food is already migrated: ${full.join(", ")} `
+          + `${full.length > 1 ? "have" : "has"} data`
+        : "✦ nothing to migrate");
+    }
+
+    const sourceFoods = foods ?? vault.getFileByPath(oldPath(FOODS_NOTE));
+    const sourceLog = logNote ?? vault.getFileByPath(oldPath(FOOD_LOG_NOTE));
+
+    if (!sourceFoods) return void new Notice("✦ nothing to migrate");
     const notes = [foods, logNote].filter(Boolean);
     const taken = notes.map(f => oldPath(f.path)).find(p => vault.getAbstractFileByPath(p));
 
     if (taken) throw new Error(`${taken.split("/").pop()} already exists`);
-    const fm = metadataCache.getFileCache(foods)?.frontmatter ?? {};
-    const { food, log, skipped } =
-      foodFromNotes(await vault.read(foods), fm, logNote ? await vault.read(logNote) : "");
+    const fm = metadataCache.getFileCache(sourceFoods)?.frontmatter ?? {};
+    const foodsText = await vault.read(sourceFoods), logText = sourceLog
+      ? await vault.read(sourceLog) : "";
+    const { food, log, skipped } = foodFromNotes(foodsText, fm, logText);
 
-    await fresh(FOOD_DATA, food);
-    await fresh(FOOD_LOG, log);
-    for (const f of notes) await fileManager.renameFile(f, oldPath(f.path));
+    // Check both partners before any write, then check each again inside its atomic edit.
+    checkImport(FOOD_DATA, current[0], food);
+    checkImport(FOOD_LOG, current[1], log);
+    await writeImport(FOOD_DATA, food);
+    await writeImport(FOOD_LOG, log);
+    if (await vault.read(sourceFoods) !== foodsText
+      || (sourceLog && await vault.read(sourceLog) !== logText))
+      throw new Error("source notes changed while migrating; review both copies");
+    for (const f of notes) {
+      const dest = oldPath(f.path);
+
+      if (vault.getAbstractFileByPath(dest)) throw new Error(`${dest} already exists`);
+      await fileManager.renameFile(f, dest);
+    }
 
     const days = Object.values(log), eaten = days.reduce((n, d) => n + d.eaten.length, 0);
 
