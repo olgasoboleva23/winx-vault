@@ -19,16 +19,29 @@
     overflow: auto;
   }
 
-  &--phone { display: grid; grid-template-rows: minmax(0, 1fr) auto; }
-  &--phone &__pages { grid-area: 1 / 1; min-height: 0; }
-  &--phone &__nav { display: contents; }
-  &--phone .winx-page-navigation__rail { grid-area: 2 / 1; margin-bottom: var(--view-bottom-spacing, 0); }
-  // the drawer covers the page's grid cell, so the bar stays visible and clickable
-  &--phone .winx-page-navigation__drawer {
-    position: relative;
-    grid-area: 1 / 1;
-    min-height: 0;
-    overflow: hidden;   // the entering sheet slides behind the bottom bar
+  &--phone {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+
+    .winx-view {
+      &__pages { grid-area: 1 / 1; min-height: 0; }
+      &__nav { display: contents; }
+    }
+
+    .winx-page-navigation {
+      &__rail {
+        grid-area: 2 / 1;
+        margin-bottom: var(--view-bottom-spacing, 0);
+      }
+
+      // the drawer covers the page's grid cell, so the bar stays visible and clickable
+      &__drawer {
+        position: relative;
+        grid-area: 1 / 1;
+        min-height: 0;
+        overflow: hidden;   // the entering sheet slides behind the bottom bar
+      }
+    }
   }
 
   // the bar sits above the navbar: the shell and its pages leave it no room of their own
