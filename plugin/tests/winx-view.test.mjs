@@ -90,9 +90,16 @@ test("setState on the shown calendar with another view keeps its page object", a
   await ready;
   await leaf.setViewState({ state: { page: "calendar" } });
   const calendar = view.state.calendar;
+  calendar.area = "body";
+  calendar.picked = "2026-11-06";
+  const dashboard = view.state.dashboard, projects = view.state.projects;
   await leaf.setViewState({ state: { page: "calendar", calendar: { view: "month" } } });
   assert.equal(view.state.calendar, calendar);
   assert.equal(calendar.view, "month");
+  assert.equal(calendar.area, "body");
+  assert.equal(calendar.picked, "2026-11-06");
+  assert.equal(view.state.dashboard, dashboard);
+  assert.equal(view.state.projects, projects);
   assert.deepEqual(made, ["calendar"]);
 });
 

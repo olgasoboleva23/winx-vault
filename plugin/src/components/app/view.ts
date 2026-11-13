@@ -10,14 +10,17 @@ export { WINX_VIEW } from "./pages.ts";
 export class WinxView extends ItemView {
   navigation = true;   // Obsidian records a history step only for a navigation view
   // the saved state, plus the calendar's unsaved area and picked day; a new one per tab
-  state = (s => reactive({
-    ...s, calendar: { ...s.calendar, area: null as string | null, picked: null as string | null },
-  }))(readState(undefined));
+  state;
   private closed = false;
   private mounted: ReturnType<typeof useVueApp> | null = null;
 
   constructor(leaf: ItemView["leaf"]) {
     super(leaf);
+    const initial = readState(undefined);
+
+    this.state = reactive({ ...initial,
+      calendar: { ...initial.calendar, area: null as string | null, picked: null as string | null },
+    });
     const json = () => JSON.stringify(saved(this.state));
 
     this.register(watch(json, () => this.app.workspace.requestSaveLayout()));
@@ -31,12 +34,10 @@ export class WinxView extends ItemView {
     const next = readState(s);
 
     if (this.mounted) result.history = isStep(this.state, next);
-    for (const [k, v] of Object.entries(next)) {
-      const own = (this.state as any)[k];
-
-      if (typeof v === "object" && v) Object.assign(own, v);
-      else (this.state as any)[k] = v;
-    }
+    this.state.page = next.page;
+    Object.assign(this.state.dashboard, next.dashboard);
+    Object.assign(this.state.calendar, next.calendar);
+    Object.assign(this.state.projects, next.projects);
 
     await super.setState(s, result);
     if (this.closed) return;
