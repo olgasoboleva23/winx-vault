@@ -51,8 +51,9 @@ export function openNote(href: string, sourcePath: string, e?: MouseEvent | null
 }
 
 // The old Winx tabs (winx-dashboard, winx-calendar, winx-projects) come back from a saved layout
-// as a Winx tab on their page, with their state. For one release, then they go with their
-// registerView.
+// as a Winx tab on their page, with their state.
+// TODO: after one release with this migration, remove OldWinxView and its registerView calls
+// in main.ts.
 export class OldWinxView extends ItemView {
   private type: string;
   private page: string;
