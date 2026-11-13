@@ -52,7 +52,7 @@ export class WinxView extends ItemView {
   // to a page (params: its own state merged in); Cmd/Ctrl-click: in a new Winx tab, a copy of this
   // one's state
   async go(page: string, params = {}, e?: MouseEvent | null) {
-    const state = withParams(saved(this.state), page, params);
+    const state = withParams(this.state, page, params);
 
     if (Keymap.isModEvent(e)) {
       const leaf = this.app.workspace.getLeaf("tab");

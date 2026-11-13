@@ -30,7 +30,7 @@ export function saved(state) {
 
 // a deep copy on `page`, `params` merged into that page's state (when it has one)
 export function withParams(state, page, params = {}) {
-  const next = JSON.parse(JSON.stringify(state));
+  const next = saved(state);
 
   next.page = page;
   if (next[page]) Object.assign(next[page], params);

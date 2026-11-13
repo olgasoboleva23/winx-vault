@@ -13,10 +13,6 @@ const TABS = ["nodate", "ahead", "regulars", "pool", "projects"];
 // what's saved with the layout; the rest of the tab's state is not
 export const SAVED = Object.keys(DEFAULT);
 
-// the keys the data comes from: a change draws the whole calendar again, from fresh data (area: one
-// area's tasks only, null all; picked: the day shown under the phone's month)
-export const DATA = ["date", "view", "showDone", "area", "picked"];
-
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const pick = (v, ok, fallback) => (ok(v) ? v : fallback);
 const bool = v => typeof v === "boolean";
