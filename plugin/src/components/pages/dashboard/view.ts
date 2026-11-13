@@ -45,6 +45,7 @@ export class DashboardPage extends Component {
       if ((d ?? todayYmd()) !== this.shownDate) this.go(d);
     }));
   }
+  onunload() { this.drawn = null; }   // a pending Markdown render must not mount the date row
 
   // another day: the cards draw again in place (the pomodoro isn't touched), the date row anew
   go(date: string | null) {

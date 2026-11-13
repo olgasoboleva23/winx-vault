@@ -2,6 +2,7 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { createRequire } from "node:module";
+import { MarkdownRenderer } from "obsidian";
 import { setApp } from "#/helpers/app.js";
 
 // The dashboard's page: layout.md drawn for its date (the body's data-date), the date row moving it
@@ -62,4 +63,22 @@ test("DashboardPage: a date set from outside (Back / Forward) is drawn", async (
   await vue.nextTick();
   assert.equal(el.querySelector("[data-date]").dataset.date, "2026-11-05");
   page.unload();
+});
+
+test("DashboardPage: closing during Markdown rendering keeps its Vue apps unmounted", async t => {
+  let finish;
+  t.mock.method(MarkdownRenderer, "render", async (_app, _md, el) => {
+    el.innerHTML = '<div class="winx-dash__date"></div>';
+    await new Promise(resolve => { finish = resolve; });
+  });
+  const el = document.body.appendChild(document.createElement("div"));
+  const page = new DashboardPage(vue.reactive({ date: null }), el);
+
+  page.load();
+  page.unload();
+  finish();
+  await new Promise(resolve => setTimeout(resolve));
+  assert.equal(!!el.querySelector(".winx-dash__date").__vue_app__, false);
+  assert.equal(!!el.querySelector("input"), false);
+  el.remove();
 });
