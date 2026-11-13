@@ -68,7 +68,7 @@ $pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
     color: alpha(--winx-purple-deep, 70%);
     &::after { mask-position: center; }
     &.winx-btn--on { border-color: transparent; background: none; color: var(--winx-purple-deep); }
-    &.winx-btn--on &__icon { filter: drop-shadow(0 0 6px alpha(--winx-gold, 95%)); }
+    &.winx-btn--on .winx-rail__icon { filter: drop-shadow(0 0 6px alpha(--winx-gold, 95%)); }
   }
   &--phone &__label { width: auto; padding: 0; font-size: $text-s; opacity: 1; transition: none; }
 }
