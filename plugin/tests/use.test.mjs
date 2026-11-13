@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { useRedraw, useNewDay, useBusy, useDataviewChanges, useWhenIndexed, useTabDate, useNoteLinks } from "#/composables/use.js";
+import { useRedraw, useNewDay, useBusy, useDataviewChanges, useWhenIndexed, useTabDate } from "#/composables/use.js";
+import { openNote } from "#/components/app/open.ts";
 import { setApp } from "#/helpers/app.js";
 
 // a component that keeps what it's given: DOM listeners by type, workspace / vault events by name, intervals
@@ -28,6 +29,15 @@ test("useRedraw: hidden, a redraw waits; shown, the next leaf or layout change d
   shown = true;
   c.events["layout-change"][0]();
   c.events["active-leaf-change"][0]();   // already drawn: not again
+  assert.equal(draws, 1);
+});
+
+test("useRedraw: a winx:page switch catches up too", () => {
+  const c = component(); let shown = false, draws = 0;
+  const { redraw } = useRedraw(c, () => shown, () => draws++);
+  redraw();
+  shown = true;
+  c.events["winx:page"][0]();
   assert.equal(draws, 1);
 });
 
@@ -90,14 +100,47 @@ test("useTabDate: the dashboard's date change reaches a block inside a dated tab
   assert.equal(n, 1);
 });
 
-test("useNoteLinks: a [[link]] opens its note (Cmd/Ctrl: a new tab); other clicks pass", () => {
-  const c = component(), el = {}; let stopped = 0;
-  useNoteLinks(c, el, e => e.mod);
-  const link = href => ({ closest: () => href && { dataset: { href } } });
-  el.listeners.click({ target: link("Finance"), preventDefault: () => stopped++, mod: true });
-  el.listeners.click({ target: link(null), preventDefault: () => stopped++ });
-  assert.deepEqual(c.app.workspace.opened, [["Finance", true]]);
-  assert.equal(stopped, 1);
+// the notes the vault knows: a short link finds its full path, as Obsidian's link resolution does
+const vaultNotes = { Finance: "02 Areas/Finance.md", Ideas: "Notes/Ideas.md" };
+const resolve = (href) => { const p = vaultNotes[href.replace(/^.*\//, "")]; return p && { path: p }; };
+
+// a link clicked; `winx` is the tab in front (null: not a Winx tab), here one that notes its go()
+const clickIn = (href, { mod = false, winx = null } = {}) => {
+  const c = component(), went = [];
+
+  c.app.metadataCache.getFirstLinkpathDest = resolve;
+  setApp(c.app);
+  openNote(href, "", { mod }, winx ? { go: (...a) => went.push(a) } : null);
+  return { opened: c.app.workspace.opened, went };
+};
+
+test("openNote: a note link opens its note (Cmd/Ctrl: a new tab)", () => {
+  const plain = clickIn("Ideas"), mod = clickIn("Ideas", { mod: true });
+  assert.deepEqual(plain.opened, [["Ideas", false]]);
+  assert.deepEqual(mod.opened, [["Ideas", true]]);
+});
+
+test("openNote in a Winx tab: an ordinary note opens in a new tab", () => {
+  const { opened, went } = clickIn("Ideas", { winx: true });
+
+  assert.deepEqual(opened, [["Ideas", true]]);
+  assert.deepEqual(went, []);
+});
+
+test("openNote in a Winx tab: a short link to a Winx page's note switches the page", () => {
+  const short = clickIn("Finance", { winx: true });
+  const full = clickIn("02 Areas/Finance", { winx: true });
+  const mod = clickIn("Finance", { winx: true, mod: true });
+
+  for (const r of [short, full]) {
+    assert.deepEqual(r.went.map(a => [a[0], a[1]]), [["finance", {}]]);
+    assert.deepEqual(r.opened, []);
+  }
+  assert.equal(mod.went[0][2].mod, true);   // go() opens a new Winx tab for it
+});
+
+test("openNote outside a Winx tab: a Winx page's note opens as a note", () => {
+  assert.deepEqual(clickIn("Finance").opened, [["Finance", false]]);
 });
 
 test("redrawNotes: every open note's preview is rendered anew (after a Winx reload)", async () => {

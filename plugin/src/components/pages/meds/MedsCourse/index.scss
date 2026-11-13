@@ -14,7 +14,7 @@
   /* today: a dashed zone per anchor, as a day's morning / evening in the calendar */
   &__today { margin-bottom: $space-xl; }
   &__zone {
-    padding: $space-m $space-l; border: 1px dashed var(--winx-border); border-radius: $radius-m;
+    padding: $space-m $space-l; border: $border-width-s dashed var(--winx-border); border-radius: $radius-m;
     background: white(60%);
     &-label { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); margin-bottom: $space-s; }
     &-label b { color: var(--winx-purple-deep); }
@@ -30,16 +30,22 @@
 
   /* the grid: a WinxTable; the table in front outweighs its own cell rules */
   &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: white(40%); }
-  & .winx-table &__date { white-space: nowrap; }
-  & .winx-table &__note { font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
+  .winx-table .winx-meds {
+    &__date { white-space: nowrap; }
+    &__note { font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
+  }
   &__row--past &__date, &__row--future &__date { color: alpha(--winx-text-dark, 60%); }
-  &__row--today { background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%)); }
-  &__row--today &__date { font-weight: 600; color: var(--winx-purple-deep); }
+  &__row--today {
+    background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%));
+    .winx-meds__date { font-weight: 600; color: var(--winx-purple-deep); }
+  }
   &__tick { margin: 0 auto; }
   &__note-input { width: 100%; min-width: 6em; }
-  &__legend { margin-top: $space-l; font-size: $text-m; color: alpha(--winx-purple-deep, 70%); }
-  &__legend span { @include row; gap: $space-s; }
-  &__legend b { color: var(--winx-purple-deep); font-family: $font-deco; font-size: $text-s; letter-spacing: 0.06em; }
+  &__legend {
+    margin-top: $space-l; font-size: $text-m; color: alpha(--winx-purple-deep, 70%);
+    span { @include row; gap: $space-s; }
+    b { color: var(--winx-purple-deep); font-family: $font-deco; font-size: $text-s; letter-spacing: 0.06em; }
+  }
 
   body.is-mobile & {
     &__note { display: none; }

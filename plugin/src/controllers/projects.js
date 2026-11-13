@@ -5,7 +5,7 @@ import { Notice } from "obsidian";
 import { MEDIA } from "#/helpers/paths.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { Search } from "#/components/uikit/Search/index.ts";
-import { PROJECTS_VIEW } from "#/store/projects.js";
+import { openWinx } from "#/components/app/open.ts";
 import { projects } from "#/store/tasks.js";
 import { Task } from "#/models/task.js";
 import { editTaskLine, newTask } from "#/controllers/tasks.js";
@@ -28,9 +28,9 @@ const pickCover = app => {
 const STATUSES = ["idea", "active", "paused", "done"];
 
 // ✦ New project: its window (the cover: a tick that opens the picture search), saved, then the
-// Projects tab on it. The new key, null when closed.
+// Winx tab on it (its Projects page). The new key, null when closed.
 export async function askNewProject(
-  app, ask = (...a) => Form.ask(...a), pick = pickCover,
+  app, ask = (...a) => Form.ask(...a), pick = pickCover, open = openWinx,
 ) {
   const v = await ask(app, "✦ New project", [
     { name: "Name", key: "name", text: "what it is" },
@@ -47,11 +47,7 @@ export async function askNewProject(
     name: v.name.trim(), description: v.description ?? "", status: v.status,
     cover: v.cover ? await pick(app) : null,
   });
-  const { workspace } = app;
-  const leaf = workspace.getLeavesOfType(PROJECTS_VIEW)[0] ?? workspace.getLeaf("tab");
-
-  await leaf.setViewState({ type: PROJECTS_VIEW, active: true, state: { open: key } });
-  void workspace.revealLeaf(leaf);
+  await open("projects", { open: key });
   return key;
 }
 

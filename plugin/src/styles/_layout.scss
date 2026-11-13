@@ -28,45 +28,42 @@
   position: relative;
   z-index: $z-base; /* stacking context so the z-index:-1 photo stays inside this leaf */
   background: var(--winx-dusk);
-}
 
-/* Photo lives on its own layer, sized to its native ratio (full height,
-   proportional width) so the fade mask below tracks the image itself
-   rather than the pane width — smooth on any pane shape. */
-:is(
-  .workspace-leaf-content:has(.dashboard),
-  .workspace-leaf-content:has(.kanban-board)
-)::before {
-  content: "";
-  position: absolute;
-  z-index: $z-under; /* above the leaf's dusk background, below its content */
-  top: 0;
-  left: 0;
-  height: 100%;
-  aspect-ratio: 1566 / 1005; /* native ratio of --winx-bg-image */
-  max-width: 100%;
-  background: var(--winx-bg-image) left center / cover no-repeat;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  // stylelint-disable-next-line property-no-vendor-prefix -- WebKit before iOS 15.4 knows only this one
-  -webkit-mask-image: linear-gradient(
-    to right,
-    black 0%,
-    black 52%,
-    black(78%) 65%,
-    black(45%) 76%,
-    black(18%) 87%,
-    transparent 98%
-  );
-  mask-image: linear-gradient(
-    to right,
-    black 0%,
-    black 52%,
-    black(78%) 65%,
-    black(45%) 76%,
-    black(18%) 87%,
-    transparent 98%
-  );
+  /* Photo lives on its own layer, sized to its native ratio (full height,
+     proportional width) so the fade mask below tracks the image itself
+     rather than the pane width — smooth on any pane shape. */
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: $z-under; /* above the leaf's dusk background, below its content */
+    top: 0;
+    left: 0;
+    height: 100%;
+    aspect-ratio: 1566 / 1005; /* native ratio of --winx-bg-image */
+    max-width: 100%;
+    background: var(--winx-bg-image) left center / cover no-repeat;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    // stylelint-disable-next-line property-no-vendor-prefix -- WebKit before iOS 15.4 knows only this one
+    -webkit-mask-image: linear-gradient(
+      to right,
+      black 0%,
+      black 52%,
+      black(78%) 65%,
+      black(45%) 76%,
+      black(18%) 87%,
+      transparent 98%
+    );
+    mask-image: linear-gradient(
+      to right,
+      black 0%,
+      black 52%,
+      black(78%) 65%,
+      black(45%) 76%,
+      black(18%) 87%,
+      transparent 98%
+    );
+  }
 }
 
 /* ── Shared base styles for both views ── */

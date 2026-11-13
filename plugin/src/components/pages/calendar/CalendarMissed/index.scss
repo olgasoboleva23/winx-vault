@@ -11,7 +11,7 @@ $wing: 40px;   // the corner wings' size
   padding: $space-s $space-l;
   border-radius: $radius-l;
   /* the Kanban card's blue */
-  border: 1px solid var(--winx-blue);
+  border: $border-width-s solid var(--winx-blue);
   background: var(--winx-sky);
   box-shadow: 0 0 16px rgb(168 200 240 / 60%);   /* --winx-blue at 60%; alpha() would serialize it as color(srgb …) */
   /* the card's fairy wings in two corners */
@@ -30,6 +30,7 @@ $wing: 40px;   // the corner wings' size
     cursor: grab;
   }
   &__date { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }
+  &__row > .winx-task-actions { display: flex; gap: $space-s; }
   /* desktop: the buttons float over the end of the text on hover (opacity only, so the row height stays) */
   body:not(.is-mobile) & {
     &__row .winx-task-btns { right: 104px; }
@@ -37,7 +38,7 @@ $wing: 40px;   // the corner wings' size
   /* the phone: the task's text on its own line, the buttons and the date under it */
   body.is-mobile & {
     &__row { flex-wrap: wrap; }
-    &__row .winx-task-btns { margin: 0; }
+    &__row .winx-task-btns { display: contents; }
     &__text { flex-basis: 100%; }
   }
 }

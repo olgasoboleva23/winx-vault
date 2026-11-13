@@ -19,7 +19,7 @@
     width: 14px;
     height: 14px;
     border-radius: $round;
-    border: 1.5px solid var(--winx-border);
+    border: $border-width-m solid var(--winx-border);
     background: white(40%);
 
     &--done    { background: var(--winx-gold); border-color: var(--winx-gold-deep); }

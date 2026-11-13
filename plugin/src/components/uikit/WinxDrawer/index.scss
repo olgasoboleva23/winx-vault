@@ -1,0 +1,63 @@
+/* A drawer (WinxDrawer), block winx-drawer: over the whole tab, a dim backdrop and the panel; left
+   slides in from the left edge (the page stays put), --bottom is the phone's sheet of round icons,
+   four to a row */
+@use "mixins" as *;
+
+$panel-w: 230px;   // the left drawer's width: an icon, a name and its ↗
+$sheet-radius: 22px;   // the phone sheet's top corners, as the nav pill's
+
+.winx-drawer {
+  position: absolute;
+  inset: 0;
+  z-index: $z-drawer;
+
+  &__backdrop { position: absolute; inset: 0; background: alpha(--winx-purple-deep, 25%); }
+
+  &__panel {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2xs;
+    width: $panel-w;
+    padding: $space-2xl $space-l;
+    overflow-y: auto;
+    background: var(--winx-sheet);
+    border-right: $border-width-m solid var(--winx-gold);
+    box-shadow: 6px 0 24px alpha(--winx-purple-deep, 18%);
+    animation: winx-drawer-left $medium ease-out;
+  }
+
+  &--bottom &__panel {
+    inset: auto 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-xl $space-s;
+    width: auto;
+    max-height: 100%;
+    // the grip, a small lavender bar over the grid
+    &::before {
+      content: "";
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: 40px;
+      height: 4px;
+      margin-bottom: $space-xs;
+      border-radius: $space-2xs;
+      background: var(--winx-purple-light);
+    }
+    padding: $space-l $space-2xl $space-xl;
+    border: none;
+    border-top: $border-width-m solid var(--winx-gold);
+    border-radius: $sheet-radius $sheet-radius 0 0;
+    box-shadow: 0 -8px 24px alpha(--winx-purple-deep, 18%);
+    animation-name: winx-drawer-bottom;
+  }
+}
+
+@keyframes winx-drawer-left { from { translate: -100% 0; } }
+@keyframes winx-drawer-bottom { from { translate: 0 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .winx-drawer__panel { animation: none; }
+}

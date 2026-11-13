@@ -16,7 +16,7 @@
   &__item {
     position: relative;
     padding: $space-s $space-2xs $space-s $space-m;
-    border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
+    border-bottom: $border-width-s dashed fade(var(--winx-gold-deep), 35%);
     transition: background $fast ease;
 
     &:last-child { border-bottom: none; }
@@ -48,8 +48,8 @@
       background: var(--winx-star-sparkle-svg) center / contain no-repeat;
       animation: winx-bought-flash 0.65s ease-out forwards;
     }
+    .winx-market__text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
   }
-  &__item--bought &__text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
 
   &__soon { margin: $space-s 0 $space-2xs; font-size: $text-m; color: var(--winx-pink-deep); }
 

@@ -1,6 +1,6 @@
-<!-- A button (block winx-btn): its look is its kind (round, nav, pill, chip, toggle, text, add; one
-     block of styles each in index.scss next to it); on: winx-btn--on; jump: it grows on hover (an
-     add one); mirrored: the nav
+<!-- A button (block winx-btn): its look is its kind (round, nav, pill, chip, toggle, text, add,
+     rail; one block of styles each in index.scss next to it); on: winx-btn--on; jump: it grows on
+     hover (an add one); mirrored: the nav
      chevron for "next"; title: its tooltip (v-tip; tip: pink on a blue place) and aria-label.
      A place's own classes: class="…" on it (Vue adds them after these). Its text is the slot; a
      click is the parent's @click -->

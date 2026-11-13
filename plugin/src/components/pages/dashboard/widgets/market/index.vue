@@ -1,20 +1,21 @@
 <!-- Celestial Market: the list by category, a round ✓ per item (the sparkle plays, then it's
      written as bought), what runs low soon, and links to the market and the supplies -->
 <script setup>
-import { reactive, watch } from "vue";
+import { inject, reactive, watch } from "vue";
+import { Keymap } from "obsidian";
+import { openWinx } from "#/components/app/open.ts";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import WinxMissing from "#/components/uikit/WinxMissing.vue";
 import WinxGroupHeader from "#/components/uikit/WinxGroupHeader.vue";
 import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
-import { MARKET, SUPPLIES } from "#/helpers/paths.js";
+import { MARKET } from "#/helpers/paths.js";
 import { buyMarketItem } from "#/controllers/widgets/market.js";
 
 const props = defineProps({ state: { type: Object, required: true } });
-const LINKS = [
-  { text: "✦ open market", path: MARKET },
-  { text: "✦ supplies", path: SUPPLIES },
-];
+const winx = inject("winx", null);
+const supplies = e => winx ? winx.go("supplies", {}, e)
+  : openWinx("supplies", {}, Keymap.isModEvent(e));
 // rows being bought: sparkling from the click until the list no longer has them (written), or the
 // write didn't happen (the line moved meanwhile)
 const bought = reactive(new Set());
@@ -81,15 +82,12 @@ watch(() => props.state.data.groups, groups => {
     >⏳ running low soon: {{ state.data.soon }}</div>
     <div class="winx-market__footer">
       <span>{{ state.data.left }}</span>
-      <WinxNoteLink
-        v-for="l in LINKS"
-        :key="l.path"
-        :path="l.path"
-        kind="text"
-        class="winx-market__link"
-      >
-        {{ l.text }}
+      <WinxNoteLink :path="MARKET" kind="text" class="winx-market__link">
+        ✦ open market
       </WinxNoteLink>
+      <WinxButton kind="text" class="winx-market__link" @click="supplies">
+        ✦ supplies
+      </WinxButton>
     </div>
   </div>
 </template>

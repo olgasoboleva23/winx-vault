@@ -22,3 +22,16 @@ test("Daily note: ✦ Open for the page's date opens its note; no date, no butto
   const none = mount(DailyNoteOpen, { props: { state: { data: { date: undefined, text: "✦" } } } });
   assert.equal(none.find("button").exists(), false);
 });
+
+test("openDaily from a Winx tab opens the note in a new tab", async () => {
+  const { openDaily } = await import("#/controllers/widgets/dailyNote.js");
+  const { WinxView } = await import("#/components/app/view.ts");
+  const { app } = vault({ "2026-11-04.md": "" });
+  const opened = [];
+
+  app.workspace.openLinkText = async (...a) => opened.push(a);
+  await openDaily("2026-11-04");
+  app.workspace.getActiveViewOfType = () => Object.create(WinxView.prototype);
+  await openDaily("2026-11-04");
+  assert.deepEqual(opened, [["2026-11-04", "", false], ["2026-11-04", "", true]]);
+});

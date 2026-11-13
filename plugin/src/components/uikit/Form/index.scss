@@ -19,7 +19,7 @@ $indent: 1em;      // a list's groups sit one em in from its name (the window's 
       align-items: center;
     }
   }
-  &__group { padding-left: $indent; border-left: 2px solid var(--background-modifier-border); }
+  &__group { padding-left: $indent; border-left: $border-width-l solid var(--background-modifier-border); }
   &__more { margin: $space-s 0 0 $indent; }
   // the table's lines: a line of the rows' names, then one a group; their cells are the grid's
   &__line {

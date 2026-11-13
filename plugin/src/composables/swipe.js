@@ -1,54 +1,62 @@
-// A row's swipes on the phone (a day's row, a Missed row, a panel card): right = done, the row's
-// own way (`right`: its checkbox, its ✓, ticked at once, a pool card added to today), left = skip
-// a 🔁 task / take an open one's date off. Only a mostly-sideways swipe counts, so scrolling still
-// works (touch-action: pan-y in the styles); a swipe stops its touches at the row, so Obsidian
-// doesn't take a sideways one for opening a sidebar. `drag.on` (drag.js): a drag, not a swipe.
-// `swipe`: how far the row follows the finger (dx → --winx-swipe) and what letting go does (kind →
-// data-swipe: done | skip | nodate).
+// Phone tasks: left reveals their buttons, further left arms the primary action; right closes.
+// Keep vertical scrolling native, and keep horizontal touches out of Obsidian's sidebar gesture.
 import { reactive } from "vue";
-import { T } from "#/models/calendarData.js";
 
-export function useSwipe(view, key, right, when = () => true) {
-  const swipe = reactive({ dx: 0, kind: null });
-  // x0, y0: where it started; on: sideways enough; t: the task; back: a left swipe's write
+const OPEN = 32, COMMIT = 160;
+
+export function useSwipe(view, key, primary, when = () => true) {
+  const swipe = reactive({ kind: null, progress: 0 });
   let s = null;
-  const left = t => view.actions.canSkip(t) ? () => view.actions.skip(t)
-    : T(t).date ? () => view.actions.unplan(t)
-    : null;
+  const reset = open => Object.assign(swipe, { kind: open ? "open" : null, progress: 0 });
+  const cancel = () => {
+    if (s) reset(s.open);
+    s = null;
+  };
+
+  const run = () => {
+    const t = when() && view.task(key());
+
+    reset(false);
+    if (t) primary(t);
+  };
 
   const start = e => {
     if (!when() || !document.body.classList.contains("is-mobile")) return;
-    view.drag.on = false;
     e.stopPropagation();
-    s = { x0: e.touches[0].clientX, y0: e.touches[0].clientY, on: false };
+    if (e.touches.length !== 1) return cancel();
+    if (e.target.closest("button, input, a")) return;
+    view.drag.on = false;
+    s = { x: e.touches[0].clientX, y: e.touches[0].clientY, axis: null,
+      open: !!swipe.kind, dx: 0 };
   };
 
   const move = e => {
     if (!s) return;
-    const mx = e.touches[0].clientX - s.x0, my = e.touches[0].clientY - s.y0;
+    if (e.touches.length !== 1 || view.drag.on || !when()) return cancel();
+    const dx = e.touches[0].clientX - s.x, dy = e.touches[0].clientY - s.y;
 
-    if (!s.on && Math.abs(mx) > 12 && Math.abs(mx) > 1.5 * Math.abs(my)) {
-      s.on = true;
-      s.t = view.task(key());
-      s.back = s.t && left(s.t);
-    }
-
-    if (!s.on) return;
+    if (!s.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 12)
+      s.axis = Math.abs(dx) > 1.5 * Math.abs(dy) ? "x" : "y";
+    if (s.axis !== "x") return;
     e.stopPropagation();
-    if (!s.t || view.drag.on || (mx < 0 && !s.back)) return;
-    swipe.dx = mx;
-    swipe.kind = mx > 0 ? "done" : view.actions.canSkip(s.t) ? "skip" : "nodate";
+    s.dx = dx;
+    swipe.progress = Math.min(1, Math.max(0, -dx / COMMIT));
+    swipe.kind = dx <= -COMMIT ? "ready"
+      : dx <= -OPEN || (s.open && dx < OPEN) ? "open" : null;
   };
 
-  const end = () => {
+  const end = e => {
     if (!s) return;
-    const { on, t, back } = s, { dx } = swipe;
+    const { axis, open, dx } = s;
+    const commit = swipe.kind === "ready" && !view.drag.on;
 
     s = null;
-    Object.assign(swipe, { dx: 0, kind: null });
-    if (!on || !t || view.drag.on || Math.abs(dx) <= 80) return;
-    if (dx > 0) right(t); else back?.();
+    if (axis !== "x") return reset(open);
+    e.stopPropagation();
+    if (e.cancelable) e.preventDefault();   // don't also tap a button exposed under the finger
+    reset(dx <= -OPEN || (open && dx < OPEN));
+    if (commit) run();
   };
 
-  return { swipe, start, move, end };
+  return { swipe, start, move, end, cancel, run };
 }

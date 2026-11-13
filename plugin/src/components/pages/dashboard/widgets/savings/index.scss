@@ -10,7 +10,7 @@
     width: 80px;
     height: 80px;
     overflow: hidden;
-    border: 2px solid var(--winx-gold);
+    border: $border-width-l solid var(--winx-gold);
     border-radius: $radius-xl;
     background: #fff;
   }
@@ -33,12 +33,12 @@
   &__stamp {
     width: $btn-m;
     height: $btn-m;
-    border: 2px dashed alpha(--winx-pink-deep, 50%);
+    border: $border-width-l dashed alpha(--winx-pink-deep, 50%);
     border-radius: $round;
     color: alpha(--winx-pink-deep, 50%);
     font-size: $text-l;
     &--on {
-      border: 2px solid var(--winx-gold-deep);
+      border: $border-width-l solid var(--winx-gold-deep);
       background: radial-gradient(var(--winx-gold-bright), var(--winx-gold));
       color: #8a5a1a;
       box-shadow: 0 0 6px alpha(--winx-gold, 80%);
@@ -46,7 +46,7 @@
   }
   &__due {
     padding: $space-m $space-xl;
-    border: 2px solid var(--winx-pink-deep);
+    border: $border-width-l solid var(--winx-pink-deep);
     border-radius: $radius-xl;
     background: white(60%);
     &-sum { color: var(--winx-pink-deep); white-space: nowrap; }

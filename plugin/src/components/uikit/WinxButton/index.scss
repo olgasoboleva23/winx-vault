@@ -2,6 +2,9 @@
    button + two classes (0,2,1), so Obsidian's button styles don't win */
 @use "mixins" as *;
 
+$rail-item: 32px;     // the nav's item: the mockup's rounded square (off the button sizes)
+$rail-radius: 8px;    // its corners, between $radius-s and $radius-m
+
 button.winx-btn {
   // round: an icon in a white circle (a task's ⭐ ⏭ ✏️ 🗑, the panel's +📅 ⏸ ▶, Missed's ✓ ☀️); bigger on the phone
   &.winx-btn--round {
@@ -96,23 +99,50 @@ button.winx-btn {
     cursor: pointer;
     transition: transform $fast ease, box-shadow $fast ease;
 
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='26' viewBox='0 0 40 26'%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-16 -8' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.4Q0 0 2.4 0Q0 0 0 2.4Q0 0 -2.4 0Q0 0 0 -2.4Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='0s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;15 -9' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.2Q0 0 2.2 0Q0 0 0 2.2Q0 0 -2.2 0Q0 0 0 -2.2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.7s' begin='.4s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-17 7' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2Q0 0 2 0Q0 0 0 2Q0 0 -2 0Q0 0 0 -2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.6s' begin='.8s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;16 7' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2.2Q0 0 2.2 0Q0 0 0 2.2Q0 0 -2.2 0Q0 0 0 -2.2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.4s' begin='.2s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;-5 -11' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3Cpath d='M0 -1.8Q0 0 1.8 0Q0 0 0 1.8Q0 0 -1.8 0Q0 0 0 -1.8Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.8s' begin='1s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(20 13)'%3E%3Cg opacity='0'%3E%3CanimateTransform attributeName='transform' type='translate' values='0 0;6 11' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Canimate attributeName='opacity' values='0;1;0' keyTimes='0;.25;1' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3Cpath d='M0 -2Q0 0 2 0Q0 0 0 2Q0 0 -2 0Q0 0 0 -2Z' fill='%23fff'%3E%3CanimateTransform attributeName='transform' type='scale' values='1;.2' dur='1.5s' begin='.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center / 30px 19.5px no-repeat;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    &:hover {
+    @include sparkles {
       box-shadow: 0 0 14px alpha(--winx-pink-deep, 80%), 0 0 4px #fff inset;
       text-shadow: 0 0 6px #fff, 0 0 2px #fff;
       & > svg { filter: drop-shadow(0 0 3px #fff); }
-      &::after { opacity: 1; }
     }
 
     &.winx-btn--jump:hover { transform: scale(1.08); }
+  }
+
+  // rail: an item of the Winx tab's nav (WinxNav): a rounded square with its icon, and its Quicksand
+  // label when the pill is open; hover: light pink, on: pink with a gold border; on hover sparkles
+  // fly out in gold against the near-white pill
+  &.winx-btn--rail {
+    @include row;
+    justify-content: flex-start;
+    position: relative;
+    min-width: $rail-item;
+    height: $rail-item;
+    padding: 0;
+    border: $border-width-s solid transparent;
+    border-radius: $rail-radius;
+    background: none;
+    box-shadow: none;
+    color: var(--winx-text-dark);
+    font-family: var(--font-text);
+    font-size: $text-l;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1;
+    text-transform: none;
+    cursor: pointer;
+
+    @include sparkles(var(--winx-gold-deep)) {
+      background: var(--winx-pink-light);
+      box-shadow: none;
+    }
+    // Keep the sparkles around the icon, large enough to see beside the label.
+    &::after { inset: -8px; mask-position: left center; mask-size: 72px 46.8px; }
+    &:focus-visible { background: var(--winx-pink-light); box-shadow: none; }
+    &.winx-btn--on,
+    &.winx-btn--on:hover {
+      border-color: var(--winx-gold);
+      background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
+    }
   }
 }
 
@@ -126,7 +156,7 @@ button.winx-btn {
       var(--winx-pink-light),
       var(--winx-pink)
     ) !important;
-    border: 1.5px solid var(--winx-gold) !important;
+    border: $border-width-m solid var(--winx-gold) !important;
     border-radius: $radius-m !important;
     padding: $space-s $space-2xl !important;
     color: var(--winx-gold-deep) !important;

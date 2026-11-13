@@ -5,7 +5,7 @@
   width: 100%; border: none; border-collapse: collapse; font-variant-numeric: tabular-nums;
   /* the rows parted by gold dashes, the header in Cinzel */
   & &__head, & &__cell {
-    padding: $space-xs; border: none; border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
+    padding: $space-xs; border: none; border-bottom: $border-width-s dashed fade(var(--winx-gold-deep), 30%);
     background: none; color: var(--winx-text-dark); font-size: $text-xl;
   }
   & &__head {
@@ -17,6 +17,6 @@
   & &__row:last-child > * { border-bottom: none; }
   /* bordered: a dashed line between the columns too */
   &#{&}--bordered :is(&__head, &__cell) + :is(&__head, &__cell) {
-    border-left: 1px dashed fade(var(--winx-gold-deep), 30%);
+    border-left: $border-width-s dashed fade(var(--winx-gold-deep), 30%);
   }
 }

@@ -42,6 +42,10 @@
 @use "tooltip";
 @use "../components/uikit/WinxTable";
 @use "../components/uikit/WinxTabs";
+@use "../components/uikit/WinxNav";
+@use "../components/uikit/WinxDrawer";
+@use "../components/app";
+@use "../components/app/PageNavigation";
 @use "../components/uikit/WinxInput";
 @use "../components/uikit/WinxCheckbox";
 @use "../components/uikit/WinxChart";
@@ -52,4 +56,3 @@
 @use "../components/pages/projects/ProjectList";
 @use "../components/pages/projects/ProjectPage";
 @use "../components/pages/dashboard/widgets/finance";
-@use "helpers";   // global .winx-is-* helpers, after the blocks

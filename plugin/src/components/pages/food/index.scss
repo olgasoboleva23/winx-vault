@@ -6,13 +6,15 @@
   &__head { margin-bottom: $space-l; }
   &__week { font-family: $font-deco; font-size: $text-xl; color: var(--winx-purple-deep); }
   &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: white(40%); }
-  & .winx-table &__day { white-space: nowrap; }
-  & .winx-table &__items { min-width: 12em; }
-  & .winx-table &__note { min-width: 8em; font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
+  .winx-table .winx-food {
+    &__day { white-space: nowrap; }
+    &__items { min-width: 12em; }
+    &__note { min-width: 8em; font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
+  }
   &__row--today {
     background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%));
+    .winx-food__day { font-weight: 600; color: var(--winx-purple-deep); }
   }
-  &__row--today &__day { font-weight: 600; color: var(--winx-purple-deep); }
 
   /* an eaten food: a chip, its name opens the food, × takes it off */
   &__item {

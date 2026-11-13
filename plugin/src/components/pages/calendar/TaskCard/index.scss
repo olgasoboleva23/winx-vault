@@ -4,7 +4,7 @@
 .winx-task-card {
   position: relative;
   padding: $space-m;
-  border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
+  border-bottom: $border-width-s dashed fade(var(--winx-gold-deep), 35%);
   color: var(--winx-text-dark);
   cursor: grab;
   transition: background $fast ease;
@@ -21,19 +21,6 @@ $fade: 18px;   // the buttons' background fades in over this much of the text
 .winx-cal .winx-task-btns {
   display: flex;
   gap: $space-xs;
-  body:not(.is-mobile) & {
-    position: absolute;
-    right: $space-xs;
-    top: 50%;
-    translate: 0 -50%;
-    padding-left: $fade;   /* the fade in from the text */
-    background: linear-gradient(90deg, transparent, var(--winx-pink-light) $fade);
-    border-radius: $pill;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity $fast ease;
-  }
-  body.is-mobile & { margin-top: $space-s; }
   button.winx-task-btns__del--armed {
     width: auto;
     padding: 0 $space-m;
@@ -43,4 +30,59 @@ $fade: 18px;   // the buttons' background fades in over this much of the text
     font-size: $text-m;
   }
 }
-body:not(.is-mobile) :is(.winx-task-card, .winx-cal__task, .winx-missed__row):hover .winx-task-btns { opacity: 1; pointer-events: auto; }
+body {
+  &:not(.is-mobile) {
+    .winx-cal {
+      .winx-task-btns {
+        position: absolute;
+        right: $space-xs;
+        top: 50%;
+        translate: 0 -50%;
+        padding-left: $fade;   /* the fade in from the text */
+        background: linear-gradient(90deg, transparent, var(--winx-pink-light) $fade);
+        border-radius: $pill;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity $fast ease;
+      }
+      .winx-task-mobile { display: none; }
+    }
+    :is(.winx-task-card, .winx-cal__task, .winx-missed__row):hover .winx-task-btns {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+  &.is-mobile {
+    :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-action: pan-y; }
+    .winx-cal {
+      .winx-task-btns { margin-top: $space-s; }
+      .winx-task-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: $space-s;
+        width: 100%;
+        margin-top: $space-s;
+        padding: $space-xs;
+        border-radius: $radius-m;
+        background: white(40%);
+        button { flex-shrink: 0; }
+      }
+      [data-swipeable]:not([data-swipe]) .winx-task-actions { display: none; }
+      .winx-task-primary {
+        order: -1;
+        background: color-mix(in srgb, var(--winx-gold) calc(var(--winx-swipe-progress, 0) * 100%), var(--winx-pink-light));
+        transition: scale $fast ease, box-shadow $fast ease;
+      }
+      [data-swipe="ready"] .winx-task-primary {
+        scale: 1.15;
+        color: var(--winx-text-dark);
+        border-color: var(--winx-gold-deep);
+        box-shadow: 0 0 12px var(--winx-gold);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .winx-task-primary { transition: none; }
+      }
+    }
+  }
+}

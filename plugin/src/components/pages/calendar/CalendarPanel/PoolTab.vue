@@ -2,7 +2,6 @@
      to today -->
 <script setup>
 import { computed, inject } from "vue";
-import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxEmpty from "#/components/uikit/WinxEmpty/index.vue";
 import GroupCard from "./GroupCard.vue";
 import TaskCard from "#/components/pages/calendar/TaskCard/index.vue";
@@ -17,11 +16,6 @@ const groups = computed(() => {
   return byArea(model.pool, t => ({ task: view.info(t), meta: model.poolMeta(t) }), config);
 });
 
-const toToday = c => {
-  const t = view.task(c.task.key);
-
-  if (t) view.actions.fromPool(t, view.ctx.today, false);
-};
 </script>
 
 <template>
@@ -32,10 +26,6 @@ const toToday = c => {
       :key="c.task.key"
       :task="c.task"
       :meta="c.meta"
-    >
-      <template #extra>
-        <WinxButton title="add to today" @click="toToday(c)">+📅</WinxButton>
-      </template>
-    </TaskCard>
+    />
   </GroupCard>
 </template>
