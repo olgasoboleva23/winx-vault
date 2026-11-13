@@ -53,7 +53,7 @@ $pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
     flex-direction: row;
     justify-content: space-around;
     gap: 0;
-    padding: $space-xs 0;
+    padding: $space-xs $space-s;
     border: none;
     border-top: $border-width-m solid var(--winx-gold);
     border-radius: 0;

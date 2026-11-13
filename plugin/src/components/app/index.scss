@@ -21,6 +21,7 @@
 
   &--phone {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
 
     .winx-view {
@@ -31,7 +32,9 @@
     .winx-page-navigation {
       &__rail {
         grid-area: 2 / 1;
-        margin-bottom: var(--view-bottom-spacing, 0);
+        // Obsidian includes the safe area in this space; paint it behind its floating navbar.
+        padding-bottom: var(--view-bottom-spacing, 0);
+        background: var(--winx-sheet);
       }
 
       // the drawer covers the page's grid cell, so the bar stays visible and clickable
