@@ -31,7 +31,7 @@ const slow = () => {
   return { loads, load: () => new Promise((ok, fail) => loads.push({ ok, fail })) };
 };
 const mount = (opts, el = document.body.appendChild(document.createElement("div"))) => {
-  const host = new VueHost(el, View(), opts);
+  const host = new VueHost(el, { view: View(), ...opts });
   host.load();
   return { host, el };
 };
@@ -109,7 +109,7 @@ test("the view gets retry by inject: it loads again", async () => {
     setup() { const retry = inject("retry"); return () => h("button", { onClick: retry }, "again"); },
   });
   const s = slow(), el = document.body.appendChild(document.createElement("div"));
-  const host = new VueHost(el, Again, { load: s.load });
+  const host = new VueHost(el, { view: Again, load: s.load });
   host.load();
   s.loads[0].ok({ n: 1 }); await settle();
   el.querySelector("button").click();
@@ -121,7 +121,7 @@ test("a card's button goes next to its title", async () => {
   let added = 0;
   const Plus = defineComponent({ setup: () => () => h("button", { onClick: () => added++ }, "+") });
   const s = slow(), el = document.body.appendChild(document.createElement("div"));
-  const host = new VueHost(el, View(), { load: s.load, card: { title: "Market" }, cardButton: Plus });
+  const host = new VueHost(el, { view: View(), load: s.load, card: { title: "Market" }, cardButton: Plus });
   host.load(); await settle();
   el.querySelector(".callout-title-inner + button").click();
   assert.equal(added, 1);
@@ -143,7 +143,7 @@ test("an error inside the view (a chart that fails to draw, async) shows the err
     setup() { onMounted(async () => { await Promise.resolve(); throw new Error("no chart"); }); return () => h("i"); },
   });
   const s = slow(), el = document.body.appendChild(document.createElement("div"));
-  const host = new VueHost(el, Broken, { load: s.load });
+  const host = new VueHost(el, { view: Broken, load: s.load });
   const quiet = console.error; console.error = () => {};
   host.load();
   s.loads[0].ok({ n: 1 }); await settle(); await new Promise(r => setTimeout(r)); await settle();
@@ -155,7 +155,7 @@ test("an error inside the view (a chart that fails to draw, async) shows the err
 
 test("watches: a widget reloads for a change in its own files only", async () => {
   const s = slow(), el = document.body.appendChild(document.createElement("div"));
-  const host = new VueHost(el, View(), { load: s.load, watches: ["00 System/Data/Weight.md"] });
+  const host = new VueHost(el, { view: View(), load: s.load, watches: ["00 System/Data/Weight.md"] });
   host.load();
   s.loads[0].ok({ n: 1 }); await settle();
   bus.fire("dataview:metadata-change", "update", { path: "00 System/Data/Tasks/Master.md" });
@@ -168,7 +168,7 @@ test("watches: a widget reloads for a change in its own files only", async () =>
 test("watches: the task files reload it from the plugin's store, at once, not through Dataview", async () => {
   const { taskStore } = await import("#/store/tasks.js");
   const s = slow(), el = document.body.appendChild(document.createElement("div"));
-  const host = new VueHost(el, View(), { load: s.load, watches: ["00 System/Data/Tasks/"] });
+  const host = new VueHost(el, { view: View(), load: s.load, watches: ["00 System/Data/Tasks/"] });
   host.load();
   s.loads[0].ok({ n: 1 }); await settle();
   bus.fire("dataview:metadata-change", "update", { path: "00 System/Data/Tasks/Master.md" });
@@ -186,4 +186,41 @@ test("a watched JSON file (Dataview doesn't index it) reloads on the vault's own
   bus.fire("modify", { path: "x/rules.json" });
   assert.equal(s.loads.length, 2);
   host.unload();
+});
+
+test("a Markdown block passes its own arguments, source and dated context to its loader", async () => {
+  const { blocks, drawBlock } = await import("#/controllers/blocks.js");
+  const { Component } = await import("obsidian");
+  const source = "probe\ncard: Example\nmeta: scroll\ndays: 7\n| medicine | morning |";
+  const note = "Notes/Example.md", contexts = [];
+  const parent = document.body.appendChild(document.createElement("div"));
+  parent.dataset.date = "2026-11-13";
+  const el = parent.appendChild(document.createElement("div"));
+  blocks.probe = { view: View(), bodyClass: "probe-body", watches: [],
+    load: ctx => { contexts.push(ctx); return { n: 7 }; } };
+  const owner = new Component();
+  owner.sourcePath = note;
+  owner.load();
+  try {
+    drawBlock(source, el, owner);
+    await settle();
+    const ctx = contexts[0];
+    assert.equal(ctx.sourcePath, note);
+    assert.equal(ctx.source, source);
+    assert.deepEqual(ctx.args, { card: "Example", meta: "scroll", days: 7 });
+    assert.equal(el.querySelector(".probe-body").textContent, "7");
+    assert.equal(el.querySelector(".callout-title-inner").textContent, "Example");
+    const { app } = await import("#/helpers/app.js");
+    const api = app.plugins.plugins.dataview.api;
+    Object.assign(api, { page: path => ({ path }), date: d => d });
+    assert.deepEqual(ctx.dv.current(), { path: note, date: "2026-11-13" });
+    parent.dataset.date = "2026-11-14";
+    assert.equal(ctx.dv.current().date, "2026-11-14");
+    bus.fire("changed", { path: note });
+    assert.equal(contexts.length, 2);
+  } finally {
+    owner.unload();
+    parent.remove();
+    delete blocks.probe;
+  }
 });
