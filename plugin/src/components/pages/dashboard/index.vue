@@ -1,9 +1,9 @@
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { Platform } from "obsidian";
 import { app } from "#/helpers/app.js";
 import { useObsidian } from "#/composables/vueApp.ts";
-import { useBusy, useNewDay, useNoteLinks } from "#/composables/use.js";
+import { useBusy, useNewDay } from "#/composables/use.js";
 import { todayYmd } from "#/helpers/dates.js";
 import { DATA, POMODORO } from "#/helpers/paths.js";
 import { blocks } from "#/controllers/blocks.js";
@@ -22,7 +22,6 @@ useNewDay(owner, day => { today.value = day; });
 watch(date, () => app.workspace.trigger("winx:date"), { flush: "post" });
 useBusy(owner, path => path !== POMODORO && path.startsWith(`${DATA}/`),
   () => root.value, "winx-dash--busy");
-onMounted(() => useNoteLinks(owner, root.value));
 const drawn = () => root.value.classList.remove("winx-dash--busy");
 const columns = [
   [["levelToday", "Level"], ["cycle", "Cycle"], ["pomodoro", "Pomodoro"], ["goals", "Goals"]],

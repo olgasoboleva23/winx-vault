@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { useRedraw, useNewDay, useBusy, useDataviewChanges, useWhenIndexed, useTabDate, useNoteLinks } from "#/composables/use.js";
+import { useRedraw, useNewDay, useBusy, useDataviewChanges, useWhenIndexed, useTabDate } from "#/composables/use.js";
+import { openNote } from "#/components/app/open.ts";
 import { setApp } from "#/helpers/app.js";
 
 // a component that keeps what it's given: DOM listeners by type, workspace / vault events by name, intervals
@@ -105,37 +106,28 @@ const resolve = (href) => { const p = vaultNotes[href.replace(/^.*\//, "")]; ret
 
 // a link clicked; `winx` is the tab in front (null: not a Winx tab), here one that notes its go()
 const clickIn = (href, { mod = false, winx = null } = {}) => {
-  const c = component(), el = {}, went = [];
+  const c = component(), went = [];
 
   c.app.metadataCache.getFirstLinkpathDest = resolve;
   setApp(c.app);
-  useNoteLinks(c, el, () => winx && { go: (...a) => went.push(a) });
-  let stopped = 0;
-  el.listeners.click({ target: { closest: () => ({ dataset: { href } }) },
-    preventDefault: () => stopped++, mod });
-  return { opened: c.app.workspace.opened, went, stopped };
+  openNote(href, "", { mod }, winx ? { go: (...a) => went.push(a) } : null);
+  return { opened: c.app.workspace.opened, went };
 };
 
-test("useNoteLinks: a [[link]] opens its note (Cmd/Ctrl: a new tab); other clicks pass", () => {
-  const c = component(), el = {}; let stopped = 0;
-  useNoteLinks(c, el, () => null);
-  const link = href => ({ closest: () => href && { dataset: { href } } });
-  el.listeners.click({ target: link(null), preventDefault: () => stopped++ });
-  assert.equal(stopped, 0);
+test("openNote: a note link opens its note (Cmd/Ctrl: a new tab)", () => {
   const plain = clickIn("Ideas"), mod = clickIn("Ideas", { mod: true });
   assert.deepEqual(plain.opened, [["Ideas", false]]);
   assert.deepEqual(mod.opened, [["Ideas", true]]);
-  assert.equal(plain.stopped, 1);
 });
 
-test("useNoteLinks in a Winx tab: an ordinary note opens in a new tab", () => {
+test("openNote in a Winx tab: an ordinary note opens in a new tab", () => {
   const { opened, went } = clickIn("Ideas", { winx: true });
 
   assert.deepEqual(opened, [["Ideas", true]]);
   assert.deepEqual(went, []);
 });
 
-test("useNoteLinks in a Winx tab: a short link to a Winx page's note switches the page", () => {
+test("openNote in a Winx tab: a short link to a Winx page's note switches the page", () => {
   const short = clickIn("Finance", { winx: true });
   const full = clickIn("02 Areas/Finance", { winx: true });
   const mod = clickIn("Finance", { winx: true, mod: true });
@@ -147,7 +139,7 @@ test("useNoteLinks in a Winx tab: a short link to a Winx page's note switches th
   assert.equal(mod.went[0][2].mod, true);   // go() opens a new Winx tab for it
 });
 
-test("useNoteLinks outside a Winx tab: a Winx page's note opens as a note", () => {
+test("openNote outside a Winx tab: a Winx page's note opens as a note", () => {
   assert.deepEqual(clickIn("Finance").opened, [["Finance", false]]);
 });
 
