@@ -3,19 +3,23 @@
      marks), the marks counted, each free journal's level after its lag (the reasons in the tip),
      💊 the medication courses on that day, the day's note. ⚙ edits the marks -->
 <script setup>
-import { computed, ref } from "vue";
-import { Notice } from "obsidian";
+import { computed, inject, ref } from "vue";
+import { Keymap, Notice } from "obsidian";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxInput from "#/components/uikit/WinxInput/index.vue";
 import WinxTable from "#/components/uikit/WinxTable/index.vue";
-import WinxNoteLink from "#/components/uikit/WinxNoteLink.vue";
+import { openWinx } from "#/components/app/open.ts";
 import { vTip } from "#/components/uikit/tooltip.js";
 import { addDays, weekOf } from "#/helpers/dates.js";
 import { dayLabel } from "#/models/course.js";
-import { FoodLog, foodWeek } from "#/models/food.js";
+import { foodWeek } from "#/models/food.js";
 import {
   addEaten, editFood, editMarks, pickTrainingTask, removeEaten, setFoodNote,
 } from "#/controllers/food.js";
+
+const winx = inject("winx", null);
+const openMeds = e => winx ? winx.go("meds", {}, e)
+  : openWinx("meds", {}, Keymap.isModEvent(e));
 
 const props = defineProps({ state: { type: Object, required: true } });
 const d = computed(() => props.state.data);
@@ -25,7 +29,7 @@ const short = date => dayLabel(date).split(",")[0];
 const step = n => { monday.value = n ? addDays(monday.value, 7 * n) : weekOf(d.value.today)[0]; };
 
 const rows = computed(() => foodWeek({
-  ...d.value, log: new FoodLog(d.value.log), days: days.value, task: d.value.task,
+  ...d.value, days: days.value, task: d.value.task,
 }).map(r => ({ ...r, label: dayLabel(r.date), when: r.date === d.value.today ? "today" : "" })));
 const columns = computed(() => [
   { key: "label", label: "День", class: "winx-food__day" },
@@ -108,8 +112,13 @@ const act = async (write) => {
             {{ row.trained ? "✓" : "" }}
           </span>
           <template v-else-if="col.key === 'courses'">
-            <span v-for="c in row.courses" :key="c.path" class="winx-row winx-gap-xs">
-              <WinxNoteLink :path="c.path" class="winx-food__course">💊</WinxNoteLink>
+            <span v-for="c in row.courses" :key="c.id" class="winx-row winx-gap-xs">
+              <WinxButton
+                kind="text"
+                title="open medication"
+                class="winx-food__course"
+                @click="openMeds"
+              >💊</WinxButton>
               <span
                 v-for="m in c.meds"
                 :key="m.code"

@@ -1,9 +1,9 @@
-// The food journal (pure; tests/food.test.mjs). Foods.md: a food per line, "- f12 каша с 4 ч #m1"
-// (its id, its name, its marks' tags), the marks themselves in its `marks` property ({ tag, icon,
-// name }: a tag kept once made, so a mark renamed keeps its foods). Log.md: what was eaten, a line
-// each, "- 2026-11-09 f12", and a day's note, "- 2026-11-09 note: …". The week's rows for the food
-// page: what was eaten with its marks' icons, the marks counted, each free journal's level after
-// its lag (a rash shows the next day), the medication courses on that day, the note.
+// The food journal (pure; tests/food.test.mjs). food.json: the marks ({ tag, icon, name }: a tag
+// kept once made, so a mark renamed keeps its foods), the training task's id and the foods by id
+// ({ name, marks: [tag] }). log.json: a day by date, { eaten: [food id], note }; a day with
+// nothing eaten and no note isn't kept. The week's rows for the food page: what was eaten with
+// its marks' icons, the marks counted, each free journal's level after its lag (a rash shows the
+// next day), the medication courses on that day, the note.
 import { addDays } from "#/helpers/dates.js";
 import { nextId } from "#/helpers/ids.js";
 
@@ -13,68 +13,63 @@ export const DEFAULT_MARKS = [
   { tag: "m3", icon: "🥛↓", name: "безлактозное молоко" },
 ];
 
-const FOOD = /^- (f\d+) (.+?)((?: #m\d+)*)$/;
-const EATEN = /^- (\d{4}-\d{2}-\d{2}) (f\d+)$/, NOTE = /^- (\d{4}-\d{2}-\d{2}) note: (.*)$/;
-const lines = text => text.replace(/\s+$/, "").split("\n").filter((l, i, a) => a.length > 1 || l);
-const joined = list => list.join("\n") + "\n";
+export const foodList = data =>
+  Object.entries(data.foods ?? {}).map(([id, f]) => ({ id, name: f.name, marks: f.marks }));
 
-export class Foods {
-  constructor(text) { this.text = text; }
-  get list() {
-    return lines(this.text).map(l => l.match(FOOD)).filter(Boolean)
-      .map(m => ({ id: m[1], name: m[2], marks: m[3].split(" #").filter(Boolean) }));
-  }
-  get nextId() { return nextId("f", this.list.map(f => f.id)); }
-  // the text with the food's line: replaced (its id's), or a new one at the end
-  set({ id, name, marks }) {
-    const line = `- ${id} ${name.trim()}${marks.map(m => ` #${m}`).join("")}`;
-    const all = lines(this.text), i = all.findIndex(l => l.match(FOOD)?.[1] === id);
+export const marksOf = data => data.marks ?? DEFAULT_MARKS;
 
-    if (i >= 0) all[i] = line; else all.push(line);
-    return joined(all);
-  }
+export const newFoodId = data => nextId("f", Object.keys(data.foods ?? {}));
+
+// the food set in place (its id's) or added at the end
+export const withFood = (data, { id, name, marks }) =>
+  ({ ...data, foods: { ...data.foods, [id]: { name: name.trim(), marks } } });
+
+export const withMarks = (data, marks) => ({ ...data, marks });
+
+export const withTask = (data, id) => ({ ...data, task: id });
+
+export const eaten = (log, date) => log[date]?.eaten ?? [];
+
+export const dayNote = (log, date) => log[date]?.note ?? "";
+
+// the log with the day set; an empty one dropped
+function withDay(log, date, day) {
+  if (day.eaten.length || day.note) return { ...log, [date]: day };
+  const rest = { ...log };
+
+  delete rest[date];
+  return rest;
 }
 
-export class FoodLog {
-  constructor(text) { this.text = text; }
-  eaten(date) {
-    return lines(this.text).map(l => l.match(EATEN)).filter(m => m?.[1] === date).map(m => m[2]);
-  }
-  note(date) {
-    return lines(this.text).map(l => l.match(NOTE)).find(m => m?.[1] === date)?.[2] ?? "";
-  }
-  add(date, id) { return joined([...lines(this.text), `- ${date} ${id}`]); }
-  // the day's n-th eaten line taken off
-  remove(date, n) {
-    let seen = -1;
+export const withEaten = (log, date, id) =>
+  withDay(log, date, { eaten: [...eaten(log, date), id], note: dayNote(log, date) });
 
-    return joined(lines(this.text).filter(l => l.match(EATEN)?.[1] !== date || ++seen !== n));
-  }
-  // the day's note set (its line replaced, or added at the end), an empty one taken off
-  setNote(date, text) {
-    const all = lines(this.text), i = all.findIndex(l => l.match(NOTE)?.[1] === date);
-    const line = `- ${date} note: ${text.trim()}`;
+// the day's n-th eaten taken off (out of range: the log as it was)
+export function withoutEaten(log, date, n) {
+  const list = eaten(log, date);
 
-    if (!text.trim()) return i < 0 ? this.text : joined(all.filter((_, j) => j !== i));
-    if (i >= 0) all[i] = line; else all.push(line);
-    return joined(all);
-  }
+  if (n < 0 || n >= list.length) return log;
+  return withDay(log, date, { eaten: list.filter((_, i) => i !== n), note: dayNote(log, date) });
 }
 
-// journals: [{ path, name, lag, entries: Map date → { level, reasons } }]; courses: [{ path, name,
+export const withNote = (log, date, text) =>
+  withDay(log, date, { eaten: eaten(log, date), note: text.trim() });
+
+// journals: [{ path, name, lag, entries: Map date → { level, reasons } }]; courses: [{ id, name,
 // start, days, meds: [{ code, name, days }], taken: Map date → the codes with a ✅ that day }]
 // task: { id, name, days: Set of the dates it was done } or null: each row then says `trained`
+// log: log.json's object
 export function foodWeek({ foods, marks, log, journals, courses, days, task = null }) {
   const byId = new Map(foods.map(f => [f.id, f]));
   const icon = new Map(marks.map(m => [m.tag, m.icon]));
 
   return days.map(date => {
-    const items = log.eaten(date).map(id => byId.get(id) ?? { id, name: id, marks: [] })
+    const items = eaten(log, date).map(id => byId.get(id) ?? { id, name: id, marks: [] })
       .map(f => ({ id: f.id, name: f.name, icons: f.marks.map(m => icon.get(m) ?? "").join("") }));
-    const all = log.eaten(date).flatMap(id => byId.get(id)?.marks ?? []);
+    const all = eaten(log, date).flatMap(id => byId.get(id)?.marks ?? []);
 
     return {
-      date, items, note: log.note(date), ...(task && { trained: task.days.has(date) }),
+      date, items, note: dayNote(log, date), ...(task && { trained: task.days.has(date) }),
       counts: Object.fromEntries(marks.map(m => [m.tag, all.filter(t => t === m.tag).length])),
       journals: journals.map(j => {
         const on = addDays(date, j.lag), e = j.entries.get(on);
@@ -83,7 +78,7 @@ export function foodWeek({ foods, marks, log, journals, courses, days, task = nu
       }),
       // a course on that day, its medicines still on then (each its own days)
       courses: courses.filter(c => c.start <= date && date < addDays(c.start, c.days)).map(c => ({
-        path: c.path, name: c.name,
+        id: c.id, name: c.name,
         meds: (c.meds ?? []).filter(m => date < addDays(c.start, m.days))
           .map(m => ({ code: m.code, name: m.name, taken: !!c.taken?.get(date)?.has(m.code) })),
       })),

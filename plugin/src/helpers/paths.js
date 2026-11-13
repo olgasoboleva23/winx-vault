@@ -41,10 +41,20 @@ export const SAVINGS = `${DATA}/Savings`;
 // the free journals: a note each (a level 0–3 a day and its reasons; Высыпания the first)
 export const WEIGHT = `${DATA}/Weight.md`, JOURNALS = `${DATA}/Journals`;
 
-// the food journal: the page (its block), the foods with their marks, what was eaten a day
-export const FOOD = `${DATA}/Food/Food.md`, FOODS = `${DATA}/Food/Foods.md`;
+// the food journal: the old page alias, foods with their marks and task, what was eaten a day;
+// the notes they were before (Migrate food reads them)
+export const FOOD = `${DATA}/Food/Food.md`, FOOD_DATA = `${DATA}/Food/food.json`;
 
-export const FOOD_LOG = `${DATA}/Food/Log.md`;
+export const FOOD_LOG = `${DATA}/Food/log.json`;
+
+export const FOODS_NOTE = `${DATA}/Food/Foods.md`, FOOD_LOG_NOTE = `${DATA}/Food/Log.md`;
+
+// the medication courses (an object by id), old page alias, the Base the course notes had
+export const COURSES = `${DATA}/Medication/courses.json`;
+
+export const MEDICATION = `${DATA}/Medication/Medication.md`;
+
+export const MEDICATION_BASE = `${DATA}/Medication/_index.base`;
 
 export const CYCLE = `${DATA}/Cycle.md`;
 

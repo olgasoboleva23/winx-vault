@@ -131,20 +131,20 @@ test("WinxCard: wings by default, :wings=false draws it without (the --wingless 
   assert.equal(mount(ui.WinxCard, { props: { title: "Trip" } }).classes().includes("winx-widget--wingless"), false);
 });
 
-test("WinxTabs: on the photo (a page without a card) the light look", async () => {
+test("WinxTabs: on the page background (a page without a card) the light look", async () => {
   const WinxTabs = (await import("../src/components/uikit/WinxTabs/index.vue")).default;
   const tabs = [{ key: "all", text: "All" }];
-  const plain = mount(WinxTabs, { props: { tabs } }), photo = mount(WinxTabs, { props: { tabs, photo: true } });
+  const plain = mount(WinxTabs, { props: { tabs } }), onBackground = mount(WinxTabs, { props: { tabs, onBackground: true } });
 
-  assert.equal(plain.classes().includes("winx-tabs--photo"), false);
-  assert.equal(photo.classes().includes("winx-tabs--photo"), true);
+  assert.equal(plain.classes().includes("winx-tabs--on-background"), false);
+  assert.equal(onBackground.classes().includes("winx-tabs--on-background"), true);
 });
 
-test("WinxAddForm: on the photo (no card under it) the --photo look", () => {
-  const photo = mount(ui.WinxAddForm, { props: { photo: true } });
+test("WinxAddForm: on the page background (no card under it) the --on-background look", () => {
+  const onBackground = mount(ui.WinxAddForm, { props: { onBackground: true } });
 
-  assert.equal(photo.classes().includes("winx-add-form--photo"), true);
-  assert.equal(mount(ui.WinxAddForm).classes().includes("winx-add-form--photo"), false);
+  assert.equal(onBackground.classes().includes("winx-add-form--on-background"), true);
+  assert.equal(mount(ui.WinxAddForm).classes().includes("winx-add-form--on-background"), false);
 });
 
 const navItems = [

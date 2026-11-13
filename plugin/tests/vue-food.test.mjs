@@ -2,7 +2,8 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { vault } from "./stubs/vault.mjs";
-import { FOOD_LOG, FOODS, JOURNALS } from "#/helpers/paths.js";
+import { COURSES, FOOD_DATA, FOOD_LOG, JOURNALS } from "#/helpers/paths.js";
+import { forFood } from "#/models/course.js";
 
 let mount, FoodPage, loadFood, DEFAULT_MARKS;
 before(async () => {
@@ -14,16 +15,24 @@ before(async () => {
   ({ DEFAULT_MARKS } = await import("#/models/food.js"));
 });
 const tick = () => new Promise(r => setTimeout(r));
-const LOG = "- 2026-11-02 f1\n- 2026-11-02 f2\n- 2026-11-02 note: сыпь\n";
+const LOG = { "2026-11-02": { eaten: ["f1", "f2"], note: "сыпь" } };
+// a course as courses.json keeps it (made-up)
+const REC = {
+  start: "2026-11-02", meds: [{ name: "мастодинон", code: "МА", times: "both", days: 2 }],
+  notes: "", marks: { "2026-11-03": { "МА🌙": "✅" } }, dayNotes: {},
+};
 const data = () => ({
   today: "2026-11-04", marks: DEFAULT_MARKS, log: LOG,
   foods: [{ id: "f1", name: "каша с 4 ч", marks: ["m1"] }, { id: "f2", name: "кофе с бзм", marks: ["m3"] }],
   journals: [{ path: `${JOURNALS}/Высыпания.md`, name: "Высыпания", lag: 1, entries: new Map([["2026-11-03", { level: 2, reasons: ["🍰"] }]]) }],
-  courses: [{ path: "M/Курс.md", name: "Курс", start: "2026-11-02", days: 2, meds: [{ code: "МА", name: "мастодинон", days: 2 }], taken: new Map([["2026-11-03", new Set(["МА"])]]) }],
+  courses: [forFood("c1", REC)],
 });
 
-test("the food page: the week, a row a day: what was eaten with its marks, the marks counted, the journal the next day, the course, the note", () => {
-  const w = mount(FoodPage, { props: { state: { data: data() } } });
+test("the food page: the week, a row a day: what was eaten with its marks, the marks counted, the journal the next day, the course, the note", async () => {
+  const went = [];
+  const w = mount(FoodPage, { props: { state: { data: data() } }, global: {
+    provide: { winx: { go: (...args) => went.push(args) } },
+  } });
   const rows = w.findAll(".winx-table__row");
 
   assert.equal(rows.length, 7);
@@ -35,6 +44,10 @@ test("the food page: the week, a row a day: what was eaten with its marks, the m
   assert.equal(mon.find(".winx-food__level").text(), "2");   // Высыпания on the 3rd
   assert.ok(w.findAll(".winx-table__head").map(h => h.text()).includes("Высыпания +1д"));   // the next day's, said in its head
   assert.equal(mon.find(".winx-food__course").text(), "💊");
+  await mon.find(".winx-food__course").trigger("click");
+  await mon.find(".winx-food__course").trigger("click", { mod: true });
+  assert.deepEqual(went.map(([page, params, e]) => [page, params, !!e.mod]),
+    [["meds", {}, false], ["meds", {}, true]]);
   assert.equal(mon.find(".winx-food__med").text(), "МА");
   assert.equal(mon.find(".winx-food__med").attributes("aria-label"), "мастодинон: не принято");
   assert.ok(mon.find(".winx-food__med").classes().includes("winx-food__med--not"));   // no ✅ that day
@@ -45,33 +58,35 @@ test("the food page: the week, a row a day: what was eaten with its marks, the m
 });
 
 test("the food page: ‹ › step a week; × takes an eaten one off; a note typed is written", async () => {
-  const { files } = vault({ [FOOD_LOG]: LOG });
+  const { files } = vault({ [FOOD_LOG]: JSON.stringify(LOG) });
+  const day = date => JSON.parse(files[FOOD_LOG])[date];
   const w = mount(FoodPage, { props: { state: { data: data() } } });
 
   await w.find(".winx-food__prev").trigger("click");
   assert.match(w.find(".winx-food__week").text(), /26 окт – 1 ноя/);
   await w.find(".winx-food__next").trigger("click");
   await w.findAll(".winx-table__row")[0].findAll(".winx-food__off")[1].trigger("click"); await tick();
-  assert.equal(files[FOOD_LOG], "- 2026-11-02 f1\n- 2026-11-02 note: сыпь\n");
+  assert.deepEqual(day("2026-11-02"), { eaten: ["f1"], note: "сыпь" });
   const input = w.findAll(".winx-table__row")[1].find(".winx-food__note input");
 
   input.element.value = "ок";
   await input.trigger("change"); await tick();
-  assert.match(files[FOOD_LOG], /- 2026-11-03 note: ок\n$/);
+  assert.deepEqual(day("2026-11-03"), { eaten: [], note: "ок" });
 });
 
 test("loadFood: the foods and marks, the log, the journals, the medication courses", async () => {
   vault({
-    [FOODS]: "---\nmarks: []\n---\n- f1 чай\n", [FOOD_LOG]: LOG, [`${JOURNALS}/Высыпания.md`]: "- 2026-11-03 1\n",
-    "M/Курс.md": "```winx\nmeds\n| Дата | МА☀️ | МА🌙 | Заметки |\n| --- | :-: | :-: | --- |\n| 2026-11-02 | ☐ | ✅ |  |\n| 2026-11-03 | ☐ | ❌ |  |\n```\n",
-  }, { props: { [FOODS]: { marks: [{ tag: "m1", icon: "🍫", name: "какао" }] }, [`${JOURNALS}/Высыпания.md`]: { lag: 1 }, "M/Курс.md": { type: "meds", start: "2026-11-02", days: 5, meds: [{ name: "мастодинон 30 капель", code: "МА", days: 5 }] } } });
+    [FOOD_DATA]: JSON.stringify({ marks: [{ tag: "m1", icon: "🍫", name: "какао" }], foods: { f1: { name: "чай", marks: [] } } }),
+    [FOOD_LOG]: JSON.stringify(LOG), [`${JOURNALS}/Высыпания.md`]: "- 2026-11-03 1\n",
+    [COURSES]: JSON.stringify({ c1: { ...REC, marks: { "2026-11-02": { "МА🌙": "✅" }, "2026-11-03": { "МА🌙": "❌" } } } }),
+  }, { props: { [`${JOURNALS}/Высыпания.md`]: { lag: 1 } } });
   const d = await loadFood();
 
   assert.deepEqual(d.foods, [{ id: "f1", name: "чай", marks: [] }]);
   assert.deepEqual(d.marks.map(m => m.icon), ["🍫"]);
-  assert.equal(d.log, LOG);
+  assert.deepEqual(d.log, LOG);
   assert.deepEqual([d.journals[0].name, d.journals[0].lag], ["Высыпания", 1]);
-  assert.deepEqual(d.courses.map(({ taken, ...c }) => c), [{ path: "M/Курс.md", name: "Курс", start: "2026-11-02", days: 5, meds: [{ code: "МА", name: "мастодинон", days: 5 }] }]);
+  assert.deepEqual(d.courses.map(({ taken, ...c }) => c), [{ id: "c1", name: "мастодинон", start: "2026-11-02", days: 2, meds: [{ code: "МА", name: "мастодинон", days: 2 }] }]);
   assert.deepEqual([...d.courses[0].taken], [["2026-11-02", new Set(["МА"])], ["2026-11-03", new Set()]]);   // a ✅ that day (❌ isn't one)
 });
 
@@ -82,4 +97,33 @@ test("the food page: a training task adds a 🏋 column, ✓ on the days it was 
   assert.ok(w.findAll(".winx-table__head").map(h => h.text()).includes("🏋"));
   assert.equal(rows[0].find(".winx-food__trained").text(), "✓");
   assert.equal(rows[1].find(".winx-food__trained").text(), "");
+});
+
+test("loadFood: no files yet: the default marks, nothing eaten, no task", async () => {
+  vault();
+  const d = await loadFood();
+
+  assert.deepEqual([d.marks, d.foods, d.log, d.courses, d.task], [DEFAULT_MARKS, [], {}, [], null]);
+});
+
+test("setFoodNote, removeEaten: one day of log.json changed", async () => {
+  const { files } = vault({ [FOOD_LOG]: JSON.stringify(LOG) });
+  const { removeEaten, setFoodNote } = await import("#/controllers/food.js");
+
+  await setFoodNote("2026-11-02", " пятна ");
+  assert.equal(JSON.parse(files[FOOD_LOG])["2026-11-02"].note, "пятна");
+  await removeEaten("2026-11-02", 1);
+  assert.deepEqual(JSON.parse(files[FOOD_LOG])["2026-11-02"].eaten, ["f1"]);
+});
+
+test("editMarks: the marks written to food.json, the foods and the task kept, a new mark tagged next", async () => {
+  const FOOD = { marks: [{ tag: "m2", icon: "🥛", name: "молоко" }], task: "t5", foods: { f1: { name: "чай", marks: ["m2"] } } };
+  const { files } = vault({ [FOOD_DATA]: JSON.stringify(FOOD) });
+  const { editMarks } = await import("#/controllers/food.js");
+  const { Form } = await import("#/components/uikit/Form/index.ts");
+  const ask = Form.ask;
+
+  Form.ask = async (app, title, fields, { values }) => ({ marks: [...values.marks, { icon: "🍓", name: " ягоды " }] });
+  try { await editMarks(); } finally { Form.ask = ask; }
+  assert.deepEqual(JSON.parse(files[FOOD_DATA]), { ...FOOD, marks: [...FOOD.marks, { tag: "m3", icon: "🍓", name: "ягоды" }] });
 });

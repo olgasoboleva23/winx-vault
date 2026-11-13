@@ -37,23 +37,25 @@ Regulars shows one **Training · Core ↔ Arms** card, the upcoming variant and 
 
 | Command (Cmd+P) | Creates |
 |---|---|
-| **Winx: New project** | a project in `00 System/Data/Projects/projects.json`: name, description, status (Active by default), an optional cover picked from `03 Resources/Media`; then the Winx tab opens on it in Projects |
+| **Winx: New project** | a project in `00 System/Data/Projects/projects.json`: name, description, status (Active by default), an optional cover picked from `03 Resources/Media`; then the Projects tab opens on it |
 | **Winx: New task** | a task: a record in `Tasks/tasks.json` and a line in `Tasks/Master.md` |
-| **Winx: Settings** | ⚙ the difficulties' XP and gold, the areas, XP Today's thresholds and the level cost, saved in `00 System/Data/config.json` (also in the Winx tab's drawer) |
+| **Winx: Settings** | ⚙ the difficulties' XP and gold, the areas, XP Today's thresholds and the level cost, saved in `00 System/Data/config.json` (also in the dashboard's ✦ Menu) |
 | **Winx: New watch item** / **New read item** / **New game** | a note in `03 Resources/Collections/Watchlist` / `Readlist` / `Gamelist` |
 | **Winx: New recipe** | a note in `03 Resources/Collections/Recipes` |
 | **Winx: New work task** | a note in `01 Projects/Work/tasks` (another folder: `"workTasks"` in the plugin's `data.json`), named `<next number>_<title in lower case with underscores>` |
-| **Winx: New medication course** | for a course of vitamins or medicines: a note in `00 System/Data/Medication` (`"meds"` in `data.json`): a group per medicine (+ adds one): name, dose, when (morning / morning and evening / day / evening / any), the meal (before / after / before sleep / any), its days; a start; the day by its anchors (a time of day and a meal: what to take then) and the codes' legend on cards, and a day per row up to the longest course inside a ```winx meds block that draws the course (today's doses as chips, the grid, a note per day) and ticks a cell round ☐ → ✅ → ❌ (its legend: taken, skipped on purpose, not marked) on a click, writing the table. A notes field (several lines) goes on a Заметки card. **Winx: Edit medication course** (or the ✎ by the course card's title) opens the same window with the course's values (kept in its `meds` property) and rebuilds the note: the marks and the days' notes carry over by date and column, cards written by hand stay. The courses' list: `_index.base` in the folder, linked from the notes that list it |
+| **Winx: New medication course** | for a course of vitamins or medicines: a record in `00 System/Data/Medication/courses.json` (id, start, the medicines (each: name, dose, when (morning / morning and evening / day / evening / any), meal (before / after / before sleep / any), its days), the marks by date and column, the days' notes, an optional notes field). The course shows on the page `00 System/Data/Medication/Medication.md` (a ```` ```winx ```` block): a tab per course, then Приём (today's dose lines, grouped by a time of day and a meal), Курс (the counts and progress, today's doses by time of day as chips, the grid; the ✎ in its title), Заметки (the notes field, drawn as Markdown) and the grid (a day per row up to the longest course, a note per day); a click on a cell ticks it ☐ → ✅ → ❌ (taken, skipped on purpose, not marked) and writes `courses.json`. **Winx: Edit medication course** (or the ✎ on the Курс card) asks which course (a picker; the ✎ already knows it), opens the same window with its values and saves the record: the marks and notes carry over by date and column |
 | **Winx: New journal** | a free journal in `00 System/Data/Journals`: its title, its reasons (a comma list) and the days after a meal its level is looked at on the food page (a rash: 1) |
 | **Winx: Buy reward** | a line in `00 System/Data/Purchases.md` |
 | **Winx: New market item** | a catalog item (if new) and an open ID line in `00 System/Data/Celestial Market.md` |
 | **Winx: Migrate market** | `Market/items.json`, an ID-based log, and the original `Celestial Market (old).md` backup |
+| **Winx: Migrate medication** | one-off: the old course notes (a table per course) become records in `courses.json`; checked cell by cell before it writes; the old notes are kept as `<name> (old).md`, `_index.base` goes to the trash; running it again changes nothing |
+| **Winx: Migrate food** | one-off, after Migrate medication: `Foods.md` and `Log.md` become `food.json` (the foods and their marks) and `log.json` (the days); it checks that no line read is lost before it writes; the old notes are kept. The 💊 mark on a day reads the courses' marks in `courses.json` |
 
 **Winx: Menu** (Alt+T) lists every Winx command to pick from. On the desktop Winx also sends today's reminders: a goal's task at the goal's time, a task with `HH:MM` in its text 30 minutes before, and a morning summary.
 
 ## 📅 Calendar
 
-A page of the Winx tab (🗓 in its pill; see [Dashboard](dashboard.md#the-winx-tab)). The tasks of `00 System/Data/Tasks` on a week or a month. The tab keeps the week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
+A tab of its own: **Winx: Open calendar** (Cmd+P) or the ✨ icon on the left (with the dashboard). The tasks of `00 System/Data/Tasks` on a week or a month. Pin the tab, drag it to a sidebar or a window; it keeps its week, tab and unfolded days across restarts (Obsidian saves them with the layout). Until you pick a date it follows today.
 
 ![Calendar](images/calendar.webp)
 
@@ -69,7 +71,7 @@ A page of the Winx tab (🗓 in its pill; see [Dashboard](dashboard.md#the-winx-
 
 ## Projects
 
-A page of the Winx tab (**⋯ Other** in the pill, then Projects). A project is a bigger undertaking cut into stages, each a list of tasks. **Winx: New project** (or **✦ New project** in the tab's header) creates one.
+A tab of its own: **Winx: Open projects** (Cmd+P). A project is a bigger undertaking cut into stages, each a list of tasks. **Winx: New project** (or **✦ New project** in the tab's header) creates one.
 
 The file is `00 System/Data/Projects/projects.json`, an object by key (`p1`, `p2`…) in display order: `name`, `status` (idea / active / paused / done), `description`, `result`, `notes`, `cover` (a picture path in the vault, or null) and `stages`, each `{ "name": "Dig the beds", "tasks": ["t41", "t42"] }`, the task ids from `tasks.json`. A project's tasks are ordinary tasks: they live in `Master.md` like the rest and take Tasks' dates and repeats.
 

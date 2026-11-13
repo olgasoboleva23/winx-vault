@@ -6,7 +6,11 @@ $indent: 1em;      // a list's groups sit one em in from its name (the window's 
   // over Obsidian's .setting-item-info / -control (0,1,0): a long name wraps, but many buttons
   // never squeeze it; the buttons wrap
   & &__info { min-width: 8em; }
-  & &__control { flex-wrap: wrap; }
+  & &__control {
+    flex-wrap: wrap;
+    // Obsidian stretches phone inputs to their control's width; a checkbox stays square.
+    &--check { flex: 0 0 var(--checkbox-size); }
+  }
   &__img { height: 24px; }
   &__textarea { width: 100%; }
   &__list {

@@ -1,8 +1,10 @@
-<!-- an empty list's line with a sparkle: "✦ All bought"; no text: "✦ Nothing here yet" (as
-     uikit/empty.js); mod: a modifier (winx-empty--error), icon instead of ✦; the slot goes
-     after the text (a button) -->
+<!-- An empty message, with an optional action in the slot.
+     onBackground uses WinxCard to keep it readable directly on the page background. -->
 <script setup>
+import WinxCard from "#/components/uikit/WinxCard/index.vue";
+
 defineProps({
+  onBackground: { type: Boolean, default: false },
   text: { type: String, default: "Nothing here yet" },
   mod: { type: String, default: null },
   icon: { type: String, default: "✦" },
@@ -10,8 +12,10 @@ defineProps({
 </script>
 
 <template>
-  <div
+  <component
+    :is="onBackground ? WinxCard : 'div'"
+    :meta="onBackground ? ['hero'] : undefined"
     class="winx-empty winx-text-center"
     :class="mod && `winx-empty--${mod}`"
-  >{{ icon }} {{ text }}<slot /></div>
+  >{{ icon }} {{ text }}<slot /></component>
 </template>

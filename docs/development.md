@@ -36,8 +36,9 @@
 │   │   │                           rules), ledger (finance), timer (pomodoro), vitals (HP / MP), xp, market
 │   │   │                           (MarketItem, the categories, supply stats), kinds (watch / read / game /
 │   │   │                           recipe notes), taskFile (a task note's lines as tasks and pool lines)
-│   │   ├── 📁 migrations         — tasks.js and market.js: the one-off migrations (Winx: Migrate tasks /
-│   │   │                           market)
+│   │   ├── 📁 migrations         — tasks.js, market.js, meds.js, food.js: the one-off migrations (Winx: Migrate tasks /
+│   │   │                           market / medication / food; install the new build on both devices first, then
+│   │   │                           migrate medication, then food, on the desktop)
 │   │   ├── 📁 composables        — use.js (useRedraw, useDataviewChanges, useWhenIndexed, useNewDay,
 │   │   │                           useBusy, useLater…), vueApp.ts (useVueApp: a Vue app owned by an Obsidian
 │   │   │                           component; useObsidian: subscriptions owned by a Vue scope), vueHost.ts (legacy

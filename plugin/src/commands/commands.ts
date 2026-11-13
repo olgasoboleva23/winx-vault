@@ -5,11 +5,13 @@ import { Form } from "#/components/uikit/Form/index.ts";
 import { newTask } from "#/controllers/tasks.js";
 import { migrateMarket } from "#/migrations/market.js";
 import { migrateTasks } from "#/migrations/tasks.js";
+import { migrateMeds } from "#/migrations/meds.js";
+import { migrateFood } from "#/migrations/food.js";
 import { openSettings } from "#/controllers/settings.js";
 import { addMarketItem } from "#/controllers/widgets/market.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
 import { createNote } from "#/controllers/notes.js";
-import { editCourse } from "#/controllers/meds.js";
+import { editCourse, newCourse, pickCourse } from "#/controllers/meds.js";
 import { askNewProject } from "#/controllers/projects.js";
 
 
@@ -42,12 +44,13 @@ export function registerCommands(plugin: Plugin) {
   // a project: name, description, status, an optional cover; then the Projects tab opens on it
   add("new-project", "New project", async () => void await askNewProject(app));
 
-  // the open medication course, its window again (the ✎ on its card does the same)
+  // a medication course (courses.json), then the Medication page opens; edited: the only one, or
+  // the one picked (the ✎ on its card does the same)
+  add("new-meds", "New medication course", async () => void await newCourse());
   add("edit-meds", "Edit medication course", async () => {
-    const file = app.workspace.getActiveFile();
+    const id = await pickCourse();
 
-    if (!file) return void new Notice("✦ Open a medication course first");
-    await editCourse(file.path);
+    if (id) await editCourse(id);
   });
 
   // a purchase, logged to Purchases.md (the wallet's spent)
@@ -73,6 +76,8 @@ export function registerCommands(plugin: Plugin) {
   // once: the old emoji Master.md and Pool.md to ids, Dataview fields and tasks.json
   add("migrate-tasks", "Migrate tasks", migrateTasks);
   add("migrate-market", "Migrate market", migrateMarket);
+  add("migrate-meds", "Migrate medication", migrateMeds);
+  add("migrate-food", "Migrate food", migrateFood);
 
   // every Winx command in one list to pick from (Alt+T in this vault's hotkeys.json)
   plugin.addCommand({
