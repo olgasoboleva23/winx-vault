@@ -22,6 +22,6 @@ input.winx-input {
     font: inherit;
     color: inherit;
     &::placeholder { color: alpha(--winx-purple-deep, 30%); }
-    &:focus { outline: none; border-bottom: 1px solid var(--winx-gold-deep); }
+    &:focus { outline: none; border-bottom: $border-width-s solid var(--winx-gold-deep); }
   }
 }

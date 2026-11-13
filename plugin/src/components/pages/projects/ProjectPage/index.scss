@@ -34,8 +34,8 @@
   /* a task row: a bar in its area's colour, a dashed line under it */
   &__task {
     position: relative; padding: $space-xs $space-m;
-    border-left: 3px solid var(--area, alpha(--winx-purple, 50%));
-    border-bottom: 1px dashed alpha(--winx-purple, 35%);
+    border-left: $border-width-xl solid var(--area, alpha(--winx-purple, 50%));
+    border-bottom: $border-width-s dashed alpha(--winx-purple, 35%);
   }
   // the date field 📅 → Pick a date… opens: there for showPicker(), never seen
   &__date { position: absolute; right: 0; bottom: 0; width: 0; height: 0; opacity: 0; }

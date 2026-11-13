@@ -2,12 +2,12 @@
 // component, a tab (ItemView) or a widget's VueHost (composables/vueHost.ts). They listen through
 // the component's registerDomEvent / registerEvent / registerInterval, so Obsidian drops it all
 // when the component unloads.
-import { Keymap, debounce } from "obsidian";
+import { debounce } from "obsidian";
 import { todayYmd } from "#/helpers/dates.js";
 import { dataview } from "#/helpers/plugins.js";
 
-// redraw(): drawn now when shown, else once it shows (a leaf or the layout changes) — catchUp()
-// asks again
+// redraw(): drawn now when shown, else once it shows (a leaf or the layout changes, the Winx tab
+// switches its page) — catchUp() asks again
 export function useRedraw(c, isShown, draw) {
   let stale = false;
   const redraw = () => { if (isShown()) { stale = false; draw(); } else stale = true; };
@@ -16,6 +16,7 @@ export function useRedraw(c, isShown, draw) {
 
   c.registerEvent(c.app.workspace.on("active-leaf-change", catchUp));
   c.registerEvent(c.app.workspace.on("layout-change", catchUp));   // a sidebar or split shown
+  c.registerEvent(c.app.workspace.on("winx:page", catchUp));   // a kept page shown again
   return { redraw, catchUp };
 }
 
@@ -33,6 +34,7 @@ export function useNewDay(c, fn) {
 // spinning) until the tab draws again and takes it off; 5 s at most
 export function useBusy(c, watched, el, cls) {
   let timer = 0;
+  c.register(() => window.clearTimeout(timer));
   c.registerEvent(c.app.vault.on("modify", f => {
     const target = watched(f.path) && el();
 
@@ -92,17 +94,6 @@ export function useWhenIndexed(c, fn) {
 // fn() when the dashboard tab's date changes, for a block `el` drawn in a dated tab
 export const useTabDate = (c, el, fn) =>
   c.registerEvent(c.app.workspace.on("winx:date", () => el.closest("[data-date]") && fn()));
-
-// [[links]] in `el` open their note, as in a note (Cmd/Ctrl: a new tab)
-export function useNoteLinks(c, el, isMod = Keymap.isModEvent) {
-  c.registerDomEvent(el, "click", e => {
-    const link = e.target.closest?.("a.internal-link[data-href]");
-
-    if (!link) return;
-    e.preventDefault();
-    void c.app.workspace.openLinkText(link.dataset.href, "", isMod(e));
-  });
-}
 
 // delayed calls by key, owned by `c`: later(key, fn, ms) (the same key again: the old one is
 // dropped), cancel(key); all dropped when c unloads (a tab closed, the plugin off)

@@ -1,6 +1,6 @@
 <!-- "Missed?": open tasks whose day has passed, only while today is on screen; a row's ✓ (done on
      its day, with Tasks) or ☀️ (moved to today) takes it off at once, the write follows. A row is
-     dragged onto a day (drag.js); swiped right on the phone (swipe.js): its ✓ -->
+     dragged onto a day (drag.js); long-swiped left on the phone (swipe.js): its ✓ -->
 <script setup>
 import { computed, inject, reactive, watch } from "vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
@@ -32,7 +32,7 @@ const rows = computed(() => {
       drag: useDragSource(view, key),
     };
 
-    r.sw = useSwipe(view, key, () => r.done && doneOnItsDay(r));
+    r.sw = useSwipe(view, key, () => doneOnItsDay(r), () => r.done);
     return r;
   }).filter(r => !gone.has(r.task.key));
 });
@@ -59,27 +59,34 @@ const toToday = r => act(r, sounds.today, t => view.actions.toToday(t));
       class="winx-missed__row winx-row winx-gap-s"
       :style="{
         '--area': r.task.color ?? undefined,
-        '--winx-swipe': r.sw.swipe.dx ? `${r.sw.swipe.dx}px` : undefined,
+        '--winx-swipe-progress': r.sw.swipe.progress,
       }"
       :data-area="r.task.area ?? undefined"
       :data-swipe="r.sw.swipe.kind"
+      :data-swipeable="r.done || null"
       draggable="true"
       @dragstart="r.drag.start"
       @dragend="r.drag.end"
       @touchstart.passive="r.sw.start"
       @touchmove.passive="r.sw.move"
       @touchend="r.sw.end"
+      @touchcancel="r.sw.cancel"
     >
       <span class="winx-missed__text winx-grow">{{ r.repeats }}<TaskText :task="r.task" /></span>
-      <div class="winx-task-btns"><TaskButtons :task="r.task" @gone="gone.add(r.task.key)" /></div>
       <em class="winx-missed__date">{{ r.shortDay }}</em>
-      <WinxButton
-        v-if="r.done"
-        :title="`done on ${r.day}`"
-        tip="pink"
-        @click="doneOnItsDay(r)"
-      >✓</WinxButton>
-      <WinxButton title="move to today" tip="pink" @click="toToday(r)">☀️</WinxButton>
+      <div class="winx-task-actions">
+        <div class="winx-task-btns">
+          <TaskButtons :task="r.task" @gone="gone.add(r.task.key)" />
+        </div>
+        <WinxButton
+          v-if="r.done"
+          class="winx-task-primary"
+          :title="`done on ${r.day}`"
+          tip="pink"
+          @click="r.sw.run"
+        >✓</WinxButton>
+        <WinxButton title="move to today" tip="pink" @click="toToday(r)">☀️</WinxButton>
+      </div>
     </div>
   </div>
 </template>

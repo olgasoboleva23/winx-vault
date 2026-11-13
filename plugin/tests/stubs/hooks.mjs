@@ -1,4 +1,4 @@
-// node's module hooks for the tests: `import … from "obsidian"` gets tests/stubs/obsidian.mjs, and a .vue file is
+// node's module hooks for the tests: `import … from "obsidian"` gets tests/stubs/obsidian.mjs, a .vue file is
 // compiled the way the build does it (unplugin-vue: <script setup> with the template inlined)
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";

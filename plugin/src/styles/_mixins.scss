@@ -35,9 +35,14 @@ $text-6xl: 30px;     // the pomodoro's time
 
 // stylelint-disable-next-line value-keyword-case -- a font's name, not a keyword
 $font-deco: Cinzel, serif;   // titles, dates, the big numbers
-$border: 1px solid var(--winx-border);
+$border-width-s: 1px;
+$border-width-m: 1.5px;
+$border-width-l: 2px;
+$border-width-xl: 3px;
+$border: $border-width-s solid var(--winx-border);
 
-// what sits over what (low to high): under -1 < base 0 < over 1 < raised 2 < scroll 3 < dropbar 5 < busy 6 < sticker 20
+// what sits over what (low to high): under -1 < base 0 < over 1 < raised 2 < scroll 3
+// < dropbar 5 < busy 6 < sticker 20 < nav 30 < drawer 31
 $z-under: -1;     // the leaf's photo, below its content
 $z-base: 0;       // a new stacking context; the card's wings behind its content
 $z-over: 1;       // content over its own decoration (a card's, a day's, Missed's)
@@ -46,6 +51,8 @@ $z-scroll: 3;     // the scroll arrows over the cards
 $z-dropbar: 5;    // the calendar's drop bar while dragging
 $z-busy: 6;       // the ✦ busy pill over everything on the page
 $z-sticker: 20;   // a hovered sticker, over its neighbours
+$z-nav: 30;       // the Winx tab's nav pill / bar, over its page
+$z-drawer: 31;    // the Other drawer, over the nav
 
 // transition durations
 $fast: 0.15s;
@@ -93,3 +100,27 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
 // white and black at some opacity: white(40%) → rgb(255 255 255 / 40%)
 @function white($opacity) { @return rgba(255, 255, 255, $opacity); }
 @function black($opacity) { @return rgba(0, 0, 0, $opacity); }
+
+// sparkles fly out of the middle on hover (WinxButton's add and rail; the picture is
+// --winx-sparkles-svg in _assets.scss), none for reduced motion; the hover's own look is the block
+// passed in. The parent is position: relative
+@mixin sparkles($color: #fff) {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: $color;
+    mask: var(--winx-sparkles-svg) center / 30px 19.5px no-repeat;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:hover {
+    @content;
+    &::after { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after { display: none; }
+  }
+}

@@ -2,7 +2,7 @@
 
 # 🖥 Dashboard
 
-A tab of its own: the ✨ icon on the left (it opens the dashboard and the calendar, both pinned, or goes back to the one you used last) or **Winx: Open dashboard** (Cmd+P). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/components/pages/dashboard/layout.md`: the same callouts and `winx` blocks a note would have.
+The dashboard is a page of the [Winx tab](#the-winx-tab) (below). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/components/pages/dashboard/index.vue`: Vue cards inside the tab’s single Vue application. The dashboard and calendar stay mounted when switching pages; closing the tab disposes both.
 
 ![Dashboard](images/dashboard.webp)
 
@@ -14,7 +14,6 @@ A tab of its own: the ✨ icon on the left (it opens the dashboard and the calen
 | **Life Areas** | Radar chart — XP earned per area this month |
 | **Cycle** | Cycle day, next start forecast, "started today" button |
 | **Weight** | Last 30 days chart, change vs a week ago, a field to log today's weight; the second pill shows a free journal (`00 System/Data/Journals/`, a note each: a level 0–3 a day and its reasons; with more than one, a select under the pills picks it): a click on a level or a reason saves the day |
-| **✦ Menu** | **⚙ Settings** (XP, gold, areas, XP Today, the level cost) and links to the notes with a page of their own: Finance, Shop, Supplies, Medication (the courses' base), Food (the food journal: a week, a row a day: what was eaten with its marks, the marks counted, each free journal's level after its lag, 💊 a course on that day, a note; ＋ a fuzzy search of the foods or a new one, ✎ a food, ⚙ the marks) |
 | **XP Today** | XP earned today, level name, streak heatmap |
 | **Quests** | Tasks due today, grouped by life area (a `winx` block: `quests`) |
 | **Celestial Market** | Pending shopping items grouped by category |
@@ -28,11 +27,22 @@ card: Weight
 ```
 ````
 
-On a phone the same dashboard and calendar tabs are used (📅 / ✦ switch between them).
+## The Winx tab
+
+One tab holds all of Winx. The ✨ icon on the left or **Winx: Open** (Cmd+P) opens it, pinned, or reveals it if it is already open. Inside it are the pages **Dashboard**, **Calendar**, **Projects**, **Finance**, **Shop**, **Supplies** and **Food**; the tab remembers the page you were on. Finance, Shop, Supplies and Food are notes (their `winx` blocks) drawn inside the tab.
+
+- **Desktop:** a floating pill at the top: ✦ Dashboard, 🗓 Calendar, ⋯ Other. The labels show on hover, and the pill collapses after a click. **⋯ Other** opens a drawer from the left with every page, one row each; the ↗ on a row opens that page in a new tab, and **⚙ Settings** (XP, gold, areas, XP Today, the level cost) is the last row.
+- **Phone:** a bottom bar of three (the same three) and a sheet for the rest.
+- **A page in a new tab:** Cmd-click a page, or its ↗, opens it in a new Winx tab that is not pinned.
+- **Back / Forward** walk the pages you visited in the tab, not the notes.
+- **Links:** a link to an ordinary note opens it in a new tab; a link to the note of a Winx page (say `Shop`) switches the page instead.
+- **Old tabs:** a saved dashboard, calendar or projects tab from before turns into a Winx tab on that page when it is shown.
+
+**Food** (the food journal): a week, a row a day: what was eaten with its marks, the marks counted, each free journal's level after its lag, 💊 a course on that day, a note; ＋ a fuzzy search of the foods or a new one, ✎ a food, ⚙ the marks.
 
 ## 🎮 XP & Levels
 
-Completing a task awards XP and gold by its difficulty (the `difficulty` of its record in `tasks.json`). The defaults below; **⚙ Settings** (in the dashboard's **✦ Menu** card, or **Winx: Settings**) changes them, the areas, XP Today's thresholds (SPARK 10 / GLOW 20 / AURA 30) and the level cost, saved in `00 System/Data/config.json`:
+Completing a task awards XP and gold by its difficulty (the `difficulty` of its record in `tasks.json`). The defaults below; **⚙ Settings** (the last row of the Winx tab's drawer, or **Winx: Settings**) changes them, the areas, XP Today's thresholds (SPARK 10 / GLOW 20 / AURA 30) and the level cost, saved in `00 System/Data/config.json`:
 
 | Difficulty | XP | Gold |
 |---|---|---|

@@ -4,10 +4,12 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
 // each component draws the markup the styles expect (the components' index.scss): the same as the old uikit/*.js did,
 // written out here; Vue's <!--v-if--> placeholders left out (no box, no style)
-let mount, ui;
+let mount, nextTick, ui;
 before(async () => {
   GlobalRegistrator.register();
+  HTMLElement.prototype.isShown = function () { return !this.hidden && this.checkVisibility(); };
   ({ mount } = await import("@vue/test-utils"));
+  ({ nextTick } = await import("vue"));
   // a component is <Name>.vue, or <Name>/index.vue when it has its own styles
   const load = async n => (await import(`../src/components/uikit/${n}`)).default;
   ui = Object.fromEntries(await Promise.all(["WinxButton", "WinxNoteLink", "WinxEmpty", "WinxMissing", "WinxFailed",
@@ -29,6 +31,22 @@ test("WinxButton: kinds, on, title, extra classes", () => {
     '<button class="winx-btn winx-btn--pill winx-weight__list">✦ list</button>');
   draws(mount(ui.WinxButton, { props: { kind: "toggle", on: true }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle winx-btn--on">✓ done</button>');
   draws(mount(ui.WinxButton, { props: { kind: "toggle" }, slots: { default: "✓ done" } }), '<button class="winx-btn winx-btn--toggle">✓ done</button>');
+});
+
+test("WinxNoteLink: a short link to a Winx page's note switches the page in place", async () => {
+  const { setApp } = await import("#/helpers/app.js");
+  const went = [], opened = [];
+  const tab = { go: (...a) => went.push(a) };
+  const { WinxView } = await import("#/components/app/view.ts");
+  const front = Object.assign(Object.create(WinxView.prototype), tab);
+
+  setApp({
+    metadataCache: { getFirstLinkpathDest: () => ({ path: "02 Areas/Finance.md" }) },
+    workspace: { getActiveViewOfType: () => front, openLinkText: (...a) => opened.push(a) },
+  });
+  await mount(ui.WinxNoteLink, { props: { path: "Finance" } }).find("button").trigger("click");
+  assert.deepEqual(went.map(a => [a[0], a[1]]), [["finance", {}]]);
+  assert.deepEqual(opened, []);
 });
 
 test("WinxNoteLink, WinxEmpty, WinxMissing, WinxFailed, WinxGroupHeader, WinxAddForm, WinxCard", () => {
@@ -127,4 +145,144 @@ test("WinxAddForm: on the photo (no card under it) the --photo look", () => {
 
   assert.equal(photo.classes().includes("winx-add-form--photo"), true);
   assert.equal(mount(ui.WinxAddForm).classes().includes("winx-add-form--photo"), false);
+});
+
+const navItems = [
+  { key: "dashboard", icon: "✦", text: "Dashboard" },
+  { key: "calendar", icon: "🗓", text: "Calendar" },
+  { key: "other", icon: "⋯", text: "Other" },
+];
+const loadNav = async () => (await import("../src/components/uikit/WinxNav/index.vue")).default;
+
+test("WinxNav: three items, the current one on, a click says which", async () => {
+  const nav = mount(await loadNav(), { props: { items: navItems, current: "calendar" } });
+  const items = nav.findAll(".winx-rail .winx-btn--rail");
+
+  assert.equal(items.length, 3);
+  assert.deepEqual(items.map(b => b.classes().includes("winx-btn--on")), [false, true, false]);
+  await items[1].trigger("click");
+  const [[key, event]] = nav.emitted("go");
+  assert.equal(key, "calendar");
+  assert.equal(event instanceof MouseEvent, true);
+});
+
+test("WinxNav: hover opens it; a click shuts it until the pointer leaves", async () => {
+  const nav = mount(await loadNav(), { props: { items: navItems, current: "calendar" } });
+  const is = m => nav.classes().includes(`winx-rail--${m}`);
+
+  await nav.trigger("pointerenter");
+  assert.equal(is("open"), true);
+  await nav.find(".winx-btn--rail").trigger("click");
+  assert.deepEqual([is("shut"), is("open")], [true, false]);
+  await nav.trigger("pointerleave");
+  await nav.trigger("pointerenter");
+  assert.deepEqual([is("shut"), is("open")], [false, true]);
+});
+
+test("WinxNav: on the phone the bottom bar, no hover states", async () => {
+  const nav = mount(await loadNav(), { props: { items: navItems, phone: true } });
+
+  await nav.trigger("pointerenter");
+  assert.deepEqual(nav.classes(), ["winx-rail", "winx-rail--phone"]);
+});
+
+test("WinxDrawer: closed draws nothing; open, Esc and the backdrop close it", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const closed = mount(WinxDrawer, { props: { open: false }, slots: { default: "rows" } });
+  assert.equal(closed.find(".winx-drawer").exists(), false);
+
+  const drawer = mount(WinxDrawer,
+    { props: { open: true, side: "bottom" }, slots: { default: "rows" } });
+  assert.equal(drawer.find(".winx-drawer.winx-drawer--bottom .winx-drawer__panel").text(), "rows");
+  await drawer.find(".winx-drawer__backdrop").trigger("click");
+  await drawer.find(".winx-drawer__panel").trigger("keydown", { key: "Escape" });
+  await drawer.find(".winx-drawer__panel").trigger("keydown", { key: "Enter" });
+  assert.equal(drawer.emitted("close").length, 2);
+  drawer.unmount();
+});
+
+test("WinxDrawer: a labelled dialog; open, it takes the focus, closed, gives it back", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const other = document.body.appendChild(document.createElement("button"));
+  other.focus();
+  const drawer = mount(WinxDrawer, { props: { label: "Other" }, attachTo: document.body });
+
+  await drawer.setProps({ open: true });
+  await nextTick();
+  const panel = drawer.find(".winx-drawer__panel");
+  assert.deepEqual(["role", "aria-modal", "tabindex", "aria-label"].map(a => panel.attributes(a)),
+    ["dialog", "true", "-1", "Other"]);
+  assert.equal(document.activeElement, panel.element);
+  await drawer.setProps({ open: false });
+  await nextTick();
+  assert.equal(document.activeElement, other);
+  drawer.unmount();
+  other.remove();
+});
+
+test("WinxDrawer: desktop Tab stays in the panel, so Escape still closes it", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const other = document.body.appendChild(document.createElement("button"));
+  other.focus();
+  const drawer = mount(WinxDrawer, {
+    attachTo: document.body,
+    slots: { default: '<button disabled>Disabled</button><button hidden>Hidden</button>'
+      + '<button tabindex="-1">Not tabbed</button><button>First</button><button>Last</button>' },
+  });
+  await drawer.setProps({ open: true });
+  await nextTick();
+  const panel = drawer.find(".winx-drawer__panel").element;
+  const buttons = drawer.findAll("button"), first = buttons[3].element, last = buttons[4].element;
+  const tab = shiftKey => {
+    const event = new KeyboardEvent("keydown", { key: "Tab", shiftKey, bubbles: true, cancelable: true });
+    document.activeElement.dispatchEvent(event);
+    return event.defaultPrevented;
+  };
+
+  assert.equal(document.activeElement === panel, true);
+  assert.equal(tab(true), true);
+  assert.equal(document.activeElement === last, true);
+  assert.equal(tab(false), true);
+  assert.equal(document.activeElement === first, true);
+  assert.equal(tab(false), false);   // ordinary moves inside the panel stay native
+  assert.equal(tab(true), true);
+  assert.equal(document.activeElement === last, true);
+  await buttons[4].trigger("keydown", { key: "Escape" });
+  assert.equal(drawer.emitted("close").length, 1);
+  await drawer.setProps({ open: false });
+  assert.equal(document.activeElement === other, true);
+  drawer.unmount();
+  other.remove();
+});
+
+test("WinxDrawer: the phone sheet leaves the bottom navigation reachable", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const other = document.body.appendChild(document.createElement("button"));
+  const dashboard = document.body.appendChild(document.createElement("button"));
+  other.focus();
+  const drawer = mount(WinxDrawer, { props: { side: "bottom" }, attachTo: document.body,
+    slots: { default: "<button>Settings</button>" } });
+  await drawer.setProps({ open: true });
+  await nextTick();
+  const panel = drawer.find(".winx-drawer__panel");
+  const event = new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true, cancelable: true });
+
+  panel.element.dispatchEvent(event);
+  assert.equal(event.defaultPrevented, false);
+  assert.notEqual(panel.attributes("aria-modal"), "true");
+  dashboard.focus();   // a click on the visible bottom bar
+  await drawer.setProps({ open: false });
+  assert.equal(document.activeElement === dashboard, true);
+  drawer.unmount();
+  other.remove();
+  dashboard.remove();
+});
+
+test("WinxNav: the current item is the page; the one whose drawer is open, expanded", async () => {
+  const nav = mount(await loadNav(),
+    { props: { items: navItems, current: "calendar", expanded: "other" } });
+  const items = nav.findAll(".winx-btn--rail");
+
+  assert.deepEqual(items.map(b => b.attributes("aria-current")), [undefined, "page", undefined]);
+  assert.deepEqual(items.map(b => b.attributes("aria-expanded")), [undefined, undefined, "true"]);
 });

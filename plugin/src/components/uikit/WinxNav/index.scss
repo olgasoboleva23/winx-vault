@@ -1,0 +1,78 @@
+/* The Winx tab's nav (WinxNav), block winx-rail: desktop, a short near-white pill with a gold border at the tab's left edge,
+   over the page (it takes no width); opened, it widens and shows the labels. Phone (--phone): the
+   bottom bar (in flow, last in the shell), an icon above a small label. The items' own look is
+   WinxButton's kind rail */
+@use "mixins" as *;
+
+$label-w: 100px;   // an opened label's room: the longest name, Dashboard, in Quicksand
+$pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
+
+.winx-rail {
+  position: absolute;
+  top: 50%;
+  left: $space-m;
+  z-index: $z-nav;
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  gap: $space-s;
+  padding: $space-m $space-s;
+  border: $border-width-m solid var(--winx-gold);   // a half-step border, as the mockup's
+  border-radius: $pill-radius;
+  background: white(92%);
+  box-shadow: 0 4px 16px alpha(--winx-purple-deep, 22%);
+
+  // the item's 32px less its border
+  &__icon { flex-shrink: 0; width: 30px; text-align: center; font-size: $text-2xl; }
+
+  // folded away until the pill opens
+  &__label {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    width: 0;
+    padding-right: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    transition: width $medium ease, padding-right $medium ease, opacity $medium ease;
+  }
+  // opened by the pointer, or by the keyboard (:focus-visible: a mouse click's focus doesn't count);
+  // --shut (clicked) keeps it folded
+  &--open:not(&--phone) &__label,
+  &:not(&--phone, &--shut):has(:focus-visible) &__label {
+    width: $label-w;
+    padding-right: $space-m;
+    opacity: 1;
+  }
+
+  // phone: the bar in the page's flow (the shell puts it last), three equal places, an icon
+  // above its label
+  &--phone {
+    position: static;
+    translate: none;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0;
+    padding: $space-xs 0;
+    border: none;
+    border-top: $border-width-m solid var(--winx-gold);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  &--phone button#{&}__item {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: $space-2xs;
+    height: $tap;
+    color: alpha(--winx-purple-deep, 70%);
+    &::after { mask-position: center; }
+    &.winx-btn--on { border-color: transparent; background: none; color: var(--winx-purple-deep); }
+    &.winx-btn--on &__icon { filter: drop-shadow(0 0 6px alpha(--winx-gold, 95%)); }
+  }
+  &--phone &__label { width: auto; padding: 0; font-size: $text-s; opacity: 1; transition: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .winx-rail__label { transition: none; }
+}

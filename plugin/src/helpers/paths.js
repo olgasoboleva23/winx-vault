@@ -21,6 +21,8 @@ export const MEDIA = "03 Resources/Media";
 
 export const GOALS = `${DATA}/Goals`;
 
+export const FINANCE_PAGE = "02 Areas/Finance.md";
+
 export const LEDGER = `${DATA}/Finance/Ledger`, RULES = `${DATA}/Finance/rules.json`;
 
 export const SHOP = `${DATA}/Shop`, PURCHASES = `${DATA}/Purchases`;

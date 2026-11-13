@@ -14,7 +14,7 @@
   /* today: a dashed zone per anchor, as a day's morning / evening in the calendar */
   &__today { margin-bottom: $space-xl; }
   &__zone {
-    padding: $space-m $space-l; border: 1px dashed var(--winx-border); border-radius: $radius-m;
+    padding: $space-m $space-l; border: $border-width-s dashed var(--winx-border); border-radius: $radius-m;
     background: white(60%);
     &-label { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); margin-bottom: $space-s; }
     &-label b { color: var(--winx-purple-deep); }

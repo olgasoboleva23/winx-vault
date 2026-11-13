@@ -1,6 +1,5 @@
 <!-- The dashboard's date row (where the note had the Meta Bind field): the date field, ‹ ›, "today"
-     when another day shows, and 📅 to the calendar on the phone only (its tabs are out of sight).
-     @go(date): another day (null: today), @calendar: open the calendar -->
+     when another day shows. @go(date): another day (null: today) -->
 <script setup>
 import { addDays } from "#/helpers/dates.js";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
@@ -10,7 +9,7 @@ const props = defineProps({
   today: { type: String, required: true },
   phone: { type: Boolean, default: false },
 });
-const emit = defineEmits(["go", "calendar"]);
+const emit = defineEmits(["go"]);
 const step = n => emit("go", addDays(props.date, n));
 const typed = e => emit("go", e.target.value || null);   // emptied (the phone's "Reset"): today
 const label = props.phone ? "☀️" : "today";
@@ -31,10 +30,4 @@ const label = props.phone ? "☀️" : "today";
     title="today"
     @click="emit('go', null)"
   >{{ label }}</WinxButton>
-  <WinxButton
-    kind="chip"
-    title="calendar"
-    class="winx-is-phone-only"
-    @click="emit('calendar')"
-  >📅</WinxButton>
 </template>

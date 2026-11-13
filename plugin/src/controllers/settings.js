@@ -1,4 +1,4 @@
-// ⚙ Settings (the dashboard's ✦ Menu, Winx: Settings): the window, then config.json written
+// ⚙ Settings (the Winx tab's drawer, Winx: Settings): the window, then config.json written
 // (the task store reads it back into helpers/config.js and everything draws again) and, for an
 // area whose key changed with ☑ apply, its tasks' records moved to the new key. Values that can't
 // be saved: a notice, nothing written.

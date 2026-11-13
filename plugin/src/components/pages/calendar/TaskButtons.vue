@@ -31,6 +31,14 @@ const skip = () => {
   view.actions.skip(t);
 };
 
+const unplan = () => {
+  const t = view.task(props.task.key);
+
+  if (!t) return;
+  emit("gone");
+  view.actions.unplan(t);
+};
+
 async function remove() {
   if (!armed.value) {
     armed.value = true;
@@ -48,6 +56,12 @@ async function remove() {
 
 <template>
   <WinxButton v-if="task.canSkip" title="skip this time" @click="skip">⏭</WinxButton>
+  <WinxButton
+    v-if="task.canUnplan"
+    class="winx-task-mobile"
+    title="remove date"
+    @click="unplan"
+  >↩</WinxButton>
   <WinxButton :title="editTitle" @click="edit">✏️</WinxButton>
   <WinxButton
     :title="del.title"

@@ -1,7 +1,5 @@
 // The ```winx block: the widgets by name (each a .vue on a VueHost) and what the plugin does
 // with a block. A widget's writes aren't here: its .vue imports them from its controller.
-import { blockDv } from "#/helpers/plugins.js";
-import { app } from "#/helpers/app.js";
 import { VueHost } from "#/composables/vueHost.ts";
 import { loadLevelToday, loadLifeAreas, loadXpToday } from "#/controllers/widgets/xp.js";
 import { loadQuests } from "#/controllers/widgets/quests.js";
@@ -83,16 +81,13 @@ export const blocks = {
 
 // a widget on its block: its VueHost, with the card when the block has a "card:" line
 function block(def, el, sourcePath, args, source) {
-  const ctx = { get dv() { return blockDv(sourcePath, el); }, app, args, sourcePath, source };
+  const { bodyClass, ...widget } = def;
   const meta = args.meta ? String(args.meta).split(/\s+/) : [];
-  const card = args.card ? { title: String(args.card), meta, bodyClass: def.bodyClass } : undefined;
+  const card = args.card ? { title: String(args.card), meta, bodyClass } : undefined;
 
   // no card: the class goes on the block itself
-  if (!card && def.bodyClass) el.addClass(def.bodyClass);
-  const { cardButton, follows, watches } = def;
-  const opts = { load: () => def.load(ctx), note: sourcePath, card, cardButton, follows, watches };
-
-  return new VueHost(el, def.view, opts);
+  if (!card && bodyClass) el.addClass(bodyClass);
+  return new VueHost(el, { ...widget, note: sourcePath, card, args, source });
 }
 
 // A ```winx block's text: the widget's name on the first line, then "key: value" lines (a JSON

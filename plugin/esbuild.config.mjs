@@ -43,7 +43,6 @@ const ctx = await esbuild.context({
   sourcemap: watch ? "inline" : false,
   minify: !watch,
   logLevel: "warning",
-  loader: { ".md": "text" },   // dashboard/layout.md: the dashboard's layout as text
   // Vue: templates compiled at build time (no compiler in main.js), no Options API, no devtools
   define: { __VUE_OPTIONS_API__: "false", __VUE_PROD_DEVTOOLS__: "false", __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false" },
   // isProduction: no __file (a path on this computer) in a release build

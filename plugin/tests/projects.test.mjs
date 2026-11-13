@@ -72,20 +72,19 @@ test("toCalendar puts the task on a day", async () => {
   assert.equal(files[MASTER], "- [ ] t1 [due:: 2026-11-12]\n");
 });
 
-test("askNewProject: the Form's values → createProject, then the tab opens on the new key", async () => {
+test("askNewProject opens the Winx tab on the new project", async () => {
   const { files, app } = vault();
   const seen = [];
-  const leaf = { setViewState: async s => seen.push(s) };
-  app.workspace = { getLeavesOfType: () => [], getLeaf: () => leaf, revealLeaf() {} };
+  const open = async (...a) => seen.push(a);
   const ask = async (_app, _title, _rows, o) => {
     assert.equal(o.values.status, "active");
     return { name: "Garden", description: "beds", status: "idea", cover: true };
   };
 
-  assert.equal(await askNewProject(app, ask, async () => "03 Resources/Media/a.webp"), "p1");
+  assert.equal(await askNewProject(app, ask, async () => "03 Resources/Media/a.webp", open), "p1");
   assert.deepEqual(json(files).p1.cover, "03 Resources/Media/a.webp");
   assert.equal(json(files).p1.status, "idea");
-  assert.deepEqual(seen, [{ type: "winx-projects", active: true, state: { open: "p1" } }]);
+  assert.deepEqual(seen, [["projects", { open: "p1" }]]);
 
   assert.equal(await askNewProject(app, async () => null), null);
   assert.deepEqual(Object.keys(json(files)), ["p1"]);

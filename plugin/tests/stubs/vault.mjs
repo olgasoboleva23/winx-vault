@@ -48,7 +48,7 @@ export function vault(files = {}, { folders = [], props = {}, dataview = null } 
     saveLocalStorage: (k, v) => { local[k] = v; },
     plugins: { plugins: dataview ? { dataview: { api: dataview } } : {} },
     internalPlugins: { getPluginById: () => null },
-    workspace: {},
+    workspace: { getActiveViewOfType: () => null },
   };
   setApp(app);
   return { files, dirs, local, io, app };

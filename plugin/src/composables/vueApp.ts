@@ -1,27 +1,25 @@
-// A Vue app owned by an Obsidian component (a widget's VueHost, the calendar tab, the dashboard's
-// page): mounted on `el` now, unmounted when the owner unloads (or by the unmount() given back,
-// once). Every error inside the app — a component's setup, a hook, a watcher, an async one too (a
-// chart that fails to draw) — goes to onError, so its owner can say so (a widget's "couldn't draw"
-// with retry).
-import type { Component } from "obsidian";
-import { createApp, type Component as VueComponent } from "vue";
+// One Vue app per Obsidian tab or Markdown block; unmounted with its owner.
+import { Component } from "obsidian";
+import { app as obsidian } from "#/helpers/app.js";
+import { createApp, onScopeDispose, type Component as VueComponent } from "vue";
 
 interface Options {
+  props?: Record<string, unknown>;
   provide?: Record<string, unknown>;   // what the components inject
   onError?: (error: Error) => void;
 }
 
-interface Mounted { unmount: () => void }
+interface Mounted { unmount: () => void; instance: any }
 
 export function useVueApp(
   owner: Component, el: HTMLElement, root: VueComponent,
-  { provide = {}, onError = e => console.error(e) }: Options = {},
+  { props = {}, provide = {}, onError = e => console.error(e) }: Options = {},
 ): Mounted {
-  const app = createApp(root);
+  const app = createApp(root, props);
 
   for (const [key, value] of Object.entries(provide)) app.provide(key, value);
   app.config.errorHandler = error => onError(error as Error);
-  app.mount(el);
+  const instance = app.mount(el);
 
   let mounted = true;
   const unmount = () => {
@@ -31,5 +29,14 @@ export function useVueApp(
   };
 
   owner.register(unmount);
-  return { unmount };
+  return { unmount, instance };
+}
+
+// Existing Obsidian event helpers can be used inside Vue without a class for every page.
+export function useObsidian() {
+  const owner = Object.assign(new Component(), { app: obsidian });
+
+  owner.load();
+  onScopeDispose(() => owner.unload());
+  return owner;
 }

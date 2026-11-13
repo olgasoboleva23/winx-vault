@@ -8,6 +8,7 @@ export class Component {
     this.onunload?.();
   }
   addChild(c) { this._children.push(c); if (this._loaded) c.load(); return c; }
+  removeChild(c) { this._children = this._children.filter(x => x !== c); c.unload(); return c; }
   register(fn) { this._cleanups.push(fn); }
   registerEvent(ref) { this._cleanups.push(() => ref?.off?.()); }
   registerDomEvent(el, type, fn) { el.addEventListener?.(type, fn); this._cleanups.push(() => el.removeEventListener?.(type, fn)); }
@@ -17,7 +18,7 @@ export class MarkdownRenderChild extends Component { constructor(el) { super(); 
 export const debounce = fn => Object.assign(fn, { cancel() {} });
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };
-export const Keymap = { isModEvent: () => false };
+export const Keymap = { isModEvent: e => !!e?.mod };
 // fuzzy: the letters of the query in order
 export const prepareFuzzySearch = q => text => {
   let i = 0;
