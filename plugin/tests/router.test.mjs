@@ -1,17 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readState, saved, withParams, isStep, PAGES } from "#/store/router.js";
-import { pages } from "#/components/app/pages.ts";
-
-test("router's PAGES are the pages of pages.ts", () => {
-  assert.deepEqual([...PAGES].sort(), Object.keys(pages).sort());
-});
+import { readState, saved, withParams, isStep } from "#/store/router.js";
+import { pages } from "#/components/app/pages.js";
 
 test("readState: junk and old shapes become a whole state", () => {
   assert.equal(readState({ page: "nope", calendar: { view: "x" } }).page, "dashboard");
   assert.equal(readState(null).calendar.view, "week");
   assert.equal(readState({ dashboard: { date: 5 } }).dashboard.date, null);
-  assert.equal(readState({ page: "calendar" }).page, "calendar");
+  for (const page of Object.keys(pages)) assert.equal(readState({ page }).page, page);
+  assert.equal(readState({ page: "constructor" }).page, "dashboard");
   assert.equal(readState({ page: "projects", projects: { open: "p1" } }).page, "projects");
   assert.equal(readState({ projects: { open: "p1" } }).projects.open, "p1");
 });

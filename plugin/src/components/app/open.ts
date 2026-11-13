@@ -1,6 +1,6 @@
 import { ItemView, Keymap, type WorkspaceLeaf } from "obsidian";
 import { app } from "#/helpers/app.js";
-import { pageOf, WINX_VIEW } from "./pages.ts";
+import { pageOf, WINX_VIEW } from "./pages.js";
 import type { WinxView } from "./view.ts";
 
 // Opening Winx: ✨, the command and the reminders go to the Winx tab used last, or open one

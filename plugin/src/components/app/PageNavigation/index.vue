@@ -9,7 +9,7 @@ import { Platform } from "obsidian";
 import WinxNav from "#/components/uikit/WinxNav/index.vue";
 import WinxDrawer from "#/components/uikit/WinxDrawer/index.vue";
 import { openWinx } from "#/components/app/open.ts";
-import { pages } from "#/components/app/pages.ts";
+import { pages } from "#/components/app/pages.js";
 import { openSettings } from "#/controllers/settings.js";
 
 const winx = inject("winx");

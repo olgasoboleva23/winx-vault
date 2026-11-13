@@ -21,7 +21,7 @@ export default class WinxPlugin extends Plugin {
     registerCommands(this);
     // a ```winx block in a note: a widget by name (controllers/blocks.js)
     this.registerMarkdownCodeBlockProcessor("winx", drawBlock);
-    // the Winx tab (its pages: components/app/pages.ts); ✨ and the command go to the one used
+    // the Winx tab (its pages: components/app/pages.js); ✨ and the command go to the one used
     // last, or open it, pinned, on the dashboard
     this.registerView(WINX_VIEW, leaf => new WinxView(leaf));
     // the old tabs, from a layout saved before: a Winx tab on their page

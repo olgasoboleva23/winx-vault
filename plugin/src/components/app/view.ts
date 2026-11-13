@@ -2,10 +2,10 @@ import { ItemView, Keymap, Notice, type ViewStateResult } from "obsidian";
 import { reactive, watch } from "vue";
 import { useVueApp } from "#/composables/vueApp.ts";
 import { isStep, readState, saved, withParams } from "#/store/router.js";
-import { pages, WINX_VIEW } from "./pages.ts";
+import { pages, WINX_VIEW } from "./pages.js";
 import Winx from "./index.vue";
 
-export { WINX_VIEW } from "./pages.ts";
+export { WINX_VIEW } from "./pages.js";
 
 export class WinxView extends ItemView {
   navigation = true;   // Obsidian records a history step only for a navigation view

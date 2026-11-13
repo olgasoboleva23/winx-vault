@@ -13,7 +13,7 @@ export const pages = {
 };
 
 // Existing links to the old page notes still select their Vue page.
-export function pageOf(path: string): string | null {
+export function pageOf(path) {
   return Object.entries(pages).find(([, p]) => "note" in p &&
     p.note.replace(/\.md$/, "") === path.replace(/\.md$/, ""))?.[0] ?? null;
 }

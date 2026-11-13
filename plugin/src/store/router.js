@@ -3,8 +3,7 @@
 
 import { readState as readCalendar, SAVED as CALENDAR_SAVED } from "#/store/calendar.js";
 import { readState as readProjects } from "#/store/projects.js";
-
-export const PAGES = ["dashboard", "calendar", "projects", "finance", "shop", "supplies", "food"];
+import { pages } from "#/components/app/pages.js";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -14,7 +13,7 @@ export function readState(saved) {
   const date = s.dashboard?.date;
 
   return {
-    page: PAGES.includes(s.page) ? s.page : "dashboard",
+    page: Object.keys(pages).includes(s.page) ? s.page : "dashboard",
     dashboard: { date: typeof date === "string" && DATE.test(date) ? date : null },
     calendar: readCalendar(s.calendar),
     projects: readProjects(s.projects),
