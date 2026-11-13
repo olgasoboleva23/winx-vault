@@ -1,14 +1,14 @@
 // The one-off move of the medication courses from their notes (type: meds, a ```winx meds table)
 // to Medication/courses.json: a record per note, checked cell by cell against the table it came
-// from before anything is written; the notes kept as "<name> (old).md", Medication.md made (the
-// page), the old Base trashed. parseCourse / courseFromNote / checkCourse / migrateMedsNotes pure
+// from before anything is written; the notes kept as "<name> (old).md", the old Base trashed.
+// parseCourse / courseFromNote / checkCourse / migrateMedsNotes pure
 // (tested), migrateMeds() the command. The old table format lives here only.
 import { Notice } from "obsidian";
 import { app } from "#/helpers/app.js";
 import { collection } from "#/helpers/collection.js";
 import { todayYmd } from "#/helpers/dates.js";
 import { nextId } from "#/helpers/ids.js";
-import { COURSES, MEDICATION, MEDICATION_BASE } from "#/helpers/paths.js";
+import { COURSES, MEDICATION_BASE } from "#/helpers/paths.js";
 import { TIMES, codeOf, courseData } from "#/models/course.js";
 
 // the old table (a course note's ```winx meds block): its columns (a code and its time of day)
@@ -29,8 +29,6 @@ export function parseCourse(text) {
 
   return { columns, rows };
 }
-
-const MEDICATION_TEXT = "---\ncssclasses:\n  - dashboard\n---\n\n```winx\nmeds\n```\n";
 
 // the table's rows by date, each a { key: cell } and its note
 const table = text => {
@@ -136,7 +134,7 @@ export function migrateMedsNotes(notes, existing, today) {
 
 // Explicit command only: every course note (not an "(old)" one) checked inside the one write of
 // courses.json, so a note off, a courses.json that isn't JSON or an "(old)" name taken writes
-// nothing; then the notes renamed, the page made, the Base trashed. Twice: nothing to migrate.
+// nothing; then the notes renamed and the Base trashed. Twice: nothing to migrate.
 export async function migrateMeds() {
   const { vault, metadataCache, fileManager } = app;
   const files = vault.getMarkdownFiles().filter(f => !f.basename.endsWith(" (old)")
@@ -159,7 +157,6 @@ export async function migrateMeds() {
       .edit(all => (result = migrateMedsNotes(notes, all, todayYmd())).records);
     for (const f of files) await fileManager.renameFile(f, oldPath(f));
 
-    if (!vault.getFileByPath(MEDICATION)) await vault.create(MEDICATION, MEDICATION_TEXT);
     const base = vault.getFileByPath(MEDICATION_BASE);
 
     if (base) await fileManager.trashFile(base);

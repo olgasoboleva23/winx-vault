@@ -35,7 +35,7 @@ import FinanceLine from "#/components/pages/dashboard/widgets/finance/index.vue"
 import WeightCard from "#/components/pages/dashboard/widgets/weight/index.vue";
 import DailyNoteOpen from "#/components/pages/dashboard/widgets/DailyNoteOpen.vue";
 import PomodoroTimer from "#/components/pages/dashboard/widgets/pomodoro/index.vue";
-// the pages on notes of their own: components/pages/<page>/
+// the Vue pages: components/pages/<page>/
 import MedsPage from "#/components/pages/meds/index.vue";
 import FoodPage from "#/components/pages/food/index.vue";
 
@@ -72,9 +72,9 @@ export const blocks = {
     cardButton: CelestialMarketAdd,
     watches: [MARKET_NOTE, MARKET_RECORDS],
   },
-  // the Medication page (00 System/Data/Medication/Medication.md): the courses
+  // the medication courses from JSON
   meds: { view: MedsPage, load: loadMeds, watches: [COURSES] },
-  // the food journal's own note (00 System/Data/Food/Food.md)
+  // the food journal from JSON
   food: {
     view: FoodPage, load: loadFood,
     watches: [FOOD_DATA, FOOD_LOG, COURSES, `${JOURNALS}/`, TASK_FILES],

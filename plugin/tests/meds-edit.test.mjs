@@ -110,14 +110,19 @@ test("editCourse: new marks and day notes survive a simultaneous property edit",
   assert.equal(saved.dayNotes["2026-11-08"], "новая заметка дня");
 });
 
-test("newCourse: courses.json made with c1, the next one c2", async () => {
-  const { files } = vault();
+test("newCourse: saving c1 and c2 opens their Medication Vue page in a new tab", async () => {
+  const { app, files } = vault(), opened = [];
+  app.workspace.getLeaf = () => ({ setViewState: async s => { opened.push(s); } });
+  app.workspace.revealLeaf = async () => {};
   const ask = async () => ({ meds: [{ name: "Аевит" }], start: "", notes: "" });
 
   assert.equal(await newCourse(ask), "c1");
   assert.equal(read(files).c1.start, "2026-11-08");
   assert.equal(await newCourse(ask), "c2");
   assert.deepEqual(Object.keys(read(files)), ["c1", "c2"]);
+  assert.deepEqual(opened, Array(2).fill({
+    type: "winx", active: true, state: { page: "meds", meds: {} },
+  }));
 });
 
 test("pickCourse: none: a notice; one: its id; more: the picker's", async () => {

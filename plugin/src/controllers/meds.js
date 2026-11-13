@@ -7,15 +7,15 @@ import { app } from "#/helpers/app.js";
 import { readJson } from "#/helpers/files.js";
 import { collection } from "#/helpers/collection.js";
 import { todayYmd } from "#/helpers/dates.js";
-import { COURSES, MEDICATION } from "#/helpers/paths.js";
+import { COURSES } from "#/helpers/paths.js";
 import {
   courseData, courseForm, courseList, courseOf, edited, formValues, intake, withDayNote, withMark,
 } from "#/models/course.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { Search } from "#/components/uikit/Search/index.ts";
+import { openWinx } from "#/components/app/open.ts";
 
 export const courses = collection(COURSES);
-
 const by = (json, fn) => Object.fromEntries(Object.entries(json).map(([id, r]) => [id, fn(r)]));
 
 export async function loadMeds() {
@@ -42,9 +42,8 @@ export async function newCourse(ask = formAsk) {
 
   if (!v) return null;
   const id = await courses.add(courseOf(v, todayYmd()), "c");
-  const page = app.vault.getFileByPath(MEDICATION);
 
-  if (page) await app.workspace.getLeaf("tab").openFile(page);
+  await openWinx("meds", {}, true);
   return id;
 }
 

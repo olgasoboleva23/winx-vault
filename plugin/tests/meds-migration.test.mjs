@@ -5,7 +5,7 @@ import { Notice } from "obsidian";
 import {
   checkCourse, courseFromNote, migrateMeds, migrateMedsNotes, parseCourse,
 } from "#/migrations/meds.js";
-import { COURSES, MEDICATION, MEDICATION_BASE } from "#/helpers/paths.js";
+import { COURSES, MEDICATION_BASE } from "#/helpers/paths.js";
 import { withMark } from "#/models/course.js";
 
 globalThis.window ??= {};
@@ -41,8 +41,6 @@ const REC = {
   marks: { "2026-11-07": { "АЕ": "✅", "МГ☀️": "✅", "МГ🌙": "❌" }, "2026-11-08": { "АЕ": "✅" } },
   dayNotes: { "2026-11-08": "сегодня" },
 };
-
-const MEDICATION_TEXT = "---\ncssclasses:\n  - dashboard\n---\n\n```winx\nmeds\n```\n";
 
 const TABLE = `| Дата | БА | МА☀️ | МА🌙 | АЕ | Заметки |
 | --- | :-: | :-: | :-: | :-: | --- |
@@ -141,14 +139,13 @@ test("migrateMedsNotes: a legacy match with different history requires review", 
     /already has a course with this start and codes/);
 });
 
-test("migrateMeds: courses.json written, the note renamed (old), Medication.md made, the base trashed; twice: nothing", async () => {
+test("migrateMeds: courses.json written, the note renamed (old), the base trashed; twice: nothing", async () => {
   const { files } = vault({ [P]: NOTE, [MEDICATION_BASE]: "views: []" }, { props: { [P]: FM } });
 
   await migrateMeds();
   assert.deepEqual(JSON.parse(files[COURSES]).c1, { ...REC, migratedFrom: P });
   assert.equal(files[`${DIR}/Аевит, Магний (old).md`], NOTE);
   assert.equal(P in files, false);
-  assert.equal(files[MEDICATION], MEDICATION_TEXT);
   assert.equal(MEDICATION_BASE in files, false);
   assert.match(Notice.last, /^✦ 1 course\(s\) migrated: 3 ✅, 1 ❌, 1 day notes; old notes: Аевит, Магний \(old\)\.md/);
   const before = structuredClone(files);

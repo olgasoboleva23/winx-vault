@@ -1,4 +1,4 @@
-<!-- The Medication page (Medication.md's ```winx meds block): a tab per course of courses.json
+<!-- The Medication Vue page: a tab per course of courses.json
      (running first, then the newest start), the picked one below it (MedsCourse); no course yet:
      how to make one -->
 <script setup>
@@ -20,7 +20,7 @@ const picked = computed({
 <template>
   <WinxEmpty v-if="!list.length" text="No courses yet: Winx: New medication course" />
   <div v-else>
-    <!-- one row, sideways scroll (Helga, pending: drop "scroll" to wrap) -->
+    <!-- one row, sideways scroll -->
     <WinxTabs
       v-model="picked"
       :tabs="list.map(c => ({ key: c.id, text: c.label }))"

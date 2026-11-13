@@ -1,4 +1,4 @@
-import { FINANCE_PAGE, FOOD, SHOP, SUPPLIES } from "#/helpers/paths.js";
+import { FINANCE_PAGE, FOOD, MEDICATION, SHOP, SUPPLIES } from "#/helpers/paths.js";
 
 export const WINX_VIEW = "winx";
 
@@ -9,6 +9,7 @@ export const pages = {
   finance: { title: "Finance", icon: "💰", widget: "finance", note: FINANCE_PAGE },
   shop: { title: "Shop", icon: "🛍", widget: "shop", note: `${SHOP}.md` },
   supplies: { title: "Supplies", icon: "📦", widget: "supplies", note: `${SUPPLIES}.md` },
+  meds: { title: "Medication", icon: "💊", widget: "meds", note: MEDICATION },
   food: { title: "Food", icon: "🍽", widget: "food", note: FOOD },
 };
 

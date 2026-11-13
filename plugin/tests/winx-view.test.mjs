@@ -273,7 +273,7 @@ test("openWinx: the newest Winx tab, else one new pinned tab", async () => {
   assert.equal(extra.pinned, false);
 });
 
-test("the drawer: Projects, Finance, Shop, Supplies, Food, then ⚙ Settings; ↗ opens a tab", async () => {
+test("the drawer: Projects, Finance, Shop, Supplies, Medication, Food, then ⚙ Settings; ↗ opens a tab", async () => {
   const { mount } = await import("@vue/test-utils");
   const PageNavigation = (await import("#/components/app/PageNavigation/index.vue")).default;
   const w = workspace([]);
@@ -287,8 +287,8 @@ test("the drawer: Projects, Finance, Shop, Supplies, Food, then ⚙ Settings; �
   const rows = shell.findAll(".winx-page-navigation__row .winx-grow");
 
   assert.deepEqual(rows.map(r => r.findAll("span").at(-1).text()),
-    ["Projects", "Finance", "Shop", "Supplies", "Food", "Settings"]);
-  assert.match(rows[5].text(), /⚙/);
+    ["Projects", "Finance", "Shop", "Supplies", "Medication", "Food", "Settings"]);
+  assert.match(rows[6].text(), /⚙/);
   await shell.find(".winx-page-navigation__open-tab").trigger("click");
   await new Promise(r => setTimeout(r));
   assert.equal(w.made.length, 1);
@@ -359,4 +359,51 @@ test("a standalone Finance widget opens its Vue page, Cmd-click in another tab",
   assert.equal(w.made[0].state.state.page, "finance");
   assert.equal(w.made[0].pinned, false);
   widget.unmount();
+});
+
+
+test("Medication route: empty state, JSON updates and marks, subscriptions released on leaving", async () => {
+  const { vault } = await import("./stubs/vault.mjs");
+  const { COURSES } = await import("#/helpers/paths.js");
+  const { flushPromises } = await import("@vue/test-utils");
+  window.moment = () => ({ format: () => "2026-11-13" });
+  const { app, files } = vault();
+  const listeners = new Set();
+  const on = (name, fn) => {
+    const entry = { name, fn };
+    listeners.add(entry);
+    return { off: () => listeners.delete(entry) };
+  };
+  const fire = name => {
+    for (const e of [...listeners]) if (e.name === name) e.fn({ path: COURSES });
+  };
+  Object.assign(app.vault, { on });
+  Object.assign(app.metadataCache, { on });
+  const { view, leaf, ready } = open();
+  app.workspace = leaf.app.workspace;
+  app.workspace.on = on;
+  document.body.append(view.contentEl);
+  await ready;
+  await leaf.setViewState({ state: { page: "meds" } });
+  await flushPromises();
+  assert.equal(view.contentEl.querySelector("h2").textContent, "Medication");
+  assert.match(view.contentEl.textContent, /No courses yet/);
+  files[COURSES] = JSON.stringify({ c1: {
+    start: "2026-11-13", meds: [{ name: "Тест", code: "ТЕ", times: ["morning", "evening"], days: 2 }],
+    notes: "", marks: {}, dayNotes: {},
+  } });
+  fire("create");
+  await flushPromises();
+  assert.equal(view.contentEl.querySelectorAll(".winx-meds__chip").length, 2);
+  view.contentEl.querySelector(".winx-meds__chip").click();
+  await flushPromises();
+  assert.equal(JSON.parse(files[COURSES]).c1.marks["2026-11-13"]["ТЕ☀️"], "✅");
+  fire("modify");
+  await flushPromises();
+  assert.equal(view.contentEl.querySelector(".winx-meds__chip").dataset.mark, "✅");
+  assert.ok(listeners.size > 0);
+  await view.go("projects");
+  assert.equal(listeners.size, 0);
+  await view.onClose();
+  view.contentEl.remove();
 });

@@ -2,7 +2,7 @@ import { test, before } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { vault } from "./stubs/vault.mjs";
-import { COURSES, FOOD_DATA, FOOD_LOG, JOURNALS, MEDICATION } from "#/helpers/paths.js";
+import { COURSES, FOOD_DATA, FOOD_LOG, JOURNALS } from "#/helpers/paths.js";
 import { forFood } from "#/models/course.js";
 
 let mount, FoodPage, loadFood, DEFAULT_MARKS;
@@ -28,8 +28,11 @@ const data = () => ({
   courses: [forFood("c1", REC)],
 });
 
-test("the food page: the week, a row a day: what was eaten with its marks, the marks counted, the journal the next day, the course, the note", () => {
-  const w = mount(FoodPage, { props: { state: { data: data() } } });
+test("the food page: the week, a row a day: what was eaten with its marks, the marks counted, the journal the next day, the course, the note", async () => {
+  const went = [];
+  const w = mount(FoodPage, { props: { state: { data: data() } }, global: {
+    provide: { winx: { go: (...args) => went.push(args) } },
+  } });
   const rows = w.findAll(".winx-table__row");
 
   assert.equal(rows.length, 7);
@@ -41,11 +44,10 @@ test("the food page: the week, a row a day: what was eaten with its marks, the m
   assert.equal(mon.find(".winx-food__level").text(), "2");   // Высыпания on the 3rd
   assert.ok(w.findAll(".winx-table__head").map(h => h.text()).includes("Высыпания +1д"));   // the next day's, said in its head
   assert.equal(mon.find(".winx-food__course").text(), "💊");
-  let opened = null;
-
-  vault().app.workspace.openLinkText = p => { opened = p; };
-  mon.find(".winx-food__course").trigger("click");
-  assert.equal(opened, MEDICATION);
+  await mon.find(".winx-food__course").trigger("click");
+  await mon.find(".winx-food__course").trigger("click", { mod: true });
+  assert.deepEqual(went.map(([page, params, e]) => [page, params, !!e.mod]),
+    [["meds", {}, false], ["meds", {}, true]]);
   assert.equal(mon.find(".winx-food__med").text(), "МА");
   assert.equal(mon.find(".winx-food__med").attributes("aria-label"), "мастодинон: не принято");
   assert.ok(mon.find(".winx-food__med").classes().includes("winx-food__med--not"));   // no ✅ that day
