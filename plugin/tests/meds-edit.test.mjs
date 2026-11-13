@@ -81,6 +81,35 @@ test("editCourse: the course deleted while its window was open: nothing written,
   assert.equal(Notice.last, "✦ that course is gone");
 });
 
+test("editCourse: a newer dose is not overwritten by a stale window", async () => {
+  const { files } = stored({ c1: REC });
+  let newer;
+
+  await editCourse("c1", async (title, rows, o) => {
+    newer = structuredClone(REC);
+    newer.meds[1].dose = "новая доза";
+    files[COURSES] = JSON.stringify({ c1: newer });
+    return { ...o.values, notes: "из старого окна" };
+  });
+  assert.deepEqual(read(files).c1, newer);
+  assert.match(Notice.last, /course changed meanwhile/);
+});
+
+test("editCourse: new marks and day notes survive a simultaneous property edit", async () => {
+  const { files } = stored({ c1: REC });
+
+  await editCourse("c1", async (title, rows, o) => {
+    await tickMeds("c1", "2026-11-08", "МГ🌙", "✅");
+    await setDayNote("c1", "2026-11-08", "новая заметка дня");
+    return { ...o.values, notes: "новая заметка курса" };
+  });
+  const saved = read(files).c1;
+
+  assert.equal(saved.notes, "новая заметка курса");
+  assert.equal(saved.marks["2026-11-08"]["МГ🌙"], "✅");
+  assert.equal(saved.dayNotes["2026-11-08"], "новая заметка дня");
+});
+
 test("newCourse: courses.json made with c1, the next one c2", async () => {
   const { files } = vault();
   const ask = async () => ({ meds: [{ name: "Аевит" }], start: "", notes: "" });

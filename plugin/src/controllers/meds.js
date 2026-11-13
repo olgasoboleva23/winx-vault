@@ -48,19 +48,27 @@ export async function newCourse(ask = formAsk) {
   return id;
 }
 
-// the window with the course's values; saved over the record as it is then (a mark written while
-// the window was open stays)
+// the window with the course's values; a mark written meanwhile stays, newer course properties
+// aren't overwritten by this window's old values
 export async function editCourse(id, ask = formAsk) {
   const rec = (await readJson(COURSES, {}))[id];
   const gone = () => void new Notice("✦ that course is gone");
 
   if (!rec) return gone();
   const { rows, required } = courseForm();
+  const values = formValues(rec), before = JSON.stringify(values);
   const v = await ask("✦ Edit medication course", rows,
-    { values: formValues(rec), required, submit: "Save" });
+    { values, required, submit: "Save" });
 
-  // deleted while the window was open: said, not lost silently
-  if (v && !await courses.update(id, r => edited(r, v))) gone();
+  if (!v) return;
+  let changed = false;
+  const saved = await courses.update(id, r => {
+    changed = JSON.stringify(formValues(r)) !== before;
+    return changed ? null : edited(r, v);
+  });
+
+  if (changed) new Notice("✦ the course changed meanwhile: open its window again");
+  else if (!saved) gone();
 }
 
 const searchPick = list => Search.pick(
