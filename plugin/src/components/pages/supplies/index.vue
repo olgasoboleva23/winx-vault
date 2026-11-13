@@ -11,7 +11,7 @@ defineProps({ state: { type: Object, required: true } });
 
 <template>
   <div class="winx-supplies">
-    <WinxEmpty v-if="state.data.empty" text="Nothing bought twice yet" />
+    <WinxEmpty v-if="state.data.empty" on-background text="Nothing bought twice yet" />
     <template v-for="g in state.data.groups" :key="g.label">
       <WinxGroupHeader :label="g.label" />
       <div

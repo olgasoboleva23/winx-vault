@@ -57,9 +57,10 @@ const canTick = computed(() => { void projects.version.value; return !!tasksApi(
       </div>
       <WinxTabs v-model="state.filter" :tabs="tabs" on-background />
     </div>
-    <WinxEmpty v-if="!all.length" text="No projects yet" />
+    <WinxEmpty v-if="!all.length" on-background text="No projects yet" />
     <WinxEmpty
       v-else-if="!shown.length"
+      on-background
       :text="`No ${label(state.filter).toLowerCase()} projects`"
     />
     <div class="winx-projects__grid">

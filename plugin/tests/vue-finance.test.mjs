@@ -32,7 +32,7 @@ test("Finance: starts on its month; ◀ ▶ step through the months there are, w
 
 test("Finance: an empty ledger says where the notes go; the dashboard's line", () => {
   const e = mount(FinanceMonths, { props: { state: { data: { empty: true, path: "x/Ledger" } } } });
-  assert.equal(e.find(".winx-fin__empty").text(), "The ledger is empty: a note per month goes to x/Ledger");
+  assert.equal(e.find(".winx-empty").text(), "✦ The ledger is empty: a note per month goes to x/Ledger");
   const l = mount(FinanceLine, { props: { state: { data: { month: "November", spent: "50 ₽", income: "72 000 ₽" } } } });
   assert.equal(l.find(".winx-fin-month > div").text(), "November: spent 50 ₽ · income 72 000 ₽");
 });

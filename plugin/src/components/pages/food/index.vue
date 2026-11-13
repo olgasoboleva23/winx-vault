@@ -5,6 +5,7 @@
 <script setup>
 import { computed, inject, ref } from "vue";
 import { Keymap, Notice } from "obsidian";
+import WinxCard from "#/components/uikit/WinxCard/index.vue";
 import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxInput from "#/components/uikit/WinxInput/index.vue";
 import WinxTable from "#/components/uikit/WinxTable/index.vue";
@@ -54,7 +55,7 @@ const act = async (write) => {
 </script>
 
 <template>
-  <div class="winx-food">
+  <WinxCard class="winx-food" :meta="['hero']">
     <div class="winx-food__head winx-row winx-gap-m">
       <WinxButton
         kind="nav"
@@ -137,5 +138,5 @@ const act = async (write) => {
         </template>
       </WinxTable>
     </div>
-  </div>
+  </WinxCard>
 </template>
