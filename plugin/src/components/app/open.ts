@@ -49,36 +49,3 @@ export function openNote(href: string, sourcePath: string, e?: MouseEvent | null
   if (tab && page) return void tab.go(page, {}, e);
   return void app.workspace.openLinkText(href, sourcePath, Keymap.isModEvent(e) || tab !== null);
 }
-
-// The old Winx tabs (winx-dashboard, winx-calendar, winx-projects) come back from a saved layout
-// as a Winx tab on their page, with their state.
-// TODO: after one release with this migration, remove OldWinxView and its registerView calls
-// in main.ts.
-export class OldWinxView extends ItemView {
-  private type: string;
-  private page: string;
-  private timer = 0;
-
-  constructor(leaf: WorkspaceLeaf, type: string, page: string) {
-    super(leaf);
-    this.type = type;
-    this.page = page;
-  }
-  getViewType() { return this.type; }
-  getDisplayText() { return "Winx"; }
-  async onClose() { window.clearTimeout(this.timer); }
-
-  // Obsidian calls it on every open (`{}` without a saved state). Moved a moment later: the leaf
-  // ignores a setViewState while it is still busy with this one
-  async setState(s: unknown) {
-    const { page } = this;
-
-    this.timer = window.setTimeout(() => {
-      if (this.leaf.view !== this) return;   // closed or already something else
-      // `popstate` (not in the typings, but read by Obsidian's setViewState): no Back step for
-      // the old view this one replaces
-      void this.leaf.setViewState({ type: WINX_VIEW, state: { page, [page]: s ?? {} },
-        popstate: true } as any);
-    });
-  }
-}

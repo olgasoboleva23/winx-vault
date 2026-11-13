@@ -5,7 +5,7 @@ import { Keymap } from "obsidian";
 import { setApp } from "#/helpers/app.js";
 
 // Vue page lifetimes, Obsidian history and opening a separate tab.
-let WinxView, made, unloaded, vue, openWinx, OldWinxView;
+let WinxView, made, unloaded, vue, openWinx;
 
 before(async () => {
   GlobalRegistrator.register();
@@ -24,7 +24,7 @@ before(async () => {
     isShown() { return this.style.display !== "none"; },
   });
   ({ WinxView } = await import("#/components/app/view.ts"));
-  ({ openWinx, OldWinxView } = await import("#/components/app/open.ts"));
+  ({ openWinx } = await import("#/components/app/open.ts"));
   vue = await import("vue");
   for (const key of ["dashboard", "calendar", "projects"]) {
     const Page = (await import(`../src/components/pages/${key}/index.vue`)).default;
@@ -193,33 +193,6 @@ test("the calendar's state is saved with the layout: unfolded days are, area isn
   view.state.calendar.unfolded = [...view.state.calendar.unfolded, "2026-11-05"];
   await vue.nextTick();
   assert.equal(saves.length, before + 1);
-});
-
-test("an old calendar leaf becomes a Winx tab on the calendar, with its state", async () => {
-  const got = [];
-  const leaf = { app: {}, setViewState: async s => got.push(s) };
-  const old = new OldWinxView(leaf, "winx-calendar", "calendar");
-
-  leaf.view = old;
-  assert.equal(old.getViewType(), "winx-calendar");
-  await old.setState({ view: "month" }, {});
-  await new Promise(r => setTimeout(r));   // after Obsidian's setViewState is done with it
-  assert.deepEqual(got, [
-    // popstate: the old view this replaces is no Back step
-    { type: "winx", state: { page: "calendar", calendar: { view: "month" } }, popstate: true },
-  ]);
-});
-
-test("an old leaf closed before its move does not come back as a Winx tab", async () => {
-  const got = [];
-  const leaf = { app: {}, setViewState: async s => got.push(s) };
-  const old = new OldWinxView(leaf, "winx-calendar", "calendar");
-
-  leaf.view = old;
-  await old.setState({}, {});
-  await old.onClose();
-  await new Promise(r => setTimeout(r));
-  assert.deepEqual(got, []);
 });
 
 // the workspace openWinx sees: its Winx leaves, the leaves it makes, what it reveals

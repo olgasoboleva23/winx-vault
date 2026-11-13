@@ -1,6 +1,6 @@
 import { Platform, Plugin } from "obsidian";
 import { WINX_VIEW, WinxView } from "./components/app/view.ts";
-import { OldWinxView, openWinx } from "./components/app/open.ts";
+import { openWinx } from "./components/app/open.ts";
 import { registerCommands } from "./commands/commands.ts";
 import { drawBlock } from "./controllers/blocks.js";
 import { useNotify } from "./composables/notify.js";
@@ -24,9 +24,6 @@ export default class WinxPlugin extends Plugin {
     // the Winx tab (its pages: components/app/pages.js); ✨ and the command go to the one used
     // last, or open it, pinned, on the dashboard
     this.registerView(WINX_VIEW, leaf => new WinxView(leaf));
-    // the old tabs, from a layout saved before: a Winx tab on their page
-    for (const page of ["dashboard", "calendar", "projects"])
-      this.registerView(`winx-${page}`, leaf => new OldWinxView(leaf, `winx-${page}`, page));
     this.addCommand({ id: "open", name: "Open", callback: () => openWinx() });
     this.addRibbonIcon("sparkles", "Winx", () => openWinx());
     this.addCommand({   // after a rebuild: load the new main.js without restarting Obsidian
