@@ -7,6 +7,7 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 let mount, nextTick, ui;
 before(async () => {
   GlobalRegistrator.register();
+  HTMLElement.prototype.isShown = function () { return !this.hidden && this.checkVisibility(); };
   ({ mount } = await import("@vue/test-utils"));
   ({ nextTick } = await import("vue"));
   // a component is <Name>.vue, or <Name>/index.vue when it has its own styles
@@ -217,6 +218,64 @@ test("WinxDrawer: a labelled dialog; open, it takes the focus, closed, gives it 
   assert.equal(document.activeElement, other);
   drawer.unmount();
   other.remove();
+});
+
+test("WinxDrawer: desktop Tab stays in the panel, so Escape still closes it", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const other = document.body.appendChild(document.createElement("button"));
+  other.focus();
+  const drawer = mount(WinxDrawer, {
+    attachTo: document.body,
+    slots: { default: '<button disabled>Disabled</button><button hidden>Hidden</button>'
+      + '<button tabindex="-1">Not tabbed</button><button>First</button><button>Last</button>' },
+  });
+  await drawer.setProps({ open: true });
+  await nextTick();
+  const panel = drawer.find(".winx-drawer__panel").element;
+  const buttons = drawer.findAll("button"), first = buttons[3].element, last = buttons[4].element;
+  const tab = shiftKey => {
+    const event = new KeyboardEvent("keydown", { key: "Tab", shiftKey, bubbles: true, cancelable: true });
+    document.activeElement.dispatchEvent(event);
+    return event.defaultPrevented;
+  };
+
+  assert.equal(document.activeElement === panel, true);
+  assert.equal(tab(true), true);
+  assert.equal(document.activeElement === last, true);
+  assert.equal(tab(false), true);
+  assert.equal(document.activeElement === first, true);
+  assert.equal(tab(false), false);   // ordinary moves inside the panel stay native
+  assert.equal(tab(true), true);
+  assert.equal(document.activeElement === last, true);
+  await buttons[4].trigger("keydown", { key: "Escape" });
+  assert.equal(drawer.emitted("close").length, 1);
+  await drawer.setProps({ open: false });
+  assert.equal(document.activeElement === other, true);
+  drawer.unmount();
+  other.remove();
+});
+
+test("WinxDrawer: the phone sheet leaves the bottom navigation reachable", async () => {
+  const WinxDrawer = (await import("../src/components/uikit/WinxDrawer/index.vue")).default;
+  const other = document.body.appendChild(document.createElement("button"));
+  const dashboard = document.body.appendChild(document.createElement("button"));
+  other.focus();
+  const drawer = mount(WinxDrawer, { props: { side: "bottom" }, attachTo: document.body,
+    slots: { default: "<button>Settings</button>" } });
+  await drawer.setProps({ open: true });
+  await nextTick();
+  const panel = drawer.find(".winx-drawer__panel");
+  const event = new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true, cancelable: true });
+
+  panel.element.dispatchEvent(event);
+  assert.equal(event.defaultPrevented, false);
+  assert.notEqual(panel.attributes("aria-modal"), "true");
+  dashboard.focus();   // a click on the visible bottom bar
+  await drawer.setProps({ open: false });
+  assert.equal(document.activeElement === dashboard, true);
+  drawer.unmount();
+  other.remove();
+  dashboard.remove();
 });
 
 test("WinxNav: the current item is the page; the one whose drawer is open, expanded", async () => {

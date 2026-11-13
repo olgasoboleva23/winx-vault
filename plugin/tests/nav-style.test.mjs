@@ -9,5 +9,5 @@ test("WinxNav: labels open on :focus-visible, not on any focus, and not when shu
     { loadPaths: [new URL("../src/styles", import.meta.url).pathname] }).css;
 
   assert.doesNotMatch(css, /:focus-within/);
-  assert.match(css, /\.winx-rail:not\(\.winx-rail--shut\):has\(:focus-visible\) \.winx-rail__label/);
+  assert.match(css, /\.winx-rail:not\(\.winx-rail--phone, \.winx-rail--shut\):has\(:focus-visible\) \.winx-rail__label/);
 });

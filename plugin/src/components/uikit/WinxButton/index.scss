@@ -110,9 +110,10 @@ button.winx-btn {
 
   // rail: an item of the Winx tab's nav (WinxNav): a rounded square with its icon, and its Quicksand
   // label when the pill is open; hover: light pink, on: pink with a gold border; on hover sparkles
-  // fly out (nav only; the pill is near-white, so they show over the hover's pink)
+  // fly out in gold against the near-white pill
   &.winx-btn--rail {
     @include row;
+    justify-content: flex-start;
     position: relative;
     min-width: $rail-item;
     height: $rail-item;
@@ -130,10 +131,12 @@ button.winx-btn {
     text-transform: none;
     cursor: pointer;
 
-    @include sparkles {
+    @include sparkles(var(--winx-gold-deep)) {
       background: var(--winx-pink-light);
       box-shadow: none;
     }
+    // Keep the sparkles around the icon, large enough to see beside the label.
+    &::after { inset: -8px; mask-position: left center; mask-size: 72px 46.8px; }
     &:focus-visible { background: var(--winx-pink-light); box-shadow: none; }
     &.winx-btn--on,
     &.winx-btn--on:hover {

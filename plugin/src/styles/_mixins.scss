@@ -104,12 +104,13 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
 // sparkles fly out of the middle on hover (WinxButton's add and rail; the picture is
 // --winx-sparkles-svg in _assets.scss), none for reduced motion; the hover's own look is the block
 // passed in. The parent is position: relative
-@mixin sparkles {
+@mixin sparkles($color: #fff) {
   &::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: var(--winx-sparkles-svg) center / 30px 19.5px no-repeat;
+    background: $color;
+    mask: var(--winx-sparkles-svg) center / 30px 19.5px no-repeat;
     opacity: 0;
     pointer-events: none;
   }

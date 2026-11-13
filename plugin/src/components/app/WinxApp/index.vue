@@ -40,16 +40,11 @@ function settings() {
   other.value = false;
   void openSettings();
 }
-
-// a drawer pick: closes the drawer, then goes there
-function pick(key, event) {
-  other.value = false;
-  void winx.go(key, {}, event);
-}
 </script>
 
 <template>
   <WinxNav
+    class="winx-app__rail"
     :items="items"
     :current="winx.state.page"
     :phone="phone"
@@ -57,6 +52,7 @@ function pick(key, event) {
     @go="go"
   />
   <WinxDrawer
+    class="winx-app__drawer"
     :open="other"
     :side="phone ? 'bottom' : 'left'"
     label="Other pages"
@@ -72,7 +68,7 @@ function pick(key, event) {
         type="button"
         class="winx-app__tile"
         :class="{ 'winx-app__tile--on': p.key === winx.state.page }"
-        @click="pick(p.key, $event)"
+        @click="go(p.key, $event)"
       >
         <span class="winx-app__tile-icon winx-center">{{ p.icon }}</span>
         <span class="winx-app__label">{{ p.text }}</span>
@@ -82,7 +78,7 @@ function pick(key, event) {
         class="winx-app__row winx-row"
         :class="{ 'winx-app__row--on': p.key === winx.state.page }"
       >
-        <button type="button" class="winx-app__go winx-row winx-grow" @click="pick(p.key, $event)">
+        <button type="button" class="winx-app__go winx-row winx-grow" @click="go(p.key, $event)">
           <span class="winx-app__icon winx-center">{{ p.icon }}</span>
           <span>{{ p.text }}</span>
         </button>

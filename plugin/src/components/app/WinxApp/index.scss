@@ -1,7 +1,7 @@
 /* The Winx tab's shell (WinxApp), block winx-app, on the tab's content: its pages, each one the
    scroller its own tab's content was (Obsidian's padding, scrolling), and the nav: desktop, the
-   pill floats over the page (absolute in the tab: it stays put while the page scrolls); phone, a
-   column, the bar last, right above Obsidian's floating navbar */
+   pill floats over the page (absolute in the tab: it stays put while the page scrolls); phone,
+   two grid rows: the page and its drawer, then the bar above Obsidian's floating navbar */
 @use "mixins" as *;
 
 $tile: 50px;   // the phone sheet's round tile (off the button sizes)
@@ -20,9 +20,17 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
     overflow: auto;
   }
 
-  &--phone { display: flex; flex-direction: column; }
-  &--phone &__pages { flex: 1; min-height: 0; }
-  &--phone &__nav { margin-bottom: var(--view-bottom-spacing, 0); }
+  &--phone { display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  &--phone &__pages { grid-area: 1 / 1; min-height: 0; }
+  &--phone &__nav { display: contents; }
+  &--phone &__rail { grid-area: 2 / 1; margin-bottom: var(--view-bottom-spacing, 0); }
+  // the drawer covers the page's grid cell, so the bar stays visible and clickable
+  &--phone &__drawer {
+    position: relative;
+    grid-area: 1 / 1;
+    min-height: 0;
+    overflow: hidden;   // the entering sheet slides behind the bottom bar
+  }
 
   // the bar sits above the navbar: the shell and its pages leave it no room of their own
   // (.is-phone .dashboard does, for a page the navbar floats over); !important to beat that
@@ -33,7 +41,7 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
   // the drawer's head: a gold crest and the name, a divider under
   &__head {
     gap: $space-l;
-    padding: 0 $space-s $space-l;
+    padding: 0 calc($space-m + $border-width-s) $space-l;   // match the rows’ padding and border
     margin-bottom: $space-s;
     border-bottom: $border;
   }
@@ -77,7 +85,7 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
     text-align: left;
     cursor: pointer;
   }
-  & button#{&}__go { gap: $space-l; padding: 0; }
+  & button#{&}__go { justify-content: flex-start; gap: $space-l; padding: 0; }
   &__icon, &__tile-icon {
     flex: none;
     width: $btn-l;

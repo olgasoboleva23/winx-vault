@@ -28,16 +28,22 @@ $pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
   // folded away until the pill opens
   &__label {
     box-sizing: border-box;
-    max-width: 0;
+    flex-shrink: 0;
+    width: 0;
+    padding-right: 0;
     overflow: hidden;
     opacity: 0;
     white-space: nowrap;
-    transition: max-width $medium ease, opacity $medium ease;
+    transition: width $medium ease, padding-right $medium ease, opacity $medium ease;
   }
   // opened by the pointer, or by the keyboard (:focus-visible: a mouse click's focus doesn't count);
   // --shut (clicked) keeps it folded
-  &--open &__label,
-  &:not(&--shut):has(:focus-visible) &__label { max-width: $label-w; padding-right: $space-m; opacity: 1; }
+  &--open:not(&--phone) &__label,
+  &:not(&--phone, &--shut):has(:focus-visible) &__label {
+    width: $label-w;
+    padding-right: $space-m;
+    opacity: 1;
+  }
 
   // phone: the bar in the page's flow (the shell puts it last), three equal places, an icon
   // above its label
@@ -60,10 +66,11 @@ $pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
     gap: $space-2xs;
     height: $tap;
     color: alpha(--winx-purple-deep, 70%);
+    &::after { mask-position: center; }
     &.winx-btn--on { border-color: transparent; background: none; color: var(--winx-purple-deep); }
     &.winx-btn--on &__icon { filter: drop-shadow(0 0 6px alpha(--winx-gold, 95%)); }
   }
-  &--phone &__label { max-width: none; padding: 0; font-size: $text-s; opacity: 1; }
+  &--phone &__label { width: auto; padding: 0; font-size: $text-s; opacity: 1; transition: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

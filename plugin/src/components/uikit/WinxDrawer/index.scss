@@ -34,6 +34,7 @@ $sheet-radius: 22px;   // the phone sheet's top corners, as the nav pill's
     grid-template-columns: repeat(4, 1fr);
     gap: $space-xl $space-s;
     width: auto;
+    max-height: 100%;
     // the grip, a small lavender bar over the grid
     &::before {
       content: "";
@@ -45,8 +46,7 @@ $sheet-radius: 22px;   // the phone sheet's top corners, as the nav pill's
       border-radius: $space-2xs;
       background: var(--winx-purple-light);
     }
-    // above Obsidian's floating navbar (0 when it doesn't float)
-    padding: $space-l $space-2xl calc(var(--view-bottom-spacing, 0px) + #{$space-xl});
+    padding: $space-l $space-2xl $space-xl;
     border: none;
     border-top: $border-width-m solid var(--winx-gold);
     border-radius: $sheet-radius $sheet-radius 0 0;
