@@ -50,9 +50,7 @@
     &__week { grid-template-columns: minmax(0, 1fr); }
     &__day { min-height: 0; }
   }
-}
-/* while dragging, today and past days split into ✓ done / ⏳ plan halves */
-.winx-cal {
+  /* while dragging, today and past days split into ✓ done / ⏳ plan halves */
   &__zones { display: none; position: absolute; inset: 0; z-index: $z-raised; gap: $space-xs; padding: $space-xs; }
   &--dragging &__zones { display: flex; flex-direction: column; }
   /* the dragged task's own day: no 📅 (it's on it already), ✓ a strip at the bottom, its tasks
@@ -227,12 +225,6 @@
     background-size: 250% 100%;
     animation: winx-tick-shimmer 1s ease-in-out 2;
   }
-}
-@keyframes winx-tick-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
-@keyframes winx-spin { to { transform: rotate(360deg); } }
-/* Phone gestures keep the row inside its column; the action tray wraps under its text. */
-body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-action: pan-y; }
-.winx-cal {
   /* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
   &__routine {
     margin: $space-xs 0;
@@ -273,3 +265,5 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
   &__zone--plan { font-family: $font-deco; font-size: $text-2xl; text-align: center; }
   &__month &__zone { font-size: $text-m; }
 }
+@keyframes winx-tick-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
+@keyframes winx-spin { to { transform: rotate(360deg); } }

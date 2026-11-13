@@ -5,15 +5,7 @@
 .winx-fin {
   font-size: $text-xl;
   &__title { font-weight: 600; letter-spacing: .02em; color: var(--winx-text-dark); }
-}
-button.winx-fin__nav-btn {
-  all: unset; cursor: pointer; padding: $space-2xs $space-m; border-radius: 8px; line-height: 1.5;
-  background: alpha(--winx-purple, 18%); color: var(--winx-text-dark);
-  &:hover { background: alpha(--winx-pink, 32%); }
-  &[disabled] { opacity: .3; cursor: default; }
-}
 
-.winx-fin {
   &__total {
     padding: $space-m $space-l; border-radius: $radius-l;
     background: alpha(--winx-purple, 12%);
@@ -50,4 +42,11 @@ button.winx-fin__nav-btn {
     &-sum { font-variant-numeric: tabular-nums; opacity: .85; }
   }
   &__empty { opacity: .6; font-style: italic; }
+}
+
+button.winx-fin__nav-btn {
+  all: unset; cursor: pointer; padding: $space-2xs $space-m; border-radius: 8px; line-height: 1.5;
+  background: alpha(--winx-purple, 18%); color: var(--winx-text-dark);
+  &:hover { background: alpha(--winx-pink, 32%); }
+  &[disabled] { opacity: .3; cursor: default; }
 }
