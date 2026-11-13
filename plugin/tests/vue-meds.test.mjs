@@ -20,8 +20,8 @@ before(async () => {
 const C1 = {
   start: "2026-11-07",
   meds: [
-    { name: "Аевит", code: "АЕ", dose: "1 таблетка", times: "any", meal: "after", days: 2 },
-    { name: "Магний 2 таблетки", code: "МГ", dose: "", times: "both", meal: "before", days: 3 },
+    { name: "Аевит", code: "АЕ", dose: "1 таблетка", times: [], meal: "after", days: 2 },
+    { name: "Магний 2 таблетки", code: "МГ", dose: "", times: ["morning", "evening"], meal: "before", days: 3 },
   ],
   notes: "После еды\nЗапивать водой",
   marks: {
@@ -32,7 +32,7 @@ const C1 = {
 };
 const C2 = {
   start: "2026-10-01",
-  meds: [{ name: "Цинк", code: "ЦИ", dose: "", times: "any", meal: "any", days: 2 }],
+  meds: [{ name: "Цинк", code: "ЦИ", dose: "", times: [], meal: "any", days: 2 }],
   notes: "", marks: { "2026-10-01": { "ЦИ": "✅" } }, dayNotes: {},
 };
 const tick = () => new Promise(r => setTimeout(r));
@@ -72,7 +72,7 @@ test("MedsCourse: Приём, Заметки when there are notes, the counts, c
     [["Магний", "✅"], ["Магний", "☐"], ["Аевит", "☐"]]);
   assert.equal(w.findAll(".winx-table__row").length, 3);
   assert.deepEqual(w.findAll(".winx-meds__legend")[0].findAll("span")
-    .map(e => e.text().replace(/\s+/g, " ")), ["АЕ Аевит", "МГ Магний", "☀️ утро", "🌙 на ночь"]);
+    .map(e => e.text().replace(/\s+/g, " ")), ["АЕ Аевит", "МА Магний", "☀️ утро", "🌙 на ночь"]);
   assert.equal(w.findAll(".winx-meds__row--today").length, 1);
   assert.equal(w.findAll(".winx-meds__tick").length, 8);   // Аевит's last day is blank
   assert.equal(w.find(".winx-meds__row--past .winx-meds__tick").classes("winx-check--on"), true);

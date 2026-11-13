@@ -18,7 +18,7 @@ const tick = () => new Promise(r => setTimeout(r));
 const LOG = { "2026-11-02": { eaten: ["f1", "f2"], note: "сыпь" } };
 // a course as courses.json keeps it (made-up)
 const REC = {
-  start: "2026-11-02", meds: [{ name: "мастодинон", code: "МА", times: "both", days: 2 }],
+  start: "2026-11-02", meds: [{ name: "мастодинон", code: "МА", times: ["morning", "evening"], days: 2 }],
   notes: "", marks: { "2026-11-03": { "МА🌙": "✅" } }, dayNotes: {},
 };
 const data = () => ({

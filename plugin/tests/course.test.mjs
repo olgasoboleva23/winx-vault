@@ -16,8 +16,8 @@ test("a mark goes round ☐ → ✅ → ❌ → ☐; a day's label in Russian", 
 const REC = {
   start: "2026-11-07",
   meds: [
-    { name: "Аевит", code: "АЕ", dose: "1 таблетка", times: "any", meal: "after", days: 2 },
-    { name: "Магний 2 таблетки", code: "МГ", dose: "", times: "both", meal: "before", days: 3 },
+    { name: "Аевит", code: "АЕ", dose: "1 таблетка", times: [], meal: "after", days: 2 },
+    { name: "Магний 2 таблетки", code: "МГ", dose: "", times: ["morning", "evening"], meal: "before", days: 3 },
   ],
   notes: "",
   marks: {
@@ -36,7 +36,7 @@ test("a record's course: a column per medicine and time, a row per day, today's 
   assert.deepEqual(d.rows[1].marks, ["☐", "✅", "☐"]);
   assert.equal(d.rows[1].note, "сегодня");
   assert.deepEqual(d.rows.map(r => r.when), ["past", "today", "future"]);
-  assert.deepEqual(d.columns[1], { key: "МГ☀️", code: "МГ", time: "☀️", name: "Магний" });
+  assert.deepEqual(d.columns[1], { key: "МГ☀️", code: "МА", time: "☀️", name: "Магний" });
   // the stray ХХ isn't counted
   assert.deepEqual([d.day, d.days, d.taken, d.due], [2, 3, 3, 6]);
   assert.deepEqual(d.today.map(g => g.label), ["☀️ утро", "🌙 на ночь", "в любое время"]);
@@ -90,7 +90,7 @@ test("time checkboxes: every selected time is one dose; none is one unrestricted
   }
 });
 
-test("old course times reopen as checkboxes and keep the existing mark keys after saving", () => {
+test("course times reopen as checkboxes and keep the existing mark keys after saving", () => {
   const values = formValues(REC);
 
   assert.deepEqual([values.meds[0].morning, values.meds[0].day, values.meds[0].evening],
@@ -144,7 +144,7 @@ test("courseOf / edited: a code per medicine, unique, kept through a rename; the
 test("forFood: the codes taken by day; courseList: running first, then the newest", () => {
   const food = forFood("c1", REC);
 
-  assert.deepEqual(food.taken.get("2026-11-07"), new Set(["АЕ", "МГ"]));
+  assert.deepEqual(food.taken.get("2026-11-07"), new Set(["АЕ", "МА"]));
   assert.deepEqual([food.id, food.name, food.days], ["c1", "Аевит, Магний", 3]);
   const list = courseList({
     c1: REC, c2: { ...REC, start: "2026-11-09" }, c3: { ...REC, start: "2026-10-01" },
@@ -153,4 +153,27 @@ test("forFood: the codes taken by day; courseList: running first, then the newes
   assert.deepEqual(list.map(c => c.id), ["c1", "c2", "c3"]);
   assert.deepEqual(list.map(c => c.running), [true, false, false]);
   assert.equal(list[0].label, "Аевит, Магний · 7 ноя");
+});
+
+test("renaming a medicine updates its labels while table and Food retain its marked history", () => {
+  const original = {
+    start: "2026-11-13", notes: "", dayNotes: {},
+    meds: [
+      { name: "Новопассит", code: "НО", times: ["evening"], days: 2 },
+      { name: "Валериана", code: "ВА", times: ["evening"], days: 2 },
+    ],
+    marks: { "2026-11-13": { "НО🌙": "✅", "ВА🌙": "❌" } },
+  };
+  const values = formValues(original);
+  values.meds[0].name = "Валериана форте";
+  const renamed = edited(original, values);
+  const data = courseData(renamed, "2026-11-13");
+  assert.deepEqual(data.columns.map(c => [c.key, c.code]), [["НО🌙", "ВА"], ["ВА🌙", "ВЛ"]]);
+  assert.deepEqual(data.rows[0].marks, ["✅", "❌"]);
+  assert.deepEqual(renamed.marks, original.marks);
+  const food = forFood("c1", renamed);
+  assert.deepEqual(food.meds.map(m => m.code), ["ВА", "ВЛ"]);
+  assert.deepEqual(food.taken.get("2026-11-13"), new Set(["ВА"]));
+  const toggled = withMark(renamed, "2026-11-14", data.columns[0].key, "✅");
+  assert.equal(toggled.marks["2026-11-14"]["НО🌙"], "✅");
 });

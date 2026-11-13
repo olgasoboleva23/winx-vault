@@ -38,9 +38,7 @@ export const nameOf = typed => parts(typed)[0];
 
 export const codeOf = typed => nameOf(typed).slice(0, 2).toUpperCase();
 
-// a code per medicine, its column's name, the key its marks follow through an edit: kept once it
-// has one (a rename or a new order keeps it), else free letters of its name (Мастодинон МА,
-// Магний МГ), else a number
+// A unique code per medicine; stored codes keep marks connected through renames and reordering.
 export const withCodes = groups => {
   const taken = new Set(groups.map(g => g.code).filter(Boolean));
 
@@ -55,6 +53,10 @@ export const withCodes = groups => {
     return { ...g, code };
   });
 };
+
+// Visible abbreviations follow current names; stored codes remain the keys of the history.
+const labelsOf = meds => new Map(withCodes(meds.map(({ name }) => ({ name })))
+  .map((m, i) => [meds[i].code, m.code]));
 
 export const medicine = g => {
   const [name, dose] = parts(g.name);
@@ -118,13 +120,18 @@ export const formValues = rec => ({
 });
 
 // a column per medicine and time of day (once a day: no time), its key the marks are kept by
-export const columns = meds => meds.flatMap(m => {
-  const times = timesOf(m.times);
+export const columns = meds => {
+  const labels = labelsOf(meds);
 
-  return (times.length ? times : [""]).map(time => ({
-    key: m.code + time, code: m.code, time, name: nameOf(m.name), days: Number(m.days) || 90,
-  }));
-});
+  return meds.flatMap(m => {
+    const times = timesOf(m.times);
+
+    return (times.length ? times : [""]).map(time => ({
+      key: m.code + time, code: labels.get(m.code), time,
+      name: nameOf(m.name), days: Number(m.days) || 90,
+    }));
+  });
+};
 
 export const courseDays = rec => Math.max(...columns(rec.meds).map(c => c.days));
 
@@ -196,11 +203,14 @@ export const withDayNote = (rec, date, text) =>
 // the food page's view of a course: its medicines and by day the codes taken (a ✅ in any of
 // their keys)
 export function forFood(id, rec) {
+  const labels = labelsOf(rec.meds);
   const code = Object.fromEntries(columns(rec.meds).map(c => [c.key, c.code]));
 
   return {
     id, name: courseName(rec), start: rec.start, days: courseDays(rec),
-    meds: rec.meds.map(m => ({ code: m.code, name: nameOf(m.name), days: Number(m.days) || 90 })),
+    meds: rec.meds.map(m => ({
+      code: labels.get(m.code), name: nameOf(m.name), days: Number(m.days) || 90,
+    })),
     taken: new Map(Object.entries(rec.marks).map(([date, marks]) => [date,
       new Set(Object.keys(marks).filter(k => marks[k] === "✅" && code[k]).map(k => code[k]))])),
   };

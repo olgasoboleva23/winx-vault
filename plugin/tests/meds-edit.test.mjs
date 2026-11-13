@@ -12,8 +12,8 @@ window.moment = () => ({ format: () => "2026-11-08" });
 const REC = {
   start: "2026-11-07",
   meds: [
-    { name: "Аевит", code: "АЕ", dose: "1 таблетка", times: "any", meal: "after", days: 2 },
-    { name: "Магний 2 таблетки", code: "МГ", dose: "", times: "both", meal: "before", days: 3 },
+    { name: "Аевит", code: "АЕ", dose: "1 таблетка", times: [], meal: "after", days: 2 },
+    { name: "Магний 2 таблетки", code: "МГ", dose: "", times: ["morning", "evening"], meal: "before", days: 3 },
   ],
   notes: "",
   marks: {
