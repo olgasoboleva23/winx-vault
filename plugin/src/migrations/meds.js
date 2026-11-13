@@ -85,9 +85,10 @@ export function checkCourse(text, rec, today) {
 }
 
 const codes = rec => rec.meds.map(m => m.code).join(",");
+const content = ({ migratedFrom: _, ...rec }) => JSON.stringify(rec);
 
-// the records with the notes' courses added (a course already there, same start and codes in
-// order, skipped: its path in `skipped`), each checked first: the first one off throws
+// Each note keeps its own course. Its original path identifies a retry; a changed import stops
+// rather than overwriting history. An older import without a path must match all content.
 export function migrateMedsNotes(notes, existing, today) {
   const records = { ...existing }, added = [], skipped = [], marks = { done: 0, skipped: 0 };
   let dayNotes = 0;
@@ -95,18 +96,35 @@ export function migrateMedsNotes(notes, existing, today) {
   for (const { path, text, fm } of notes) {
     const rec = courseFromNote(text, fm);
 
-    if (Object.values(records).some(r => r.start === rec.start && codes(r) === codes(rec))) {
-      skipped.push(path);
-      continue;
-    }
-
     try {
       checkCourse(text, rec, today);
     } catch (e) {
       throw new Error(`${path}: ${e.message}`);
     }
 
-    records[nextId("c", Object.keys(records))] = rec;
+    const prior = Object.values(records).find(r => r.migratedFrom === path);
+
+    if (prior) {
+      if (content(prior) !== content(rec))
+        throw new Error(`${path}: course changed since migration; review both copies`);
+      skipped.push(path);
+      continue;
+    }
+
+    const legacy = Object.entries(records).filter(([, r]) => !r.migratedFrom
+      && r.start === rec.start && codes(r) === codes(rec));
+
+    if (legacy.length) {
+      if (legacy.length !== 1 || content(legacy[0][1]) !== content(rec))
+        throw new Error(`${path}: already has a course with this start and codes; review both`);
+      const [id, old] = legacy[0];
+
+      records[id] = { ...old, migratedFrom: path };
+      skipped.push(path);
+      continue;
+    }
+
+    records[nextId("c", Object.keys(records))] = { ...rec, migratedFrom: path };
     added.push(path);
     for (const m of Object.values(rec.marks).flatMap(Object.values))
       m === "✅" ? marks.done++ : marks.skipped++;

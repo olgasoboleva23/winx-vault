@@ -41,6 +41,7 @@ const REC = {
   marks: { "2026-11-07": { "АЕ": "✅", "МГ☀️": "✅", "МГ🌙": "❌" }, "2026-11-08": { "АЕ": "✅" } },
   dayNotes: { "2026-11-08": "сегодня" },
 };
+
 const MEDICATION_TEXT = "---\ncssclasses:\n  - dashboard\n---\n\n```winx\nmeds\n```\n";
 
 const TABLE = `| Дата | БА | МА☀️ | МА🌙 | АЕ | Заметки |
@@ -82,7 +83,7 @@ test("checkCourse: the record draws the old table; a cell off names its date and
 test("migrateMedsNotes: new records c1…; a course already there is skipped", () => {
   const first = migrateMedsNotes([{ path: P, text: NOTE, fm: FM }], {}, "2026-11-08");
 
-  assert.deepEqual(first.records, { c1: REC });
+  assert.deepEqual(first.records, { c1: { ...REC, migratedFrom: P } });
   assert.deepEqual(first.added, [P]);
   assert.deepEqual(first.marks, { done: 3, skipped: 1 });
   assert.equal(first.dayNotes, 1);
@@ -93,11 +94,58 @@ test("migrateMedsNotes: new records c1…; a course already there is skipped", (
   assert.deepEqual(again.records, first.records);
 });
 
+test("migrateMedsNotes: different source notes keep separate histories despite matching dates and codes", () => {
+  const other = NOTE.replace("| 2026-11-08 | ✅ | ☐ | ☐ | сегодня |",
+    "| 2026-11-08 | ❌ | ✅ | ☐ | другой курс |");
+  const result = migrateMedsNotes([
+    { path: P, text: NOTE, fm: FM },
+    { path: `${DIR}/Другой курс.md`, text: other, fm: FM },
+  ], {}, "2026-11-08");
+
+  assert.equal(Object.keys(result.records).length, 2);
+  assert.equal(result.records.c1.marks["2026-11-08"].АЕ, "✅");
+  assert.equal(result.records.c2.marks["2026-11-08"].АЕ, "❌");
+  assert.equal(result.records.c2.dayNotes["2026-11-08"], "другой курс");
+  const again = migrateMedsNotes([
+    { path: P, text: NOTE, fm: FM },
+    { path: `${DIR}/Другой курс.md`, text: other, fm: FM },
+  ], result.records, "2026-11-08");
+
+  assert.deepEqual(again.records, result.records);
+  assert.equal(again.skipped.length, 2);
+});
+
+test("migrateMedsNotes: identical notes at different paths remain separate courses", () => {
+  const notes = [P, `${DIR}/Второй курс.md`].map(path => ({ path, text: NOTE, fm: FM }));
+  const result = migrateMedsNotes(notes, {}, "2026-11-08");
+
+  assert.equal(Object.keys(result.records).length, 2);
+  assert.deepEqual(result.records.c1.marks, REC.marks);
+  assert.deepEqual(result.records.c2.marks, REC.marks);
+});
+
+test("migrateMedsNotes: an imported course changed before retry stops without replacing history", () => {
+  const first = migrateMedsNotes([{ path: P, text: NOTE, fm: FM }], {}, "2026-11-08");
+  const changed = { c1: withMark(first.records.c1, "2026-11-08", "МГ🌙", "✅") };
+  const before = structuredClone(changed);
+
+  assert.throws(() => migrateMedsNotes([{ path: P, text: NOTE, fm: FM }], changed, "2026-11-08"),
+    /changed since migration/);
+  assert.deepEqual(changed, before);
+});
+
+test("migrateMedsNotes: a legacy match with different history requires review", () => {
+  const existing = { c1: withMark(REC, "2026-11-08", "МГ🌙", "✅") };
+
+  assert.throws(() => migrateMedsNotes([{ path: P, text: NOTE, fm: FM }], existing, "2026-11-08"),
+    /already has a course with this start and codes/);
+});
+
 test("migrateMeds: courses.json written, the note renamed (old), Medication.md made, the base trashed; twice: nothing", async () => {
   const { files } = vault({ [P]: NOTE, [MEDICATION_BASE]: "views: []" }, { props: { [P]: FM } });
 
   await migrateMeds();
-  assert.deepEqual(JSON.parse(files[COURSES]).c1, REC);
+  assert.deepEqual(JSON.parse(files[COURSES]).c1, { ...REC, migratedFrom: P });
   assert.equal(files[`${DIR}/Аевит, Магний (old).md`], NOTE);
   assert.equal(P in files, false);
   assert.equal(files[MEDICATION], MEDICATION_TEXT);
@@ -133,9 +181,27 @@ test("migrateMeds: a course already in courses.json is named as skipped; its not
   const { files } = vault({ [P]: NOTE, [COURSES]: JSON.stringify({ c1: REC }) }, { props: { [P]: FM } });
 
   await migrateMeds();
-  assert.deepEqual(JSON.parse(files[COURSES]), { c1: REC });
+  assert.deepEqual(JSON.parse(files[COURSES]), { c1: { ...REC, migratedFrom: P } });
   assert.equal(files[`${DIR}/Аевит, Магний (old).md`], NOTE);
   assert.match(Notice.last, /^✦ 0 course\(s\) migrated: .*; skipped, already in courses\.json: Аевит, Магний\.md$/);
+});
+
+test("migrateMeds: interrupted rename followed by a new mark keeps both histories on retry", async () => {
+  const { app, files } = vault({ [P]: NOTE }, { props: { [P]: FM } });
+  const rename = app.fileManager.renameFile;
+
+  app.fileManager.renameFile = async () => { throw new Error("rename failed"); };
+  await migrateMeds();
+  assert.match(Notice.last, /rename failed/);
+  const newer = withMark(JSON.parse(files[COURSES]).c1, "2026-11-08", "МГ🌙", "✅");
+
+  files[COURSES] = JSON.stringify({ c1: newer });
+  const before = structuredClone(files);
+
+  app.fileManager.renameFile = rename;
+  await migrateMeds();
+  assert.match(Notice.last, /changed since migration/);
+  assert.deepEqual(files, before);
 });
 
 test("migrateMeds: an \"(old)\" note already there stops it before any write, named", async () => {
