@@ -57,6 +57,10 @@
   }
   &__avg-line { position: absolute; left: 0; right: 0; height: 0; border-top: $border-width-l solid var(--winx-pink-deep); z-index: $z-over; }
   /* the period lengths: pink columns, a purple line */
-  &__chart--per &__col { background: alpha(--winx-pink-deep, 55%); }
-  &__chart--per &__avg-line { border-color: var(--winx-purple-deep); }
+  &__chart--per {
+    .winx-cycle {
+      &__col { background: alpha(--winx-pink-deep, 55%); }
+      &__avg-line { border-color: var(--winx-purple-deep); }
+    }
+  }
 }

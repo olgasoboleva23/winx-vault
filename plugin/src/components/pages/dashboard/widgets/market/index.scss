@@ -48,8 +48,8 @@
       background: var(--winx-star-sparkle-svg) center / contain no-repeat;
       animation: winx-bought-flash 0.65s ease-out forwards;
     }
+    .winx-market__text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
   }
-  &__item--bought &__text { text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
 
   &__soon { margin: $space-s 0 $space-2xs; font-size: $text-m; color: var(--winx-pink-deep); }
 

@@ -28,9 +28,11 @@
   }
   &--mini {
     padding-top: 0;
+    .winx-pomodoro {
+      &__mini { display: flex; }
+      &__body { display: none; }
+    }
   }
-  &--mini &__mini { display: flex; }
-  &--mini &__body { display: none; }
 
   &__mini-ring {
     width: 52px;

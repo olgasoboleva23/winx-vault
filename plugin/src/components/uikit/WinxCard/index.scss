@@ -68,11 +68,11 @@
       text-transform: uppercase !important;
       font-size: $text-2xl !important;
       padding-inline: $deco + $space-m !important; /* room for the wings */
-    }
-    /* a widget's button next to the title (the market's +, WinxButton add): on the title's line */
-    > .callout-title .winx-btn.winx-widget__add {
-      align-self: center;
-      margin: (-$space-xs) 0 (-$space-xs) $space-s;   /* centred on the title's line without making it taller */
+      /* a widget's button next to the title (the market's +, WinxButton add): on the title's line */
+      .winx-btn.winx-widget__add {
+        align-self: center;
+        margin: (-$space-xs) 0 (-$space-xs) $space-s;   /* centred on the title's line without making it taller */
+      }
     }
 
     /* Hover glow */

@@ -58,19 +58,23 @@ $pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
     border-top: $border-width-m solid var(--winx-gold);
     border-radius: 0;
     box-shadow: none;
+
+    button.winx-rail__item {
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      gap: $space-2xs;
+      height: $tap;
+      color: alpha(--winx-purple-deep, 70%);
+      &::after { mask-position: center; }
+      &.winx-btn--on {
+        border-color: transparent; background: none; color: var(--winx-purple-deep);
+        .winx-rail__icon { filter: drop-shadow(0 0 6px alpha(--winx-gold, 95%)); }
+      }
+    }
+
+    .winx-rail__label { width: auto; padding: 0; font-size: $text-s; opacity: 1; transition: none; }
   }
-  &--phone button#{&}__item {
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-    gap: $space-2xs;
-    height: $tap;
-    color: alpha(--winx-purple-deep, 70%);
-    &::after { mask-position: center; }
-    &.winx-btn--on { border-color: transparent; background: none; color: var(--winx-purple-deep); }
-    &.winx-btn--on .winx-rail__icon { filter: drop-shadow(0 0 6px alpha(--winx-gold, 95%)); }
-  }
-  &--phone &__label { width: auto; padding: 0; font-size: $text-s; opacity: 1; transition: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

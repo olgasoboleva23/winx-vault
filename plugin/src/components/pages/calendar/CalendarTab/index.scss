@@ -21,8 +21,12 @@
     &-label { display: block; overflow: hidden; white-space: nowrap; text-overflow: clip; font-size: $text-xs; color: var(--winx-lavender); }
     &--on &-label { font-weight: 600; }
     /* hover: the piece glows in its area's colour (a click filters by the area) */
-    &:hover &-label { text-shadow: 0 0 6px var(--area); }
-    &:hover &-track { box-shadow: 0 0 10px var(--area), 0 0 4px var(--area); }
+    &:hover {
+      .winx-cal__area {
+        &-label { text-shadow: 0 0 6px var(--area); }
+        &-track { box-shadow: 0 0 10px var(--area), 0 0 4px var(--area); }
+      }
+    }
     &-track { display: block; height: $space-m; overflow: hidden; border-radius: $pill; background: color-mix(in srgb, var(--area) 40%, transparent); transition: box-shadow $fast ease; }
     &-fill { display: block; height: 100%; background: var(--area); box-shadow: 0 0 6px var(--area); }
   }
@@ -52,11 +56,6 @@
   }
   /* while dragging, today and past days split into ✓ done / ⏳ plan halves */
   &__zones { display: none; position: absolute; inset: 0; z-index: $z-raised; gap: $space-xs; padding: $space-xs; }
-  &--dragging &__zones { display: flex; flex-direction: column; }
-  /* the dragged task's own day: no 📅 (it's on it already), ✓ a strip at the bottom, its tasks
-     open to a drop (drag.js: before / after one of its group, the line shows where) */
-  &--dragging :is(&__day--source, &__cell--source) { padding-bottom: $tap + $space-s; }
-  &--dragging :is(&__day--source, &__cell--source) &__zones { top: auto; height: $tap; }
   :is(&__day--source, &__cell--source) :is(&__zone--plan, &__zones:not(:has(.winx-cal__zone--done))) {
     display: none;
   }
@@ -86,7 +85,16 @@
       box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
     }
   }
-  &--dragging &__dropbar-in { display: grid; }
+  &--dragging {
+    .winx-cal__zones { display: flex; flex-direction: column; }
+    /* the dragged task's own day: no 📅 (it's on it already), ✓ a strip at the bottom, its tasks
+       open to a drop (drag.js: before / after one of its group, the line shows where) */
+    :is(.winx-cal__day--source, .winx-cal__cell--source) {
+      padding-bottom: $tap + $space-s;
+      .winx-cal__zones { top: auto; height: $tap; }
+    }
+    .winx-cal__dropbar-in { display: grid; }
+  }
   &__chip {
     padding: $space-l $space-xs;
     border-radius: $radius-m;
@@ -144,13 +152,11 @@
   }
   /* stickers from ![[...]] in the task text */
   &__sticker { height: 24px; width: auto; vertical-align: middle; }
-  &__month &__sticker { height: 14px; }
   /* hover: the sticker grows to its full 84px over the card */
   &__sticker {
     position: relative; transition: transform $fast;
     &:hover { z-index: $z-sticker; transform: scale(3.5); border-radius: $radius-s; box-shadow: 0 2px 10px black(35%); }
   }
-  &__month &__sticker:hover { transform: scale(6); }
   &__task:has(.winx-cal__sticker:hover) { overflow: visible; }
   /* backlog area headings: pills like the Kanban's group headings */
   &__group {
@@ -186,6 +192,13 @@
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: $space-s;
+    .winx-cal {
+      &__sticker {
+        height: 14px;
+        &:hover { transform: scale(6); }
+      }
+      &__zone { font-size: $text-m; }
+    }
   }
   &__weekday { font-family: $font-deco; font-size: $text-m; color: var(--winx-lavender); }
   &__cell {
@@ -201,10 +214,14 @@
   &__phone-month {
     display: grid;
     gap: $space-l;
+    .winx-cal {
+      &__month { gap: $space-2xs; }
+      &__cell {
+        min-height: 48px; padding: $space-2xs; text-align: center;
+        &--picked { border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 80%); }
+      }
+    }
   }
-  &__phone-month &__month { gap: $space-2xs; }
-  &__phone-month &__cell { min-height: 48px; padding: $space-2xs; text-align: center; }
-  &__phone-month &__cell--picked { border-color: var(--winx-gold-deep); box-shadow: 0 0 8px alpha(--winx-gold, 80%); }
   &__dots {
     display: flex;
     flex-wrap: wrap;
@@ -263,7 +280,6 @@
   &__late { color: #b0306a; font-weight: 600; }
   &__after { margin-right: $space-2xs; color: var(--winx-purple-deep); opacity: 0.6; }   /* ↳ a task after the one above */
   &__zone--plan { font-family: $font-deco; font-size: $text-2xl; text-align: center; }
-  &__month &__zone { font-size: $text-m; }
 }
 @keyframes winx-tick-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
 @keyframes winx-spin { to { transform: rotate(360deg); } }
