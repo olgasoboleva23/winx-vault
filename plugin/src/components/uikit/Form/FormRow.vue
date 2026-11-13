@@ -88,13 +88,16 @@ const model = computed({
       <button title="One more" @click="groups.push({})">+</button>
     </div>
   </template>
-  <div v-else-if="!bare" class="setting-item">
+  <div v-else-if="!bare" class="setting-item" :class="{ 'mod-toggle': 'check' in row }">
     <!-- a long name wraps (the field stays in the window), but many buttons never squeeze it -->
     <div class="setting-item-info winx-form__info">
       <div class="setting-item-name">{{ row.name }}</div>
       <div v-if="'check' in row" class="setting-item-description">{{ row.check }}</div>
     </div>
-    <div class="setting-item-control winx-form__control">
+    <div
+      class="setting-item-control winx-form__control"
+      :class="{ 'winx-form__control--check': 'check' in row }"
+    >
       <FormRow :row="row" :values="values" bare />
     </div>
   </div>
@@ -114,6 +117,7 @@ const model = computed({
   <input
     v-else-if="'check' in row"
     type="checkbox"
+    :aria-label="row.name"
     :checked="!!values[row.key]"
     @change="values[row.key] = $event.target.checked"
   >

@@ -17,9 +17,12 @@ export const dayLabel = date =>
   `${+date.slice(8, 10)} ${MONTHS[+date.slice(5, 7) - 1]}, ${DAYS[weekday(date) - 1]}`;
 
 // the medicines of a course, a group each in the window: the name, the dose ("30 капель"; none:
-// the words from the first number of the name), when (morning | both | day | evening | any: once a
-// day), the meal (before | after | sleep | any), days
+// the words from the first number of the name), times (morning / day / evening, a dose each;
+// none: once at any time), the meal (before | after | sleep | any), days
 const WHEN = { morning: ["☀️"], both: ["☀️", "🌙"], day: ["🌤"], evening: ["🌙"], any: [] };
+const TIME_KEYS = ["morning", "day", "evening"];
+// old records have a single choice, including "both"; new ones keep the selected times
+const timesOf = times => (Array.isArray(times) ? times : [times]).flatMap(t => WHEN[t] ?? []);
 const MEAL_TEXT = { before: "перед едой", after: "после еды", sleep: "перед сном" };
 const MEALS = [...Object.values(MEAL_TEXT), ""];
 const pairs = list => list.map(([label, value]) => ({ label, value }));
@@ -57,7 +60,7 @@ export const medicine = g => {
   const [name, dose] = parts(g.name);
 
   return {
-    name, dose: g.dose?.trim() || dose, times: WHEN[g.times] ?? [],
+    name, dose: g.dose?.trim() || dose, times: timesOf(g.times),
     meal: MEAL_TEXT[g.meal] ?? "", days: Number(g.days) || 90, code: g.code,
   };
 };
@@ -70,13 +73,9 @@ export const courseForm = () => ({
       list: [
         { name: "Name", key: "name", text: "Мастодинон" },
         { name: "Dose", key: "dose", text: "30 капель" },
-        {
-          name: "When", key: "times",
-          options: pairs([
-            ["утром", "morning"], ["утром и вечером", "both"], ["днём", "day"],
-            ["вечером", "evening"], ["неважно", "any"],
-          ]),
-        },
+        { name: "Утром", key: "morning", check: "Ничего не отмечено — один приём в любое время" },
+        { name: "Днём", key: "day", check: "" },
+        { name: "Вечером", key: "evening", check: "" },
         {
           name: "Meal", key: "meal",
           options: pairs([
@@ -98,7 +97,7 @@ export const courseForm = () => ({
 
 // the medicines as the record keeps them: as typed, a code each
 const normal = meds => withCodes(meds).map(g => ({
-  name: g.name, code: g.code, dose: g.dose ?? "", times: g.times ?? "any",
+  name: g.name, code: g.code, dose: g.dose ?? "", times: TIME_KEYS.filter(t => g[t]),
   meal: g.meal ?? "any", days: Number(g.days) || 90,
 }));
 
@@ -111,14 +110,18 @@ export const edited = (rec, v) => ({
   ...rec, start: v.start?.trim() || rec.start, meds: normal(v.meds), notes: v.notes?.trim() ?? "",
 });
 
-export const formValues = rec =>
-  ({ meds: rec.meds.map(g => ({ ...g })), start: rec.start, notes: rec.notes });
+export const formValues = rec => ({
+  meds: rec.meds.map(g => ({
+    ...g, ...Object.fromEntries(TIME_KEYS.map(t => [t, timesOf(g.times).includes(WHEN[t][0])])),
+  })),
+  start: rec.start, notes: rec.notes,
+});
 
 // a column per medicine and time of day (once a day: no time), its key the marks are kept by
 export const columns = meds => meds.flatMap(m => {
-  const times = WHEN[m.times]?.length ? WHEN[m.times] : [""];
+  const times = timesOf(m.times);
 
-  return times.map(time => ({
+  return (times.length ? times : [""]).map(time => ({
     key: m.code + time, code: m.code, time, name: nameOf(m.name), days: Number(m.days) || 90,
   }));
 });

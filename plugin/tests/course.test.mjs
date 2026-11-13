@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  columns, courseData, courseForm, courseList, courseOf, dayLabel, edited, forFood, intake, next,
+  columns, courseData, courseForm, courseList, courseOf, dayLabel, edited, forFood, formValues,
+  intake, next,
   withDayNote, withMark,
 } from "#/models/course.js";
 
@@ -66,15 +67,54 @@ test("intake: the Приём lines by time of day and meal, the doses", () => {
   ]);
 });
 
+test("time checkboxes: every selected time is one dose; none is one unrestricted dose", () => {
+  const cases = [
+    [{}, ["ТЕ"]],
+    [{ morning: true }, ["ТЕ☀️"]],
+    [{ day: true }, ["ТЕ🌤"]],
+    [{ evening: true }, ["ТЕ🌙"]],
+    [{ morning: true, day: true }, ["ТЕ☀️", "ТЕ🌤"]],
+    [{ morning: true, evening: true }, ["ТЕ☀️", "ТЕ🌙"]],
+    [{ day: true, evening: true }, ["ТЕ🌤", "ТЕ🌙"]],
+    [{ morning: true, day: true, evening: true }, ["ТЕ☀️", "ТЕ🌤", "ТЕ🌙"]],
+  ];
+
+  for (const [checked, keys] of cases) {
+    const rec = courseOf({ meds: [{ name: "Тест", days: 1, ...checked }] }, "2026-11-13");
+    const data = courseData(rec, "2026-11-13");
+
+    assert.deepEqual(data.columns.map(c => c.key), keys);
+    assert.equal(data.due, keys.length);
+    assert.equal(data.today.flatMap(g => g.items).length, keys.length);
+    assert.equal(intake(rec.meds).length, keys.length);
+  }
+});
+
+test("old course times reopen as checkboxes and keep the existing mark keys after saving", () => {
+  const values = formValues(REC);
+
+  assert.deepEqual([values.meds[0].morning, values.meds[0].day, values.meds[0].evening],
+    [false, false, false]);
+  assert.deepEqual([values.meds[1].morning, values.meds[1].day, values.meds[1].evening],
+    [true, false, true]);
+  const saved = edited(REC, values);
+
+  assert.deepEqual(saved.meds.map(m => m.times), [[], ["morning", "evening"]]);
+  assert.deepEqual(courseData(saved, "2026-11-08"), courseData(REC, "2026-11-08"));
+  assert.deepEqual(forFood("c1", saved), forFood("c1", REC));
+  assert.deepEqual(formValues(saved), { ...values, meds: values.meds.map((m, i) =>
+    ({ ...m, times: saved.meds[i].times })) });
+});
+
 test("courseOf / edited: the window's values as a record, the marks kept through an edit", () => {
   assert.deepEqual(courseOf({ meds: [{ name: "Мастодинон 30 капель" }] }, "2026-11-10"), {
     start: "2026-11-10",
     meds: [{
-      name: "Мастодинон 30 капель", code: "МА", dose: "", times: "any", meal: "any", days: 90,
+      name: "Мастодинон 30 капель", code: "МА", dose: "", times: [], meal: "any", days: 90,
     }],
     notes: "", marks: {}, dayNotes: {},
   });
-  const meds = REC.meds.map(m => ({ ...m, dose: "3 капли" }));
+  const meds = formValues(REC).meds.map(m => ({ ...m, dose: "3 капли" }));
   const rec = edited(REC, { meds, start: "", notes: "x" });
 
   assert.deepEqual([rec.start, rec.notes, rec.meds[0].dose], ["2026-11-07", "x", "3 капли"]);
@@ -94,11 +134,10 @@ test("courseOf / edited: a code per medicine, unique, kept through a rename; the
   const { rows, required } = courseForm();
 
   assert.deepEqual(rows.map(r => r.key), ["meds", "start", "notes"]);
-  assert.deepEqual(rows[0].list.map(r => r.key), ["name", "dose", "times", "meal", "days"]);
+  assert.deepEqual(rows[0].list.map(r => r.key),
+    ["name", "dose", "morning", "day", "evening", "meal", "days"]);
   assert.deepEqual([rows[0].required, required, rows[2].lines], [["name"], ["meds"], true]);
-  assert.deepEqual(rows[0].list[2].options.map(o => o.label),
-    ["утром", "утром и вечером", "днём", "вечером", "неважно"]);
-  assert.deepEqual(rows[0].list[3].options.map(o => o.label),
+  assert.deepEqual(rows[0].list[5].options.map(o => o.label),
     ["перед едой", "после еды", "перед сном", "неважно"]);
 });
 
