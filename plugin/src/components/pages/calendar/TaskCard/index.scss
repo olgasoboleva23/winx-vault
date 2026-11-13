@@ -44,3 +44,34 @@ $fade: 18px;   // the buttons' background fades in over this much of the text
   }
 }
 body:not(.is-mobile) :is(.winx-task-card, .winx-cal__task, .winx-missed__row):hover .winx-task-btns { opacity: 1; pointer-events: auto; }
+
+body:not(.is-mobile) .winx-cal .winx-task-mobile { display: none; }
+body.is-mobile .winx-cal {
+  .winx-task-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-s;
+    width: 100%;
+    margin-top: $space-s;
+    padding: $space-xs;
+    border-radius: $radius-m;
+    background: white(40%);
+    button { flex-shrink: 0; }
+  }
+  [data-swipeable]:not([data-swipe]) .winx-task-actions { display: none; }
+  .winx-task-primary {
+    order: -1;
+    background: color-mix(in srgb, var(--winx-gold) calc(var(--winx-swipe-progress, 0) * 100%), var(--winx-pink-light));
+    transition: scale $fast ease, box-shadow $fast ease;
+  }
+  [data-swipe="ready"] .winx-task-primary {
+    scale: 1.15;
+    color: var(--winx-text-dark);
+    border-color: var(--winx-gold-deep);
+    box-shadow: 0 0 12px var(--winx-gold);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .winx-task-primary { transition: none; }
+  }
+}

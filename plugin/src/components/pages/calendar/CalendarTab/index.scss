@@ -230,19 +230,9 @@
 }
 @keyframes winx-tick-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
 @keyframes winx-spin { to { transform: rotate(360deg); } }
-/* phone swipes: right = done (green), left = skip / no date (lilac); the row follows the finger */
+/* Phone gestures keep the row inside its column; the action tray wraps under its text. */
 body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-action: pan-y; }
 .winx-cal {
-  [data-swipe] { transition: none; transform: translateX(var(--winx-swipe, 0)); }
-  [data-swipe="done"] { box-shadow: -40px 0 0 -6px rgb(120 200 150 / 70%); }
-  :is([data-swipe="skip"], [data-swipe="nodate"]) { box-shadow: 40px 0 0 -6px alpha(--winx-purple-deep, 40%); }
-  /* what the swipe will do, in the band it uncovers: ✓ done on the left, ⏭ skip / ↩ no date on the right */
-  [data-swipe] { position: relative; overflow: visible; }
-  [data-swipe]::after { position: absolute; top: 50%; transform: translateY(-50%); font-size: $text-xl; pointer-events: none; }
-  [data-swipe="done"]::after { content: "✓"; left: -30px; color: #fff; font-weight: 700; }
-  [data-swipe="skip"]::after { content: "⏭"; right: -32px; }
-  [data-swipe="nodate"]::after { content: "↩"; right: -30px; color: #fff; font-weight: 700; }
-
   /* 🔁 repeats off: the day's routine folded into one dashed translucent box; unfolded, its tasks sit inside it */
   &__routine {
     margin: $space-xs 0;

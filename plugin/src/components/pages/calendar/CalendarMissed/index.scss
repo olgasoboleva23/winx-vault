@@ -30,6 +30,7 @@ $wing: 40px;   // the corner wings' size
     cursor: grab;
   }
   &__date { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }
+  &__row > .winx-task-actions { display: flex; gap: $space-s; }
   /* desktop: the buttons float over the end of the text on hover (opacity only, so the row height stays) */
   body:not(.is-mobile) & {
     &__row .winx-task-btns { right: 104px; }
@@ -37,7 +38,7 @@ $wing: 40px;   // the corner wings' size
   /* the phone: the task's text on its own line, the buttons and the date under it */
   body.is-mobile & {
     &__row { flex-wrap: wrap; }
-    &__row .winx-task-btns { margin: 0; }
+    &__row .winx-task-btns { display: contents; }
     &__text { flex-basis: 100%; }
   }
 }

@@ -5,10 +5,11 @@
      written — even if the calendar draws again meanwhile; unticked in time: nothing. The sound
      comes from installSounds (it listens to every .task-list-item-checkbox). The row is dragged
      onto a day or the panel, and an open one is a reorder target in its day (drag.js); on the
-     phone it's swiped (swipe.js): right ticks its checkbox -->
+     phone a long left swipe (swipe.js) ticks its checkbox -->
 <script setup>
 import { vTip } from "#/components/uikit/tooltip.js";
 import { computed, inject, ref } from "vue";
+import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import TaskText from "./TaskText.vue";
 import TaskButtons from "./TaskButtons.vue";
 import { useDragSource, useReorder } from "#/composables/drag.js";
@@ -32,7 +33,8 @@ const key = () => props.task.key;
 const drag = useDragSource(view, key, () => props.day);
 const onto = useReorder(view, key, () => props.kind === "open" ? props.day : null);
 const { swipe, ...touch } = useSwipe(view, key,
-  () => input.value.checked || input.value.click(), () => live.value && box.value);
+  () => input.value.checked || input.value.click(),
+  () => live.value && box.value && !ticking.value && !done.value);
 
 // ticked: written 2 s later (unticked in time: nothing); the wait is the tab's (view.waits), so a
 // redraw doesn't drop it, and a closed tab does
@@ -59,11 +61,12 @@ function onTick(e) {
       { 'winx-cal__task--ticking': ticking, 'winx-cal__task--done': done },
     ]"
     :style="{
-      '--area': task.color ?? undefined, '--winx-swipe': swipe.dx ? `${swipe.dx}px` : undefined,
+      '--area': task.color ?? undefined, '--winx-swipe-progress': swipe.progress,
     }"
     :data-area="task.area"
     :data-goal="task.goal || null"
     :data-swipe="swipe.kind"
+    :data-swipeable="live && box || null"
     :draggable="drags ? 'true' : null"
     @dragstart="drag.start"
     @dragend="drag.end"
@@ -73,6 +76,7 @@ function onTick(e) {
     @touchstart.passive="touch.start"
     @touchmove.passive="touch.move"
     @touchend="touch.end"
+    @touchcancel="touch.cancel"
   >
     <span v-if="after" class="winx-cal__after">↳</span>
     <template v-if="box">
@@ -94,7 +98,14 @@ function onTick(e) {
         @change="onTick"
       >
     </template>{{ repeat }}<TaskText :task="task" />
-    <div v-if="live && !done" class="winx-task-btns">
+    <div v-if="live && !done" class="winx-task-btns winx-task-actions">
+      <WinxButton
+        v-if="box"
+        class="winx-task-primary winx-task-mobile"
+        title="complete task"
+        :disabled="ticking"
+        @click="touch.run"
+      >✓</WinxButton>
       <TaskButtons :task="task" @gone="gone = true" />
     </div>
   </div>

@@ -224,6 +224,7 @@ export function taskInfo(t, ctx, app) {
     sticker: stickerFile ? app.vault.getResourcePath(stickerFile) : null,
 
     canSkip: ctx.actions.canSkip(t),
+    canUnplan: !!task.date && !ctx.actions.canSkip(t),
   };
   ctx.infos.set(t, i);
   return i;

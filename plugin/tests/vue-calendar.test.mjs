@@ -41,14 +41,14 @@ const TASKS = () => { n = 0; return [
   task(" ", "#area/mind write [due:: 2026-11-04]"),
 ]; };
 // the tab's Vue app on made-up data; `ticked`, `placed`, `moved`, `unplanned` collect what the writes get
-function mount(over = {}, tasksApi = {}) {
+function mount(over = {}, tasksApi = {}, source = { tasks: TASKS(), poolLines: [] }) {
   const { reactive, markRaw, createApp } = vue;
   const st = reactive({ ...state.readState(undefined), area: null, picked: null, ...over });
   const days = state.shownDays(st, TODAY), ticked = [], placed = [], moved = [], unplanned = [];
   const ctx = markRaw({
     state: st, today: TODAY, days, base: state.baseDate(st, TODAY), view: st.view,
     shown: { open: true, ghost: true, done: st.showDone }, everything: null, TASKS: tasksApi, infos: new Map(),
-    model: new data.CalendarData({ tasks: TASKS(), poolLines: [], days, today: TODAY }),
+    model: new data.CalendarData({ ...source, days, today: TODAY }),
     config: { areas: [{ key: "body", label: "🌺 Body", icon: "🌺", color: "#e8609a" }], areaIcons: {}, areaMap: {}, areaColors: {} },
   });
   const text = data.T;
@@ -62,7 +62,7 @@ function mount(over = {}, tasksApi = {}) {
     { getFirstLinkpathDest: () => null }, vault: {} }), task: k => data.findTask(k, ctx.model.all) };
   const el = document.body.appendChild(document.createElement("div"));
   createApp(Tab).provide("calendar", view).mount(el);
-  return { el, st, ticked, placed, moved, unplanned, tab };
+  return { el, st, ticked, placed, moved, unplanned, tab, view };
 }
 const box = (el, text) => [...el.querySelectorAll(".winx-cal__task--open")].find(r => r.textContent.includes(text))
   .querySelector("input");
@@ -218,51 +218,121 @@ test("dropped onto another open task of its day and group: before or after it, b
   assert.ok(!stretch.classList.contains("winx-cal__task--drop-after"));
 });
 
-test("on the phone, a row swiped right is done (a day's row: its checkbox; a card: ticked at once), left: its date off", async () => {
+test("phone: a short left swipe opens actions; a long one arms completion, moving back disarms", async () => {
   document.body.classList.add("is-mobile");
   mock.timers.enable({ apis: ["setTimeout"] });
   try {
     const { el, ticked, unplanned } = mount();
     const walk = row(el, "walk");
-    touch(walk, "touchstart", 100, 100);
-    touch(walk, "touchmove", 160, 100);
+    swipe(walk, -60);
     await vue.nextTick();
-    assert.equal(walk.dataset.swipe, "done");
-    assert.equal(walk.style.getPropertyValue("--winx-swipe"), "60px");
+    assert.equal(walk.dataset.swipe, "open");
+    assert.equal(ticked.length, 0);
+    assert.equal(unplanned.length, 0);
+    assert.ok(walk.querySelector('[aria-label="remove date"]'));
+    touch(walk, "touchstart", 240, 100);
+    touch(walk, "touchmove", 60, 100);
+    await vue.nextTick();
+    assert.equal(walk.dataset.swipe, "ready");
+    touch(walk, "touchmove", 180, 100);
     fire(walk, "touchend");
+    await vue.nextTick();
+    assert.equal(walk.dataset.swipe, "open");
+    assert.equal(walk.querySelector("input").checked, false);
+    swipe(walk, 60);
     await vue.nextTick();
     assert.equal(walk.dataset.swipe, undefined);
-    assert.equal(ticked.length, 0);   // 60 px: too short
-    swipe(walk, 100);
+    swipe(walk, -180);
     await vue.nextTick();
     assert.ok(walk.querySelector("input").checked);
-    mock.timers.tick(2000);
+    mock.timers.tick(1999);
+    assert.equal(ticked.length, 0);
+    mock.timers.tick(1);
     assert.deepEqual(ticked.map(t => data.T(t).text), ["walk"]);
-    swipe(card(el, "plan trip"), 100);
-    assert.deepEqual(ticked.map(t => data.T(t).text), ["walk", "plan trip"]);
+    swipe(card(el, "plan trip"), -180);
     await vue.nextTick();
-    assert.equal(card(el, "plan trip"), undefined);   // gone at once
-    swipe(row(el, "write"), -100);
+    assert.deepEqual(ticked.map(t => data.T(t).text), ["walk", "plan trip"]);
+    assert.equal(card(el, "plan trip"), undefined);
+    const write = row(el, "write");
+    swipe(write, -60);
+    await vue.nextTick();
+    write.querySelector('[aria-label="remove date"]').click();
     assert.deepEqual(unplanned, ["write"]);
-    touch(walk, "touchstart", 100, 100);   // mostly down: a scroll, not a swipe
-    touch(walk, "touchmove", 200, 300);
-    fire(walk, "touchend");
-    assert.equal(ticked.length, 2);
   } finally { mock.timers.reset(); document.body.classList.remove("is-mobile"); }
 });
 
-test("on the phone, a card can't be swiped while the Tasks plugin is off", async () => {
+test("phone: cancellation restores open actions; vertical scrolling and a drag never complete a task", async () => {
   document.body.classList.add("is-mobile");
   try {
-    const { el, ticked } = mount({}, null);
+    const { el, ticked } = mount();
     const plan = card(el, "plan trip");
-
-    touch(plan, "touchstart", 100, 100);
-    touch(plan, "touchmove", 160, 100);
+    for (const opened of [false, true]) {
+      if (opened) swipe(plan, -60);
+      touch(plan, "touchstart", 240, 100);
+      touch(plan, "touchmove", 40, 100);
+      fire(plan, "touchcancel");
+      await vue.nextTick();
+      assert.equal(plan.dataset.swipe, opened ? "open" : undefined);
+      assert.equal(ticked.length, 0);
+    }
+    swipe(plan, 60);
+    touch(plan, "touchstart", 240, 100);
+    touch(plan, "touchmove", 230, 140);
+    touch(plan, "touchmove", 40, 150);
+    fire(plan, "touchend");
     await vue.nextTick();
     assert.equal(plan.dataset.swipe, undefined);
+    touch(plan, "touchstart", 240, 100);
+    fire(plan, "dragstart");
+    touch(plan, "touchmove", 40, 100);
     fire(plan, "touchend");
+    fire(plan, "dragend");
     assert.equal(ticked.length, 0);
+  } finally { document.body.classList.remove("is-mobile"); }
+});
+
+test("phone: primary button completes a card; without Tasks, swiping cannot complete it", async () => {
+  document.body.classList.add("is-mobile");
+  try {
+    const { el, ticked } = mount();
+    const plan = card(el, "plan trip");
+    swipe(plan, -60);
+    await vue.nextTick();
+    plan.querySelector('[aria-label="complete task"]').click();
+    assert.equal(ticked.length, 1);
+    const disabled = mount({}, null);
+    swipe(card(disabled.el, "plan trip"), -180);
+    assert.equal(disabled.ticked.length, 0);
+  } finally { document.body.classList.remove("is-mobile"); }
+});
+
+test("phone: pool swipes add an open copy today; Missed swipes complete on the task's own day", async () => {
+  document.body.classList.add("is-mobile");
+  try {
+    const { el, view, ticked } = mount({ tab: "pool" }, {}, {
+      tasks: [task(" ", "late chore [due:: 2026-11-02]")],
+      poolLines: [{ id: "t900", rec: { name: "pool chore" }, path: "Pool.md" }],
+    });
+    const added = [], completed = [], today = [];
+    view.actions.fromPool = (t, day, done) => added.push([data.T(t).text, day, done]);
+    view.actions.doneOnItsDay = t => completed.push([data.T(t).text, data.T(t).date]);
+    view.actions.toToday = t => today.push(data.T(t).text);
+    const pool = card(el, "pool chore");
+    swipe(pool, -60);
+    await vue.nextTick();
+    assert.equal(pool.dataset.swipe, "open");
+    assert.equal(pool.querySelectorAll('[aria-label="add to today"]').length, 1);
+    swipe(pool, -180);
+    assert.deepEqual(added, [["pool chore", TODAY, false]]);
+    assert.equal(ticked.length, 0);
+    const missed = el.querySelector(".winx-missed__row");
+    swipe(missed, -60);
+    await vue.nextTick();
+    assert.equal(missed.dataset.swipe, "open");
+    assert.ok(missed.querySelector('[aria-label="move to today"]'));
+    swipe(missed, -180);
+    assert.deepEqual(completed, [["late chore", "2026-11-02"]]);
+    assert.deepEqual(today, []);
   } finally { document.body.classList.remove("is-mobile"); }
 });
 
