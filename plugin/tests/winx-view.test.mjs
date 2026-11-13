@@ -314,3 +314,42 @@ test("Finance route loads its ledger into the Vue page; closing removes its subs
   await view.onClose();
   assert.equal(listeners.size, 0);
 });
+
+test("dashboard links select Vue pages even when their old notes do not exist", async () => {
+  const { mount } = await import("@vue/test-utils");
+  const Finance = (await import("#/components/pages/dashboard/widgets/finance/index.vue")).default;
+  const Market = (await import("#/components/pages/dashboard/widgets/market/index.vue")).default;
+  const went = [], notes = [];
+  setApp({ metadataCache: { getFirstLinkpathDest: () => null }, workspace: {
+    getActiveViewOfType: () => null, openLinkText: (...args) => notes.push(args),
+  } });
+  for (const [Component, data, label, page] of [
+    [Finance, { empty: true }, "open finance", "finance"],
+    [Market, { empty: true, groups: [] }, "supplies", "supplies"],
+  ]) {
+    const w = mount(Component, { props: { state: { data } }, global: {
+      provide: { winx: { go: (...args) => went.push(args) } },
+    } });
+    const button = w.findAll("button").find(b => b.text().includes(label));
+    await button.trigger("click");
+    await button.trigger("click", { mod: true });
+    assert.deepEqual(went.splice(0).map(([p, params, e]) => [p, params, !!e.mod]),
+      [[page, {}, false], [page, {}, true]]);
+    w.unmount();
+  }
+  assert.deepEqual(notes, []);
+});
+
+test("a standalone Finance widget opens its Vue page, Cmd-click in another tab", async () => {
+  const { mount } = await import("@vue/test-utils");
+  const Finance = (await import("#/components/pages/dashboard/widgets/finance/index.vue")).default;
+  const recent = { activeTime: 1 }, w = workspace([recent]);
+  const widget = mount(Finance, { props: { state: { data: { empty: true } } } });
+  await widget.find("button").trigger("click");
+  await widget.find("button").trigger("click", { mod: true });
+  await new Promise(r => setTimeout(r));
+  assert.deepEqual(recent.went, [["finance", {}]]);
+  assert.equal(w.made[0].state.state.page, "finance");
+  assert.equal(w.made[0].pinned, false);
+  widget.unmount();
+});
