@@ -16,7 +16,7 @@
   &__item {
     position: relative;
     padding: $space-s $space-2xs $space-s $space-m;
-    border-bottom: 1px dashed fade(var(--winx-gold-deep), 35%);
+    border-bottom: $border-width-s dashed fade(var(--winx-gold-deep), 35%);
     transition: background $fast ease;
 
     &:last-child { border-bottom: none; }

@@ -21,5 +21,5 @@
 .callout[data-callout="card"] > .callout-content > .block-language-winx + .block-language-winx {
   margin-top: $space-l;
   padding-top: $space-l;
-  border-top: 1px dashed fade(var(--winx-gold-deep), 35%);
+  border-top: $border-width-s dashed fade(var(--winx-gold-deep), 35%);
 }

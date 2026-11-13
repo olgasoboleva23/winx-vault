@@ -117,7 +117,7 @@ button.winx-btn {
     min-width: $rail-item;
     height: $rail-item;
     padding: 0;
-    border: 1px solid transparent;
+    border: $border-width-s solid transparent;
     border-radius: $rail-radius;
     background: none;
     box-shadow: none;
@@ -153,7 +153,7 @@ button.winx-btn {
       var(--winx-pink-light),
       var(--winx-pink)
     ) !important;
-    border: 1.5px solid var(--winx-gold) !important;
+    border: $border-width-m solid var(--winx-gold) !important;
     border-radius: $radius-m !important;
     padding: $space-s $space-2xl !important;
     color: var(--winx-gold-deep) !important;

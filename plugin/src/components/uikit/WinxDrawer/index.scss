@@ -23,7 +23,7 @@ $sheet-radius: 22px;   // the phone sheet's top corners, as the nav pill's
     padding: $space-2xl $space-l;
     overflow-y: auto;
     background: var(--winx-sheet);
-    border-right: 1.5px solid var(--winx-gold);
+    border-right: $border-width-m solid var(--winx-gold);
     box-shadow: 6px 0 24px alpha(--winx-purple-deep, 18%);
     animation: winx-drawer-left $medium ease-out;
   }
@@ -48,7 +48,7 @@ $sheet-radius: 22px;   // the phone sheet's top corners, as the nav pill's
     // above Obsidian's floating navbar (0 when it doesn't float)
     padding: $space-l $space-2xl calc(var(--view-bottom-spacing, 0px) + #{$space-xl});
     border: none;
-    border-top: 1.5px solid var(--winx-gold);
+    border-top: $border-width-m solid var(--winx-gold);
     border-radius: $sheet-radius $sheet-radius 0 0;
     box-shadow: 0 -8px 24px alpha(--winx-purple-deep, 18%);
     animation-name: winx-drawer-bottom;

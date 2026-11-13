@@ -40,7 +40,7 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
   &__crest {
     width: $btn-l;
     height: $btn-l;
-    border: 1.5px solid var(--winx-gold-deep);
+    border: $border-width-m solid var(--winx-gold-deep);
     border-radius: $round;
     background: linear-gradient(135deg, var(--winx-gold-bright), var(--winx-gold));
     box-shadow: 0 2px 10px alpha(--winx-gold-deep, 45%);
@@ -55,7 +55,7 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
   &__row {
     gap: $space-l;
     padding: $space-s $space-m;
-    border: 1px solid transparent;
+    border: $border-width-s solid transparent;
     border-radius: $radius-m;
     &:hover, &:focus-within { background: var(--winx-pink-light); }
     &--on, &--on:hover {
@@ -82,7 +82,7 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
     flex: none;
     width: $btn-l;
     height: $btn-l;
-    border: 1px solid alpha(--winx-pink-deep, 30%);
+    border: $border-width-s solid alpha(--winx-pink-deep, 30%);
     border-radius: $round;
     background: #fff;
     font-size: $text-2xl;
@@ -91,7 +91,7 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
     flex: none;
     width: auto;
     padding: $space-2xs $space-s;
-    border: 1px solid alpha(--winx-pink-deep, 35%);
+    border: $border-width-s solid alpha(--winx-pink-deep, 35%);
     border-radius: $radius-s;
     background: #fff;
     color: alpha(--winx-purple-deep, 70%);
@@ -113,7 +113,7 @@ $tile: 50px;   // the phone sheet's round tile (off the button sizes)
   &__tile-icon {
     width: $tile;
     height: $tile;
-    border: 1.5px solid var(--winx-gold);
+    border: $border-width-m solid var(--winx-gold);
     background: linear-gradient(135deg, var(--winx-pink-light), var(--winx-pink));
     box-shadow: 0 0 6px alpha(--winx-pink-deep, 30%);
     font-size: $text-4xl;

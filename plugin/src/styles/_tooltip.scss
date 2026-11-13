@@ -3,7 +3,7 @@
    paper, the pink paper (--pink) over a blue place; the arrow in the same colour */
 .tooltip.winx-tooltip {
   padding: $space-s $space-xl;
-  border: 1px solid var(--winx-blue);
+  border: $border-width-s solid var(--winx-blue);
   border-radius: $radius-m;
   background: var(--winx-sky);
   color: var(--winx-text-dark);

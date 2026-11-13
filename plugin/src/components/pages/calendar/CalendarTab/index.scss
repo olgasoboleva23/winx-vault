@@ -7,7 +7,7 @@
     & button.winx-cal__mute { width: auto; padding: 0 $space-s; background: none; border: none; box-shadow: none; font-size: $text-2xl; cursor: pointer; }
   }
   /* a stripe before each task in its area's colour (--area: set from the settings on the row) */
-  :is(.winx-cal__task, .winx-missed__row, .winx-task-card)[data-area] { border-left: 3px solid var(--area); }
+  :is(.winx-cal__task, .winx-missed__row, .winx-task-card)[data-area] { border-left: $border-width-xl solid var(--area); }
   /* the week's balance: one thin bar split by area (its share of the week's tasks), the done part brighter;
      the areas with nothing this week as grey icons after it */
   &__balance {
@@ -65,7 +65,7 @@
   &__task--drop-before { box-shadow: 0 -2px 0 var(--winx-gold-deep); }
   &__task--drop-after { box-shadow: 0 2px 0 var(--winx-gold-deep); }
   &__zone {
-    border: 1px dashed var(--winx-border);
+    border: $border-width-s dashed var(--winx-border);
     border-radius: $radius-m;
     background: rgb(255 248 252 / 90%);
     font-size: $text-4xl;
@@ -83,7 +83,7 @@
       gap: $space-s;
       padding: $space-s;
       border-radius: $radius-xl;
-      border: 1px solid var(--winx-gold-deep);
+      border: $border-width-s solid var(--winx-gold-deep);
       background: rgb(255 248 252 / 95%);
       box-shadow: 0 4px 16px alpha(--winx-purple-deep, 35%);
     }
@@ -92,7 +92,7 @@
   &__chip {
     padding: $space-l $space-xs;
     border-radius: $radius-m;
-    border: 1px dashed var(--winx-border);
+    border: $border-width-s dashed var(--winx-border);
     font-family: $font-deco;
     font-size: $text-l;
     color: var(--winx-purple-deep);
@@ -129,7 +129,7 @@
   &__task {
     position: relative;
     padding: $space-xs;
-    border-bottom: 1px dashed fade(var(--winx-gold-deep), 30%);
+    border-bottom: $border-width-s dashed fade(var(--winx-gold-deep), 30%);
     font-size: $text-l;
     line-height: 1.3;
     color: var(--winx-text-dark);
@@ -247,7 +247,7 @@ body.is-mobile :is(.winx-cal__task, .winx-missed__row, .winx-task-card) { touch-
   &__routine {
     margin: $space-xs 0;
     border-radius: $radius-xl;
-    border: 1px dashed alpha(--winx-purple-deep, 35%);
+    border: $border-width-s dashed alpha(--winx-purple-deep, 35%);
     background: white(40%);
     &--open { padding: 0 $space-2xs $space-xs; }
     &-time {

@@ -4,7 +4,7 @@
 :is(span, button).winx-check {
   @include center;
   width: 22px; height: 22px; flex: none; padding: 0;
-  border: 1.5px solid var(--winx-purple); border-radius: $radius-s;
+  border: $border-width-m solid var(--winx-purple); border-radius: $radius-s;
   background: white; color: white; font-size: $text-xl; line-height: 1; box-shadow: none;
   &.winx-check--s { width: 16px; height: 16px; font-size: $text-s; border-radius: $space-xs; }
   &.winx-check--on { background: var(--winx-purple); border-color: var(--winx-purple); &::after { content: "✓"; } }

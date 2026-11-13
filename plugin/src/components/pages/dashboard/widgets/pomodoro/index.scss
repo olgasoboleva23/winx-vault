@@ -37,7 +37,7 @@
     height: 52px;
     flex: none;
     border-radius: $round;
-    border: 2px solid var(--winx-border);
+    border: $border-width-l solid var(--winx-border);
     cursor: pointer;
     transition: --p $tick linear;
     background:
@@ -72,7 +72,7 @@
     flex: none;
     padding: 0;
     border-radius: $round;
-    border: 2px solid var(--winx-border);
+    border: $border-width-l solid var(--winx-border);
     background: var(--winx-pink);
     display: grid;
     place-items: center;
@@ -96,7 +96,7 @@
     position: relative;
     display: grid;
     place-items: center;
-    border: 2px solid var(--winx-border);
+    border: $border-width-l solid var(--winx-border);
     transition: --p $tick linear;
     background: conic-gradient(
       var(--winx-pink-deep) calc(var(--p) * 360deg),
@@ -109,7 +109,7 @@
       inset: $space-l;
       border-radius: $round;
       background: var(--winx-pink-light);
-      border: 2px solid var(--winx-border);
+      border: $border-width-l solid var(--winx-border);
     }
   }
 
@@ -161,7 +161,7 @@
 
   &#{&} &__btn {
     border-radius: $round;
-    border: 2px solid var(--winx-border);
+    border: $border-width-l solid var(--winx-border);
     background: var(--winx-pink);
     display: grid;
     place-items: center;

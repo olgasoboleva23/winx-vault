@@ -35,7 +35,11 @@ $text-6xl: 30px;     // the pomodoro's time
 
 // stylelint-disable-next-line value-keyword-case -- a font's name, not a keyword
 $font-deco: Cinzel, serif;   // titles, dates, the big numbers
-$border: 1px solid var(--winx-border);
+$border-width-s: 1px;
+$border-width-m: 1.5px;
+$border-width-l: 2px;
+$border-width-xl: 3px;
+$border: $border-width-s solid var(--winx-border);
 
 // what sits over what (low to high): under -1 < base 0 < over 1 < raised 2 < scroll 3
 // < dropbar 5 < busy 6 < sticker 20 < nav 30 < drawer 31
