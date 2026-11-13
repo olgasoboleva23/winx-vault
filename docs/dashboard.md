@@ -2,7 +2,7 @@
 
 # 🖥 Dashboard
 
-The dashboard is a page of the [Winx tab](#the-winx-tab) (below). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/components/pages/dashboard/layout.md`: the same callouts and `winx` blocks a note would have.
+The dashboard is a page of the [Winx tab](#the-winx-tab) (below). At the top: the day it shows (‹ › and **today**; no date set means today, and it moves on at midnight), and **✦ Open** for that day's daily note. After a change to the tasks or the data the tab dims with a pink ✦ until the cards have redrawn. Its layout is `plugin/src/components/pages/dashboard/index.vue`: Vue cards inside the tab’s single Vue application. The dashboard and calendar stay mounted when switching pages; closing the tab disposes both.
 
 ![Dashboard](images/dashboard.webp)
 

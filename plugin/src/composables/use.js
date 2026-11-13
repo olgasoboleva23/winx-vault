@@ -35,6 +35,7 @@ export function useNewDay(c, fn) {
 // spinning) until the tab draws again and takes it off; 5 s at most
 export function useBusy(c, watched, el, cls) {
   let timer = 0;
+  c.register(() => window.clearTimeout(timer));
   c.registerEvent(c.app.vault.on("modify", f => {
     const target = watched(f.path) && el();
 

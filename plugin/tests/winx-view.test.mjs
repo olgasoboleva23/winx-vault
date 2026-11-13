@@ -1,12 +1,11 @@
 import { test, before, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { Component, Keymap } from "obsidian";
+import { Keymap } from "obsidian";
 import { setApp } from "#/helpers/app.js";
 
-// The Winx tab: its pages made once and kept (hidden), its steps in Obsidian's history, Cmd-click
-// a new tab. The pages here are stand-ins (pages.ts' make replaced), counted as they're made.
-let WinxView, pages, realMake, made, unloaded, vue, openWinx, OldWinxView;
+// Vue page lifetimes, Obsidian history and opening a separate tab.
+let WinxView, made, unloaded, vue, openWinx, OldWinxView;
 
 before(async () => {
   GlobalRegistrator.register();
@@ -25,18 +24,17 @@ before(async () => {
     isShown() { return this.style.display !== "none"; },
   });
   ({ WinxView } = await import("#/components/app/view.ts"));
-  ({ pages } = await import("#/components/app/pages.ts"));
   ({ openWinx, OldWinxView } = await import("#/components/app/open.ts"));
   vue = await import("vue");
-  realMake = Object.fromEntries(Object.entries(pages).map(([k, p]) => [k, p.make]));
-  for (const key of Object.keys(pages)) {
-    pages[key].make = () => {
+  for (const key of ["dashboard", "calendar", "projects"]) {
+    const Page = (await import(`../src/components/pages/${key}/index.vue`)).default;
+    Page.setup = () => {
       made.push(key);
-      const page = new Component();
-      page.onunload = () => unloaded.push(key);
-      return page;
+      vue.onUnmounted(() => unloaded.push(key));
+      return () => vue.h("div", { class: "winx-view__page" }, key);
     };
   }
+
 });
 
 beforeEach(() => { made = []; unloaded = []; });
@@ -80,8 +78,9 @@ test(keeps, async () => {
   await view.go("calendar");
   assert.deepEqual(made, ["dashboard", "calendar"]);
   assert.deepEqual(unloaded, []);
-  const shown = [...view.contentEl.querySelectorAll(".winx-app__page")].map(e => e.isShown());
-  assert.deepEqual(shown, [false, true]);
+  const shown = [...view.contentEl.querySelectorAll(".winx-view__page")].map(e => e.isShown());
+  assert.deepEqual(shown, [true]);
+  assert.equal(view.contentEl.querySelector(".winx-view__page").textContent, "calendar");
   assert.equal(view.getDisplayText(), "Calendar");
 });
 
@@ -145,6 +144,16 @@ test("closing the tab unloads every page, hidden ones too", async () => {
   await view.go("dashboard");
   await view.onClose();
   assert.deepEqual(unloaded.sort(), ["calendar", "dashboard"]);
+});
+
+test("closing while the initial state is being restored leaves the tab unmounted", async () => {
+  const { view, ready } = open();
+  await ready;
+  const restoring = view.setState({ page: "calendar" }, {});
+  await view.onClose();
+  await restoring;
+  assert.deepEqual(made, []);
+  assert.equal(view.contentEl.childElementCount, 0);
 });
 
 test("two Winx tabs keep their own state: one's dashboard date isn't the other's", async () => {
@@ -259,21 +268,21 @@ test("openWinx: the newest Winx tab, else one new pinned tab", async () => {
 
 test("the drawer: Projects, Finance, Shop, Supplies, Food, then ⚙ Settings; ↗ opens a tab", async () => {
   const { mount } = await import("@vue/test-utils");
-  const WinxApp = (await import("#/components/app/WinxApp/index.vue")).default;
+  const PageNavigation = (await import("#/components/app/PageNavigation/index.vue")).default;
   const w = workspace([]);
   const went = [];
-  const shell = mount(WinxApp, { global: { provide: { winx: {
+  const shell = mount(PageNavigation, { global: { provide: { winx: {
     state: { page: "dashboard" }, go: async (...a) => { went.push(a); },
   } } } });
 
   assert.equal(shell.find(".winx-drawer").exists(), false);
   await shell.findAll(".winx-btn--rail").at(-1).trigger("click");
-  const rows = shell.findAll(".winx-app__row .winx-grow");
+  const rows = shell.findAll(".winx-page-navigation__row .winx-grow");
 
   assert.deepEqual(rows.map(r => r.findAll("span").at(-1).text()),
     ["Projects", "Finance", "Shop", "Supplies", "Food", "Settings"]);
   assert.match(rows[5].text(), /⚙/);
-  await shell.find(".winx-app__open-tab").trigger("click");
+  await shell.find(".winx-page-navigation__open-tab").trigger("click");
   await new Promise(r => setTimeout(r));
   assert.equal(w.made.length, 1);
   assert.equal(w.made[0].pinned, false);
@@ -284,9 +293,24 @@ test("the drawer: Projects, Finance, Shop, Supplies, Food, then ⚙ Settings; �
   assert.equal(shell.find(".winx-drawer").exists(), false);
 });
 
-test("Finance is its note drawn in the tab", () => {
-  const page = realMake.finance({}, document.createElement("div"));
 
-  assert.equal(page.constructor.name, "NotePage");
-  assert.equal(page.path, "02 Areas/Finance.md");
+test("Finance route loads its ledger into the Vue page; closing removes its subscriptions", async () => {
+  const { vault } = await import("./stubs/vault.mjs");
+  const { app } = vault();
+  const listeners = new Set();
+  const on = (_name, fn) => { listeners.add(fn); return { off: () => listeners.delete(fn) }; };
+  Object.assign(app.vault, { on });
+  Object.assign(app.metadataCache, { on });
+  app.vault.adapter.list = async () => ({ files: [] });
+  const { view, leaf, ready } = open();
+  app.workspace = leaf.app.workspace;
+  app.workspace.on = on;
+  await ready;
+  await leaf.setViewState({ state: { page: "finance" } });
+  await new Promise(r => setTimeout(r));
+  assert.match(view.contentEl.querySelector(".winx-fin__empty").textContent, /The ledger is empty/);
+  assert.equal(view.contentEl.querySelector("h2").textContent, "Finance");
+  assert.ok(listeners.size > 0);
+  await view.onClose();
+  assert.equal(listeners.size, 0);
 });

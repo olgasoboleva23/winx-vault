@@ -15,20 +15,6 @@ export class Component {
   registerInterval(id) { this._cleanups.push(() => clearInterval(id)); return id; }
 }
 export class MarkdownRenderChild extends Component { constructor(el) { super(); this.containerEl = el; } }
-// rendering markdown: the dashboard layout's date slot only (its ```winx blocks aren't drawn here)
-// `calls`: what it was asked to draw, [md, sourcePath, the component it draws under]
-export const MarkdownRenderer = {
-  calls: [],
-  render: async (app, md, el, path, child) => {
-    MarkdownRenderer.calls.push([md, path, child]);
-    el.innerHTML = md.includes("winx-dash__date") ? '<div class="winx-dash__date"></div>' : "";
-  },
-};
-// where a note's text starts after its properties
-export const getFrontMatterInfo = text => {
-  const end = text.startsWith("---\n") ? text.indexOf("\n---\n", 3) : -1;
-  return { contentStart: end < 0 ? 0 : end + 5 };
-};
 export const debounce = fn => Object.assign(fn, { cancel() {} });
 export class Notice { constructor(text) { Notice.last = text; } }
 export const Platform = { isMobile: false };

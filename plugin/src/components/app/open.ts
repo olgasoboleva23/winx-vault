@@ -1,7 +1,7 @@
 import { ItemView, Keymap, type WorkspaceLeaf } from "obsidian";
 import { app } from "#/helpers/app.js";
-import { pageOf } from "./pages.ts";
-import { WINX_VIEW, WinxView } from "./view.ts";
+import { pageOf, WINX_VIEW } from "./pages.ts";
+import type { WinxView } from "./view.ts";
 
 // Opening Winx: ✨, the command and the reminders go to the Winx tab used last, or open one
 // (pinned) on the dashboard; `newTab`: another one, not pinned. With a page: that page in it.
@@ -23,12 +23,16 @@ export async function openWinx(page?: string, params = {}, newTab = false) {
   }
 
   await workspace.revealLeaf(leaf);   // loads a tab still deferred since the start
-  if (page && leaf.view instanceof WinxView) await leaf.view.go(page, params);
+  if (page) await (leaf.view as WinxView).go(page, params);
   return leaf;
 }
 
 // the Winx tab in front, if it is one
-export const activeWinx = () => app.workspace.getActiveViewOfType(WinxView);
+export const activeWinx = (): WinxView | null => {
+  const view = app.workspace.getActiveViewOfType(ItemView);
+
+  return view?.getViewType() === WINX_VIEW ? view as WinxView : null;
+};
 
 // is a Winx tab the one in front?
 export const inWinx = () => activeWinx() !== null;

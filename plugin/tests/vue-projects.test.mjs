@@ -48,7 +48,9 @@ function mount(over = {}) {
     open: k => { view.state.open = k; },
   };
   const el = document.body.appendChild(document.createElement("div"));
-  vue.createApp(Projects).provide("projects", view).mount(el);
+  vue.createApp(Projects, { state: view.state }).provide("winx", {
+    go: (_page, params, e) => view.open(params.open, e),
+  }).mount(el);
   return { el, view };
 }
 const cards = el => [...el.querySelectorAll(".winx-projects__card")];

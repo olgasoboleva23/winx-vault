@@ -1,17 +1,11 @@
-import { ItemView, Keymap, Platform, type ViewStateResult } from "obsidian";
+import { ItemView, Keymap, Notice, type ViewStateResult } from "obsidian";
 import { reactive, watch } from "vue";
 import { useVueApp } from "#/composables/vueApp.ts";
 import { isStep, readState, saved, withParams } from "#/store/router.js";
-import { pages, type PageDef } from "./pages.ts";
-import WinxApp from "./WinxApp/index.vue";
+import { pages, WINX_VIEW } from "./pages.ts";
+import Winx from "./index.vue";
 
-// The Winx tab: one tab, its pages (pages.ts) shown one at a time under the shell's pill (the
-// phone's bottom bar). Its state (the page shown, each page's own) is saved with the layout; a
-// page switch is a step in Obsidian's back / forward, a week inside the calendar is not. A kept
-// page switched away is hidden, not unloaded, so coming back is instant.
-export const WINX_VIEW = "winx";
-
-type Page = ReturnType<PageDef["make"]>;
+export { WINX_VIEW } from "./pages.ts";
 
 export class WinxView extends ItemView {
   navigation = true;   // Obsidian records a history step only for a navigation view
@@ -19,9 +13,8 @@ export class WinxView extends ItemView {
   state = (s => reactive({
     ...s, calendar: { ...s.calendar, area: null as string | null, picked: null as string | null },
   }))(readState(undefined));
-  private made = new Map<string, { page: Page, el: HTMLElement }>();
-  private shown: string | null = null;
-  private pagesEl: HTMLElement | null = null;
+  private closed = false;
+  private mounted: ReturnType<typeof useVueApp> | null = null;
 
   constructor(leaf: ItemView["leaf"]) {
     super(leaf);
@@ -30,14 +23,14 @@ export class WinxView extends ItemView {
     this.register(watch(json, () => this.app.workspace.requestSaveLayout()));
   }
   getViewType() { return WINX_VIEW; }
-  getDisplayText() { return pages[this.state.page]?.title ?? "Winx"; }
+  getDisplayText() { return pages[this.state.page as keyof typeof pages]?.title ?? "Winx"; }
   getIcon() { return "sparkles"; }
 
   getState() { return saved(this.state); }
   async setState(s: unknown, result: ViewStateResult) {
     const next = readState(s);
 
-    if (this.shown) result.history = isStep(this.state, next);
+    if (this.mounted) result.history = isStep(this.state, next);
     for (const [k, v] of Object.entries(next)) {
       const own = (this.state as any)[k];
 
@@ -46,7 +39,15 @@ export class WinxView extends ItemView {
     }
 
     await super.setState(s, result);
-    this.show(next.page);
+    if (this.closed) return;
+    this.mounted ??= useVueApp(this, this.contentEl, Winx, {
+      provide: { winx: this },
+      onError: error => {
+        console.error(error);
+        new Notice(`${this.getDisplayText()}: couldn't draw: ${error.message}`);
+      },
+    });
+    (this.leaf as any).updateHeader?.();
   }
 
   // to a page (params: its own state merged in); Cmd/Ctrl-click: in a new Winx tab, a copy of this
@@ -64,49 +65,13 @@ export class WinxView extends ItemView {
   }
 
   async onOpen() {
-    const phone = Platform.isMobile;
-
-    this.contentEl.addClasses(["winx-app", "dashboard", ...(phone ? ["winx-app--phone"] : [])]);
-    this.pagesEl = this.contentEl.createDiv({ cls: "winx-app__pages" });
-    const nav = this.contentEl.createDiv({ cls: "winx-app__nav" });
-
-    useVueApp(this, nav, WinxApp, { provide: { winx: this } });
+    this.closed = false;
+    this.contentEl.addClass("winx-host");
   }
-  onResize() { this.current()?.page.catchUp?.(); }
+  onResize() { this.app.workspace.trigger("winx:page"); }
   async onClose() {
-    for (const { page } of this.made.values()) this.removeChild(page);
-    this.made.clear();
-    this.shown = null;
-    this.contentEl.empty();
-  }
-
-  private current() { return this.shown ? this.made.get(this.shown) : undefined; }
-
-  // the page `key` shown: the one before hidden (kept) or unloaded; made the first time
-  private show(key: string) {
-    if (key === this.shown || !this.pagesEl) return;
-
-    const old = this.current();
-
-    if (old && pages[this.shown!].keep) old.el.hide();
-    else if (old) {
-      this.removeChild(old.page);
-      old.el.remove();
-      this.made.delete(this.shown!);
-    }
-
-    let now = this.made.get(key);
-
-    if (now) now.el.show();
-    else {
-      const el = this.pagesEl.createDiv({ cls: "winx-app__page" });
-
-      now = { el, page: this.addChild(pages[key].make(this, el)) };
-      this.made.set(key, now);
-    }
-
-    this.shown = key;
-    this.app.workspace.trigger("winx:page");
-    (this.leaf as any).updateHeader?.();
+    this.closed = true;
+    this.mounted?.unmount();
+    this.mounted = null;
   }
 }

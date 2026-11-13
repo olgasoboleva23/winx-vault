@@ -1,0 +1,41 @@
+/* WinxView: the Obsidian tab, scrolling pages and navigation placement. */
+@use "mixins" as *;
+
+.winx-host.view-content { padding: 0; overflow: hidden; }
+
+.winx-view {
+  // the tab's content: Obsidian's .workspace-leaf-content .view-content is (0,2,0)
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+
+  &__pages { height: 100%; }
+
+  // Obsidian's own padding of a tab's content (its .markdown-preview-view's loses to it there too)
+  & &__page {
+    box-sizing: border-box;
+    height: 100%;
+    padding: var(--size-4-3) var(--size-4-3) max(var(--safe-area-inset-bottom), var(--size-4-8));
+    overflow: auto;
+  }
+
+  &--phone { display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  &--phone &__pages { grid-area: 1 / 1; min-height: 0; }
+  &--phone &__nav { display: contents; }
+  &--phone .winx-page-navigation__rail { grid-area: 2 / 1; margin-bottom: var(--view-bottom-spacing, 0); }
+  // the drawer covers the page's grid cell, so the bar stays visible and clickable
+  &--phone .winx-page-navigation__drawer {
+    position: relative;
+    grid-area: 1 / 1;
+    min-height: 0;
+    overflow: hidden;   // the entering sheet slides behind the bottom bar
+  }
+
+  // the bar sits above the navbar: the shell and its pages leave it no room of their own
+  // (.is-phone .dashboard does, for a page the navbar floats over); !important to beat that
+  // rule's own !important (_callout-grid.scss)
+  .is-phone & {
+    &.dashboard { padding-bottom: 0 !important; }
+    .winx-view__page { padding-bottom: $space-2xl !important; }
+  }
+}

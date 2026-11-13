@@ -67,19 +67,27 @@ function mount(over = {}, tasksApi = {}, source = { tasks: TASKS(), poolLines: [
 const box = (el, text) => [...el.querySelectorAll(".winx-cal__task--open")].find(r => r.textContent.includes(text))
   .querySelector("input");
 
-test("CalendarPage: hidden, a task change waits; shown again, catchUp draws it once", async () => {
-  const { CalendarPage } = await import("#/components/pages/calendar/view.ts");
+test("CalendarPage: cached while hidden, refreshed on return; subscriptions end on close", async () => {
+  const Calendar = (await import("#/components/pages/calendar/index.vue")).default;
   const { taskStore } = await import("#/store/tasks.js");
-  const el = document.body.appendChild(document.createElement("div"));
-  let shown = false; el.isShown = () => shown;
+  const { mount } = await import("@vue/test-utils");
+  const shown = vue.ref(true);
   const st = vue.reactive({ ...state.readState(undefined), area: null, picked: null });
-  const page = new CalendarPage(st, el); page.load();
-  const v0 = page.ctx;
+  const Root = { setup: () => () => vue.h(vue.KeepAlive, null, {
+    default: () => shown.value ? vue.h(Calendar, { state: st }) : null,
+  }) };
+  const wrapper = mount(Root, { attachTo: document.body });
+  const view = wrapper.findComponent(Tab).vm.$.provides.calendar;
+  const first = view.ctx;
+  shown.value = false; await vue.nextTick();
   taskStore.version.value++; await vue.nextTick();
-  assert.equal(page.ctx, v0);           // hidden: not rebuilt
-  shown = true; page.catchUp(); await vue.nextTick();
-  assert.notEqual(page.ctx, v0);        // shown: rebuilt once
-  page.unload();
+  assert.equal(view.ctx, first);
+  shown.value = true; await vue.nextTick();
+  assert.notEqual(view.ctx, first);
+  const last = view.ctx;
+  wrapper.unmount();
+  taskStore.version.value++; await vue.nextTick();
+  assert.equal(view.ctx, last);
 });
 
 test("a tick is written 2 s later; unticked in time, nothing", async () => {
