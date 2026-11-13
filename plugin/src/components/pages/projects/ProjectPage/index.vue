@@ -102,7 +102,7 @@ async function newStage(name) {
           v-model="stageName"
           :input="{ placeholder: 'New stage' }"
           submit="+ stage"
-          photo
+          on-background
           @submit="newStage"
         />
       </div>

@@ -55,7 +55,7 @@ const canTick = computed(() => { void projects.version.value; return !!tasksApi(
         <h1 class="winx-projects__title">Projects</h1>
         <WinxButton kind="chip" @click="askNewProject(app)">✦ New project</WinxButton>
       </div>
-      <WinxTabs v-model="state.filter" :tabs="tabs" photo />
+      <WinxTabs v-model="state.filter" :tabs="tabs" on-background />
     </div>
     <WinxEmpty v-if="!all.length" text="No projects yet" />
     <WinxEmpty
