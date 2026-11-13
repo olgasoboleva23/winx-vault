@@ -24,7 +24,6 @@ const m = computed(() => {
   <div class="winx-fin winx-col winx-gap-2xl">
     <WinxEmpty
       v-if="state.data.empty"
-      on-background
       :text="`The ledger is empty: a note per month goes to ${state.data.path}`"
     />
     <template v-else>

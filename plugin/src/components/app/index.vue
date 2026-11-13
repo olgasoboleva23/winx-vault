@@ -35,7 +35,12 @@ watch(() => winx.state.page, async () => {
         class="winx-view__page markdown-preview-view markdown-rendered dashboard"
       >
         <h2>{{ page.title }}</h2>
-        <Widget :definition="{ ...blocks[page.widget], note: page.note }" />
+        <Widget
+          :definition="{
+            ...blocks[page.widget], note: page.note,
+            card: page.card ? { meta: ['hero'] } : undefined,
+          }"
+        />
       </div>
     </div>
     <div class="winx-view__nav winx-page-navigation"><PageNavigation /></div>

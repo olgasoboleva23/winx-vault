@@ -316,6 +316,9 @@ test("Finance route loads its ledger into the Vue page; closing removes its subs
   await leaf.setViewState({ state: { page: "finance" } });
   await new Promise(r => setTimeout(r));
   assert.match(view.contentEl.querySelector(".winx-fin .winx-empty").textContent, /The ledger is empty/);
+  const card = view.contentEl.querySelector('.callout[data-callout="card"]');
+  assert.equal(card.dataset.calloutMetadata, "hero");
+  assert.ok(card.querySelector(".callout-content > .winx-fin"));
   assert.equal(view.contentEl.querySelector("h2").textContent, "Finance");
   assert.ok(listeners.size > 0);
   await view.onClose();
