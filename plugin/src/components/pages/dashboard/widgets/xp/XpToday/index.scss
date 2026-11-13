@@ -86,7 +86,7 @@
         bottom: calc(100% + $space-s);
         right: 0;
         background: var(--winx-purple-deep);
-        color: white;
+        color: var(--winx-on-selected);
         font-size: $text-2xs;
         white-space: nowrap;
         padding: $space-xs $space-m;

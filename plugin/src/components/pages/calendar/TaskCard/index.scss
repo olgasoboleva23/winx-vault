@@ -10,7 +10,7 @@
   transition: background $fast ease;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: fade(white, 35%); border-radius: $radius-m; }
+  &:hover { background: fade(var(--winx-surface), 35%); border-radius: $radius-m; }
   &--paused { opacity: 0.55; }
   &__text { font-size: $text-xl; line-height: 1.35; }
   &__meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
@@ -76,7 +76,7 @@ body {
       }
       [data-swipe="ready"] .winx-task-primary {
         scale: 1.15;
-        color: var(--winx-text);
+        color: var(--winx-on-gold);
         border-color: var(--winx-gold-deep);
         box-shadow: 0 0 12px var(--winx-gold);
       }

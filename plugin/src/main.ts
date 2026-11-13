@@ -7,6 +7,7 @@ import { useNotify } from "./composables/notify.js";
 import { redrawNotes } from "./helpers/plugins.js";
 import { setApp } from "./helpers/app.js";
 import { installSounds } from "./helpers/sounds.js";
+import { useTheme } from "./controllers/theme.js";
 import { useTaskStore } from "./store/tasks.js";
 
 // The Winx plugin: the ```winx blocks (widgets), the Winx tab, the task window and the
@@ -17,6 +18,7 @@ export default class WinxPlugin extends Plugin {
   async onload() {
     setApp(this.app);
     useTaskStore(this);   // the tasks, read by the plugin itself (store/tasks.js)
+    useTheme(this);
     installSounds(this);
     registerCommands(this);
     // a ```winx block in a note: a widget by name (controllers/blocks.js)

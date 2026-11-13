@@ -142,7 +142,7 @@
 
     &:last-child { border-bottom: none; }
     &[draggable="true"] { cursor: grab; }
-    &[draggable="true"]:hover { background: fade(white, 35%); border-radius: 8px; }
+    &[draggable="true"]:hover { background: fade(var(--winx-surface), 35%); border-radius: 8px; }
     &--ghost   { opacity: 0.5; }
     &--done    { opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--winx-gold-deep); }
     // room for the checkbox (left: $space-xs, ~16px wide, then a gap)

@@ -79,3 +79,9 @@
     letter-spacing: 1.5px !important;
   }
 }
+
+// Utility pages keep the page colour; only Dashboard, Calendar and Projects have the photo.
+.workspace-leaf-content[data-type="winx"]:not(:has(
+  .winx-view[data-page="dashboard"], .winx-view[data-page="calendar"],
+  .winx-view[data-page="projects"]
+))::before { display: none; }

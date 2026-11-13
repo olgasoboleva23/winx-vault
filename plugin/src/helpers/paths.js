@@ -52,6 +52,8 @@ export const CONFIG = `${DATA}/config.json`;
 
 export const ASSETS = "00 System/Assets", STICKERS = `${ASSETS}/stickers`;
 
+export const THEME_IMAGES = `${ASSETS}/themes`;
+
 export const SOUNDS = `${ASSETS}/winx music`;
 
 // the daily notes: the folder set in Obsidian's Daily notes (the vault's root when none)

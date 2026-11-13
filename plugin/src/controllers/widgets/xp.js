@@ -10,7 +10,7 @@ import { taskStore } from "#/store/tasks.js";
 import { levelInfo, taskXp, xpLegend } from "#/models/xp.js";
 import { mana, mpLine, mpTable, vitals } from "#/models/vitals.js";
 import { cycleLog } from "./cycle.js";
-import { chartColor } from "#/helpers/chart.js";
+import { chartColor, chartScale } from "#/helpers/chart.js";
 
 export async function loadLevelToday({ dv }) {
   const { xpMap } = config;
@@ -61,7 +61,13 @@ export async function loadLifeAreas({ dv }) {
         backgroundColor: chartColor("--winx-pink-deep", 0.3),
         borderColor: chartColor("--winx-pink-deep"),
       }] },
-      options: { plugins: { legend: { display: false } } },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { r: { ...chartScale(),
+          angleLines: { color: chartColor("--winx-chart-grid", 0.1) },
+          pointLabels: { color: chartColor("--winx-chart-text") },
+        } },
+      },
     },
   };
 }

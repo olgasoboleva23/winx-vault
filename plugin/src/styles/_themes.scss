@@ -1,0 +1,138 @@
+// The choice lives on body; colours stay inside Winx, away from Obsidian and Kanban.
+body.winx-theme-winx-dark :is(
+  .workspace-leaf-content[data-type="winx"], .block-language-winx, .winx-tooltip, .winx-syncing
+) {
+  --winx-pink-light: #262b48;
+  --winx-pink: #30304c;
+  --winx-pink-deep: #f4a6c8;
+  --winx-purple-light: #343454;
+  --winx-purple: #b89bd8;
+  --winx-purple-deep: #ead9ed;
+  --winx-blue: #a8c8f0;
+  --winx-blue-deep: #89add5;
+  --winx-gold: #e8c070;
+  --winx-gold-bright: #f8d9a3;
+  --winx-gold-deep: #e8c070;
+  --winx-lavender: #cfc1df;
+  --winx-sheet: #191e35;
+  --winx-text: #ece4f2;
+  --winx-border: #806783;
+  --winx-surface: #242b49;
+  --winx-surface-warm: #272d4b;
+  --winx-surface-done: #3b3445;
+  --winx-surface-skipped: #48283e;
+  --winx-crest-text: #241a30;
+  --winx-on-gold: #241a30;
+  --winx-on-selected: #241a30;
+  --winx-on-accent: #241a30;
+  --winx-on-background: #ffffff;
+  --winx-highlight: #f4c6de;
+  --winx-heading: #f6e8f0;
+  --winx-danger: #ff7aa8;
+  --winx-overdue: #ff9bc0;
+  --winx-savings-text: #e8c070;
+  --winx-sky-start: #293b57;
+  --winx-sky-end: #353458;
+  --winx-dusk-dark: #141a33;
+  --winx-dusk-rose: #2a2350;
+  --winx-chart-text: #cfc1df;
+  --winx-chart-grid: #cfc1df;
+  --winx-font-deco: "Cinzel";
+  --winx-bg-blend: normal;
+  --winx-bg-image: var(--winx-theme-image, none);
+  --winx-twilight: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end));
+  --winx-sky: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end), var(--winx-purple-light));
+  --winx-dusk: linear-gradient(135deg, var(--winx-dusk-dark), var(--winx-dusk-rose));
+}
+
+body.winx-theme-gothic :is(
+  .workspace-leaf-content[data-type="winx"], .block-language-winx, .winx-tooltip, .winx-syncing
+) {
+  --winx-pink-light: #2a2219;
+  --winx-pink: #352b1f;
+  --winx-pink-deep: #d9822b;
+  --winx-purple-light: #3a3024;
+  --winx-purple: #b18e60;
+  --winx-purple-deep: #e3d6b8;
+  --winx-blue: #6fa0e0;
+  --winx-blue-deep: #4d82c2;
+  --winx-gold: #b8913f;
+  --winx-gold-bright: #e5bd71;
+  --winx-gold-deep: #d0a253;
+  --winx-lavender: #d7c7a8;
+  --winx-sheet: #211b15;
+  --winx-text: #e3d6b8;
+  --winx-border: #5c4a35;
+  --winx-surface: #30271d;
+  --winx-surface-warm: #342a20;
+  --winx-surface-done: #3e3623;
+  --winx-surface-skipped: #472820;
+  --winx-crest-text: #1b140d;
+  --winx-on-gold: #1b140d;
+  --winx-on-selected: #1b140d;
+  --winx-on-accent: #1b140d;
+  --winx-on-background: #f2e8d2;
+  --winx-highlight: #e5bd71;
+  --winx-heading: #e8b060;
+  --winx-danger: #e26d4e;
+  --winx-overdue: #ef9674;
+  --winx-savings-text: #e8b060;
+  --winx-sky-start: #263647;
+  --winx-sky-end: #313a40;
+  --winx-dusk-dark: #17130f;
+  --winx-dusk-rose: #2a2119;
+  --winx-chart-text: #c5b496;
+  --winx-chart-grid: #c5b496;
+  --winx-font-deco: "Pirata One";
+  --winx-bg-blend: normal;
+  --winx-bg-image: var(--winx-theme-image, none);
+  --winx-twilight: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end));
+  --winx-sky: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end), var(--winx-purple-light));
+  --winx-dusk: linear-gradient(135deg, var(--winx-dusk-dark), var(--winx-dusk-rose));
+}
+
+body.winx-theme-da2 :is(
+  .workspace-leaf-content[data-type="winx"], .block-language-winx, .winx-tooltip, .winx-syncing
+) {
+  --winx-pink-light: #2b2524;
+  --winx-pink: #392927;
+  --winx-pink-deep: #a3201f;
+  --winx-purple-light: #423332;
+  --winx-purple: #b89080;
+  --winx-purple-deep: #ebe2d0;
+  --winx-blue: #4a6c8f;
+  --winx-blue-deep: #7192ad;
+  --winx-gold: #c9a14a;
+  --winx-gold-bright: #e4c578;
+  --winx-gold-deep: #d9b45e;
+  --winx-lavender: #d6c6b9;
+  --winx-sheet: #211c1b;
+  --winx-text: #ebe2d0;
+  --winx-border: #6b5a3a;
+  --winx-surface: #302928;
+  --winx-surface-warm: #362c2b;
+  --winx-surface-done: #3b3324;
+  --winx-surface-skipped: #472422;
+  --winx-crest-text: #211c1b;
+  --winx-on-gold: #211c1b;
+  --winx-on-selected: #211c1b;
+  --winx-on-accent: #f3e9d6;
+  --winx-on-background: #f3e9d6;
+  --winx-highlight: #e4c578;
+  --winx-heading: #c9a14a;
+  --winx-danger: #e96f5d;
+  --winx-overdue: #ec9584;
+  --winx-savings-text: #d9b45e;
+  --winx-sky-start: #29323b;
+  --winx-sky-end: #393339;
+  --winx-dusk-dark: #1a1716;
+  --winx-dusk-rose: #2e2220;
+  --winx-chart-text: #cbbeb1;
+  --winx-chart-grid: #cbbeb1;
+  --winx-font-deco: "Cinzel Decorative";
+  --winx-bg-blend: normal;
+  --winx-bg-image: var(--winx-theme-image, none);
+  --winx-twilight: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end));
+  --winx-sky: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end), var(--winx-purple-light));
+  --winx-dusk: linear-gradient(135deg, var(--winx-dusk-dark), var(--winx-dusk-rose));
+}

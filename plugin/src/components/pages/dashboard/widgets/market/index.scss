@@ -20,7 +20,7 @@
     transition: background $fast ease;
 
     &:last-child { border-bottom: none; }
-    &:hover { background: fade(white, 30%); border-radius: $radius-m; }
+    &:hover { background: fade(var(--winx-surface), 30%); border-radius: $radius-m; }
   }
 
   &__text {

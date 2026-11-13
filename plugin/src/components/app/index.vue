@@ -19,7 +19,7 @@ watch(() => winx.state.page, async () => {
 </script>
 
 <template>
-  <div :class="['winx-view dashboard', { 'winx-view--phone': phone }]">
+  <div :class="['winx-view dashboard', { 'winx-view--phone': phone }]" :data-page="winx.state.page">
     <div class="winx-view__pages">
       <KeepAlive :include="['CalendarPage', 'DashboardPage']">
         <component

@@ -9,7 +9,7 @@ export default {
     rules: { "color-hex-length": "long" },
   }, {
     files: ["src/components/**/*.scss", "src/styles/_{busy,syncing,scroll-cards,tooltip}.scss"],
-    rules: { "color-no-hex": true, "function-disallowed-list": ["rgb", "rgba"] },
+    rules: { "color-no-hex": true, "color-named": "never", "function-disallowed-list": ["rgb", "rgba"] },
   }, {
     files: ["src/components/pages/dashboard/widgets/xp/LevelToday/index.scss"],
     rules: { "color-no-hex": null, "function-disallowed-list": null },

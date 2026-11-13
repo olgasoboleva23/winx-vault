@@ -62,6 +62,7 @@ onMounted(() => {
   const { redraw } = redraws;
 
   catchUp = redraws.catchUp;
+  owner.registerEvent(app.workspace.on("winx:theme", redraw));
   const taskFiles = `${TASKS}/`, others = def.watches?.filter(w => w !== taskFiles);
   const watched = others && (path =>
     others.some(w => w.endsWith("/") ? path.startsWith(w) : path === w));

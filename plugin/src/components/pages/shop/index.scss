@@ -9,7 +9,7 @@
     background: var(--winx-twilight);
     border: $border-width-l solid var(--winx-border);
     border-radius: 18px;
-    color: white;
+    color: var(--winx-on-background);
     font-size: 1.4em;
     font-weight: 600;
     box-shadow: 0 4px 16px alpha(--winx-purple-deep, 25%);

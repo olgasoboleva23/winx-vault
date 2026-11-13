@@ -3,6 +3,13 @@
 // difficulties' XP and gold, the areas, XP Today's thresholds and the level cost: applyConfig,
 // called by the task store whenever the file is read. A task's record names its difficulty and
 // area by `key`.
+export const THEMES = [
+  { value: "winx", label: "Winx" },
+  { value: "winx-dark", label: "Winx dark" },
+  { value: "gothic", label: "Gothic" },
+  { value: "da2", label: "Dragon Age 2" },
+];
+
 const DIFFICULTIES = [
   { label: "⭐ Easy", key: "easy", xp: 5, gold: 2 },
   { label: "⭐⭐ Medium", key: "medium", xp: 10, gold: 5 },
@@ -29,7 +36,7 @@ const LEVEL_COST = { base: 100, step: 25 };
 
 // filled by applyConfig below
 const config = {
-  difficulties: [], areas: [], levels: [], levelCost: { base: 0, step: 0 },
+  theme: "winx", difficulties: [], areas: [], levels: [], levelCost: { base: 0, step: 0 },
   xpMap: {}, areaMap: {}, areaIcons: {}, areaColors: {},
   marketCategories: [
     { label: "🌿 Harvest", tag: "#food" },
@@ -49,6 +56,7 @@ export function applyConfig(json = {}) {
   const areas = Array.isArray(json.areas) && json.areas.length ? json.areas : AREAS;
   const lv = { ...LEVELS, ...json.levels }, cost = { ...LEVEL_COST, ...json.levelCost };
 
+  config.theme = THEMES.some(t => t.value === json.theme) ? json.theme : "winx";
   config.difficulties = DIFFICULTIES.map(x =>
     ({ ...x, xp: x.key === "none" ? 0 : num(d[x.key]?.xp, x.xp),
       gold: num(d[x.key]?.gold, x.gold) }));
