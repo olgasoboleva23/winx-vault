@@ -4,6 +4,8 @@
 .winx-meds {
   color: var(--winx-text-dark);
 
+  &__notes { white-space: pre-wrap; }
+
   &__sum { text-align: center; font-size: $text-m; letter-spacing: 0.04em; color: alpha(--winx-purple-deep, 70%); margin-bottom: $space-m; }
   &__bar {
     height: $space-l; margin: 0 $space-m $space-2xl; border-radius: $pill; overflow: hidden;

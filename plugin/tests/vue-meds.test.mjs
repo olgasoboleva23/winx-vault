@@ -23,7 +23,7 @@ const C1 = {
     { name: "Аевит", code: "АЕ", dose: "1 таблетка", times: "any", meal: "after", days: 2 },
     { name: "Магний 2 таблетки", code: "МГ", dose: "", times: "both", meal: "before", days: 3 },
   ],
-  notes: "**после еды**",
+  notes: "После еды\nЗапивать водой",
   marks: {
     "2026-11-07": { "АЕ": "✅", "МГ☀️": "✅", "МГ🌙": "❌" },
     "2026-11-08": { "МГ☀️": "✅" },
@@ -67,7 +67,7 @@ test("MedsCourse: Приём, Заметки when there are notes, the counts, c
     ["☀️ утро, перед едой: Магний 2 таблетки", "🌙 на ночь, перед едой: Магний 2 таблетки",
       "в любое время, после еды: Аевит 1 таблетка"]);
   assert.ok(w.findAll(".callout-title-inner").map(e => e.text()).includes("Заметки"));
-  assert.equal(w.find(".winx-markdown").exists(), true);
+  assert.equal(w.find(".winx-meds__notes").element.textContent, C1.notes);
   assert.deepEqual(w.findAll(".winx-meds__chip").map(c => [c.text(), c.attributes("data-mark")]),
     [["Магний", "✅"], ["Магний", "☐"], ["Аевит", "☐"]]);
   assert.equal(w.findAll(".winx-table__row").length, 3);

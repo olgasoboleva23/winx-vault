@@ -12,7 +12,6 @@ import WinxButton from "#/components/uikit/WinxButton/index.vue";
 import WinxCard from "#/components/uikit/WinxCard/index.vue";
 import WinxCheckbox from "#/components/uikit/WinxCheckbox/index.vue";
 import WinxInput from "#/components/uikit/WinxInput/index.vue";
-import WinxMarkdown from "#/components/uikit/WinxMarkdown.vue";
 import WinxTable from "#/components/uikit/WinxTable/index.vue";
 import { TIMES, next } from "#/models/course.js";
 import { editCourse, setDayNote, tickMeds } from "#/controllers/meds.js";
@@ -84,7 +83,7 @@ const note = (r, el) => {
       <div v-for="line in intake" :key="line" class="winx-meds__intake">{{ line }}</div>
     </WinxCard>
     <WinxCard v-if="notes" title="Заметки">
-      <WinxMarkdown :text="notes" />
+      <div class="winx-meds__notes">{{ notes }}</div>
     </WinxCard>
     <WinxCard title="Курс">
       <template #button>
