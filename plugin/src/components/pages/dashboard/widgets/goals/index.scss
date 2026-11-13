@@ -2,7 +2,7 @@
 /* ── Goals (src/widgets/goals/goals.js): a block winx-goal per goal ── */
 .winx-goal {
   &__head {
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
   }
 
   &__name { font-weight: 600; }
@@ -20,7 +20,7 @@
     height: 14px;
     border-radius: $round;
     border: $border-width-m solid var(--winx-border);
-    background: white(40%);
+    background: alpha(--winx-surface, 40%);
 
     &--done    { background: var(--winx-gold); border-color: var(--winx-gold-deep); }
     &--missed  { border-color: var(--winx-pink-deep); border-style: dashed; }

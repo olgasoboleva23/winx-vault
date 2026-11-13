@@ -57,11 +57,11 @@
     font-size: $text-6xl;
     font-weight: 700;
     line-height: 1.1;
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
   }
 
   &__mini-mode {
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     opacity: 0.75;
     margin-right: $space-xs;
   }
@@ -81,7 +81,7 @@
     cursor: pointer;
     transition: transform $fast ease;
     &:hover { transform: scale(1.05); }
-    svg { width: 20px; height: 20px; fill: var(--winx-text-dark); }
+    svg { width: 20px; height: 20px; fill: var(--winx-text); }
   }
 
   &__body {
@@ -151,7 +151,7 @@
     position: relative;
     cursor: pointer;
     font-size: $text-6xl;
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     z-index: $z-raised;
   }
 
@@ -176,7 +176,7 @@
     }
 
     svg {
-      fill: var(--winx-text-dark);
+      fill: var(--winx-text);
     }
 
     &--play {
@@ -231,7 +231,7 @@
     &-text {
       font-size: $text-l;
       font-weight: 600;
-      color: var(--winx-text-dark);
+      color: var(--winx-text);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }

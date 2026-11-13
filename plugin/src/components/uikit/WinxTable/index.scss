@@ -6,7 +6,7 @@
   /* the rows parted by gold dashes, the header in Cinzel */
   & &__head, & &__cell {
     padding: $space-xs; border: none; border-bottom: $border-width-s dashed fade(var(--winx-gold-deep), 30%);
-    background: none; color: var(--winx-text-dark); font-size: $text-xl;
+    background: none; color: var(--winx-text); font-size: $text-xl;
   }
   & &__head {
     padding: $space-m $space-xs $space-s; text-align: left; white-space: nowrap;

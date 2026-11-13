@@ -13,7 +13,7 @@
   }
 
   &__text {
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     font-size: $text-xl;
   }
 
@@ -21,7 +21,7 @@
     margin-top: $space-s;
     height: 10px;
     border-radius: $radius-s;
-    background: white(40%);
+    background: alpha(--winx-surface, 40%);
     position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
   }
 

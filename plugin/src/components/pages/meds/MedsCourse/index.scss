@@ -2,7 +2,7 @@
 /* ===== A medication course (block winx-meds): inside its card. The chips are buttons, as are the
    grid's ticks: the block in front (& &__chip) outweighs Obsidian's button styles ===== */
 .winx-meds {
-  color: var(--winx-text-dark);
+  color: var(--winx-text);
 
   &__notes { white-space: pre-wrap; }
 
@@ -17,26 +17,26 @@
   &__today { margin-bottom: $space-xl; }
   &__zone {
     padding: $space-m $space-l; border: $border-width-s dashed var(--winx-border); border-radius: $radius-m;
-    background: white(60%);
+    background: alpha(--winx-surface, 60%);
     &-label { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); margin-bottom: $space-s; }
     &-label b { color: var(--winx-purple-deep); }
   }
   & &__chip {
     @include row;
     gap: $space-m; min-height: $btn-touch; padding: $space-xs $space-2xl $space-xs $space-s;
-    border: $border; border-radius: $pill; background: white(75%); color: var(--winx-text-dark);
+    border: $border; border-radius: $pill; background: alpha(--winx-surface, 75%); color: var(--winx-text);
     font-size: $text-xl; cursor: pointer; box-shadow: none; transition: box-shadow $fast ease;
-    &[data-mark="✅"] { border-color: var(--winx-gold-deep); background: rgb(255 252 240); box-shadow: 0 0 8px alpha(--winx-gold, 60%); text-decoration: line-through; color: alpha(--winx-text-dark, 60%); }
-    &[data-mark="❌"] { border-color: var(--winx-pink-deep); background: rgb(255 240 244); }
+    &[data-mark="✅"] { border-color: var(--winx-gold-deep); background: var(--winx-surface-done); box-shadow: 0 0 8px alpha(--winx-gold, 60%); text-decoration: line-through; color: alpha(--winx-text, 60%); }
+    &[data-mark="❌"] { border-color: var(--winx-pink-deep); background: var(--winx-surface-skipped); }
   }
 
   /* the grid: a WinxTable; the table in front outweighs its own cell rules */
-  &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: white(40%); }
+  &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: alpha(--winx-surface, 40%); }
   .winx-table .winx-meds {
     &__date { white-space: nowrap; }
     &__note { font-size: $text-m; color: alpha(--winx-purple-deep, 65%); }
   }
-  &__row--past &__date, &__row--future &__date { color: alpha(--winx-text-dark, 60%); }
+  &__row--past &__date, &__row--future &__date { color: alpha(--winx-text, 60%); }
   &__row--today {
     background: linear-gradient(90deg, fade(var(--winx-blue), 60%), fade(var(--winx-purple-light), 60%));
     .winx-meds__date { font-weight: 600; color: var(--winx-purple-deep); }

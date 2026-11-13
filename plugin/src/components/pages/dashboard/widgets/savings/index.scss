@@ -12,7 +12,7 @@
     overflow: hidden;
     border: $border-width-l solid var(--winx-gold);
     border-radius: $radius-xl;
-    background: #fff;
+    background: var(--winx-surface);
   }
   &__img {
     display: block; width: 100%; height: 100%; object-fit: cover;
@@ -40,7 +40,7 @@
     &--on {
       border: $border-width-l solid var(--winx-gold-deep);
       background: radial-gradient(var(--winx-gold-bright), var(--winx-gold));
-      color: #8a5a1a;
+      color: var(--winx-savings-text);
       box-shadow: 0 0 6px alpha(--winx-gold, 80%);
     }
   }
@@ -48,7 +48,7 @@
     padding: $space-m $space-xl;
     border: $border-width-l solid var(--winx-pink-deep);
     border-radius: $radius-xl;
-    background: white(60%);
+    background: alpha(--winx-surface, 60%);
     &-sum { color: var(--winx-pink-deep); white-space: nowrap; }
   }
 }

@@ -1,11 +1,11 @@
 @use "mixins" as *;
 /* ===== The food journal (block winx-food): inside its card; the grid is a WinxTable ===== */
 .winx-food {
-  color: var(--winx-text-dark);
+  color: var(--winx-text);
 
   &__head { margin-bottom: $space-l; }
   &__week { font-family: $font-deco; font-size: $text-xl; color: var(--winx-purple-deep); }
-  &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: white(40%); }
+  &__grid { overflow-x: auto; padding: $space-xs $space-s; border-radius: $radius-m; background: alpha(--winx-surface, 40%); }
   .winx-table .winx-food {
     &__day { white-space: nowrap; }
     &__items { min-width: 12em; }
@@ -20,7 +20,7 @@
   &__item {
     @include row;
     gap: $space-xs; padding: $space-2xs $space-s; border: $border; border-radius: $pill;
-    background: white(70%); font-size: $text-l; white-space: nowrap;
+    background: alpha(--winx-surface, 70%); font-size: $text-l; white-space: nowrap;
   }
   &__item-name { cursor: pointer; }
   &__off { cursor: pointer; opacity: 0.45; &:hover { opacity: 1; color: var(--winx-pink-deep); } }

@@ -34,7 +34,7 @@ $text-5xl: 26px;     // the cycle's day
 $text-6xl: 30px;     // the pomodoro's time
 
 // stylelint-disable-next-line value-keyword-case -- a font's name, not a keyword
-$font-deco: Cinzel, serif;   // titles, dates, the big numbers
+$font-deco: var(--winx-font-deco), serif;   // titles, dates, the big numbers
 $border-width-s: 1px;
 $border-width-m: 1.5px;
 $border-width-l: 2px;
@@ -97,14 +97,13 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
   &::after  { bottom: $inset; right: $inset; transform: scale(-1, -1); }
 }
 
-// white and black at some opacity: white(40%) → rgb(255 255 255 / 40%)
-@function white($opacity) { @return rgba(255, 255, 255, $opacity); }
+// black at some opacity, for shadows and masks
 @function black($opacity) { @return rgba(0, 0, 0, $opacity); }
 
 // sparkles fly out of the middle on hover (WinxButton's add and rail; the picture is
 // --winx-sparkles-svg in _assets.scss), none for reduced motion; the hover's own look is the block
 // passed in. The parent is position: relative
-@mixin sparkles($color: #fff) {
+@mixin sparkles($color: var(--winx-highlight)) {
   &::after {
     content: "";
     position: absolute;

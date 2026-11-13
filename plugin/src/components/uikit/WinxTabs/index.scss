@@ -11,7 +11,7 @@
   // straight on the photo: light words with a shadow, the picked one fully lit
   &--on-background {
     button.winx-tabs__tab {
-      color: white(95%); opacity: 0.75; text-shadow: 0 1px 3px black(50%);
+      color: alpha(--winx-on-background, 95%); opacity: 0.75; text-shadow: 0 1px 3px black(50%);
       &--on { opacity: 1; }
     }
   }

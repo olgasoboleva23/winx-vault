@@ -22,8 +22,25 @@
   --winx-gold-deep: #c89540;
   --winx-lavender: #f4e4f5;
   --winx-sheet: #fffafd;   /* the nav pill, the drawer and the phone's sheet: a near-white pink */
-  --winx-text-dark: #4a1f4a;
+  --winx-text: #4a1f4a;
   --winx-border: #d4a5d8;
+
+  /* Surfaces, text and decoration have separate roles in dark themes. */
+  --winx-surface: #ffffff;
+  --winx-surface-warm: #fff8fc;
+  --winx-surface-done: #fffcf0;
+  --winx-surface-skipped: #fff0f4;
+  --winx-on-accent: #ffffff;
+  --winx-on-background: #ffffff;
+  --winx-highlight: #ffffff;
+  --winx-heading: #a8c8f0;
+  --winx-danger: #d0457a;
+  --winx-overdue: #b0306a;
+  --winx-savings-text: #8a5a1a;
+  --winx-sky-start: #c8e0f5;
+  --winx-sky-end: #d8d0f0;
+  --winx-bg-blend: multiply;
+  --winx-font-deco: "Cinzel";
 
   /* ── Gradients ── */
   --winx-twilight: linear-gradient(
@@ -34,7 +51,7 @@
   );
 
   /* Kanban card wash — cool blue → lilac */
-  --winx-sky: linear-gradient(135deg, #c8e0f5, #d8d0f0, var(--winx-purple-light));
+  --winx-sky: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end), var(--winx-purple-light));
 
   /* Workspace background — deep dusk purple → rose.
      Endpoint colors exposed for the fade overlay in winx-layout.css */

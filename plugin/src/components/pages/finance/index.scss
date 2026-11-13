@@ -3,9 +3,9 @@
 
 @use "mixins" as *;
 .winx-fin {
-  color: var(--winx-text-dark);
+  color: var(--winx-text);
   font-size: $text-xl;
-  &__title { font-weight: 600; letter-spacing: .02em; color: var(--winx-text-dark); }
+  &__title { font-weight: 600; letter-spacing: .02em; color: var(--winx-text); }
 
   &__total {
     padding: $space-m $space-l; border-radius: $radius-l;
@@ -46,7 +46,7 @@
 
 button.winx-fin__nav-btn {
   all: unset; cursor: pointer; padding: $space-2xs $space-m; border-radius: 8px; line-height: 1.5;
-  background: alpha(--winx-purple, 18%); color: var(--winx-text-dark);
+  background: alpha(--winx-purple, 18%); color: var(--winx-text);
   &:hover { background: alpha(--winx-pink, 32%); }
   &[disabled] { opacity: .3; cursor: default; }
 }

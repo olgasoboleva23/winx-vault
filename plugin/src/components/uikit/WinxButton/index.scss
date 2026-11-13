@@ -13,7 +13,7 @@ button.winx-btn {
     padding: 0;
     border-radius: $round;
     border: $border;
-    background: white(85%);
+    background: alpha(--winx-surface, 85%);
     color: var(--winx-purple-deep);
     box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
     font-size: $text-l;
@@ -31,7 +31,7 @@ button.winx-btn {
     padding: 0 $space-xl;
     border-radius: $pill;
     border: $border;
-    background: white(75%);
+    background: alpha(--winx-surface, 75%);
     color: var(--winx-purple-deep);
     box-shadow: 0 0 6px alpha(--winx-pink-deep, 35%);
     font-size: $text-m;
@@ -90,8 +90,8 @@ button.winx-btn {
     border: none;
     border-radius: $round;
     background: alpha(--winx-pink-deep, 85%);
-    box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
-    color: #fff;
+    box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px var(--winx-highlight) inset;
+    color: var(--winx-on-accent);
     font-family: var(--font-text);
     font-size: $text-3xl;
     line-height: 1;
@@ -100,9 +100,9 @@ button.winx-btn {
     transition: transform $fast ease, box-shadow $fast ease;
 
     @include sparkles {
-      box-shadow: 0 0 14px alpha(--winx-pink-deep, 80%), 0 0 4px #fff inset;
-      text-shadow: 0 0 6px #fff, 0 0 2px #fff;
-      & > svg { filter: drop-shadow(0 0 3px #fff); }
+      box-shadow: 0 0 14px alpha(--winx-pink-deep, 80%), 0 0 4px var(--winx-highlight) inset;
+      text-shadow: 0 0 6px var(--winx-highlight), 0 0 2px var(--winx-highlight);
+      & > svg { filter: drop-shadow(0 0 3px var(--winx-highlight)); }
     }
 
     &.winx-btn--jump:hover { transform: scale(1.08); }
@@ -122,7 +122,7 @@ button.winx-btn {
     border-radius: $rail-radius;
     background: none;
     box-shadow: none;
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     font-family: var(--font-text);
     font-size: $text-l;
     font-weight: 500;

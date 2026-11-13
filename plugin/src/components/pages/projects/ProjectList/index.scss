@@ -11,7 +11,7 @@
   &__header .winx-tabs { font-size: $text-xl; }
   &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: $space-3xl; }
   &__card { cursor: pointer; }
-  &__description { margin-bottom: $space-m; color: var(--winx-text-dark); }
+  &__description { margin-bottom: $space-m; color: var(--winx-text); }
 
   &__next { margin-top: $space-m; cursor: default; }
 

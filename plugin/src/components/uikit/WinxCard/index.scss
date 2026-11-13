@@ -107,7 +107,7 @@
           var(--winx-pink-deep)
         );
         border-radius: 99px;
-        border: $border-width-s solid white(30%);
+        border: $border-width-s solid alpha(--winx-highlight, 30%);
       }
     }
   }
@@ -137,7 +137,7 @@ $cover-h: 150px; /* a cover's height: a picture's frame, not a spacing value */
   &__skeleton {
     height: 72px;
     border-radius: $radius-l;
-    background: linear-gradient(90deg, white(25%) 25%, white(60%) 50%, white(25%) 75%);
+    background: linear-gradient(90deg, alpha(--winx-highlight, 25%) 25%, alpha(--winx-highlight, 60%) 50%, alpha(--winx-highlight, 25%) 75%);
     background-size: 200% 100%;
     animation: winx-shimmer 1.6s linear infinite;
   }
