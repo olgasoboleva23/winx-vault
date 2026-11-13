@@ -1,4 +1,4 @@
-import { FINANCE_PAGE, FOOD, MEDICATION, SHOP, SUPPLIES } from "#/helpers/paths.js";
+import { FINANCE_PAGE, SHOP, SUPPLIES } from "#/helpers/paths.js";
 
 export const WINX_VIEW = "winx";
 
@@ -11,8 +11,8 @@ export const pages = {
   supplies: {
     title: "Supplies", icon: "📦", widget: "supplies", card: true, note: `${SUPPLIES}.md`,
   },
-  meds: { title: "Medication", icon: "💊", widget: "meds", note: MEDICATION },
-  food: { title: "Food", icon: "🍽", widget: "food", card: true, note: FOOD },
+  meds: { title: "Medication", icon: "💊", widget: "meds" },
+  food: { title: "Food", icon: "🍽", widget: "food", card: true },
 };
 
 // Existing links to the old page notes still select their Vue page.

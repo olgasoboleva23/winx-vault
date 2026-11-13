@@ -1,23 +1,11 @@
+import { addToMarket, loadCelestialMarket, loadSupplies, buyMarketItem } from "#/controllers/widgets/market.js";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { migrateMarketText, migrateMarket } from "#/migrations/market.js";
-import { MARKET, MARKET_RECORDS, MARKET_OLD } from "#/helpers/paths.js";
+import { MARKET, MARKET_RECORDS } from "#/helpers/paths.js";
 import { vault } from "./stubs/vault.mjs";
 import { supplyStats } from "#/models/market.js";
 
 const note = `${MARKET}.md`;
-const old = "# List\n- [ ] Tea #food [created:: 2026-11-01]\n- [x] tea #food ✅ 2026-10-01\n- [x] Tea #food ✅ 2026-10-12\n- [-] Soap #home [cancelled:: 2026-11-02]\n```md\n- [ ] example #other\n```\n";
-
-test("Market migration preserves lines, statuses, metadata and code examples", () => {
-  const { log, records } = migrateMarketText(old);
-  assert.equal(log.split("\n").length, old.split("\n").length);
-  assert.deepEqual(log.match(/\d{4}-\d{2}-\d{2}/g), old.match(/\d{4}-\d{2}-\d{2}/g));
-  assert.equal(log, old.replaceAll("Tea #food", "m1").replaceAll("tea #food", "m1").replace("Soap #home", "m2"));
-  assert.equal(records.m1.name, "Tea");
-  assert.equal(records.m1.tag, "#food");
-  assert.equal(Object.keys(records).length, 2);
-  assert.deepEqual(migrateMarketText(log, records), { log, records });
-});
 
 test("Market ids retain purchases after renaming and separate same-named records", () => {
   const history = [
@@ -31,36 +19,6 @@ test("Market ids retain purchases after renaming and separate same-named records
   assert.equal(stats[0].buys, 2);
   assert.equal(stats[0].name, "New name");
 });
-
-test("Market migration backs up before replacing text and can resume after the catalog write", async () => {
-  const { files, app } = vault({ [note]: old });
-  const process = app.vault.process;
-  app.vault.process = async () => { throw new Error("disk full"); };
-  await migrateMarket();
-  assert.equal(files[note], old);
-  assert.equal(files[MARKET_OLD], old);
-  assert.ok(files[MARKET_RECORDS]);
-  app.vault.process = process;
-  await migrateMarket();
-  assert.equal(files[note], migrateMarketText(old).log);
-  const saved = { ...files };
-  await migrateMarket();
-  assert.deepEqual(files, saved);
-});
-
-test("Market migration refuses a concurrent log change without losing the new line", async () => {
-  const { files, app } = vault({ [note]: old });
-  const process = app.vault.process;
-  app.vault.process = (f, fn) => {
-    files[note] += "- [ ] Added elsewhere #food\n";
-    return process(f, fn);
-  };
-  await migrateMarket();
-  assert.equal(files[note], old + "- [ ] Added elsewhere #food\n");
-  assert.equal(files[MARKET_OLD], old);
-});
-
-import { addToMarket, loadCelestialMarket, loadSupplies, buyMarketItem } from "#/controllers/widgets/market.js";
 
 test("Market loaders resolve catalog names and Supplies history; additions serialize and deduplicate", async () => {
   globalThis.window = { moment: () => ({ format: () => "2026-11-11" }) };
@@ -91,22 +49,10 @@ test("A moved market row never buys another item, corrupt catalogs are not overw
   assert.equal(files[note], "- [ ] m2\n");
 });
 
-test("Market migration takes the first tag that is a category", () => {
-  const text = "- [ ] Tea #brand #food";
-  const { records } = migrateMarketText(text);
-  assert.equal(records.m1.tag, "#food");
-  assert.deepEqual(records.m1.tags, ["#brand", "#food"]);
-});
-
 test("A new vault's first market item starts the catalog", async () => {
   const { files } = vault({});
   await addToMarket("Tea", "#food");
   assert.deepEqual(JSON.parse(files[MARKET_RECORDS]), { m1: { name: "Tea", tag: "#food" } }
 );
   assert.equal(files[note], "- [ ] m1\n");
-});
-
-test("Market migration takes non-Latin tags out of the name", () => {
-  const { records } = migrateMarketText("- [ ] Чай #еда");
-  assert.equal(records.m1.name, "Чай");
 });

@@ -19,10 +19,9 @@ export const dayLabel = date =>
 // the medicines of a course, a group each in the window: the name, the dose ("30 капель"; none:
 // the words from the first number of the name), times (morning / day / evening, a dose each;
 // none: once at any time), the meal (before | after | sleep | any), days
-const WHEN = { morning: ["☀️"], both: ["☀️", "🌙"], day: ["🌤"], evening: ["🌙"], any: [] };
+const WHEN = { morning: ["☀️"], day: ["🌤"], evening: ["🌙"] };
 const TIME_KEYS = ["morning", "day", "evening"];
-// old records have a single choice, including "both"; new ones keep the selected times
-const timesOf = times => (Array.isArray(times) ? times : [times]).flatMap(t => WHEN[t] ?? []);
+const timesOf = (times = []) => times.flatMap(t => WHEN[t] ?? []);
 const MEAL_TEXT = { before: "перед едой", after: "после еды", sleep: "перед сном" };
 const MEALS = [...Object.values(MEAL_TEXT), ""];
 const pairs = list => list.map(([label, value]) => ({ label, value }));
@@ -35,8 +34,6 @@ const parts = typed => {
 };
 
 export const nameOf = typed => parts(typed)[0];
-
-export const codeOf = typed => nameOf(typed).slice(0, 2).toUpperCase();
 
 // A unique code per medicine; stored codes keep marks connected through renames and reordering.
 export const withCodes = groups => {

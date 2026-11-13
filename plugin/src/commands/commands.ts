@@ -3,10 +3,7 @@ import { KINDS } from "#/models/kinds.js";
 import { mirrorMobileConfig } from "#/controllers/mobileConfig.js";
 import { Form } from "#/components/uikit/Form/index.ts";
 import { newTask } from "#/controllers/tasks.js";
-import { migrateMarket } from "#/migrations/market.js";
 import { migrateTasks } from "#/migrations/tasks.js";
-import { migrateMeds } from "#/migrations/meds.js";
-import { migrateFood } from "#/migrations/food.js";
 import { openSettings } from "#/controllers/settings.js";
 import { addMarketItem } from "#/controllers/widgets/market.js";
 import { logPurchase } from "#/controllers/widgets/shop.js";
@@ -75,9 +72,6 @@ export function registerCommands(plugin: Plugin) {
 
   // once: the old emoji Master.md and Pool.md to ids, Dataview fields and tasks.json
   add("migrate-tasks", "Migrate tasks", migrateTasks);
-  add("migrate-market", "Migrate market", migrateMarket);
-  add("migrate-meds", "Migrate medication", migrateMeds);
-  add("migrate-food", "Migrate food", migrateFood);
 
   // every Winx command in one list to pick from (Alt+T in this vault's hotkeys.json)
   plugin.addCommand({
