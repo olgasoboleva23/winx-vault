@@ -20,16 +20,16 @@
     transition: background $fast ease;
 
     &:last-child { border-bottom: none; }
-    &:hover { background: fade(white, 30%); border-radius: $radius-m; }
+    &:hover { background: fade(var(--winx-surface), 30%); border-radius: $radius-m; }
   }
 
   &__text {
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     font-size: $text-xl;
   }
 
   /* the bought button's tick (a WinxButton add, jump): its own soft glow at rest */
-  &__tick { width: 30px; height: 19.5px; filter: drop-shadow(0 0 1.5px #fff); }
+  &__tick { width: 30px; height: 19.5px; filter: drop-shadow(0 0 1.5px var(--winx-highlight)); }
 
   /* bought: strike, sparkle burst over the button, slide away */
   &__item--bought {
@@ -107,7 +107,7 @@
     text-align: center;
     font-size: $text-xs;
     letter-spacing: 0;
-    color: #fff;
+    color: var(--winx-on-accent);
     background: var(--winx-pink-deep);
   }
 }

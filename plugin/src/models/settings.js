@@ -12,6 +12,7 @@ export function settingsValues(config) {
   const [, spark, glow, aura] = config.levels.map(l => l.max);
 
   return {
+    theme: config.theme,
     difficulties: config.difficulties.map(({ key, label, xp, gold }) => ({ key, label, xp, gold })),
     areas: config.areas.map(a => ({ ...pick(a), was: a.key, apply: true })),
     spark, glow, aura, base: config.levelCost.base, step: config.levelCost.step,
@@ -20,6 +21,7 @@ export function settingsValues(config) {
 
 // the values as config.json
 export const toConfig = v => ({
+  theme: v.theme,
   difficulties: Object.fromEntries(v.difficulties.map(d =>
     [d.key, { xp: d.key === "none" ? 0 : d.xp, gold: d.gold }])),
   areas: v.areas.map(a => ({ ...pick(a), key: a.key.trim() })),
@@ -43,7 +45,8 @@ export function settingsProblem(v, records, config) {
     if (n) return `«${a.title}» has ${n} tasks: move them to another area first`;
   }
 
-  if (!(v.spark < v.glow && v.glow < v.aura)) return "XP Today: SPARK < GLOW < AURA";
+  if (!(v.spark < v.glow && v.glow < v.aura))
+    return `XP Today: ${config.levels.slice(1, 4).map(l => l.name).join(" < ")}`;
   if (!Number.isFinite(v.base) || v.base <= 0)
     return "the first level must cost a finite number greater than zero";
   if (!Number.isFinite(v.step) || v.step < 0)

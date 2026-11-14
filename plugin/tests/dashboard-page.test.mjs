@@ -45,3 +45,20 @@ test("a dashboard date restored by Back / Forward is drawn", async () => {
   assert.equal(wrapper.attributes("data-date"), "2026-11-05");
   wrapper.unmount();
 });
+
+test("the open dashboard changes its market title when the theme changes", async () => {
+  const { applyConfig } = await import("#/helpers/config.js");
+  const { taskStore } = await import("#/store/tasks.js");
+  const { wrapper } = page();
+  const marketTitle = () => wrapper.findAllComponents({ name: "WinxWidget" })
+    .map(w => w.props("definition").card?.title).filter(Boolean).at(-1);
+  try {
+    assert.equal(marketTitle(), "Celestial");
+    for (const theme of ["gothic", "da2", "winx-dark"]) {
+      applyConfig({ theme });
+      taskStore.version.value++;
+      await vue.nextTick();
+      assert.equal(marketTitle(), theme === "winx-dark" ? "Celestial" : "Market");
+    }
+  } finally { wrapper.unmount(); applyConfig(); }
+});

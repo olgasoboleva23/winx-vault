@@ -18,7 +18,7 @@ $tile: 50px;   // the phone sheet's round tile
     border-radius: $round;
     background: linear-gradient(135deg, var(--winx-gold-bright), var(--winx-gold));
     box-shadow: 0 2px 10px alpha(--winx-gold-deep, 45%);
-    color: var(--winx-purple-deep);
+    color: var(--winx-crest-text);
     font-family: $font-deco;
     font-size: $text-2xl;
   }
@@ -44,7 +44,7 @@ $tile: 50px;   // the phone sheet's round tile
     border: none;
     background: none;
     box-shadow: none;
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     font-family: var(--font-text);
     font-size: $text-2xl;
     font-weight: 500;
@@ -58,7 +58,7 @@ $tile: 50px;   // the phone sheet's round tile
     height: $btn-l;
     border: $border-width-s solid alpha(--winx-pink-deep, 30%);
     border-radius: $round;
-    background: #fff;
+    background: var(--winx-surface);
     font-size: $text-2xl;
   }
   & button#{&}__open-tab {
@@ -67,7 +67,7 @@ $tile: 50px;   // the phone sheet's round tile
     padding: $space-2xs $space-s;
     border: $border-width-s solid alpha(--winx-pink-deep, 35%);
     border-radius: $radius-s;
-    background: #fff;
+    background: var(--winx-surface);
     color: alpha(--winx-purple-deep, 70%);
     font-size: $text-l;
     opacity: 0;

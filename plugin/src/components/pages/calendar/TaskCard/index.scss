@@ -5,12 +5,12 @@
   position: relative;
   padding: $space-m;
   border-bottom: $border-width-s dashed fade(var(--winx-gold-deep), 35%);
-  color: var(--winx-text-dark);
+  color: var(--winx-text);
   cursor: grab;
   transition: background $fast ease;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: fade(white, 35%); border-radius: $radius-m; }
+  &:hover { background: fade(var(--winx-surface), 35%); border-radius: $radius-m; }
   &--paused { opacity: 0.55; }
   &__text { font-size: $text-xl; line-height: 1.35; }
   &__meta { margin-top: $space-2xs; font-size: $text-s; color: fade(var(--winx-purple-deep), 75%); }
@@ -24,9 +24,9 @@ $fade: 18px;   // the buttons' background fades in over this much of the text
   button.winx-task-btns__del--armed {
     width: auto;
     padding: 0 $space-m;
-    border-color: #d0457a;
-    background: #d0457a;
-    color: #fff;
+    border-color: var(--winx-danger);
+    background: var(--winx-danger);
+    color: var(--winx-on-accent);
     font-size: $text-m;
   }
 }
@@ -65,7 +65,7 @@ body {
         margin-top: $space-s;
         padding: $space-xs;
         border-radius: $radius-m;
-        background: white(40%);
+        background: alpha(--winx-surface, 40%);
         button { flex-shrink: 0; }
       }
       [data-swipeable]:not([data-swipe]) .winx-task-actions { display: none; }
@@ -76,7 +76,7 @@ body {
       }
       [data-swipe="ready"] .winx-task-primary {
         scale: 1.15;
-        color: var(--winx-text-dark);
+        color: var(--winx-on-gold);
         border-color: var(--winx-gold-deep);
         box-shadow: 0 0 12px var(--winx-gold);
       }

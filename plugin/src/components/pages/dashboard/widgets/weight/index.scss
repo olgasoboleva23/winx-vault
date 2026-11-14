@@ -5,14 +5,14 @@
      the layout settled) would keep the whole widget that wide */
   display: grid; grid-template-columns: minmax(0, 1fr); gap: $space-m;
   &__head { display: flex; align-items: baseline; gap: $space-l; }
-  &__now { font-family: $font-deco; font-size: $text-4xl; color: var(--winx-text-dark); }
+  &__now { font-family: $font-deco; font-size: $text-4xl; color: var(--winx-text); }
   &__delta { font-size: $text-m; color: var(--winx-purple-deep); }
   &__list { justify-self: start; }
   &__modes { align-items: center; }   /* the pills and the ＋ on one middle line */
   /* which journal (more than one): a small select under the pills */
   & &__journal {
     justify-self: start; height: $btn-s; padding: 0 $space-m; border: $border; border-radius: $pill;
-    background: white(75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer;
+    background: alpha(--winx-surface, 75%); color: var(--winx-purple-deep); font-size: $text-m; cursor: pointer;
   }
   /* weight ↔ a journal, and the journal's form: a level 0–3, the reasons */
   &__log {

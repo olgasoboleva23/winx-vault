@@ -1,7 +1,7 @@
 @use "mixins" as *;
 /* ===== A text field (block winx-input); the tag in front outweighs Obsidian's input styles ===== */
 input.winx-input {
-  color: var(--winx-text-dark);
+  color: var(--winx-text);
   box-shadow: none;
   /* the field: a finger's height on the pink paper */
   &.winx-input--field {
@@ -9,7 +9,7 @@ input.winx-input {
     padding: 0 $space-xl;
     border: $border;
     border-radius: $radius-l;
-    background: white(65%);
+    background: alpha(--winx-surface, 65%);
     font-size: $text-2xl;
     &::placeholder { color: var(--winx-purple); }
   }

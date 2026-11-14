@@ -11,8 +11,8 @@
     height: $pill-h;
     border-radius: $pill;
     background: alpha(--winx-pink-deep, 85%);
-    box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px #fff inset;
-    color: #fff;
+    box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%), 0 0 4px var(--winx-highlight) inset;
+    color: var(--winx-on-accent);
     font-size: $text-3xl;
   }
   &__star { animation: winx-spin 0.9s linear infinite; }

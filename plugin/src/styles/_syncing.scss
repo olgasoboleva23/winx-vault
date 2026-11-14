@@ -12,7 +12,7 @@
   border-radius: $pill;
   background: alpha(--winx-pink-deep, 85%);
   box-shadow: 0 0 12px alpha(--winx-pink-deep, 60%);
-  color: #fff;
+  color: var(--winx-on-accent);
   font-size: $text-m;
   &__star { animation: winx-spin 1.2s linear infinite; }
 }

@@ -19,7 +19,7 @@ $pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
   padding: $space-m $space-s;
   border: $border-width-m solid var(--winx-gold);   // a half-step border, as the mockup's
   border-radius: $pill-radius;
-  background: white(92%);
+  background: alpha(--winx-surface, 92%);
   box-shadow: 0 4px 16px alpha(--winx-purple-deep, 22%);
 
   // the item's 32px less its border
@@ -53,7 +53,7 @@ $pill-radius: 22px;   // the pill's corners: it is tall, not a capsule
     flex-direction: row;
     justify-content: space-around;
     gap: 0;
-    padding: $space-xs 0;
+    padding: $space-xs $space-s;
     border: none;
     border-top: $border-width-m solid var(--winx-gold);
     border-radius: 0;

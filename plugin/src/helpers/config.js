@@ -3,6 +3,22 @@
 // difficulties' XP and gold, the areas, XP Today's thresholds and the level cost: applyConfig,
 // called by the task store whenever the file is read. A task's record names its difficulty and
 // area by `key`.
+export const THEMES = [
+  { value: "winx", label: "Winx" },
+  { value: "winx-dark", label: "Winx dark" },
+  { value: "gothic", label: "Gothic" },
+  { value: "da2", label: "Dragon Age 2" },
+];
+
+const WINX_LABELS = {
+  xp: ["VOID", "SPARK", "GLOW", "AURA", "TRANSFORMATION"], market: "Celestial",
+};
+
+export const themeLabels = theme => ({
+  gothic: { xp: ["Затишье", "Искра", "Поток", "Разряд", "Буря"], market: "Market" },
+  da2: { xp: ["Покой", "Пробуждение", "Пламя", "Сияние", "Справедливость"], market: "Market" },
+}[theme] ?? WINX_LABELS);
+
 const DIFFICULTIES = [
   { label: "⭐ Easy", key: "easy", xp: 5, gold: 2 },
   { label: "⭐⭐ Medium", key: "medium", xp: 10, gold: 5 },
@@ -29,7 +45,7 @@ const LEVEL_COST = { base: 100, step: 25 };
 
 // filled by applyConfig below
 const config = {
-  difficulties: [], areas: [], levels: [], levelCost: { base: 0, step: 0 },
+  theme: "winx", difficulties: [], areas: [], levels: [], levelCost: { base: 0, step: 0 },
   xpMap: {}, areaMap: {}, areaIcons: {}, areaColors: {},
   marketCategories: [
     { label: "🌿 Harvest", tag: "#food" },
@@ -49,6 +65,7 @@ export function applyConfig(json = {}) {
   const areas = Array.isArray(json.areas) && json.areas.length ? json.areas : AREAS;
   const lv = { ...LEVELS, ...json.levels }, cost = { ...LEVEL_COST, ...json.levelCost };
 
+  config.theme = THEMES.some(t => t.value === json.theme) ? json.theme : "winx";
   config.difficulties = DIFFICULTIES.map(x =>
     ({ ...x, xp: x.key === "none" ? 0 : num(d[x.key]?.xp, x.xp),
       gold: num(d[x.key]?.gold, x.gold) }));
@@ -57,12 +74,14 @@ export function applyConfig(json = {}) {
     name: a.name ?? a.title,
     color: a.color ?? null, label: `${a.icon ?? "✦"} ${a.title ?? a.key}`,
   }));
+  const names = themeLabels(config.theme).xp;
+
   config.levels = [
-    { name: "VOID", max: 0, cls: "v0" },
-    { name: "SPARK", max: num(lv.spark, LEVELS.spark), cls: "v1" },
-    { name: "GLOW", max: num(lv.glow, LEVELS.glow), cls: "v2" },
-    { name: "AURA", max: num(lv.aura, LEVELS.aura), cls: "v3" },
-    { name: "TRANSFORMATION", max: Infinity, cls: "v4" },
+    { name: names[0], max: 0, cls: "v0" },
+    { name: names[1], max: num(lv.spark, LEVELS.spark), cls: "v1" },
+    { name: names[2], max: num(lv.glow, LEVELS.glow), cls: "v2" },
+    { name: names[3], max: num(lv.aura, LEVELS.aura), cls: "v3" },
+    { name: names[4], max: Infinity, cls: "v4" },
   ];
   config.levelCost = {
     // Non-positive costs can leave levelInfo subtracting zero or a negative number forever.

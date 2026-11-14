@@ -13,7 +13,7 @@ $wing: 40px;   // the corner wings' size
   /* the Kanban card's blue */
   border: $border-width-s solid var(--winx-blue);
   background: var(--winx-sky);
-  box-shadow: 0 0 16px rgb(168 200 240 / 60%);   /* --winx-blue at 60%; alpha() would serialize it as color(srgb …) */
+  box-shadow: 0 0 16px alpha(--winx-blue, 60%);
   /* the card's fairy wings in two corners */
   @include wings($wing, 3px);
   > * { position: relative; z-index: $z-over; }
@@ -26,7 +26,7 @@ $wing: 40px;   // the corner wings' size
     padding: $space-xs $space-s;
     border-radius: $radius-m;
     font-size: $text-l;
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     cursor: grab;
   }
   &__date { font-size: $text-s; font-style: normal; color: fade(var(--winx-purple-deep), 65%); }

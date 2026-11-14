@@ -5,7 +5,7 @@
 .winx-project {
   &__back { margin-bottom: $space-xl; }
   &__header { margin-bottom: $space-xl; }
-  &__description { margin-bottom: $space-m; color: var(--winx-text-dark); }
+  &__description { margin-bottom: $space-m; color: var(--winx-text); }
   &__body {
     display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: $space-xl;
     align-items: start;
@@ -25,7 +25,7 @@
   &__stage-count { font-size: $text-l; color: alpha(--winx-purple-deep, 70%); }
   &__stage-done {
     @include center;
-    width: $btn-s; height: $btn-s; border: $border; border-radius: $round; background: white(85%);
+    width: $btn-s; height: $btn-s; border: $border; border-radius: $round; background: alpha(--winx-surface, 85%);
     color: var(--winx-purple-deep);
   }
   &__stage-head { margin-bottom: $space-s; }

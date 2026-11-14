@@ -9,11 +9,11 @@
     background: var(--winx-twilight);
     border: $border-width-l solid var(--winx-border);
     border-radius: 18px;
-    color: white;
+    color: var(--winx-on-background);
     font-size: 1.4em;
     font-weight: 600;
     box-shadow: 0 4px 16px alpha(--winx-purple-deep, 25%);
-    text-shadow: 0 1px 2px alpha(--winx-text-dark, 30%);
+    text-shadow: 0 1px 2px alpha(--winx-text, 30%);
 
     &-icon {
       font-size: 1.3em;
@@ -35,7 +35,7 @@
     background: var(--winx-pink-light);
     border: $border;
     border-radius: $radius-xl;
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     font-size: 1em;
     font-weight: 500;
     cursor: pointer;
@@ -74,7 +74,7 @@
     );
     border: $border;
     border-radius: $pill;
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     font-weight: 700;
     font-size: 0.9em;
   }

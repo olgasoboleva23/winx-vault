@@ -224,3 +224,21 @@ test("a Markdown block passes its own arguments, source and dated context to its
     delete blocks.probe;
   }
 });
+
+
+test("a theme change redraws visible widgets and catches up a kept hidden widget when shown", async () => {
+  const s = slow(), { host, el } = mount({ load: s.load });
+  s.loads[0].ok({ n: 1 }); await settle();
+  bus.fire("winx:theme");
+  assert.equal(s.loads.length, 2);
+  s.loads[1].ok({ n: 2 }); await settle();
+  el.dataset.hidden = "1";
+  bus.fire("winx:theme");
+  assert.equal(s.loads.length, 2);
+  delete el.dataset.hidden;
+  bus.fire("winx:page");
+  assert.equal(s.loads.length, 3);
+  host.unload();
+  bus.fire("winx:theme");
+  assert.equal(s.loads.length, 3);
+});

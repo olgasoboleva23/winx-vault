@@ -13,7 +13,7 @@
   }
 
   &__text {
-    color: var(--winx-text-dark);
+    color: var(--winx-text);
     font-size: $text-xl;
   }
 
@@ -21,18 +21,18 @@
     margin-top: $space-s;
     height: 10px;
     border-radius: $radius-s;
-    background: white(40%);
+    background: alpha(--winx-surface, 40%);
     position: relative;   /* no overflow clip, so the (optional) tip sparkles can fly out */
   }
 
   &__progress-fill {
     height: 100%;
-    background: linear-gradient(
+    background: var(--winx-progress-fill, linear-gradient(
       90deg,
       var(--winx-pink-deep),
       var(--winx-gold),
       var(--winx-pink-deep)
-    );
+    ));
     background-size: 200% 100%;
     animation: winx-shimmer 3s linear infinite;
     border-radius: $radius-s;
@@ -44,7 +44,7 @@
   &__vital {
     font-size: $text-s;
     color: var(--winx-purple-deep);
-    &-name { width: 1.8em; font-family: $font-deco; letter-spacing: 1px; }
+    &-name { flex: 0 0 2.6em; white-space: nowrap; font-family: $font-deco; letter-spacing: 1px; }
     &-value { min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; }   /* 50/50 and 0/4: bars of one length */
     &-bar {
       height: $space-m;

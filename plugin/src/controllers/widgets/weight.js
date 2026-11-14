@@ -7,7 +7,7 @@ import { addDays, dm, todayYmd } from "#/helpers/dates.js";
 import { WeightLog } from "#/models/weightLog.js";
 import { readJournals } from "#/controllers/journals.js";
 import { cycleLog } from "./cycle.js";
-import { chartColor } from "#/helpers/chart.js";
+import { chartColor, chartScale } from "#/helpers/chart.js";
 import { edit } from "#/helpers/files.js";
 import { amount } from "#/helpers/format.js";
 import { WEIGHT } from "#/helpers/paths.js";
@@ -34,7 +34,10 @@ function weightChart(days, vals) {
     options: {
       plugins: { legend: { display: false } },
       scales: {
-        y: { suggestedMin: Math.min(...seen) - 0.5, suggestedMax: Math.max(...seen) + 0.5 },
+        x: chartScale(),
+        y: { ...chartScale(),
+          suggestedMin: Math.min(...seen) - 0.5, suggestedMax: Math.max(...seen) + 0.5,
+        },
       },
     },
   } : null;
@@ -65,7 +68,9 @@ function logChart(days, entries, period) {
           return e ? `${e.level}${e.reasons.length ? " · " + e.reasons.join(", ") : ""}` : "";
         } },
       } },
-      scales: { y: { min: 0, max: 3, ticks: { stepSize: 1 } } },
+      scales: { x: chartScale(), y: { ...chartScale(), min: 0, max: 3,
+        ticks: { ...chartScale().ticks, stepSize: 1 },
+      } },
     },
   };
 }
