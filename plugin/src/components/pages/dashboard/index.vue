@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { Platform } from "obsidian";
+import config, { themeLabels } from "#/helpers/config.js";
+import { taskStore } from "#/store/tasks.js";
 import { app } from "#/helpers/app.js";
 import { useObsidian } from "#/composables/vueApp.ts";
 import { useBusy, useNewDay } from "#/composables/use.js";
@@ -23,12 +25,15 @@ watch(date, () => app.workspace.trigger("winx:date"), { flush: "post" });
 useBusy(owner, path => path !== POMODORO && path.startsWith(`${DATA}/`),
   () => root.value, "winx-dash--busy");
 const drawn = () => root.value.classList.remove("winx-dash--busy");
-const columns = [
-  [["levelToday", "Level"], ["cycle", "Cycle"], ["pomodoro", "Pomodoro"], ["goals", "Goals"]],
-  [["lifeAreas", "Life Areas"], ["weight", "Weight"]],
-  [["xpToday", "XP Today"], ["quests", "Quests", "scroll"],
-    ["celestialMarket", "Celestial", "scroll"]],
-];
+const columns = computed(() => {
+  taskStore.version.value;
+  return [
+    [["levelToday", "Level"], ["cycle", "Cycle"], ["pomodoro", "Pomodoro"], ["goals", "Goals"]],
+    [["lifeAreas", "Life Areas"], ["weight", "Weight"]],
+    [["xpToday", "XP Today"], ["quests", "Quests", "scroll"],
+      ["celestialMarket", themeLabels(config.theme).market, "scroll"]],
+  ];
+});
 </script>
 
 <template>

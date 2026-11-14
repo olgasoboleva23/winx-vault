@@ -82,7 +82,7 @@ defineExpose({ state, refresh });
   <component
     :is="def.card ? WinxCard : 'div'"
     ref="root"
-    v-bind="def.card"
+    v-bind="definition.card"
     :class="def.bodyClass"
   >
     <template v-if="def.cardButton" #button><component :is="def.cardButton" /></template>

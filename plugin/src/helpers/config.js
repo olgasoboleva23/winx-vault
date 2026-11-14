@@ -10,6 +10,15 @@ export const THEMES = [
   { value: "da2", label: "Dragon Age 2" },
 ];
 
+const WINX_LABELS = {
+  xp: ["VOID", "SPARK", "GLOW", "AURA", "TRANSFORMATION"], market: "Celestial",
+};
+
+export const themeLabels = theme => ({
+  gothic: { xp: ["Затишье", "Искра", "Поток", "Разряд", "Буря"], market: "Market" },
+  da2: { xp: ["Покой", "Пробуждение", "Пламя", "Сияние", "Справедливость"], market: "Market" },
+}[theme] ?? WINX_LABELS);
+
 const DIFFICULTIES = [
   { label: "⭐ Easy", key: "easy", xp: 5, gold: 2 },
   { label: "⭐⭐ Medium", key: "medium", xp: 10, gold: 5 },
@@ -65,12 +74,14 @@ export function applyConfig(json = {}) {
     name: a.name ?? a.title,
     color: a.color ?? null, label: `${a.icon ?? "✦"} ${a.title ?? a.key}`,
   }));
+  const names = themeLabels(config.theme).xp;
+
   config.levels = [
-    { name: "VOID", max: 0, cls: "v0" },
-    { name: "SPARK", max: num(lv.spark, LEVELS.spark), cls: "v1" },
-    { name: "GLOW", max: num(lv.glow, LEVELS.glow), cls: "v2" },
-    { name: "AURA", max: num(lv.aura, LEVELS.aura), cls: "v3" },
-    { name: "TRANSFORMATION", max: Infinity, cls: "v4" },
+    { name: names[0], max: 0, cls: "v0" },
+    { name: names[1], max: num(lv.spark, LEVELS.spark), cls: "v1" },
+    { name: names[2], max: num(lv.glow, LEVELS.glow), cls: "v2" },
+    { name: names[3], max: num(lv.aura, LEVELS.aura), cls: "v3" },
+    { name: names[4], max: Infinity, cls: "v4" },
   ];
   config.levelCost = {
     // Non-positive costs can leave levelInfo subtracting zero or a negative number forever.

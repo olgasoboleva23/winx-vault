@@ -45,7 +45,8 @@ export function settingsProblem(v, records, config) {
     if (n) return `«${a.title}» has ${n} tasks: move them to another area first`;
   }
 
-  if (!(v.spark < v.glow && v.glow < v.aura)) return "XP Today: SPARK < GLOW < AURA";
+  if (!(v.spark < v.glow && v.glow < v.aura))
+    return `XP Today: ${config.levels.slice(1, 4).map(l => l.name).join(" < ")}`;
   if (!Number.isFinite(v.base) || v.base <= 0)
     return "the first level must cost a finite number greater than zero";
   if (!Number.isFinite(v.step) || v.step < 0)

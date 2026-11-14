@@ -96,3 +96,24 @@ test("chart colors come from the Winx container instead of Obsidian's palette", 
   assert.equal(chartColor("--winx-pink-deep"), "rgba(163, 32, 31, 1)");
   root.remove(); document.body.style.removeProperty("--winx-pink-deep");
 });
+
+test("theme XP names follow the same custom thresholds and survive settings round trips", () => {
+  const expected = {
+    winx: ["VOID", "SPARK", "GLOW", "AURA", "TRANSFORMATION"],
+    "winx-dark": ["VOID", "SPARK", "GLOW", "AURA", "TRANSFORMATION"],
+    gothic: ["Затишье", "Искра", "Поток", "Разряд", "Буря"],
+    da2: ["Покой", "Пробуждение", "Пламя", "Сияние", "Справедливость"],
+  };
+  try {
+    for (const [theme, names] of Object.entries(expected)) {
+      applyConfig({ theme, levels: { spark: 12, glow: 24, aura: 36 } });
+      assert.deepEqual(config.levels.map(l => l.name), names);
+      assert.deepEqual(config.levels.map(l => l.max), [0, 12, 24, 36, Infinity]);
+      assert.equal(config.levels.find(l => 25 <= l.max).name, names[3]);
+      const saved = toConfig(settingsValues(config));
+      assert.deepEqual(saved.levels, { spark: 12, glow: 24, aura: 36 });
+      applyConfig(saved);
+      assert.deepEqual(config.levels.map(l => l.name), names);
+    }
+  } finally { applyConfig(); }
+});
