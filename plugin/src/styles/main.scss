@@ -2,6 +2,10 @@
 // used to be injected last). A component's own block is its index.scss next to it (components/…);
 // here, the shared look (tokens, mixins, cards' grid, layout, …). Keep the order: rules of the same
 // weight win by order. Partials @use "mixins" by the load path (esbuild.config.mjs: src/styles).
+// Variables: Sass $… in _mixins.scss holds fixed sizes and durations, substituted at build time.
+// CSS var(--winx-…) stays in the output so colours, fonts and decoration can change with the theme
+// without rebuilding (_tokens.scss provides defaults, _themes.scss overrides them).
+// Some Sass values combine both, e.g. $border uses a fixed width and var(--winx-border) for its colour.
 @use "utilities";   // layout utilities first: the blocks win over them
 @use "animations";
 @use "assets";
