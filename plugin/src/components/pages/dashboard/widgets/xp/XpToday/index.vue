@@ -6,7 +6,10 @@ defineProps({ state: { type: Object, required: true } });
 <template>
   <div class="winx-xp">
     <div class="winx-xp__header winx-flex winx-between">
-      <div class="winx-xp__aura">🔮 {{ state.data.aura }} • {{ state.data.todayXP }} XP</div>
+      <div class="winx-xp__aura">
+        <span class="winx-xp__icon" aria-hidden="true">🔮</span>
+        {{ state.data.aura }} • {{ state.data.todayXP }} XP
+      </div>
       <div>{{ state.data.trend }} 7d</div>
     </div>
     <div class="winx-xp__grid">

@@ -35,13 +35,13 @@
   0%,
   100% {
     filter: brightness(100%)
-      drop-shadow(0 0 8px alpha(--winx-gold, 90%))
-      drop-shadow(0 0 16px alpha(--winx-gold, 50%));
+      drop-shadow(0 0 8px fade(var(--winx-level-glow, var(--winx-gold)), 90%))
+      drop-shadow(0 0 16px fade(var(--winx-level-glow, var(--winx-gold)), 50%));
   }
   50% {
     filter: brightness(130%)
-      drop-shadow(0 0 8px alpha(--winx-gold, 90%))
-      drop-shadow(0 0 16px alpha(--winx-gold, 50%));
+      drop-shadow(0 0 8px fade(var(--winx-level-glow, var(--winx-gold)), 90%))
+      drop-shadow(0 0 16px fade(var(--winx-level-glow, var(--winx-gold)), 50%));
   }
 }
 

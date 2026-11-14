@@ -46,7 +46,7 @@
 
   &__cell,
   &__swatch {
-    background: var(--winx-purple-deep);
+    background: var(--winx-xp-color, var(--winx-purple-deep));
     opacity: var(--cell-opacity, 0.9);
 
     &--v0 {

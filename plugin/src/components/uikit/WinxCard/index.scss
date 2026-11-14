@@ -37,19 +37,20 @@
     &::after {
       content: "";
       position: absolute;
-      width: $deco;
-      height: $deco;
-      background: var(--winx-wing-svg) 0 0 / contain no-repeat;
+      width: min(#{$deco}, var(--winx-corner-size, #{$deco}));
+      height: min(#{$deco}, var(--winx-corner-size, #{$deco}));
+      filter: var(--winx-corner-filter, none);
+      background: var(--winx-corner-svg, var(--winx-wing-svg)) 0 0 / contain no-repeat;
       pointer-events: none;
     }
 
     &::before {
-      top: $space-xs;
-      left: $space-xs;
+      top: var(--winx-corner-inset, #{$space-xs});
+      left: var(--winx-corner-inset, #{$space-xs});
     }
     &::after {
-      bottom: $space-xs;
-      right: $space-xs;
+      bottom: var(--winx-corner-inset, #{$space-xs});
+      right: var(--winx-corner-inset, #{$space-xs});
       transform: scale(-1, -1);
     }
     /* no wings (WinxCard :wings="false", the projects' cards): the title without their room */

@@ -1,3 +1,5 @@
+@use "mixins" as *;
+
 // The choice lives on body; colours stay inside Winx, away from Obsidian and Kanban.
 body.winx-theme-winx-dark :is(
   .workspace-leaf-content[data-type="winx"], .block-language-winx, .winx-tooltip, .winx-syncing
@@ -37,6 +39,7 @@ body.winx-theme-winx-dark :is(
   --winx-dusk-rose: #2a2350;
   --winx-chart-text: #cfc1df;
   --winx-chart-grid: #cfc1df;
+  --winx-corner-filter: brightness(0.65) saturate(0.65);
   --winx-font-deco: "Cinzel";
   --winx-bg-blend: normal;
   --winx-bg-image: var(--winx-theme-image, none);
@@ -48,91 +51,164 @@ body.winx-theme-winx-dark :is(
 body.winx-theme-gothic :is(
   .workspace-leaf-content[data-type="winx"], .block-language-winx, .winx-tooltip, .winx-syncing
 ) {
-  --winx-pink-light: #2a2219;
-  --winx-pink: #352b1f;
-  --winx-pink-deep: #d9822b;
-  --winx-purple-light: #3a3024;
-  --winx-purple: #b18e60;
-  --winx-purple-deep: #e3d6b8;
-  --winx-blue: #6fa0e0;
-  --winx-blue-deep: #4d82c2;
-  --winx-gold: #b8913f;
-  --winx-gold-bright: #e5bd71;
-  --winx-gold-deep: #d0a253;
-  --winx-lavender: #d7c7a8;
-  --winx-sheet: #211b15;
-  --winx-text: #e3d6b8;
-  --winx-border: #5c4a35;
-  --winx-surface: #30271d;
-  --winx-surface-warm: #342a20;
-  --winx-surface-done: #3e3623;
-  --winx-surface-skipped: #472820;
-  --winx-crest-text: #1b140d;
-  --winx-on-gold: #1b140d;
-  --winx-on-selected: #1b140d;
-  --winx-on-accent: #1b140d;
-  --winx-on-background: #f2e8d2;
-  --winx-highlight: #e5bd71;
-  --winx-heading: #e8b060;
-  --winx-danger: #e26d4e;
-  --winx-overdue: #ef9674;
-  --winx-savings-text: #e8b060;
-  --winx-sky-start: #263647;
-  --winx-sky-end: #313a40;
-  --winx-dusk-dark: #17130f;
-  --winx-dusk-rose: #2a2119;
-  --winx-chart-text: #c5b496;
-  --winx-chart-grid: #c5b496;
+  --winx-pink-light: #202e3b;
+  --winx-pink: #19232d;
+  --winx-pink-deep: #70b9e8;
+  --winx-purple-light: #26394a;
+  --winx-purple: #8eaec3;
+  --winx-purple-deep: #c1d9e8;
+  --winx-blue: #88c9f0;
+  --winx-blue-deep: #499ed5;
+  --winx-gold: #81bde0;
+  --winx-gold-bright: #c7eaff;
+  --winx-gold-deep: #a8d6ef;
+  --winx-lavender: #b9cedb;
+  --winx-sheet: #131d27;
+  --winx-text: #d8e3ea;
+  --winx-border: #526575;
+  --winx-surface: #233542;
+  --winx-surface-warm: #293d4b;
+  --winx-surface-done: #253c46;
+  --winx-surface-skipped: #412c35;
+  --winx-crest-text: #14222c;
+  --winx-on-gold: #14222c;
+  --winx-on-selected: #14222c;
+  --winx-on-accent: #102331;
+  --winx-on-background: #e4f3ff;
+  --winx-highlight: #b3e3ff;
+  --winx-heading: #b3dcf4;
+  --winx-danger: #f08c93;
+  --winx-overdue: #f5a2aa;
+  --winx-savings-text: #a8d6ef;
+  --winx-sky-start: #203747;
+  --winx-sky-end: #182733;
+  --winx-dusk-dark: #0c1722;
+  --winx-dusk-rose: #182d3b;
+  --winx-chart-text: #bdcfdd;
+  --winx-chart-grid: #8da6b8;
+  --winx-wing-svg: none;
+  --winx-corner-svg: var(--winx-metal-corner);
+  --winx-corner-size: 32px;
+  --winx-corner-inset: #{-$border-width-s};
+  --winx-scroll-hint-svg: var(--winx-barrier-scroll-svg);
+  --winx-scroll-still-svg: var(--winx-scroll-arrow-svg);
+  --winx-star-icon: var(--winx-ore-icon);
+  --winx-star-sparkle-svg: none;
+  --winx-xp-color: var(--winx-pink-deep);
+  --winx-progress-fill: var(--winx-pink-deep);
+  --winx-level-glow: #7fcaff;
   --winx-font-deco: "Pirata One";
   --winx-bg-blend: normal;
   --winx-bg-image: var(--winx-theme-image, none);
   --winx-twilight: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end));
   --winx-sky: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end), var(--winx-purple-light));
   --winx-dusk: linear-gradient(135deg, var(--winx-dusk-dark), var(--winx-dusk-rose));
+
+  button.winx-btn:is(.winx-btn--add, .winx-btn--rail) {
+    &::after {
+      inset: 0;
+      background: #b3e3ff;
+      mask: var(--winx-barrier-lightning) center / 100% 100% no-repeat;
+      filter: drop-shadow(0 0 3px #4299ff);
+    }
+    &:hover::after { animation: winx-barrier-lightning 2.8s linear infinite; }
+  }
+  .winx-xp__icon {
+    display: inline-block;
+    width: $text-2xl;
+    height: $text-2xl;
+    font-size: 0;
+    vertical-align: middle;
+    background: var(--winx-level-glow);
+    mask: var(--winx-xp-lightning) center / contain no-repeat;
+  }
+
 }
 
 body.winx-theme-da2 :is(
   .workspace-leaf-content[data-type="winx"], .block-language-winx, .winx-tooltip, .winx-syncing
 ) {
-  --winx-pink-light: #2b2524;
-  --winx-pink: #392927;
-  --winx-pink-deep: #a3201f;
-  --winx-purple-light: #423332;
-  --winx-purple: #b89080;
-  --winx-purple-deep: #ebe2d0;
-  --winx-blue: #4a6c8f;
-  --winx-blue-deep: #7192ad;
-  --winx-gold: #c9a14a;
-  --winx-gold-bright: #e4c578;
-  --winx-gold-deep: #d9b45e;
-  --winx-lavender: #d6c6b9;
-  --winx-sheet: #211c1b;
-  --winx-text: #ebe2d0;
-  --winx-border: #6b5a3a;
-  --winx-surface: #302928;
-  --winx-surface-warm: #362c2b;
-  --winx-surface-done: #3b3324;
-  --winx-surface-skipped: #472422;
-  --winx-crest-text: #211c1b;
-  --winx-on-gold: #211c1b;
-  --winx-on-selected: #211c1b;
-  --winx-on-accent: #f3e9d6;
-  --winx-on-background: #f3e9d6;
-  --winx-highlight: #e4c578;
-  --winx-heading: #c9a14a;
-  --winx-danger: #e96f5d;
-  --winx-overdue: #ec9584;
-  --winx-savings-text: #d9b45e;
-  --winx-sky-start: #29323b;
-  --winx-sky-end: #393339;
-  --winx-dusk-dark: #1a1716;
-  --winx-dusk-rose: #2e2220;
-  --winx-chart-text: #cbbeb1;
-  --winx-chart-grid: #cbbeb1;
+  --winx-pink-light: #f3f0e8;
+  --winx-pink: #e7e4dd;
+  --winx-pink-deep: #762d3c;
+  --winx-purple-light: #ddd7d2;
+  --winx-purple: #866772;
+  --winx-purple-deep: #642735;
+  --winx-blue: #b8d7e2;
+  --winx-blue-deep: #45758a;
+  --winx-gold: #997d62;
+  --winx-gold-bright: #ccbca6;
+  --winx-gold-deep: #762d3c;
+  --winx-lavender: #e8e0db;
+  --winx-sheet: #f1eee6;
+  --winx-text: #30272b;
+  --winx-border: #aaa29a;
+  --winx-surface: #faf7f0;
+  --winx-surface-warm: #f4ede3;
+  --winx-surface-done: #e3e7dc;
+  --winx-surface-skipped: #f1dce0;
+  --winx-crest-text: #642735;
+  --winx-on-gold: #faf7f0;
+  --winx-on-selected: #faf7f0;
+  --winx-on-accent: #faf7f0;
+  --winx-on-background: #fff4e8;
+  --winx-highlight: #fff8ee;
+  --winx-heading: #642735;
+  --winx-danger: #a5293c;
+  --winx-overdue: #922b3c;
+  --winx-savings-text: #762d3c;
+  --winx-sky-start: #dfd7d1;
+  --winx-sky-end: #d2c4be;
+  --winx-dusk-dark: #5b3439;
+  --winx-dusk-rose: #b16e64;
+  --winx-chart-text: #65575c;
+  --winx-chart-grid: #8c8182;
+  --winx-wing-svg: none;
+  --winx-corner-svg: var(--winx-stone-corner);
+  --winx-corner-size: 32px;
+  --winx-corner-inset: #{-$border-width-s};
+  --winx-scroll-hint-svg: var(--winx-justice-scroll-svg);
+  --winx-star-icon: var(--winx-justice-icon);
+  --winx-star-sparkle-svg: none;
+  --winx-xp-color: var(--winx-pink-deep);
+  --winx-progress-fill: var(--winx-pink-deep);
+  --winx-level-glow: #a8e9ff;
   --winx-font-deco: "Cinzel Decorative";
   --winx-bg-blend: normal;
   --winx-bg-image: var(--winx-theme-image, none);
   --winx-twilight: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end));
   --winx-sky: linear-gradient(135deg, var(--winx-sky-start), var(--winx-sky-end), var(--winx-purple-light));
   --winx-dusk: linear-gradient(135deg, var(--winx-dusk-dark), var(--winx-dusk-rose));
+
+  button.winx-btn:is(.winx-btn--add, .winx-btn--rail) {
+    &::after {
+      inset: 0;
+      mask: none;
+      background: none;
+      border-radius: inherit;
+      box-shadow: inset 0 0 6px #a8e9ff, 0 0 8px #79bfe4;
+      transition: opacity $slow ease;
+    }
+  }
+  .winx-xp__icon {
+    display: inline-block;
+    width: $text-2xl;
+    height: $text-2xl;
+    font-size: 0;
+    vertical-align: middle;
+    background: var(--winx-level-glow);
+    mask: var(--winx-xp-flame) center / contain no-repeat;
+  }
+
+  .winx-btn.winx-btn--pill {
+    background: var(--winx-pink-deep) !important;
+    color: var(--winx-on-accent) !important;
+  }
+
+}
+
+@keyframes winx-barrier-lightning {
+  0%, 16%, 30%, 100% { opacity: 0; }
+  4%, 22% { opacity: 1; }
+  10%, 26% { opacity: 0.3; }
 }

@@ -88,13 +88,14 @@ $tap: 44px;         // a row or a field on the phone: a finger's size
   &::before, &::after {
     content: "";
     position: absolute;
-    width: $size;
-    height: $size;
-    background: var(--winx-wing-svg) no-repeat center / contain;
+    width: min(#{$size}, var(--winx-corner-size, #{$size}));
+    height: min(#{$size}, var(--winx-corner-size, #{$size}));
+    filter: var(--winx-corner-filter, none);
+    background: var(--winx-corner-svg, var(--winx-wing-svg)) no-repeat center / contain;
     pointer-events: none;
   }
-  &::before { top: $inset; left: $inset; }
-  &::after  { bottom: $inset; right: $inset; transform: scale(-1, -1); }
+  &::before { top: var(--winx-corner-inset, #{$inset}); left: var(--winx-corner-inset, #{$inset}); }
+  &::after  { bottom: var(--winx-corner-inset, #{$inset}); right: var(--winx-corner-inset, #{$inset}); transform: scale(-1, -1); }
 }
 
 // black at some opacity, for shadows and masks
